@@ -1,8 +1,8 @@
 ﻿# Social Worker Application
 ## What is Social Worker for?
-The **Social Worker Application** is an add-in web application for adding sales order and invoices in [Corprio](https://www.corprio.com) using conversations with a chatbot.
+The **Social Worker Application** is an add-in web application for posting product catalogue on Facebook and Instagram and adding sales order in [Corprio](https://www.corprio.com) using conversations with a chatbot.
 ## Technology
-The application is developed using ASP.NET Core 6.
+The application is developed using ASP.NET Core 6. It communicates with Facebook via Meta API.
 ## Register Social Worker in Corprio
 The Social Worker Application must be registered in [Corprio Portal](https://portal.corprio.com) before users can subscribe it.  Register the application with the following parameters.
 

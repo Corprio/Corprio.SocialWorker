@@ -21,7 +21,7 @@ namespace Corprio.SocialWorker.Models
         
         public List<KeyValuePair<Guid, string>> PrdMemory { get; set; } = new List<KeyValuePair<Guid, string>>();
 
-        public List<KeyValuePair<string, List<string>>> VarMemory { get; set; } = new List<KeyValuePair<string, List<string>>>;
+        public List<KeyValuePair<string, List<string>>> VarMemory { get; set; } = new List<KeyValuePair<string, List<string>>>();
 
         public List<KeyValuePair<string, string>> AttValMemory { get; set; } = new List<KeyValuePair<string, string>>();
 
@@ -48,6 +48,9 @@ namespace Corprio.SocialWorker.Models
     public class BotBasket
     {
         public Guid ProductID { get; set; }
+        
+        public string Name { get; set; }
+
         public decimal Quantity { get; set; }
     }
 

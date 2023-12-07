@@ -217,6 +217,15 @@ namespace Corprio.SocialWorker.Helpers
             return await AddProductToCart(product);
         }
 
+        private async Task<string> UpdateAttributeValuesMemory(string attributeType, string name)
+        {
+            Bot.AttValMemory.Add(new KeyValuePair<string, string>(attributeType, name));
+            KeyValuePair<string, List<string>> attributeValues = Bot.VarMemory.FirstOrDefault(x => x.Key == attributeType);
+            attributeValues = new KeyValuePair<string, List<string>>(attributeType, new List<string>());
+            await UpdateProfile();
+            return await AskQuestion();
+        }
+
         private async Task<string> AskQuestion()
         {
             switch (Bot.ThinkingOf)
@@ -253,16 +262,26 @@ namespace Corprio.SocialWorker.Helpers
 
                     if (attributeValues.Value.Count == 1)
                     {
-                        Bot.AttValMemory.Add(new KeyValuePair<string, string>(attributeValues.Key, attributeValues.Value[0]));
-                        attributeValues = new KeyValuePair<string, List<string>>(attributeValues.Key, new List<string>());                        
-                        await UpdateProfile();
-                        return await AskQuestion();
+                        return await UpdateAttributeValuesMemory(attributeType: attributeValues.Key, name: attributeValues.Value[0]);
+
+                        //Bot.AttValMemory.Add(new KeyValuePair<string, string>(attributeValues.Key, attributeValues.Value[0]));
+                        //attributeValues = new KeyValuePair<string, List<string>>(attributeValues.Key, new List<string>());
+                        //await UpdateProfile();
+                        //return await AskQuestion();
                     }
 
                     string choices = await ProductVariationChoiceString();
                     return ThusSpokeBabel(key: "AskProductVariation", placeholders: new List<string>() { attributeValues.Key, choices });
+
                 case BotTopic.Quantity:
-                    return ThusSpokeBabel("AskQty");
+                    BotBasket basket = Bot.Cart.FirstOrDefault(x => x.Quantity == 0);
+                    if (basket == null)
+                    {
+                        Log.Error("The Bot was expected one basket with zero quantity but found none.");
+                        return await SoftReboot();
+                    }
+                    return ThusSpokeBabel(key: "AskQty", placeholders: new List<string>() { basket.Name } );
+
                 default:
                     return ThusSpokeBabel("Err_DefaultMsg");
             }
@@ -270,7 +289,7 @@ namespace Corprio.SocialWorker.Helpers
 
         private async Task<string> AddProductToCart(Product product)
         {
-            Bot.Cart.Add(new BotBasket { ProductID = product.ID });
+            Bot.Cart.Add(new BotBasket { ProductID = product.ID, Name = product.Name });
             Bot.PrdMemory = new List<KeyValuePair<Guid, string>>();
             Bot.ThinkingOf = BotTopic.Quantity;
             await UpdateProfile();
@@ -290,12 +309,12 @@ namespace Corprio.SocialWorker.Helpers
         private async Task<string> HandleMC(string input)
         {
             if (!int.TryParse(input, out int num))
-                return $"{ThusSpokeBabel("Err_NotUnderstand")}\n{AskQuestion()}";
+                return $"{ThusSpokeBabel("Err_NotUnderstand")}\n{await AskQuestion()}";
 
             switch (Bot.ThinkingOf)
             {
                 case BotTopic.Product:
-                    if (num > Bot.PrdMemory.Count || num < 0) return $"{ThusSpokeBabel("Err_NotUnderstand")}\n{AskQuestion()}";
+                    if (num > Bot.PrdMemory.Count || num < 0) return $"{ThusSpokeBabel("Err_NotUnderstand")}\n{await AskQuestion()}";
                     if (num == 0)
                     {
                         Bot.ThinkingOfMC = false;
@@ -310,10 +329,13 @@ namespace Corprio.SocialWorker.Helpers
                     {
                         Log.Error("The bot was expecting at least one attribute with values, but there was none.");
                         return await SoftReboot();
-                    }
-                    // stopped at here...
-                    var relevantVar = Bot.VarMemory.FirstOrDefault(x => x.Value.Any());
-                    return null;
+                    }                    
+                    
+                    if (num > attributeValues.Value.Count || num < 1) 
+                        return $"{ThusSpokeBabel("Err_NotUnderstand")}\n{await AskQuestion()}";                    
+                    
+                    return await UpdateAttributeValuesMemory(attributeType: attributeValues.Key, name: attributeValues.Value[num - 1]);
+
                 default:
                     Log.Error($"The bot was expecting multiple choices but the topic was {Bot.ThinkingOf}");
                     return await SoftReboot();
@@ -366,7 +388,7 @@ namespace Corprio.SocialWorker.Helpers
         {
             input = input.ToLower();
             if (!BabelFish.YesNo.ContainsKey(input)) 
-                return $"{ThusSpokeBabel("Err_NotUnderstand")}\n{AskQuestion()}";
+                return $"{ThusSpokeBabel("Err_NotUnderstand")}\n{await AskQuestion()}";
 
             Bot.ThinkingOfYN = false;
             if (BabelFish.YesNo[input] == 2)
@@ -416,7 +438,7 @@ namespace Corprio.SocialWorker.Helpers
         }
 
         public async Task<string> ThinkBeforeSpeak(string input)
-        {            
+        {                        
             if (input.ToLower() == BabelFish.KillCode) return await HandleCancel();
             
             // TODO - pick up the chat based on:
@@ -451,6 +473,10 @@ namespace Corprio.SocialWorker.Helpers
                     }
 
                     return ThusSpokeBabel(key: "CannotFindProduct", new List<string>() { input });
+                
+                case BotTopic.Product:
+                    return await AskQuestion();
+
                 case BotTopic.Quantity:
                 case BotTopic.Email:
                 case BotTopic.Name:

@@ -9,7 +9,7 @@ namespace Corprio.SocialWorker.Dictionaries
         {
             ["AskProduct"] = new Dictionary<BotLanguage, string>()
             {
-                [BotLanguage.English] = "If you are want to purchase a product, please input its name or product code, or visit the relevant catalogue. ",
+                [BotLanguage.English] = "If you want to purchase a product, please input its name or product code, or visit the relevant catalogue. ",
                 [BotLanguage.TraditionalChinese] = "",
                 [BotLanguage.SimplifiedChinese] = "",
             },
@@ -51,7 +51,7 @@ namespace Corprio.SocialWorker.Dictionaries
             },            
             ["AskQty"] = new Dictionary<BotLanguage, string>()
             {
-                [BotLanguage.English] = "How many units do you want to buy? ",
+                [BotLanguage.English] = "How many units of {0} do you want to buy? ",
                 [BotLanguage.TraditionalChinese] = "",
                 [BotLanguage.SimplifiedChinese] = "",
             },

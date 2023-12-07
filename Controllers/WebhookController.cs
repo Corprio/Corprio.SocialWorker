@@ -181,7 +181,16 @@ namespace Corprio.SocialWorker.Controllers
 
                     var bot = new DomesticHelper(client: corprioClient, organizationID: organizationID, metaProfile: metaProfile,
                         senderId: messaging.Sender.Id, detectedLocales: messaging.Message?.NLP?.DetectedLocales);
-                    string response = await bot.ThinkBeforeSpeak(messaging.Message.Text);
+                    string response;
+                    try
+                    {
+                        response = await bot.ThinkBeforeSpeak(messaging.Message.Text);
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.Error(ex.Message);
+                        return StatusCode(200);
+                    }
                     if (string.IsNullOrWhiteSpace(response)) continue;
 
                     string endPoint = payload.Object == "instagram" ? $"{BaseUrl}/{ApiVersion}/me/messages" : $"{BaseUrl}/{ApiVersion}/{messaging.Recipient.Id}/messages";
@@ -214,7 +223,7 @@ namespace Corprio.SocialWorker.Controllers
         /// <returns>Status code</returns>
         [HttpPost("/webhook")]
         public async Task<IActionResult> HandleWebhookPost([FromServices] HttpClient httpClient)
-        {                        
+        {            
             string hash = Request.Headers.ContainsKey("x-hub-signature-256") ? Request.Headers["x-hub-signature-256"] : string.Empty;
             (bool verified, string requestString) = await HashCheck(request: Request, metaHash: hash);
             if (!verified)
