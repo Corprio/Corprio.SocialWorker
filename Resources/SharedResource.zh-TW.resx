@@ -1,0 +1,366 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="AppDescription" xml:space="preserve">
+    <value>Corprio 銷售管理是一個免費應用軟件，用於管理您的銷售交易（例如訂單和發票）</value>
+  </data>
+  <data name="BillSalesOrder" xml:space="preserve">
+    <value>從銷售訂單開具發票</value>
+  </data>
+  <data name="btnCreateInvoice" xml:space="preserve">
+    <value>開具發票</value>
+  </data>
+  <data name="ConfirmReturnInvoice" xml:space="preserve">
+    <value>退回發票將創建銷售退回記錄，已開發票的產品將自動退回倉庫。 您確定要退還此發票嗎？</value>
+  </data>
+  <data name="ConfirmVoidInvoice" xml:space="preserve">
+    <value>您確定要取消這張發票嗎？</value>
+  </data>
+  <data name="ConfirmVoidOrder" xml:space="preserve">
+    <value>您確定要取消此銷售訂單嗎？</value>
+  </data>
+  <data name="ConfirmVoidSalesReturn" xml:space="preserve">
+    <value>您確定要取消此銷售退貨嗎？</value>
+  </data>
+  <data name="DepositAmount" xml:space="preserve">
+    <value>訂金</value>
+  </data>
+  <data name="DiscountPercent" xml:space="preserve">
+    <value>折扣 %</value>
+  </data>
+  <data name="Feature1Description" xml:space="preserve">
+    <value>你可以簡單地處理公司的日常銷售操作，包括管理你客戶的訂單，處理訂單，發出及打印發票，減低出錯而流失客戶的機會</value>
+  </data>
+  <data name="Feature1Title" xml:space="preserve">
+    <value>管理你的銷售流程</value>
+  </data>
+  <data name="Feature2Description" xml:space="preserve">
+    <value>你可以簡單地使用預設的報告模板，或根據公司的需求，使用簡單易用的報告設計工具，自訂客戶資料，修改模板設計。</value>
+  </data>
+  <data name="Feature2Title" xml:space="preserve">
+    <value>可自訂的報告格式</value>
+  </data>
+  <data name="Free to Use" xml:space="preserve">
+    <value>免費使用</value>
+  </data>
+  <data name="FreeToUseDescription" xml:space="preserve">
+    <value>使用這應用不會收取任何費用，請即加入Corprio開始使用吧！</value>
+  </data>
+  <data name="Help" xml:space="preserve">
+    <value>幫助</value>
+  </data>
+  <data name="Home page" xml:space="preserve">
+    <value>主頁</value>
+  </data>
+  <data name="Invoice" xml:space="preserve">
+    <value>發票</value>
+  </data>
+  <data name="InvoiceDescription" xml:space="preserve">
+    <value>發票是已確認的銷售，你可以在這裡搜尋和打印發票。</value>
+  </data>
+  <data name="InvoiceHasBeenVoided" xml:space="preserve">
+    <value>由於發票已作廢，因此無法執行所需的操作。</value>
+  </data>
+  <data name="InvoiceNum" xml:space="preserve">
+    <value>發票號碼</value>
+  </data>
+  <data name="InvoicePrintReportID" xml:space="preserve">
+    <value>發票打印輸出的報告ID</value>
+  </data>
+  <data name="InvoicePrintReportID_Description" xml:space="preserve">
+    <value>用於打印發票的報告ID</value>
+  </data>
+  <data name="InvoicePrintReportID_Warning" xml:space="preserve">
+    <value>除非已創建自己的發票佈局，否則請勿更改此設置</value>
+  </data>
+  <data name="IsInvoiceReturned" xml:space="preserve">
+    <value>已退貨</value>
+  </data>
+  <data name="Join for FREE!" xml:space="preserve">
+    <value>免費申請</value>
+  </data>
+  <data name="More apps from Corprio..." xml:space="preserve">
+    <value>更多Corprio應用...</value>
+  </data>
+  <data name="MsgForOwnerOnly" xml:space="preserve">
+    <value>只有組織所有者可以進行更改</value>
+  </data>
+  <data name="OrderHasBeenVoided" xml:space="preserve">
+    <value>該銷售訂單已作廢！ 它不能再次作廢。</value>
+  </data>
+  <data name="Print" xml:space="preserve">
+    <value>列印</value>
+  </data>
+  <data name="Recent Invoices" xml:space="preserve">
+    <value>最近的發票</value>
+  </data>
+  <data name="Reports" xml:space="preserve">
+    <value>報告</value>
+  </data>
+  <data name="ReturnInvoice" xml:space="preserve">
+    <value>銷售退貨</value>
+  </data>
+  <data name="Sales Dashboard" xml:space="preserve">
+    <value>銷售儀表板</value>
+  </data>
+  <data name="Sales Location" xml:space="preserve">
+    <value>銷售地點</value>
+  </data>
+  <data name="Sales Rep" xml:space="preserve">
+    <value>銷售代表</value>
+  </data>
+  <data name="SalesLocationDescription" xml:space="preserve">
+    <value>銷售地點是發生交易的地點，可用作實際店舖。</value>
+  </data>
+  <data name="SalesOrder" xml:space="preserve">
+    <value>銷售訂單</value>
+  </data>
+  <data name="SalesOrderDescription" xml:space="preserve">
+    <value>銷售訂單是客人的購買請求，當貨品送出給客人，你應該將訂單轉為發票以確認完成銷售。</value>
+  </data>
+  <data name="SalesOrderNum" xml:space="preserve">
+    <value>銷售訂單號</value>
+  </data>
+  <data name="SalesOrderPrintReportID" xml:space="preserve">
+    <value>打印銷售訂單的報告ID</value>
+  </data>
+  <data name="SalesOrderPrintReportID_Description" xml:space="preserve">
+    <value>用於打印銷售訂單的報告ID</value>
+  </data>
+  <data name="SalesOrderPrintReportID_Warning" xml:space="preserve">
+    <value>除非已創建自己的銷售訂單佈局，否則請勿更改此設定</value>
+  </data>
+  <data name="SalesRepDescription" xml:space="preserve">
+    <value>銷售代表是負責訂單的人，如果你要追蹤訂單紀錄或計算佣金，可以使用銷售代表。</value>
+  </data>
+  <data name="SalesReturn" xml:space="preserve">
+    <value>銷售退貨</value>
+  </data>
+  <data name="SalesReturnDescription" xml:space="preserve">
+    <value>銷售退貨是客戶退回購買的商品或服務的記錄。</value>
+  </data>
+  <data name="SalesReturnHasBeenVoided" xml:space="preserve">
+    <value>銷售退貨已作廢！ 它不能再次作廢。</value>
+  </data>
+  <data name="Settings" xml:space="preserve">
+    <value>設定</value>
+  </data>
+  <data name="SOWarehouseDesc" xml:space="preserve">
+    <value>用於扣除庫存的倉庫</value>
+  </data>
+  <data name="Warehouse" xml:space="preserve">
+    <value>貨倉</value>
+  </data>
+  <data name="PaymentLink" xml:space="preserve">
+    <value>支付連結</value>
+  </data>
+  <data name="PaymentLinkDesc" xml:space="preserve">
+    <value>您可以把此超連結分享給客戶，以進行網上付款。</value>
+  </data>
+  <data name="Share" xml:space="preserve">
+    <value>分享</value>
+  </data>
+  <data name="PaymentLinkCopied" xml:space="preserve">
+    <value>支付連結已復製到剪貼板!</value>
+  </data>
+  <data name="PaidAmount" xml:space="preserve">
+    <value>已付金額</value>
+  </data>
+  <data name="MsgInvoiceFullyPaid" xml:space="preserve">
+    <value>發票已全額支付！</value>
+  </data>
+  <data name="MsgInvoiceIsVoided" xml:space="preserve">
+    <value>發票已作廢！</value>
+  </data>
+  <data name="MsgSalesOrderFullyPaid" xml:space="preserve">
+    <value>銷售訂單已全額支付！</value>
+  </data>
+  <data name="MsgSalesOrderIsVoided" xml:space="preserve">
+    <value>銷售訂單已作廢！</value>
+  </data>
+  <data name="Recent Orders" xml:space="preserve">
+    <value>最近的訂單</value>
+  </data>
+  <data name="InvoiceAmount" xml:space="preserve">
+    <value>發票金額</value>
+  </data>
+  <data name="InvoiceCount" xml:space="preserve">
+    <value>發票數量</value>
+  </data>
+  <data name="SearchInvoiceTips" xml:space="preserve">
+    <value>輸入發票號、銷售訂單號、客戶名稱、電話、產品代碼或名稱進行搜索</value>
+  </data>
+  <data name="SearchOrderTips" xml:space="preserve">
+    <value>輸入銷售訂單號、客戶名稱、電話、產品代碼或名稱進行搜索</value>
+  </data>
+  <data name="AppSlogan" xml:space="preserve">
+    <value>輕鬆準確地 &lt;br&gt; 管理您的銷售</value>
+  </data>
+  <data name="SearchReturnTips" xml:space="preserve">
+    <value>輸入銷售退貨編號。 發票號碼、客戶姓名、電話、產品代碼或要搜索的名稱</value>
+  </data>
+  <data name="Line" xml:space="preserve">
+    <value>行</value>
+  </data>
+  <data name="Approve" xml:space="preserve">
+    <value>批准</value>
+  </data>
+  <data name="MsgNoApprovePermission" xml:space="preserve">
+    <value>抱歉，您沒有“批准”權限。</value>
+  </data>
+  <data name="PromptUnapprove" xml:space="preserve">
+    <value>您確定要取消批准此記錄嗎？</value>
+  </data>
+  <data name="Unapprove" xml:space="preserve">
+    <value>取消批准</value>
+  </data>
+  <data name="AddLine" xml:space="preserve">
+    <value>添加產品</value>
+  </data>
+  <data name="Chat" xml:space="preserve">
+    <value>聊天</value>
+  </data>
+  <data name="Discounts" xml:space="preserve">
+    <value>折扣</value>
+  </data>
+  <data name="InvoiceBot" xml:space="preserve">
+    <value>發票機器人</value>
+  </data>
+  <data name="ProductName" xml:space="preserve">
+    <value>產品名稱</value>
+  </data>
+  <data name="Qty" xml:space="preserve">
+    <value>數量</value>
+  </data>
+  <data name="SalesOrderBot" xml:space="preserve">
+    <value>銷售訂單機器人</value>
+  </data>
+  <data name="Subtotal" xml:space="preserve">
+    <value>小計</value>
+  </data>
+  <data name="TotalAmount" xml:space="preserve">
+    <value>總金額</value>
+  </data>
+  <data name="TotalQty" xml:space="preserve">
+    <value>總數量</value>
+  </data>
+  <data name="UnitPrice" xml:space="preserve">
+    <value>單價</value>
+  </data>
+</root>

@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.6.33829.357
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Corprio.SocialWorker", "Corprio.SocialWorker.csproj", "{F6FE85F8-C705-43D5-B7D5-FD3A1FF04D2D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+		Sandbox|Any CPU = Sandbox|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F6FE85F8-C705-43D5-B7D5-FD3A1FF04D2D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F6FE85F8-C705-43D5-B7D5-FD3A1FF04D2D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F6FE85F8-C705-43D5-B7D5-FD3A1FF04D2D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F6FE85F8-C705-43D5-B7D5-FD3A1FF04D2D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F6FE85F8-C705-43D5-B7D5-FD3A1FF04D2D}.Sandbox|Any CPU.ActiveCfg = Sandbox|Any CPU
+		{F6FE85F8-C705-43D5-B7D5-FD3A1FF04D2D}.Sandbox|Any CPU.Build.0 = Sandbox|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {EB5C4255-5BF9-48B6-A36D-0F6B01A71EB5}
+	EndGlobalSection
+EndGlobal

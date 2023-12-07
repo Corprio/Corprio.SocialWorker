@@ -1,0 +1,10 @@
+﻿body {
+    /* main color of app is green */
+    --darker-mainc: #355905;
+    --dark-mainc: #5b940f;
+    --mainc: #7bc21d;
+    --light-mainc: #a6de4d;
+    --lighter-mainc: #cff591;
+    --faint-mainc: #f3ffe0;
+}
+

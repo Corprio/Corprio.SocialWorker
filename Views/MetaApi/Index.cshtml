@@ -1,0 +1,31 @@
+﻿@using Corprio.Core.Utility
+@{
+    ViewData["Title"] = "Permission Configuration";
+    Guid organizationID = Context.SelectedOrganizationID() ?? Guid.Empty;
+}
+
+<script src="~/js/views/MetaApi/Index.js" asp-append-version="true"></script>
+<script>
+    // use vdata to pass parameters to TS
+    const vdata = {
+        actions: {
+            refreshAccessToken: '@StringHelper.Encode(@Url.Action("RefreshAccessToken", "MetaApi", new { organizationID }))',
+        },
+        applicationSetting: {
+        }
+    };
+</script>
+<script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js"></script>
+
+<p id="profile"></p>
+<!-- note:'business_management' is required for viewing pages managed by the user-->
+
+<div id="status" class="mt-1 mb-0"></div>
+
+<div class="container-fluid mt-md-4 mt-5">
+    <fb:login-button id="fb-login-btn"
+                     scope="email, public_profile, business_management,
+                        pages_manage_metadata, pages_messaging, pages_manage_posts, pages_manage_engagement,
+                        instagram_basic, instagram_content_publish, instagram_manage_comments, instagram_manage_messages">
+    </fb:login-button>
+</div>

@@ -1,0 +1,76 @@
+// Configure bundling and minification for the project.
+// More info at https://go.microsoft.com/fwlink/?LinkId=808241
+[
+  {
+    "outputFileName": "wwwroot/css/site.min.css",
+    // An array of relative input file paths. Globbing patterns supported
+    "inputFiles": [
+      "wwwroot/css/site.css",
+      "wwwroot/css/chatroom.css"
+    ]
+  },
+  {
+    "outputFileName": "wwwroot/js/site.min.js",
+    "inputFiles": [
+      "wwwroot/js/site.js",
+      "wwwroot/js/views/Shared/_Layout.js"
+    ],
+    // Optionally specify minification options
+    "minify": {
+      "enabled": true,
+      "renameLocals": true
+    },
+    // Optionally generate .map file
+    "sourceMap": false
+  },
+  {
+    "outputFileName": "wwwroot/css/viewer.part.bundle.min.css",
+    "inputFiles": [
+      "node_modules/@devexpress/analytics-core/dist/css/dx-analytics.common.css",
+      "node_modules/@corprio/aspnetcore-site/dist/css/dx-analytics.material.corprio-scheme.css",
+      "node_modules/devexpress-reporting/dist/css/dx-webdocumentviewer.css"
+    ],
+    "minify": {
+      "enabled": true,
+      "adjustRelativePaths": false
+    }
+  },
+  {
+    "outputFileName": "wwwroot/css/designer.part.bundle.min.css",
+    "inputFiles": [
+      "node_modules/@devexpress/analytics-core/dist/css/dx-querybuilder.css",
+      "node_modules/devexpress-reporting/dist/css/dx-reportdesigner.css"
+    ],
+    "minify": {
+      "enabled": true,
+      "adjustRelativePaths": false
+    }
+  },
+  {
+    "outputFileName": "wwwroot/js/viewer.part.bundle.min.js",
+    "inputFiles": [
+      "node_modules/@devexpress/analytics-core/dist/js/dx-analytics-core.min.js",
+      "node_modules/devexpress-reporting/dist/js/dx-webdocumentviewer.min.js"
+    ],
+    "minify": {
+      "enabled": false
+    },
+    "sourceMap": false
+  },
+  {
+    "outputFileName": "wwwroot/js/designer.part.bundle.min.js",
+    "inputFiles": [
+      "node_modules/@devexpress/analytics-core/dist/js/dx-querybuilder.min.js",
+      "node_modules/devexpress-reporting/dist/js/dx-reportdesigner.min.js",
+      "node_modules/ace-builds/src-min-noconflict/ace.js",
+      "node_modules/ace-builds/src-min-noconflict/ext-language_tools.js",
+      "node_modules/ace-builds/src-min-noconflict/theme-dreamweaver.js",
+      "node_modules/ace-builds/src-min-noconflict/theme-ambiance.js"
+    ],
+    "minify": {
+      "enabled": false
+    },
+    "sourceMap": false
+  }
+]
+

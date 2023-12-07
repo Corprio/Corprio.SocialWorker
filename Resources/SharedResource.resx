@@ -1,0 +1,372 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="AppDescription" xml:space="preserve">
+    <value>Corprio Sales Master is a free application software for managing your sales transactions such as orders and invoices</value>
+  </data>
+  <data name="BillSalesOrder" xml:space="preserve">
+    <value>Bill sales order</value>
+  </data>
+  <data name="btnCreateInvoice" xml:space="preserve">
+    <value>Create invoice</value>
+  </data>
+  <data name="ConfirmReturnInvoice" xml:space="preserve">
+    <value>Returning an invoice will create a sales return record and invoiced products will be returned to warehouse automatically.  Are you sure to proceed returning this invoice?</value>
+  </data>
+  <data name="ConfirmVoidInvoice" xml:space="preserve">
+    <value>Are you sure to void this invoice?</value>
+  </data>
+  <data name="ConfirmVoidOrder" xml:space="preserve">
+    <value>Are you sure to void this sales order?</value>
+  </data>
+  <data name="ConfirmVoidSalesReturn" xml:space="preserve">
+    <value>Are you sure to void this sales return?</value>
+  </data>
+  <data name="DepositAmount" xml:space="preserve">
+    <value>Deposit amount</value>
+  </data>
+  <data name="DiscountPercent" xml:space="preserve">
+    <value>Discount %</value>
+  </data>
+  <data name="Feature1Description" xml:space="preserve">
+    <value>You can manage your orders from customers easily and then process orders, issue and print invoices for your daily operations with minimal faults.</value>
+  </data>
+  <data name="Feature1Title" xml:space="preserve">
+    <value>Manage Your Sales Operations</value>
+  </data>
+  <data name="Feature2Description" xml:space="preserve">
+    <value>You can simply use the prebuilt report templates or you can add your own fields and adjust the layout with a user-friendly report builder, based on your company’s needs.</value>
+  </data>
+  <data name="Feature2Title" xml:space="preserve">
+    <value>User-customizable Report Format</value>
+  </data>
+  <data name="Free to Use" xml:space="preserve">
+    <value>Free to Use</value>
+  </data>
+  <data name="FreeToUseDescription" xml:space="preserve">
+    <value>You will not be charged for using this app forever. Join Corprio now to get started.</value>
+  </data>
+  <data name="Help" xml:space="preserve">
+    <value>Help</value>
+  </data>
+  <data name="Home page" xml:space="preserve">
+    <value>Home</value>
+  </data>
+  <data name="Invoice" xml:space="preserve">
+    <value>Invoice</value>
+  </data>
+  <data name="InvoiceDescription" xml:space="preserve">
+    <value>Invoices are the confirmed sales of your business. You can search and print the invoices here.</value>
+  </data>
+  <data name="InvoiceHasBeenVoided" xml:space="preserve">
+    <value>Cannot perform the required action because the invoice has been voided.</value>
+  </data>
+  <data name="InvoiceNum" xml:space="preserve">
+    <value>Inv No.</value>
+  </data>
+  <data name="InvoicePrintReportID" xml:space="preserve">
+    <value>Report ID for invoice printout</value>
+  </data>
+  <data name="InvoicePrintReportID_Description" xml:space="preserve">
+    <value>ID of the report layout used for printing invoices</value>
+  </data>
+  <data name="InvoicePrintReportID_Warning" xml:space="preserve">
+    <value>Do not change this unless you have created your own invoice layout</value>
+  </data>
+  <data name="IsInvoiceReturned" xml:space="preserve">
+    <value>Returned</value>
+  </data>
+  <data name="Join for FREE!" xml:space="preserve">
+    <value>Join for FREE!</value>
+  </data>
+  <data name="Line" xml:space="preserve">
+    <value>Line</value>
+  </data>
+  <data name="More apps from Corprio..." xml:space="preserve">
+    <value>More apps from Corprio...</value>
+  </data>
+  <data name="MsgForOwnerOnly" xml:space="preserve">
+    <value>Only the organization owner can make changes</value>
+  </data>
+  <data name="OrderHasBeenVoided" xml:space="preserve">
+    <value>The sales order has been voided already!  It cannot be voided again.</value>
+  </data>
+  <data name="Print" xml:space="preserve">
+    <value>Print</value>
+  </data>
+  <data name="Recent invoices" xml:space="preserve">
+    <value>Recent Invoices</value>
+  </data>
+  <data name="Reports" xml:space="preserve">
+    <value>Reports</value>
+  </data>
+  <data name="ReturnInvoice" xml:space="preserve">
+    <value>Sales return</value>
+  </data>
+  <data name="Sales Dashboard" xml:space="preserve">
+    <value>Sales Dashboard</value>
+  </data>
+  <data name="Sales Location" xml:space="preserve">
+    <value>Sales Location</value>
+  </data>
+  <data name="Sales Rep" xml:space="preserve">
+    <value>Sales Rep</value>
+  </data>
+  <data name="SalesLocationDescription" xml:space="preserve">
+    <value>Sales locations are the places where the transactions are taken place. A physical shop is a good example of a sales location.</value>
+  </data>
+  <data name="SalesOrder" xml:space="preserve">
+    <value>Sales Order</value>
+  </data>
+  <data name="SalesOrderDescription" xml:space="preserve">
+    <value>Sales orders are the buying requests from customers. You should bill your sales orders into invoices when they are delivered or picked up.</value>
+  </data>
+  <data name="SalesOrderNum" xml:space="preserve">
+    <value>SO No.</value>
+  </data>
+  <data name="SalesOrderPrintReportID" xml:space="preserve">
+    <value>Report ID for sales order printout</value>
+  </data>
+  <data name="SalesOrderPrintReportID_Description" xml:space="preserve">
+    <value>ID of the report layout used for printing sales orders</value>
+  </data>
+  <data name="SalesOrderPrintReportID_Warning" xml:space="preserve">
+    <value>Do not change this unless you have created your own sales order layout</value>
+  </data>
+  <data name="SalesRepDescription" xml:space="preserve">
+    <value>Sales reps (sales representatives) are the sales persons who take the order or invoice in charge. When you want to trace an order or calculate commission for a staff, sales rep is helpful for you.</value>
+  </data>
+  <data name="SalesReturn" xml:space="preserve">
+    <value>Sales Return</value>
+  </data>
+  <data name="SalesReturnDescription" xml:space="preserve">
+    <value>Sales return are records where customers return purchased goods or services.</value>
+  </data>
+  <data name="SalesReturnHasBeenVoided" xml:space="preserve">
+    <value>The sales return has been voided already!  It cannot be voided again.</value>
+  </data>
+  <data name="Settings" xml:space="preserve">
+    <value>Settings</value>
+  </data>
+  <data name="SOWarehouseDesc" xml:space="preserve">
+    <value>Warehouse for deducting stock</value>
+  </data>
+  <data name="Warehouse" xml:space="preserve">
+    <value>Warehouse</value>
+  </data>
+  <data name="PaymentLink" xml:space="preserve">
+    <value>Payment Link</value>
+  </data>
+  <data name="PaymentLinkDesc" xml:space="preserve">
+    <value>You can share this hyperlink with your customer for making online payment.</value>
+  </data>
+  <data name="Share" xml:space="preserve">
+    <value>Share</value>
+  </data>
+  <data name="PaymentLinkCopied" xml:space="preserve">
+    <value>Payment link has been copied to the clipboard!</value>
+  </data>
+  <data name="PaidAmount" xml:space="preserve">
+    <value>Paid Amount</value>
+  </data>
+  <data name="MsgInvoiceFullyPaid" xml:space="preserve">
+    <value>Invoice is fully paid!</value>
+  </data>
+  <data name="MsgInvoiceIsVoided" xml:space="preserve">
+    <value>Invoice has been voided!</value>
+  </data>
+  <data name="MsgSalesOrderFullyPaid" xml:space="preserve">
+    <value>Sales order is fully paid!</value>
+  </data>
+  <data name="MsgSalesOrderIsVoided" xml:space="preserve">
+    <value>Sales order has been voided!</value>
+  </data>
+  <data name="Recent Orders" xml:space="preserve">
+    <value>Recent Orders</value>
+  </data>
+  <data name="InvoiceAmount" xml:space="preserve">
+    <value>Invoice amount</value>
+  </data>
+  <data name="InvoiceCount" xml:space="preserve">
+    <value>Count</value>
+  </data>
+  <data name="SearchInvoiceTips" xml:space="preserve">
+    <value>Input invoice number, sales order number, customer name, phone, product code or name to search</value>
+  </data>
+  <data name="SearchOrderTips" xml:space="preserve">
+    <value>Input sales order number, customer name, phone, product code or name to search</value>
+  </data>
+  <data name="AppSlogan" xml:space="preserve">
+    <value>Manage your sales &lt;br&gt; easily and accurately</value>
+  </data>
+  <data name="SearchReturnTips" xml:space="preserve">
+    <value>Input sales return number. invoice number, customer name, phone, product code or name to search</value>
+  </data>
+  <data name="Approve" xml:space="preserve">
+    <value>Approve</value>
+  </data>
+  <data name="MsgNoApprovePermission" xml:space="preserve">
+    <value>Sorry, you do not have the "Approve" permission.</value>
+  </data>
+  <data name="PromptUnapprove" xml:space="preserve">
+    <value>Are you sure to unapprove this record?</value>
+  </data>
+  <data name="Unapprove" xml:space="preserve">
+    <value>Unapprove</value>
+  </data>
+  <data name="AddLine" xml:space="preserve">
+    <value>Add product</value>
+  </data>
+  <data name="Chat" xml:space="preserve">
+    <value>Chat</value>
+  </data>
+  <data name="Discounts" xml:space="preserve">
+    <value>Discounts</value>
+  </data>
+  <data name="InvoiceBot" xml:space="preserve">
+    <value>Invoice Bot</value>
+  </data>
+  <data name="ProductName" xml:space="preserve">
+    <value>Product Name</value>
+  </data>
+  <data name="Qty" xml:space="preserve">
+    <value>Qty</value>
+  </data>
+  <data name="SalesOrderBot" xml:space="preserve">
+    <value>Sales Order Bot</value>
+  </data>
+  <data name="Subtotal" xml:space="preserve">
+    <value>Sub-total</value>
+  </data>
+  <data name="TotalAmount" xml:space="preserve">
+    <value>Total Amount</value>
+  </data>
+  <data name="TotalQty" xml:space="preserve">
+    <value>Total Qty</value>
+  </data>
+  <data name="UnitPrice" xml:space="preserve">
+    <value>Unit Price</value>
+  </data>
+  <data name="InvoiceSummary" xml:space="preserve">
+    <value>Invoice Summary</value>
+  </data>
+  <data name="SalesOrderSummary" xml:space="preserve">
+    <value>Sales Order Summary</value>
+  </data>
+</root>

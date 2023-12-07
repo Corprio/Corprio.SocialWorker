@@ -1,0 +1,68 @@
+﻿@inject Microsoft.Extensions.Configuration.IConfiguration configuration
+
+@{
+    string clientID = configuration["CorprioClientCredential:ClientID"];
+    ViewData["Title"] = localizer["Home page"];
+    ViewData["Description"] = localizer["AppDescription"];    
+}
+<div class="container-fluid mt-md-4 mt-5">
+    <div class="row grey-wash-b">
+        <div class="col-md-5 flex-center">
+            <div class="text-center text-md-left px-3 px-md-5 pb-5">
+                <h1 class="dark-turq mb-3">@globalLocalizer[clientID]</h1>
+                <h2 class="subheading mb-5">
+                    @Html.Raw(localizer["AppSlogan"])
+                </h2>
+                <a class="btn btn-default btn-lg btn-wide" href="/Account/Register">@globalLocalizer["JoinForFree"]</a>
+                
+            </div>
+        </div>
+        <div class="col-md-7">
+            <img class="w-100" src="/images/Corprio sales banner.png" alt="" />
+        </div>
+    </div>
+</div>
+<div class="jumb jumb-reverse bg-white">
+    <div class="jumb-text">
+        <div>
+            <h2>@localizer["Feature1Title"]</h2>
+            <p>@localizer["Feature1Description"]</p>
+        </div>
+    </div>
+    <div class="jumb-graphic">
+        <img class="w-100 rounded-lg shad-2" src="/images/Corprio sales feature 1.png" />
+    </div>
+</div>
+<div class="jumb">
+    <div class="jumb-text">
+        <div>
+            <h2>@localizer["Feature2Title"]</h2>
+            <p>@localizer["Feature2Description"]</p>
+        </div>
+    </div>
+    <div class="jumb-graphic">
+        <img class="w-100 rounded-lg shad-2" src="/images/Corprio sales feature 2.png" />
+    </div>
+</div>
+<div class="jumb jumb-reverse bg-white">
+    <div class="jumb-text">
+        <div>
+            <h2>@globalLocalizer["FeatureCorprioTitle"]</h2>
+            <p>@globalLocalizer["FeatureCorprioDescription"]</p>
+        </div>
+    </div>
+    <div class="jumb-graphic flex-center">
+        @await Html.PartialAsync("_OrbitingApps")
+    </div>
+</div>
+<div class="jumb">
+    <div class="jumb-text">
+        <div>
+            <h2>@globalLocalizer["FreeForever"]</h2>
+            <p>@globalLocalizer["FreeToUseDescription"]</p>
+        </div>
+    </div>
+    <div class="jumb-graphic">
+        <a class="btn btn-lg btn-wide btn-default" href="/Account/Register">@globalLocalizer["JoinForFree"]</a>
+    </div>
+</div>

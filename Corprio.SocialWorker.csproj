@@ -1,0 +1,68 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <Configurations>Debug;Release;Sandbox</Configurations>
+    <Authors>Corprio</Authors>
+    <Company>Popular IT</Company>
+    <Copyright>Copyright 2023 Popular IT</Copyright>
+    <PackageTags>corprio sales sales assistant</PackageTags>
+    <Description>Add-on web application in Corprio for adding sales orders and invoices using conversations with chatbot</Description>
+	<JavaScriptTestRoot>Tests\</JavaScriptTestRoot>
+	<JavaScriptTestFramework>Jest</JavaScriptTestFramework>
+	<GenerateProgramFile>false</GenerateProgramFile>
+	<UserSecretsId>7173AE0C-B16C-40C5-B589-E46477EED957</UserSecretsId>
+	<TypeScriptCompileBlocked>true</TypeScriptCompileBlocked>
+	<Title>Corprio Sales Assistant Application</Title>	
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Views\Home\Index.ts" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Azure.Extensions.AspNetCore.Configuration.Secrets" Version="1.3.0" />
+    <PackageReference Include="Azure.Identity" Version="1.10.4" />
+    <PackageReference Include="BuildBundlerMinifier" Version="3.2.449" />
+    <PackageReference Include="Corprio.AspNetCore.XtraReportSite" Version="1.1.53" />
+    <PackageReference Include="Microsoft.JavaScript.UnitTest" Version="1.5.10610.1">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <TypeScriptCompile Include="Views\MetaApi\Index.ts" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Resources\SharedResource.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>SharedResource.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Update="bundleconfig.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Resources\SharedResource.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>SharedResource.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Models\ReportData\" />
+    <Folder Include="Reports\" />
+  </ItemGroup>
+
+
+
+</Project>

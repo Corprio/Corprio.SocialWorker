@@ -1,0 +1,42 @@
+{
+  "version": "1.0.0",
+  "name": "corprio-salesassistant",
+  "private": true,
+  "devDependencies": {
+    "@babel/core": "^7.23.3",
+    "@babel/preset-env": "^7.23.3",
+    "@babel/preset-typescript": "^7.23.3",
+    "@corprio/aspnetcore-site": "2.5.26",
+    "@corprio/devexpress-localization": "^1.1.1",
+    "@corprio/gulp-typescript": "1.0.7",
+    "@devexpress/analytics-core": "22.2.3",
+    "@jest/globals": "^29.7.0",
+    "@types/facebook-js-sdk": "^3.3.10",
+    "@types/jest": "^29.5.8",
+    "@types/lodash": "^4.14.202",
+    "babel-jest": "^29.7.0",
+    "bootstrap": "^4.6.0",
+    "cldrjs": "^0.5.1",
+    "devexpress-reporting": "22.2.3",
+    "devextreme": "22.2.3",
+    "devextreme-aspnet-data": "2.8.2",
+    "devextreme-quill": "^1.0.0",
+    "eslint": "^8.53.0",
+    "globalize": "^1.4.2",
+    "gulp": "^4.0.2",
+    "jest": "^29.7.0",
+    "jest-editor-support": "^31.1.2",
+    "jquery": "3.4.1",
+    "jquery-ui-dist": "^1.12.1",
+    "jquery-validation": "1.19.1",
+    "jquery-validation-unobtrusive": "3.2.11",
+    "jszip": "3.2.1",
+    "mocha": "^10.2.0",
+    "popper.js": "1.16.1",
+    "ts-jest": "^29.1.1"
+  },
+  "scripts": {
+    "refreshVSToken": "vsts-npm-auth -config .npmrc",
+    "test": "jest"
+  }
+}
