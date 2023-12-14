@@ -160,6 +160,15 @@ namespace Corprio.SocialWorker.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Connect Facebook.
+        /// </summary>
+        public static string ConnectFacebook {
+            get {
+                return ResourceManager.GetString("ConnectFacebook", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Deposit amount.
         /// </summary>
         public static string DepositAmount {
@@ -516,6 +525,24 @@ namespace Corprio.SocialWorker.Resources {
         public static string PromptUnapprove {
             get {
                 return ResourceManager.GetString("PromptUnapprove", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Publish Catalogue.
+        /// </summary>
+        public static string PublishCatalogue {
+            get {
+                return ResourceManager.GetString("PublishCatalogue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Publish Product.
+        /// </summary>
+        public static string PublishProduct {
+            get {
+                return ResourceManager.GetString("PublishProduct", resourceCulture);
             }
         }
         

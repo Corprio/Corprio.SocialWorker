@@ -24,7 +24,7 @@ namespace Corprio.SocialWorker
         public void ConfigureServices(IServiceCollection services)
         {            
             services.AddCommonAppServices(Configuration);
-            services.AddHttpClient();            
+            services.AddHttpClient();
 
             CorprioApiSetting corprioApiSetting = new()
             {
@@ -33,7 +33,7 @@ namespace Corprio.SocialWorker
             };
 
             //add HTTP client for accessing API without user login
-            services.AddClientAccessTokenHttpClient("webhookClient", "default", client => { client.ConfigureForCorprio(corprioApiSetting); });
+            services.AddClientAccessTokenHttpClient("webhookClient", "default", client => { client.ConfigureForCorprio(corprioApiSetting); });            
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

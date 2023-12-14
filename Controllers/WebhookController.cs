@@ -15,6 +15,14 @@ using Corprio.CorprioAPIClient;
 using System.Dynamic;
 using Microsoft.Extensions.Configuration;
 using Corprio.SocialWorker.Helpers;
+using Corprio.SocialWorker.Dictionaries;
+using Corprio.AspNetCore.Site.Filters;
+using Corprio.DataModel;
+using Corprio.Core.Exceptions;
+using Corprio.DataModel.Business.Products.ViewModel;
+using Corprio.DataModel.Business.Products;
+using Corprio.DataModel.Business;
+using Corprio.DataModel.Shared;
 
 namespace Corprio.SocialWorker.Controllers
 {
@@ -22,8 +30,7 @@ namespace Corprio.SocialWorker.Controllers
     {
         readonly IHttpClientFactory httpClientFactory;
         readonly IConfiguration configuration;
-
-        private readonly string AppId;
+        
         private readonly string ApiVersion;
         private readonly string AppSecret;
         private readonly string BaseUrl;
@@ -32,8 +39,7 @@ namespace Corprio.SocialWorker.Controllers
         {
             this.httpClientFactory = httpClientFactory;
             this.configuration = configuration;
-
-            AppId = configuration["MetaApiSetting:AppId"];
+            
             ApiVersion = configuration["MetaApiSetting:ApiVersion"];
             BaseUrl = configuration["MetaApiSetting:BaseUrl"];
             AppSecret = "b8956ab840c1d15a8bb0bee5551a6ccb"; // Put this in a vault!!!
@@ -75,6 +81,7 @@ namespace Corprio.SocialWorker.Controllers
 
         /// <summary>
         /// Verify if a HTTP request really comes from Meta
+        /// https://developers.facebook.com/docs/messenger-platform/webhooks
         /// </summary>
         /// <param name="request">HTTP request in question</param>
         /// <param name="metaHash">Hash included in the HTTP request headers</param>
@@ -101,62 +108,129 @@ namespace Corprio.SocialWorker.Controllers
 
             return new Tuple<bool, string>((computedHash == metaHash), requestBody);
         }
-
-        ///// <summary>
-        ///// Make a reply to an IG comment
-        ///// </summary>
-        ///// <param name="accessToken">Page access token</param>
-        ///// <param name="commentId">ID of the comment in question</param>
-        ///// <param name="message">Message of the reply</param>
-        ///// <returns>ID of the reply comment</returns>
-        //public string MakeIgCommentReply(string accessToken, string commentId, string message)
-        //{
-        //    using var restClient = new RestClient($"{BaseUrl}/{ApiVersion}/{commentId}/replies");
-        //    RestRequest request = MetaRestRequest(method: Method.Post, accessToken: accessToken);
-        //    request.AddParameter("message", message);
-        //    RestResponse response = restClient.Execute(request);
-        //    OneLinePayload payload = response?.Content == null ? new() : JsonConvert.DeserializeObject<OneLinePayload>(response.Content)!;
-        //    if (payload.Error != null)
-        //    {
-        //        Log.Information($"Encountered an error in posting message {message} to {endPoint} with token {accesstoken}.");                
-        //    }
-        //    return payload?.Id;
-        //}        
-
+        
         /// <summary>
         /// Respond to webhook triggered by feeds
         /// </summary>
         /// <param name="httpClient">HTTP client for executing API query</param>
         /// <param name="payload">Webhook payload</param>
-        /// <param name="metaProfile">Meta profile of the organization with which the webhook is related</param>
+        /// <param name="payload">Webhook payload</param>
         /// <returns>Status code</returns>
-        public async Task<IActionResult> HandleFeedWebhook(HttpClient httpClient, FeedWebhookPayload payload, MetaProfileModel metaProfile)
-        {            
+        public async Task<IActionResult> HandleFeedWebhook(HttpClient httpClient, APIClient corprioClient, FeedWebhookPayload payload)
+        {
+            // note: it is possible for more than one entry/change to come in, as Meta aggregates up to 1,000 event notifications
+            // see Frequency at https://developers.facebook.com/docs/graph-api/webhooks/getting-started
             foreach (var entry in payload.Entry)
             {
                 foreach (var change in entry.Changes)
                 {
-                    // note: the page ID included in the webhook notification may not be assocated with any of the access tokens in our DB
-                    MetaPage relevantPage = metaProfile?.Pages?.FirstOrDefault(x => x.PageId == change.Value.From.Id);
-                    if (string.IsNullOrWhiteSpace(relevantPage?.Token)) continue;
-                    await ActionHelper.PostOrComment(
+                    //var bot = new DomesticHelper(client: corprioClient, organizationID: Guid.Parse("3C83FE2B-FE0A-420C-AF24-E76FCF5BD7E7"), botStatus: new MetaChatBot() { Id = "24286888740958239" }, pageName: "Yo-Yo");
+                    //Guid productId = Guid.Parse("AF112F6B-2ABC-431C-A16F-ED4487BFD71F");
+                    //MetaPost post = new() { IsFbPost = false };
+                    //MetaPage page = new() { Token = "EAAEcibYeGIUBOZCjbwHaILofgZAajzBlzX9PFbDZCpLKafFPQjmrmEaNVZAVskYLKGNvSd0g8BT4DgbQAeRFoHf26sscYNGzCpjz7sfyFHuBRk6c5zvechmGliH2NHLO4JOaccoANwAvEAoT7GiJiW7QqAo204J4i3fZCOA2yDaNZCsdHomAEfKBOlaZBSH" };
+
+                    if (!BabelFish.Buy.Contains(change.Value.Message.ToUpper().Trim())) continue;
+
+                    // we use the post ID to find the organization ID, then use both IDs to find the page ID,
+                    // and finally use the page ID to find the token
+                    List<dynamic> queryResult = await corprioClient.ApplicationSubscriptionApi.QueryCustomData(
+                        new DataModel.DynamicQuery
+                        {
+                            Selector = "new (ApplicationSubscription.OrganizationID)",
+                            Where = "Key=@0",
+                            WhereArguments = new object[] { change.Value.PostId }
+                        });
+                    Guid organizationID = UtilityHelper.GetGuidFromDynamicQueryResult(queryResult, "OrganizationID");
+                    if (organizationID == Guid.Empty)
+                    {
+                        Log.Error($"Failed to get organization ID based on post ID {change.Value.PostId}.");
+                        continue;
+                    }
+                    MetaPost post = null;
+                    string customData = await corprioClient.ApplicationSubscriptionApi.GetCustomData(organizationID: organizationID, key: change.Value.PostId);
+                    if (!string.IsNullOrWhiteSpace(customData))
+                    {
+                        post = JsonConvert.DeserializeObject<MetaPost>(customData)!;
+                    }
+                    if (string.IsNullOrWhiteSpace(post?.PageId))
+                    {
+                        Log.Error($"Failed to get page ID based on post ID {change.Value.PostId}.");
+                        continue;
+                    }
+                    MetaPage page = null;
+                    customData = await corprioClient.ApplicationSubscriptionApi.GetCustomData(organizationID: organizationID, key: post.PageId);
+                    if (!string.IsNullOrWhiteSpace(customData))
+                    {
+                        page = JsonConvert.DeserializeObject<MetaPage>(customData)!;
+                    }
+                    if (string.IsNullOrWhiteSpace(page?.Token))
+                    {
+                        Log.Error($"Failed to get access token of page {post.PageId}.");
+                        continue;
+                    }
+
+                    List<dynamic> existingProducts = await corprioClient.ProductApi.Query(
+                        organizationID: organizationID,
+                        selector: "new (ID, EntityProperties)",
+                        where: "EntityProperties.Any(Name==@0 && Value==@1)",
+                        orderBy: "ID",
+                        whereArguments: new string[] { BabelFish.ProductEpName, change.Value.PostId },
+                        skip: 0,
+                        take: 1);
+                    Guid productId = UtilityHelper.GetGuidFromDynamicQueryResult(existingProducts, "ID");
+                    if (productId == Guid.Empty)
+                    {
+                        Log.Error($"Failed to find the product posted as {change.Value.PostId}.");
+                        continue;
+                    }
+
+                    MetaChatBot botStatus = await ActionHelper.GetCustomData<MetaChatBot>(corprioClient: corprioClient,
+                        organizationID: organizationID, key: change.Value.From.Id);
+                    botStatus ??= new MetaChatBot() { Id = change.Value.From.Id };
+                    var bot = new DomesticHelper(client: corprioClient, organizationID: organizationID, botStatus: botStatus, pageName: page.Name);
+                    string message;
+                    try
+                    {
+                        message = await bot.ReachOut(productId);
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.Error($"Failed to reach out to sell {productId}. {ex.Message}");
+                        continue;
+                    }
+
+                    if (string.IsNullOrWhiteSpace (message))
+                    {
+                        Log.Error($"The bot failed to provide any message.");
+                        continue;
+                    }
+
+                    string endPoint = post.IsFbPost 
+                        ? $"{BaseUrl}/{ApiVersion}/{change.Value.From.Id}/messages" 
+                        : $"{BaseUrl}/{ApiVersion}/me/messages";
+                    await ActionHelper.SendMessage(
                         httpClient: httpClient,
-                        accessToken: relevantPage.Token,
-                        message: $"{change.Value.From.Name}, thank you for your message; we will get back to you as soon as possible.",
-                        endPoint: $"{BaseUrl}/{ApiVersion}/{change.Value.PostId}/comments");
+                        accessToken: page.Token,
+                        endPoint: endPoint,
+                        message: message,
+                        recipientId: change.Value.From.Id);
                 }
             }
             return StatusCode(200);
         }
-                
+
         /// <summary>
         /// Respond to webhook triggered by messages
         /// </summary>
+        /// <param name="httpClient">HTTP client for executing API query</param>
+        /// <param name="corprioClient">Client for Api requests among Corprio projects</param>
         /// <param name="payload">Webhook payload</param>
         /// <returns>Status code</returns>
-        public async Task<IActionResult> HandleMessageWebhook(HttpClient httpClient, APIClient corprioClient, Guid organizationID, 
-            MessageWebhookPayload payload, MetaProfileModel metaProfile)
+        /// <exception cref="Exception"></exception>
+        public async Task<IActionResult> HandleMessageWebhook(HttpClient httpClient, APIClient corprioClient, MessageWebhookPayload payload)
         {
+            // note: it is possible for more than one entry/messaging to come in, as Meta aggregates up to 1,000 event notifications
+            // see Frequency at https://developers.facebook.com/docs/graph-api/webhooks/getting-started
             foreach (var entry in payload.Entry)
             {
                 foreach (var messaging in entry.Messaging)
@@ -167,11 +241,32 @@ namespace Corprio.SocialWorker.Controllers
                         Log.Error($"Recipient ID for \"{messaging.Message?.Text}\" is blank.");
                         continue;
                     }
+                    
+                    List <dynamic> queryResult = await corprioClient.ApplicationSubscriptionApi.QueryCustomData(
+                        new DataModel.DynamicQuery {
+                            Selector = "new (ApplicationSubscription.OrganizationID)",
+                            Where = "Key=@0",
+                            WhereArguments = new object[] { messaging.Recipient.Id }
+                        });
+                    Guid organizationID = UtilityHelper.GetGuidFromDynamicQueryResult(queryResult, "OrganizationID");
+                    if (organizationID == Guid.Empty) 
+                    {
+                        Log.Error($"Failed to get organization ID based on page ID {messaging.Recipient.Id}.");
+                        continue;
+                    }
 
-                    MetaPage page = payload.Object == "instagram" 
-                        ? metaProfile.Pages.FirstOrDefault(x => x.IgId == messaging.Recipient.Id)
-                        : metaProfile.Pages.FirstOrDefault(x => x.PageId == messaging.Recipient.Id);
-
+                    string pageId = payload.Object == "instagram"
+                        ? await corprioClient.ApplicationSubscriptionApi.GetCustomData(organizationID: organizationID, key: messaging.Recipient.Id)
+                        : messaging.Recipient.Id;
+                    
+                    if (string.IsNullOrWhiteSpace(pageId))
+                    {
+                        Log.Error($"Failed to get ID of the page that received \"{messaging.Message?.Text}\".");
+                        continue;
+                    }
+                    MetaPage page = await ActionHelper.GetCustomData<MetaPage>(corprioClient: corprioClient, 
+                        organizationID: organizationID, key: pageId.Replace("\"", ""));  // need to replace the quotation marks returned by GetCustomData
+                    
                     if (string.IsNullOrWhiteSpace(page?.Token))
                     {
                         // note: we move on to the next message instead of throwing errors
@@ -179,8 +274,12 @@ namespace Corprio.SocialWorker.Controllers
                         continue;
                     }
 
-                    var bot = new DomesticHelper(client: corprioClient, organizationID: organizationID, metaProfile: metaProfile,
-                        senderId: messaging.Sender.Id, detectedLocales: messaging.Message?.NLP?.DetectedLocales);
+                    // assumption: senderId is the same regardless if (i) the sender made a comment on a post or (ii) sent a message via messenger
+                    MetaChatBot botStatus = await ActionHelper.GetCustomData<MetaChatBot>(corprioClient: corprioClient, 
+                        organizationID: organizationID, key: messaging.Sender.Id);
+                    botStatus ??= new MetaChatBot() { Id = messaging.Sender.Id };
+                    var bot = new DomesticHelper(client: corprioClient, organizationID: organizationID, botStatus: botStatus, 
+                        detectedLocales: messaging.Message?.NLP?.DetectedLocales, pageName: page.Name);
                     string response;
                     try
                     {
@@ -189,9 +288,10 @@ namespace Corprio.SocialWorker.Controllers
                     catch (Exception ex)
                     {
                         Log.Error(ex.Message);
-                        return StatusCode(200);
+                        response = bot.ThusSpokeBabel("Err_DefaultMsg");
                     }
-                    if (string.IsNullOrWhiteSpace(response)) continue;
+                    // note: the bot must respond with something in 30 seconds (source: https://developers.facebook.com/docs/messenger-platform/policy/responsiveness)
+                    if (string.IsNullOrWhiteSpace(response)) response = bot.ThusSpokeBabel("Err_DefaultMsg");
 
                     string endPoint = payload.Object == "instagram" ? $"{BaseUrl}/{ApiVersion}/me/messages" : $"{BaseUrl}/{ApiVersion}/{messaging.Recipient.Id}/messages";
                     await ActionHelper.SendMessage(
@@ -199,8 +299,7 @@ namespace Corprio.SocialWorker.Controllers
                         accessToken: page.Token,
                         endPoint: endPoint,
                         message: response,
-                        recipientId: messaging.Sender.Id,
-                        senderId: messaging.Recipient.Id);                    
+                        recipientId: messaging.Sender.Id);
                 }
             }
             return StatusCode(200);
@@ -235,29 +334,69 @@ namespace Corprio.SocialWorker.Controllers
 
             // if the payload includes "Messaging" and one of its element has sender, then presumably it is for webhook on messages
             MessageWebhookPayload messageWebhookPayload = requestString == null ? null : JsonConvert.DeserializeObject<MessageWebhookPayload>(requestString)!;
-            if (messageWebhookPayload?.Entry?.Any(x => x?.Messaging.Any(y => !string.IsNullOrWhiteSpace(y.Sender?.Id)) ?? false) ?? false)
+            if (messageWebhookPayload?.Entry?.Any(x => x.Messaging?.Any(y => !string.IsNullOrWhiteSpace(y.Sender?.Id)) ?? false) ?? false)
             {                
-                // DEV ONLY - we should replace the following codes with a search for meta profile in ApplicationSubscriptions
-                Guid organizationID = Guid.Parse("3C83FE2B-FE0A-420C-AF24-E76FCF5BD7E7");
-                string setting = await corprioClient.OrganizationApi.GetApplicationSetting(organizationID);                
-                if (string.IsNullOrWhiteSpace(setting)) throw new Exception($"No application setting found for {organizationID}");
-                MetaProfileModel metaProfile = JsonConvert.DeserializeObject<MetaProfileModel>(setting)! ?? throw new Exception($"No Meta profile for {organizationID}.");
-
-                return await HandleMessageWebhook(httpClient: httpClient, corprioClient: corprioClient, organizationID: organizationID, 
-                    payload: messageWebhookPayload, metaProfile: metaProfile);
+                return await HandleMessageWebhook(httpClient: httpClient, corprioClient: corprioClient, payload: messageWebhookPayload);
             }
 
-            //// if the payload includes "Changes", then presumably it is for webhook on feed
-            //FeedWebhookPayload feedWebhookPayload = requestString == null ? null : JsonConvert.DeserializeObject<FeedWebhookPayload>(requestString)!;
-            //if (feedWebhookPayload?.Entry?.Any(x => x.Changes?.Count > 0) ?? false)
-            //{
-            //    // TODO - we should crawl through ApplicationSubscriptions to find the organization with a page whose ID = 
-            //    Guid organizationID = Guid.NewGuid();
-            //    return await HandleFeedWebhook(feedWebhookPayload);
-            //}
+            // if the payload includes "Changes", then presumably it is for webhook on feed
+            FeedWebhookPayload feedWebhookPayload = requestString == null ? null : JsonConvert.DeserializeObject<FeedWebhookPayload>(requestString)!;
+            if (feedWebhookPayload?.Entry?.Any(x => x.Changes?.Count > 0) ?? false)
+            {
+                return await HandleFeedWebhook(httpClient: httpClient, corprioClient: corprioClient, payload: feedWebhookPayload);
+            }
 
             Log.Information($"Cannot recognize payload in webhook notification. Payload: {requestString}");
             return StatusCode(200);
+        }
+        
+        /// <summary>
+        /// Trigger the publication of a catalogue / product list
+        /// </summary>
+        /// <param name="httpClient">HTTP client for executing API query</param>        
+        /// <param name="organizationID">Organization ID</param>
+        /// <param name="productlistID">Entity ID of product list</param>        
+        /// <returns>Status code</returns>        
+        [HttpPost("/{organizationID:guid}/PublishCatalogue/{productlistID:guid}")]
+        public async Task<IActionResult> TriggerPostingCatalogue([FromServices] HttpClient httpClient, [FromRoute] Guid organizationID,
+            [FromHeader] CorprioRequestHeader header, [FromBody] ComputeHashRequest body, [FromRoute] Guid productlistID)
+        {
+            APIClient corprioClient = new(httpClientFactory.CreateClient("webhookClient"));
+            var hashRequest = new ComputeHashRequest()
+            {
+                OrganizationID = body.OrganizationID,
+                Payload = System.Text.Json.JsonSerializer.Serialize(body),
+                RequestApplicationID = body.RequestApplicationID,
+                RequestUserID = body.RequestUserID,
+                Timestamp = body.Timestamp,
+                RequiredDataPermissions = body.RequiredDataPermissions,
+            };
+            bool isValidHash = await corprioClient.ApplicationApi.ValidateHash(computeHashRequest: hashRequest, hash: header.Hash);
+            if (!isValidHash) return StatusCode(401);
+            return StatusCode(200);
+            //(bool success, List<string> errorMessages) = await PublishCatalogue(httpClient: httpClient, corprioClient: corprioClient,
+            //    organizationID: organizationID, productlistID: productlistID);
+            //return success ? StatusCode(200) : StatusCode(400, errorMessages);
+        }
+
+        /// <summary>
+        /// Trigger the publication of a product
+        /// </summary>
+        /// <param name="httpClient">HTTP client for executing API query</param>        
+        /// <param name="organizationID">Organization ID</param>
+        /// <param name="productID">Entity ID of product</param>
+        /// <returns>Status code</returns>
+        [HttpPost("/{organizationID:guid}/PublishProduct/{productID:guid}")]
+        public async Task<IActionResult> TriggerPostingProduct([FromServices] HttpClient httpClient, [FromRoute] Guid organizationID, 
+            [FromHeader] CorprioRequestHeader header, [FromBody] ComputeHashRequest body, [FromRoute] Guid productID)
+        {            
+            APIClient corprioClient = new(httpClientFactory.CreateClient("webhookClient"));            
+            bool isValidHash = await corprioClient.ApplicationApi.ValidateHash(computeHashRequest: body, hash: header.Hash);
+            if (!isValidHash) return StatusCode(401);
+            return StatusCode(200);
+            //(bool success, List<string> errorMessages) = await PublishProduct(httpClient: httpClient, corprioClient: corprioClient,
+            //    organizationID: organizationID, productID: productID);
+            //return success ? StatusCode(200) : StatusCode(400, errorMessages);
         }
     }
 }

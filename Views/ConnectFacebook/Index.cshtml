@@ -1,0 +1,82 @@
+﻿@using Corprio.Core.Utility
+@{
+    ViewData["Title"] = "Permission Configuration";
+    Guid organizationID = Context.SelectedOrganizationID() ?? Guid.Empty;
+}
+
+<script src="~/js/views/MetaApi/Index.js" asp-append-version="true"></script>
+<script>
+    // use vdata to pass parameters to TS
+    const vdata = {
+        actions: {
+            refreshAccessToken: '@StringHelper.Encode(@Url.Action("RefreshAccessToken", "ConnectFacebook", new { organizationID }))',
+        },
+        applicationSetting: {
+        }
+    };
+</script>
+<script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js"></script>
+
+<div class="container-fluid mt-md-4 mt-5 d-flex justify-content-center" style="max-width: 770px;">
+    <div>        
+        <h3 id="page-headline">Welcome to Corprio Social Worker!</h3>
+        <p id="page-var-text">
+            Click the login button below to connect your Facebook page(s) and Instagram accounts with Corprio.
+            Once it is done, Corprio Social Worker can do the following magic for you:
+        </p>
+        <ul class="fa-ul">
+            <li class="mb-2"><span class="fa-li"><i class="fas fa-check-square"></i></span>Publish your products and catalogues from Corprio to your Facebook pages and Instagram accounts.</li>
+            <li class="mb-2"><span class="fa-li"><i class="fas fa-check-square"></i></span>Send private messages to customers who have commented 'BUY' on your product posts.</li>
+            <li class="mb-2"><span class="fa-li"><i class="fas fa-check-square"></i></span>Activate a chatbot that will handle product enquiry on your behalf through Facebook and Instagram Messaging.</li>
+        </ul>
+        <button class="btn btn-primary" id="loginBtn" style="display: block;">Continue with Facebook</button>
+        <button class="btn btn-primary" id="logoutBtn" style="display: none;">Logout from Facebook</button>
+        <br />
+        <br />
+        <hr />
+        <a class="collapsed" data-toggle="collapse" href="#faq">
+            <h4 class="d-flex justify-content-between">
+                <span>FAQ</span>
+                <i class="fa-regular fa-chevron-up ml-auto"></i>
+            </h4>
+        </a>
+        <div id="faq" class="collapse">
+            <ol>
+                <li class="mb-3" style="list-style: disc; list-style-type: lower-roman;">
+                    <a class="collapsed" data-toggle="collapse" href="#faq1"><b>Why do you need the permissions listed in the login page?</b></a>
+                    <div id="faq1" class="mt-2 collapse">The App requires the permissions to read and manage your pages and engagements in order to publish products/catalogues and send messages on your behalf.</div>
+                </li>
+
+                <li class="mb-3" style="list-style: disc; list-style-type: lower-roman;">
+                    <a class="collapsed" data-toggle="collapse" href="#faq2"><b>Will Corprio remember my Facebook login password?</b></a>
+                    <div id="faq2" class="mt-2 collapse">No, Corprio does not have access to your Facebook login password and therefore cannot store it. When you log in, you provide your credentials to Facebook only, and Facebook provides Corprio with an access token for managing your Facebook pages and Instagram accounts. The token is valid for up to 60 days. In other words, Social Worker will cease to function if you do not log in again in 60 days.</div>
+                </li>
+
+                <li class="mb-3" style="list-style: disc; list-style-type: lower-roman;">
+                    <a class="collapsed" data-toggle="collapse" href="#faq3"><b>How can I publish my product catalogue?</b></a>
+                    <div id="faq3" class="mt-2 collapse">Go to any Corprio application that allows you to view/edit catalogues (e.g., GoBuyClick). You will notice that there is a button next to your catalogue for publishing. Once you click it, the catalogue will be posted to your Facebook pages and Instagram accounts.</div>
+                </li>
+
+                <li class="mb-3" style="list-style: disc; list-style-type: lower-roman;">
+                    <a class="collapsed" data-toggle="collapse" href="#faq4"><b>How can I publish my product?</b></a>
+                    <div id="faq4" class="mt-2 collapse">Go to any Corprio application that allows you to view/edit products (e.g., Corprio.Product). You will notice that there is a button next to your product for publishing. Once you click it, the product will be posted to your Facebook pages and Instagram accounts.</div>
+                </li>
+
+                <li class="mb-3" style="list-style: disc; list-style-type: lower-roman;">
+                    <a class="collapsed" data-toggle="collapse" href="#faq5"><b>The chatbot for my Facebook page / Instagram account ceases to function. Why?</b></a>
+                    <div id="faq5" class="mt-2 collapse">A common root cause is that the access token Facebook had granted to Corprio for messaging on your behalf has expired. To renew the token, you simply need to click the login button above.</div>
+                </li>
+
+                <li class="mb-3" style="list-style: disc; list-style-type: lower-roman;">
+                    <a class="collapsed" data-toggle="collapse" href="#faq6"><b>I clicked the button for publishing a product / product catalogue but nothing happened. Why?</b></a>
+                    <div id="faq6" class="mt-2 collapse">A common root cause is that the access token Facebook had granted to Corprio for making posts on your behalf has expired. To renew the token, you simply need to click the login button above.</div>
+                </li>
+
+                <li class="mb-3" style="list-style: disc; list-style-type: lower-roman;">
+                    <a class="collapsed" data-toggle="collapse" href="#faq7"><b>I could publish my products / product catalogues, but the posts do not have any images. Why?</b></a>
+                    <div id="faq7" class="mt-2 collapse">A common root cause is that the images do not fit the format and/or size requirements set by Facebook/Instagram. You may retry by first removing the undesirable posts, updating the product/catalogue with a smaller image in .jpg/.jpeg/.png format, and then publishing it again.</div>
+                </li>
+            </ol>
+        </div>
+    </div>    
+</div>

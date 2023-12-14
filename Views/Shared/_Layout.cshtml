@@ -119,19 +119,7 @@
     string controller = (string)ViewContext.RouteData.Values["Controller"];
     string action = (string)(ViewContext.RouteData.Values["Action"] ?? "Index");
 }
-<body>
-
-    <script>
-        // use vdata to pass parameters to TS
-        //const vdata = {
-        //    actions: {
-        //        refreshAccessToken: '@StringHelper.Encode(@Url.Action("RefreshAccessToken", "MetaApi", new { organizationID }))',
-        //    },
-        //    applicationSetting: {                
-        //    }
-        //};
-    </script>
-
+<body>    
     <div id="page">
         @await Html.PartialAsync("_Navbar", model: new NavbarViewModel{
         ClientID = clientID,
@@ -148,17 +136,16 @@
             @if (User.Identity.IsAuthenticated)
             {
                 @await Html.PartialAsync("_SidebarMenu", model: new SidebarMenuViewModel{
-            ClientID = clientID,
-            OrganizationID = organizationID,
-            Menu = menu,
-            Controller = controller,
-            Action = action,
-            GlobalLocalizer = globalLocalizer,
-            Localizer = localizer,
-            AppIconPath = "/images/sales-trans-bg.png"
-            })
+                ClientID = clientID,
+                OrganizationID = organizationID,
+                Menu = menu,
+                Controller = controller,
+                Action = action,
+                GlobalLocalizer = globalLocalizer,
+                Localizer = localizer,
+                AppIconPath = "/images/sales-trans-bg.png"
+                })
             }
-
             <div id="beside-sidebar">
                 <div id="fixed-topbar">
                     @RenderSection("TopBar", required: false)
@@ -188,8 +175,7 @@
             <div id="overlay" style="display:none;"></div>
         </div>
     </div>
-    <script src="@configuration["CorprioPortalUrl"]/js/corprio-menu-popup-snippet.min.js"></script>
-    @*<script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js"></script>*@
+    <script src="@configuration["CorprioPortalUrl"]/js/corprio-menu-popup-snippet.min.js"></script>    
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

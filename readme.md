@@ -19,4 +19,4 @@ The Social Worker Application must be registered in [Corprio Portal](https://por
 |Product|Read|
 |Customer|Read|
 
-**Sending email**: Not required
+**Sending email**: Required

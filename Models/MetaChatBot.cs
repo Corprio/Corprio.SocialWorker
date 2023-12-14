@@ -9,15 +9,11 @@ namespace Corprio.SocialWorker.Models
         /// <summary>
         /// Id of the entity that is having a conversation with the bot
         /// </summary>
-        public string Id { get; set; }
+        public string Id { get; set; }        
         
         public BotLanguage Lang { get; set; }
 
         public BotTopic ThinkingOf { get; set; } = BotTopic.Limbo;
-
-        public bool ThinkingOfYN { get; set; }
-
-        public bool ThinkingOfMC { get; set; }
         
         public List<KeyValuePair<Guid, string>> PrdMemory { get; set; } = new List<KeyValuePair<Guid, string>>();
 
@@ -33,16 +29,16 @@ namespace Corprio.SocialWorker.Models
     public class BotClient
     {
         public Guid? Id { get; set; }
+        
+        public string Email { get; set; }        
 
-        public string Name { get; set; }
+        public OTP OTP { get; set; }
+    }
 
-        public string Email { get; set; }
-
-        public string Phone_CC { get; set; }
-
-        public string Phone_NDC { get; set; }
-
-        public string Phone_Num { get; set; }
+    public class OTP
+    {
+        public string Code { get; set; }
+        public DateTime ExpiryTime { get; set; } = DateTime.UtcNow.AddDays(1);
     }
 
     public class BotBasket
@@ -52,6 +48,10 @@ namespace Corprio.SocialWorker.Models
         public string Name { get; set; }
 
         public decimal Quantity { get; set; }
+
+        public decimal? Price { get; set; }
+
+        public string UOMCode { get; set; }        
     }
 
     public enum BotLanguage
@@ -64,14 +64,15 @@ namespace Corprio.SocialWorker.Models
     public enum BotTopic
     {
         Limbo,
-        Product,
-        ProductVariations,
-        Quantity,
-        Checkout,
-        ClearCart,
-        Basket,
-        Name,
-        Email,
-        MobilePhone
+        ProductOpen,
+        ProductYN,
+        ProductMC,
+        ProductVariationMC,
+        QuantityOpen,
+        CheckoutYN,
+        ClearCartYN,
+        EmailOpen,
+        EmailConfirmationOpen,
+        PromotionOpen
     }    
 }

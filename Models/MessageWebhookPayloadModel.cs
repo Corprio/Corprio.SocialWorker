@@ -66,7 +66,10 @@ namespace Corprio.SocialWorker.Models
     }
 
     public class NLPprops
-    {        
+    {
+        /// <summary>
+        /// List of locales detected by Wit.ai
+        /// </summary>
         [JsonProperty("detected_locales")]
         public List<DetectedLocale> DetectedLocales { get; set; }
     }

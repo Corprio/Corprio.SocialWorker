@@ -70,13 +70,13 @@ namespace Corprio.SocialWorker.Controllers
                 string code = string.IsNullOrWhiteSpace(invitationCode) ? "default" : invitationCode;
 
                 //send email of the subscriber
-                MailMessage mailMessage = new MailMessage
+                EmailMessage mailMessage = new()
                 {
                     Subject = emailContentTemplate[code].Subject.GetText(locale),
                     Body = emailContentTemplate[code].Body.GetText(locale),
-                    From = new MailAddress("noreply@corprio.com")
-                };
-                mailMessage.To.Add(new MailAddress(emailAddress, organizationName));
+                    FromEmail = new EmailAddress("noreply@corprio.com"),
+                    ToEmails = new EmailAddress[] { new EmailAddress(emailAddress) }
+                };                     
                 await emailSender.SendEmailAsync(mailMessage);
                 return Ok();
             }

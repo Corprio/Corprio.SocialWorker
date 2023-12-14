@@ -4,6 +4,9 @@ using Newtonsoft.Json;
 
 namespace Corprio.SocialWorker.Models
 {
+    /// <summary>
+    /// https://developers.facebook.com/docs/graph-api/webhooks/reference/page/#feed
+    /// </summary>
     public class FeedWebhookPayload
     {
         [JsonProperty("object")]

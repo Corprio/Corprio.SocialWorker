@@ -369,4 +369,13 @@
   <data name="SalesOrderSummary" xml:space="preserve">
     <value>Sales Order Summary</value>
   </data>
+  <data name="ConnectFacebook" xml:space="preserve">
+    <value>Connect Facebook</value>
+  </data>
+  <data name="PublishCatalogue" xml:space="preserve">
+    <value>Publish Catalogue</value>
+  </data>
+  <data name="PublishProduct" xml:space="preserve">
+    <value>Publish Product</value>
+  </data>
 </root>

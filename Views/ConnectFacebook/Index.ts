@@ -6,43 +6,86 @@ declare const vdata: {
     };
 };
 
+// 'business_management' is required for viewing pages managed by the user
+const permissions: string[] = ['email', 'public_profile', 'business_management', 'pages_manage_metadata',
+    'pages_messaging', 'pages_manage_posts', 'pages_manage_engagement', 'instagram_basic', 'instagram_content_publish',
+    'instagram_manage_comments', 'instagram_manage_messages'];
+
 // https://github.com/DefinitelyTyped/DefinitelyTyped/blob/master/types/facebook-js-sdk/index.d.ts
 /// <reference types="facebook-js-sdk" />
 
+// Reference for the order of the following three code blocks: https://www.devils-heaven.com/facebook-javascript-sdk-login
 window.fbAsyncInit = function () {
-    console.log('fbAsyncInit is doing its things...');
+    console.log('fbAsyncInit is doing its things...');       
     FB.init({
         appId: '312852768233605',
         cookie: true,                     // Enable cookies to allow the server to access the session.
         xfbml: true,                     // Parse social plugins on this webpage.
         version: 'v18.0'           // Use this Graph API version for this call.
     });
-
-    document.addEventListener("DOMContentLoaded", (event) => {
-        console.log("DOM fully loaded and parsed");
-        $('fb:login-button').on('click', checkLoginState);
-    });
-
+    
     FB.getLoginStatus(function (response) {   // Called after the JS SDK has been initialized.
         statusChangeCallback(response);        // Returns the login status.
     });
 };
 
+(function (element: Document, tagName: string, selector: string) {
+    var js, fjs = element.getElementsByTagName(tagName)[0];
+    if (element.getElementById(selector)) { return; }
+    js = element.createElement(tagName); js.id = selector;
+    js.src = "https://connect.facebook.net/en_US/sdk.js";
+    fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk')
+);
+
+document.addEventListener("DOMContentLoaded", (event) => {
+    console.log("DOM fully loaded and parsed");
+
+    $('#loginBtn').on('click', function() {
+        console.log('Logging into Facebook...');
+        FB.login((response: facebook.StatusResponse) => {
+            if (response.authResponse) {
+                //user just authorized your app                
+                checkLoginState();
+            } 
+        }, {            
+            scope: permissions.toString(),
+            return_scopes: true
+        });
+    });
+
+    $('#logoutBtn').on('click', function () {
+        console.log('Logging out from Facebook...')
+        FB.logout(checkLoginState);
+    });
+});
+
 function statusChangeCallback(response: facebook.StatusResponse) {  // Called with the results from FB.getLoginStatus().
     console.log('statusChangeCallback');
-    console.log(response);                   // The current login status of the person.
-    if (response?.status === 'connected') {   // Logged into your webpage and Facebook.                                        
+    console.log(response);
+    if (response?.status === 'connected') {
+        // Logged into your webpage and Facebook.
+        $('#loginBtn').hide();
+        $('#logoutBtn').show();
+        FB.api('/me', { fields: 'name' }, function (response: facebook.User) {            
+            $('#page-headline').text('Good to have you back, ' + response.name + '!');
+        });
+        $('#page-var-text').text('Corprio Social Worker can now do the following: ');
         getPages();
         refreshAccessToken(response.authResponse?.userID, response.authResponse?.accessToken);
-    } else {                                 // Not logged into your webpage or we are unable to tell.
-        $('#status').text('Please log into this webpage.');
+    } else {
+        // Not logged into your webpage or we are unable to tell.
+        $('#loginBtn').show();
+        $('#logoutBtn').hide();
+        $('#page-headline').text('Welcome to Corprio Social Worker!');        
+        $('#page-var-text').text('Click the login button below to connect your Facebook page(s) and Instagram accounts with Corprio. ' +
+            'Once it is done, Corprio Social Worker can do the following magic for you: ');
     }
 }
 
 function checkLoginState() {
-    // Called when a person is finished with the Login Button.    
-    FB.getLoginStatus(function (response) {
-        // See the onlogin handler
+    // Called when a person is finished with the Login/Logout Button.    
+    FB.getLoginStatus(function (response) {        
         statusChangeCallback(response)
     })
 }
@@ -62,6 +105,7 @@ function refreshAccessToken(metaId: string, accessToken: string) {
 }
 
 // add webhooks to page subscriptions (IMPORTANT: subscribe to the fields as those subscribed on App level)
+// https://developers.facebook.com/docs/messenger-platform/webhooks/#connect-your-app
 function addPageSubscriptions(page_id: string, page_access_token: string) {
     console.log(`Subscribing to page ${page_id}...`);
     return FB.api(

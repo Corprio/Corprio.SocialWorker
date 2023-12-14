@@ -363,4 +363,13 @@
   <data name="UnitPrice" xml:space="preserve">
     <value>单价</value>
   </data>
+  <data name="ConnectFacebook" xml:space="preserve">
+    <value>连接脸书</value>
+  </data>
+  <data name="PublishCatalogue" xml:space="preserve">
+    <value>发布商品目录</value>
+  </data>
+  <data name="PublishProduct" xml:space="preserve">
+    <value>发布商品</value>
+  </data>
 </root>

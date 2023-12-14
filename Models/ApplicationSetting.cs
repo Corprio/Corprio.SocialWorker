@@ -8,5 +8,6 @@ namespace Corprio.SocialWorker.Models
 {
     public class ApplicationSetting
     {
+        public string MetaId { get; set; }
     }
 }
