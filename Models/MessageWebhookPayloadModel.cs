@@ -16,7 +16,7 @@ namespace Corprio.SocialWorker.Models
     public class MessageWebhookEntry
     {
         [JsonProperty("id")]
-        public string Id { get; set; }
+        public string WebhookEntryID { get; set; }
 
         [JsonProperty("time")]
         public double Time { get; set; }

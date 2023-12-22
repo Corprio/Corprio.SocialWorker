@@ -179,22 +179,20 @@ namespace Corprio.SocialWorker.Dictionaries
                 [BotLanguage.English] = "Check out our new product catalogue at: ",
                 [BotLanguage.TraditionalChinese] = "造訪我們新的商品目錄：",
                 [BotLanguage.SimplifiedChinese] = "造访我们新的商品目录：",
-            },
-            ["ListPrice"] = new Dictionary<BotLanguage, string>()
-            {
-                [BotLanguage.English] = "List Price",
-                [BotLanguage.TraditionalChinese] = "標價",
-                [BotLanguage.SimplifiedChinese] = "标价",
-            },
+            },            
             ["HowToBuy"] = new Dictionary<BotLanguage, string>()
             {
-                [BotLanguage.English] = "Reply to this post with \"BUY\" if you like to buy \"{0}\".",
-                [BotLanguage.TraditionalChinese] = "如果您想購買「{0}」，請以「買」回覆此貼文。",
-                [BotLanguage.SimplifiedChinese] = "如果您想购买「{0}」，请以「买」回覆此贴文。",
+                [BotLanguage.English] = "Reply to this post with \"{1}\" if you like to buy \"{0}\".",
+                [BotLanguage.TraditionalChinese] = "如果您想購買「{0}」，請以「{1}」回覆此貼文。",
+                [BotLanguage.SimplifiedChinese] = "如果您想购买「{0}」，请以「{1}」回覆此贴文。",
             },
-        };
-
-        public static readonly List<string> Buy = new() { "BUY", "買", "买" };
+            ["DefaultKeyWordForShoppingIntention"] = new Dictionary<BotLanguage, string>()
+            {
+                [BotLanguage.English] = "BUY",
+                [BotLanguage.TraditionalChinese] = "買",
+                [BotLanguage.SimplifiedChinese] = "买",
+            },            
+        };        
 
         public static readonly Dictionary<string, int> YesNo = new()
         {

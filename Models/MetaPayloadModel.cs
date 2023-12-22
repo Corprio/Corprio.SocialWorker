@@ -6,7 +6,7 @@ namespace Corprio.SocialWorker.Models
     public class OneLinePayload : MetaPayloadError
     {        
         [JsonProperty("id")]
-        public string Id { get; set; }
+        public string MetaID { get; set; }
     }
 
     public class ActionResultPayload : MetaPayloadError
@@ -21,10 +21,10 @@ namespace Corprio.SocialWorker.Models
     public class MessageFeedback : MetaPayloadError
     {
         [JsonProperty("recipient_id")]
-        public string RecipientId { get; set; }
+        public string RecipientID { get; set; }
 
         [JsonProperty("message_id")]
-        public string MessageId { get; set; }
+        public string MessageID { get; set; }
     }
 
     /// <summary>
@@ -63,7 +63,7 @@ namespace Corprio.SocialWorker.Models
         /// Meta entity ID for a Facebook page
         /// </summary>
         [JsonProperty("id")]
-        public string Id { get; set; }
+        public string FacebookPageID { get; set; }
 
         /// <summary>
         /// Instagram account linked to page during Instagram business conversion flow

@@ -1,7 +1,159 @@
 ﻿@using Corprio.Core.Utility
+@using Corprio.DataModel.Business
+@using Corprio.SocialWorker.Models
+@using Corprio.SocialWorker.Dictionaries
+@using Corprio.SocialWorker.Helpers
+@inject Corprio.CorprioAPIClient.APIClient corprioApi
+@inject Microsoft.Extensions.Configuration.IConfiguration configuration
 @{
     ViewData["Title"] = "Settings";
+    string env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "PRD";
     Guid organizationID = Context.SelectedOrganizationID() ?? Guid.Empty;
+    OrganizationCoreInfo orgInfo = organizationID.Equals(Guid.Empty) ? null : await corprioApi.OrganizationApi.GetCoreInfo(organizationID: organizationID);    
+    string defaultCatalogueMessage = BabelFish.Vocab["VisitCatalogue"][UtilityHelper.NICAM(orgInfo)];
+    string sampleShortName = orgInfo == null ? orgInfo.ShortName : "MyCompany";
+    string catalogueURL = $"{configuration["GoBuyClickUrl"]}/Catalogue/{sampleShortName}/SAMPLE_CATALOGUE";
+    string defaultProductMessage = BabelFish.Vocab["HowToBuy"][UtilityHelper.NICAM(orgInfo)].Replace("{0}", "Example Product");
+    
+    string messageType_CataloguePost = nameof(MessageType.CataloguePost);
+    string messageType_ProductPost = nameof(MessageType.ProductPost);
+    string separator = TemplateComponent.Separator;
+    string defaultTemplate_catalogue = string.Join(separator, DefaultTemplate.DefaultTempalte_Catalogue);
+    string defaultTemplate_product = string.Join(separator, DefaultTemplate.DefaultTempalte_Product);
 }
 
-<div class="container-fluid mt-md-4 mt-5 d-flex justify-content-center" style="max-width: 770px;">Settings</div>
+<script src="~/js/views/Settings/Index.js" asp-append-version="true"></script>
+<script>            
+    // use vdata to pass parameters to TS
+    const vdata = {
+        actions: {
+            getKeyword: '@StringHelper.Encode(@Url.Action("GetKeyword", "Settings", new { organizationID }))',
+            getTemplate: '@StringHelper.Encode(@Url.Action("GetTemplate", "Settings", new { organizationID }))',
+            saveTemplate: '@StringHelper.Encode(@Url.Action("SaveTemplate", "Settings", new { organizationID }))',
+        },
+        sampleValues: {
+            catalogueURL: "@catalogueURL",
+            defaultCatalogueMessage: "@defaultCatalogueMessage",
+            defaultProductMessage: "@defaultProductMessage",
+        },
+        settings: {
+            env: "@env"
+        },
+        templateComponents: {
+            catalogueCodeValue: "@TemplateComponent.CatalogueCode",
+            catalogueEndDateValue: "@TemplateComponent.CatalogueEndDate",
+            catalogueNameValue: "@TemplateComponent.CatalogueName",
+            catalogueStartDateValue: "@TemplateComponent.CatalogueStartDate",            
+            catalogueUrlValue: "@TemplateComponent.CatalogueUrl",
+            defaultMessageValue: "@TemplateComponent.DefaultMessage",
+            defaultTemplate_catalogue: "@defaultTemplate_catalogue",
+            defaultTemplate_product: "@defaultTemplate_product",
+            messageType_CataloguePost: "@messageType_CataloguePost",
+            messageType_ProductPost: "@messageType_ProductPost",
+            newLineValue: "@TemplateComponent.LineBreak",
+            productNameValue: "@TemplateComponent.ProductName",
+            productCodeValue: "@TemplateComponent.ProductCode",
+            productDescriptionValue: "@TemplateComponent.ProductDescription",
+            productListPriceValue: "@TemplateComponent.ProductListPrice",
+            productReplyKeyword: "@TemplateComponent.Keyword",
+            separator: "@separator"
+        },
+        localizer: {
+            saveTemplateTitle: "Template Saved",
+            saveTemplateMessage: "The template was saved.",
+        }
+    };
+</script>
+
+<div class="container-fluid mt-md-4 mt-5 d-flex justify-content-center">
+    <div class="container">
+        <div class="d-flex justify-content-center my-3">
+            <div id="load-indicator-top"></div>
+        </div>
+                
+        <h3>Template for Publishing Products</h3>
+        <div class="row mb-2">
+            <div class="col-sm">
+                <h4 class="mb-2">Customized Template</h4>                
+                <div id="block-panel-product" class="rounded border border-success bg-white py-1 mb-3" style="min-width:100px; min-height:100px;">&nbsp;</div>                                
+                <div class="input-group mb-3">
+                    <select id="component-select-product" class="custom-select">
+                        <option selected disabled value="">Standard Message Component</option>
+                        <option value="@TemplateComponent.LineBreak">New Line</option>
+                        <option value="@TemplateComponent.ProductName">Product Name</option>
+                        <option value="@TemplateComponent.ProductCode">Product Code</option>
+                        <option value="@TemplateComponent.ProductDescription">Product Description</option>
+                        <option value="@TemplateComponent.ProductListPrice">Product Price</option>
+                        <option value="@TemplateComponent.DefaultMessage">Default Message</option>
+                        <option value="@TemplateComponent.Keyword">Keyword</option>
+                    </select>
+                    <div class="input-group-append">
+                        <button id="component-btn-product" class="btn btn-outline-primary" type="button">Add</button>
+                    </div>
+                    <div class="invalid-feedback">Your message should mention the keyword.</div>
+                </div>
+
+                <div class="input-group mb-3">
+                    <input type="text" id="custom-input-product" class="form-control" placeholder="Custom Text" aria-label="Custom Text" aria-describedby="basic-addon2">
+                    <div class="input-group-append">
+                        <button id="custom-btn-product" class="btn btn-outline-primary" type="button">Add</button>
+                    </div>
+                </div>
+
+                <div class="input-group mb-3">
+                    <label class="my-1 mr-2" for="keyword-input-product">Key word to trigger chatbot actions</label>
+                    <input type="text" id="keyword-input-product" class="form-control" placeholder="(For example: BUY)">
+                    <div class="invalid-feedback">The keyword must not be blank and consist of up to 10 characters</div>
+                </div>
+
+                <button id="restore-default-btn-product" class="btn btn-outline-danger mb-3" type="button">Default Setting</button>
+                <button id="save-template-btn-product" class="btn btn-outline-info mb-3" type="button">Save</button>
+            </div>
+
+            <div class="col-sm">
+                <h4 class="mb-2">Preview</h4>
+                <div id="preview-panel-product" class="rounded border border-success p-2 bg-white" style="min-width:100px; min-height:100px;">&nbsp;</div>
+            </div>
+        </div>
+
+        @*Hide catalogue setting in production for now*@
+        <div id="catalogue-setting">
+            <h3>Template for Publishing Catalogues</h3>
+            <div class="row mb-2">
+                <div class="col-sm">
+                    <h4 class="mb-2">Customized Template</h4>
+                    <div id="block-panel-catalogue" class="rounded border border-success bg-white py-1 mb-3" style="min-width:100px; min-height:100px;">&nbsp;</div>
+                    <div class="input-group mb-3">
+                        <select id="component-select-catalogue" class="custom-select">
+                            <option selected disabled value="">Standard Message Component</option>
+                            <option value="@TemplateComponent.LineBreak">New Line</option>
+                            <option value="@TemplateComponent.CatalogueName">Catalogue Name</option>
+                            <option value="@TemplateComponent.CatalogueCode">Catalogue Code</option>
+                            <option value="@TemplateComponent.CatalogueStartDate">Catalogue Start Date</option>
+                            <option value="@TemplateComponent.CatalogueEndDate">Catalogue End Date</option>
+                            <option value="@TemplateComponent.CatalogueUrl">Catalogue URL</option>
+                            <option value="@TemplateComponent.DefaultMessage">Default Message</option>
+                        </select>
+                        <div class="input-group-append">
+                            <button id="component-btn-catalogue" class="btn btn-outline-primary" type="button">Add</button>
+                        </div>
+                    </div>
+
+                    <div class="input-group mb-3">
+                        <input type="text" id="custom-input-catalogue" class="form-control" placeholder="Custom Text" aria-label="Custom Text" aria-describedby="basic-addon2">
+                        <div class="input-group-append">
+                            <button id="custom-btn-catalogue" class="btn btn-outline-primary" type="button">Add</button>
+                        </div>
+                    </div>
+                    <button id="restore-default-btn-catalogue" class="btn btn-outline-danger mb-3" type="button">Default Setting</button>
+                    <button id="save-template-btn-catalogue" class="btn btn-outline-info mb-3" type="button">Save</button>
+                </div>
+
+                <div class="col-sm">
+                    <h4 class="mb-2">Preview</h4>
+                    <div id="preview-panel-catalogue" class="rounded border border-success p-2 bg-white" style="min-width:100px; min-height:100px;">&nbsp;</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

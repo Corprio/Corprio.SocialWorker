@@ -8,19 +8,10 @@ using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Corprio.CorprioAPIClient;
-using Corprio.SocialWorker.Dictionaries;
-using Corprio.CorprioRestClient;
-using Corprio.DataModel.Business.Products.ViewModel;
-using Corprio.DataModel.Business.Products;
-using Corprio.DataModel.Business;
-using Corprio.DataModel;
-using Corprio.Core.Exceptions;
-using Corprio.DataModel.Shared;
 
 namespace Corprio.SocialWorker.Helpers
 {
-    public class ActionHelper
+    public class ApiActionHelper
     {
         /// <summary>
         /// Make a post or comment
@@ -83,7 +74,7 @@ namespace Corprio.SocialWorker.Helpers
             {
                 Log.Error($"Encountered an error in posting to {endPoint}. {payload?.Error?.CustomErrorMessage()}");
             }
-            return payload?.Id;
+            return payload?.MetaID;
         }
 
         /// <summary>
@@ -125,24 +116,6 @@ namespace Corprio.SocialWorker.Helpers
                 Log.Error($"Encountered an error when sending a message to {recipientId}. {feedback?.Error?.CustomErrorMessage()}");
             }
             return feedback;
-        }
-
-        /// <summary>
-        /// Get custom data
-        /// </summary>
-        /// <param name="corprioClient">Client for Api requests among Corprio projects</param>
-        /// <param name="organizationID">Organization ID</param>
-        /// <param name="key">Key for custom data</param>
-        /// <returns>Custom data as a class object</returns>
-        public static async Task<T> GetCustomData<T>(APIClient corprioClient, Guid organizationID, string key)
-        {
-            string customData = await corprioClient.ApplicationSubscriptionApi.GetCustomData(organizationID: organizationID, key: key);
-            if (string.IsNullOrWhiteSpace(customData))
-            {
-                Log.Error($"No custom data found for {organizationID}");
-                return default;
-            }
-            return JsonConvert.DeserializeObject<T>(customData)!;
         }        
     }
 }

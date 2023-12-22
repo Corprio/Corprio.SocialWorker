@@ -14,22 +14,47 @@ using Microsoft.Extensions.Configuration;
 using Corprio.SocialWorker.Helpers;
 using System.Linq;
 using Corprio.SocialWorker.Dictionaries;
+using Microsoft.EntityFrameworkCore;
+using Corprio.AspNetCore.Site.Filters;
+using DevExtreme.AspNet.Mvc;
+using Corprio.DevExtremeLib;
 
 namespace Corprio.SocialWorker.Controllers
 {
     public class CataloguePublicationController : MetaApiController
     {
-        readonly IConfiguration configuration;
+        private readonly ApplicationDbContext db;        
 
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="configuration"></param>
-        public CataloguePublicationController(IConfiguration configuration) : base(configuration)
+        public CataloguePublicationController(ApplicationDbContext context, IConfiguration configuration) : base(configuration)
         {
+            db = context;
         }
 
-        public IActionResult Index() => View();
+        public override IActionResult Index([FromRoute] Guid organizationID)
+        {
+            return View(organizationID);
+        }
+
+        /// <summary>
+        /// Get catalogue records
+        /// </summary>
+        /// <param name="corprioClient"></param>
+        /// <param name="loadDataOptions"></param>
+        /// <returns></returns>
+        [OrganizationAuthorizationCheck(
+           ActionEntityTypes = new EntityType[] { EntityType.ProductList },
+           RequiredPermissions = new DataAction[] { DataAction.Read })]
+        public async Task<IActionResult> GetPage([FromServices] APIClient corprioClient, DataSourceLoadOptions loadDataOptions)
+        {
+            PagedList<CatalogueViewModel> list = await corprioClient.ProductListApi.QueryPage<CatalogueViewModel>(OrganizationID,
+                "new (ID,Code,Name,StartDate,EndDate,Remark)", loadDataOptions?.ToCorprioLoadDataOption());
+
+            return list.FormGridPageResult();
+        }
 
         /// <summary>
         /// Publish a product list
@@ -39,26 +64,28 @@ namespace Corprio.SocialWorker.Controllers
         /// <param name="organizationID">Organization ID</param>
         /// <param name="productlistID">Entity ID of product list</param>
         /// <returns>(1) True if the whole operation is completed and (2) list of any error messages</returns>
-        public async Task<Tuple<bool, List<string>>> PublishCatalogue([FromServices] HttpClient httpClient, [FromServices] APIClient corprioClient,
-            [FromRoute] Guid organizationID, [FromRoute] Guid productlistID)
+        [HttpPost]
+        public async Task<IActionResult> PublishCatalogue([FromServices] HttpClient httpClient, [FromServices] APIClient corprioClient,
+            [FromRoute] Guid organizationID, Guid productlistID)
         {
-            List<string> errorMessages = new();
-            MetaUser metaUser = await ActionHelper.GetCustomData<MetaUser>(corprioClient: corprioClient, organizationID: organizationID,
-                key: BabelFish.CustomDataKeyForMetaUser) ?? throw new Exception($"Failed to get Meta user for {organizationID}.");
+            if (productlistID.Equals(Guid.Empty)) throw new Exception("Product list ID is invalid.");            
+            MetaUser metaUser = db.MetaUsers.Include(x => x.Pages).FirstOrDefault(x => x.OrganizationID == organizationID)
+                ?? throw new Exception($"Failed to get Meta user for {organizationID}.");
 
-            if (metaUser.PageIds.Count == 0)
+            List<string> errorMessages = new();
+            if (metaUser.Pages.Count == 0)
             {
                 errorMessages.Add($"{organizationID} has no pages to publish catalogue {productlistID}.");
                 Log.Information(errorMessages.Last());
-                return new Tuple<bool, List<string>>(false, errorMessages);
+                return StatusCode(400, errorMessages);
             }
 
             ProductList productList = await corprioClient.ProductListApi.Get(organizationID: organizationID, id: productlistID)
                 ?? throw new Exception($"Product list {productlistID} could not be found.");
             OrganizationCoreInfo coreInfo = await corprioClient.OrganizationApi.GetCoreInfo(organizationID)
                 ?? throw new Exception($"Failed to get core information of organization {organizationID}.");
-            // note: do not use the description in product list because it includes HTML tags
-            string message = $"{productList.Name}\n{BabelFish.Vocab["VisitCatalogue"][UtilityHelper.NICAM(coreInfo)]}\n{configuration["GoBuyClickUrl"]}/Catalogue/{coreInfo.ShortName}/{productList.Code}";
+            PostTemplate template = await DbActionHelper.GetTemplate(db: db, organizationID: organizationID, messageType: MessageType.CataloguePost);
+            string message = template.CataloguePostMessage(productList: productList, coreInfo: coreInfo, goBuyClickUrl: GoBuyClickUrl);                        
 
             PagedList<ProductInfo> products;
             List<string> imageUrls = new();
@@ -84,7 +111,7 @@ namespace Corprio.SocialWorker.Controllers
                     string imageUrlKey = productInfo.Image01ID == null ? string.Empty : await corprioClient.ImageApi.UrlKey(organizationID: organizationID, id: (Guid)productInfo.Image01ID);
                     string imageUrl = string.IsNullOrWhiteSpace(imageUrlKey) ? string.Empty : corprioClient.ImageApi.Url(organizationID: organizationID, imageUrlKey: imageUrlKey);
 
-                    // DEV ONLY: the imageUrl generated in DEV environment won't work, so we re-assign a publicly accessible URL to it FOR NOW
+                    // DEV ONLY: the imageUrl generated in DEV environment won't work, so we re-assign a publicly accessible URL to it
                     if (imageUrl.Contains("localhost")) imageUrl = GenerateImageUrlForDev();
 
                     if (!string.IsNullOrWhiteSpace(imageUrl)) imageUrls.Add(imageUrl);
@@ -94,24 +121,16 @@ namespace Corprio.SocialWorker.Controllers
 
             string postId;
             bool success = true;
-            foreach (string pageId in metaUser.PageIds)
+            foreach (MetaPage page in metaUser.Pages)
             {
-                MetaPage page = await ActionHelper.GetCustomData<MetaPage>(corprioClient: corprioClient, organizationID: organizationID, key: pageId);
-                if (string.IsNullOrWhiteSpace(page?.Token))
+                // note: if there are no images to begin with, we simply don't attempt to post anything to IG
+                if (!string.IsNullOrWhiteSpace(page.InstagramID) && imageUrls.Any())
                 {
-                    errorMessages.Add($"Failed to retrieve page access token for {pageId}.");
-                    Log.Information(errorMessages.Last());
-                    success = false;
-                    continue;
-                }
-
-                if (!string.IsNullOrWhiteSpace(page.IgId))
-                {
-                    postId = await MakeIgCarouselPost(httpClient: httpClient, accessToken: page.Token, igUserId: page.IgId,
+                    postId = await MakeIgCarouselPost(httpClient: httpClient, accessToken: page.Token, igUserId: page.InstagramID,
                         mediaUrls: imageUrls, message: message);
                     if (string.IsNullOrWhiteSpace(postId))
                     {
-                        errorMessages.Add($"Failed to publish carousel post to {page.Name}-{page.IgId}");
+                        errorMessages.Add($"Failed to publish carousel post to {page.Name}-{page.InstagramID}");
                         Log.Information(errorMessages.Last());
                         success = false;
                     }
@@ -127,7 +146,7 @@ namespace Corprio.SocialWorker.Controllers
                 }
             }
 
-            return new Tuple<bool, List<string>>(success, errorMessages);
+            return success ? StatusCode(200) : StatusCode(400, errorMessages);            
         }
     }
 }

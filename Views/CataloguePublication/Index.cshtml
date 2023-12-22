@@ -1,7 +1,95 @@
-﻿@using Corprio.Core.Utility
+﻿@using Corprio.DataModel.Business.Products
+@using Corprio.AspNetCore.Site.Extensions
+@using Corprio.SocialWorker.Models
+@inject System.Text.Encodings.Web.JavaScriptEncoder encoder
+@inject Corprio.CorprioAPIClient.APIClient corprio
+@inject Microsoft.Extensions.Configuration.IConfiguration configuration
 @{
-    ViewData["Title"] = "Catalogue Publication";
     Guid organizationID = Context.SelectedOrganizationID() ?? Guid.Empty;
+    ViewData["Title"] = @localizer["PublishCatalogue"];
+    string goBuyClickUrl = configuration["GoBuyClickUrl"];
 }
+<div class="m-4">
+    <div class="title-border-l">
+        <h4>@localizer["PublishCatalogue"]</h4>
+    </div>
+    <div class="d-flex justify-content-center my-3">
+        <div id="load-indicator-top"></div>
+    </div>
+    @(
+        Html.DevExtreme().DataGrid<CatalogueViewModel>()
+        .StandardGrid(gridID: "catalogue-grid")
+        .RowAlternationEnabled(false)
+        .ShowRowLines(true)
+        .NoDataText(localizer["noData"])
+        .ConfigDataSource(controllerName: "CataloguePublication", organizationID: organizationID)
+        .ElementAttr("class", "clickable-row")        
+        .OnRowClick($"function(e){{ window.open(`{goBuyClickUrl}/{organizationID}/catalogue/Edit/productlistid`.replace('productlistid', e.key), '_blank').focus() }}")
+        .Columns(col =>
+        {
+            // reference: https://demos.devexpress.com/ASPNetCore/Demo/DataGrid/CommandColumnCustomization/
+            col.Add().Caption(localizer["Publish"]).Name("Publish").Type(GridCommandColumnType.Buttons).Width(52).ShowInColumnChooser(false)
+            .Buttons(b => b.Add().Hint(localizer["PublishCatalogueHint"]).Icon("upload").OnClick("PublishCatalogue"));
+            col.AddFor(m => m.Code);
+            col.AddFor(m => m.Name);
+            col.AddShortDateTimeFor(m => m.StartDate, User.UserSettings()).SortOrder(SortOrder.Desc).DataType(GridColumnDataType.Date);
+            col.AddShortDateTimeFor(m => m.EndDate, User.UserSettings()).DataType(GridColumnDataType.Date);
+            col.AddFor(m => m.Remark);
+        })        
+        .Toolbar(toolbar => toolbar.Items(items =>
+        {
+            items.Add().Name(DataGridToolbarItem.ColumnChooserButton).Location(ToolbarItemLocation.After);
+            items.Add().Name(DataGridToolbarItem.ExportButton).Location(ToolbarItemLocation.After);
+            // redirect to GoBuyClick
+            items.Add().Location(ToolbarItemLocation.Before).ShowText(ToolbarItemShowTextMode.Always)
+            .Widget(w => w.Button().Text(globalLocalizer["Add New"]).Type(ButtonType.Default)
+            .OnClick($"function(e){{ window.open(`{goBuyClickUrl}/{organizationID}/Catalogue/Add`, '_blank').focus() }}"));
+        }))
+    )
+    <div class="d-flex justify-content-center my-3">
+        <div id="load-indicator-bottom"></div>
+    </div>
+</div>
+<vc:static-data model="@StaticDataRequestViewModel.All(true)" org-info="true" />
+<script>
+    const viewSettingConfig = corprio.gridViewStateConfig("product", "grd");
+    const langs = StaticData.OrgInfo.SupportedLanguages;
+    const loadIndicatorTop = $('#load-indicator-top').dxLoadIndicator({ visible: false }).dxLoadIndicator('instance');
+    const loadIndicatorBottom = $('#load-indicator-bottom').dxLoadIndicator({ visible: false }).dxLoadIndicator('instance');
 
-<div class="container-fluid mt-md-4 mt-5 d-flex justify-content-center" style="max-width: 770px;">Catalogue Publication</div>
+    function PublishCatalogue(e) {
+        console.log(e.row.data.ID);
+        var prompt = DevExpress.ui.dialog.custom({
+            title: "@encoder.Encode(localizer["PublishCatalogue"])",
+            messageHtml: "<p>@encoder.Encode(localizer["PublishCataloguePrompt"])</p>",
+            buttons: [{
+                text: "@encoder.Encode(localizer["Confirm"])",
+                onClick: function () {
+                    loadIndicatorTop.option('visible', true);
+                    loadIndicatorBottom.option('visible', true);
+                    $.ajax({
+                        url: "@Url.Action("PublishCatalogue", new { organizationID })",
+                        type: "POST",
+                        data: { productlistID: e.row.data.ID }
+                    }).done(function () {
+                        var message = DevExpress.ui.dialog.custom({
+                            title: "@encoder.Encode(localizer["PublicationCompletedTitle"])",
+                            messageHtml: "<p>@localizer["CataloguePublicationCompletedMessage"]</p>",
+                        });
+                        message.show();
+                    }).fail(corprio.formatError)
+                    .always(() => {
+                        loadIndicatorTop.option('visible', false);
+                        loadIndicatorBottom.option('visible', false);
+                    });
+                },
+                type: "default",
+            }, {
+                text: "@encoder.Encode(localizer["Cancel"])",
+                onClick: function () { console.log("Cancelled") },
+                type: "normal",
+            }]
+        });
+        prompt.show();
+    }
+</script>

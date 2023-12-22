@@ -1,7 +1,185 @@
-﻿@using Corprio.Core.Utility
+﻿@using Corprio.DataModel.Business.Products
+@using Corprio.AspNetCore.Site.Extensions
+@using Corprio.SocialWorker.Models
+@inject System.Text.Encodings.Web.JavaScriptEncoder encoder
+@inject Corprio.CorprioAPIClient.APIClient corprio
+@inject Microsoft.Extensions.Configuration.IConfiguration configuration
 @{
-    ViewData["Title"] = "Product Publication";
     Guid organizationID = Context.SelectedOrganizationID() ?? Guid.Empty;
+    ViewData["Title"] = @localizer["PublishProduct"];
+    string masterProductUrl = configuration["ProductMasterUrl"];
 }
+<div class="m-4">
+    <div class="title-border-l">
+        <h4>@localizer["PublishProduct"]</h4>
+    </div>
+    <div class="d-flex justify-content-center my-3">
+        <div id="load-indicator-top"></div>
+    </div>
+    @(
+        Html.DevExtreme().DataGrid<ProductViewModel>()
+        .StandardGrid()
+        .ConfigDataSource(controllerName: "ProductPublication", organizationID: organizationID)
+        .ElementAttr("class", "clickable-row")
+        .NoDataText(localizer["noData"])
+        // redirect to ProductMaster        
+        .OnRowClick($"function(e){{ window.open(`{masterProductUrl}/{organizationID}/Product/Edit/productid`.replace('productid', e.key), '_blank').focus() }}")
+        .Columns(col =>
+        {
+            // reference: https://demos.devexpress.com/ASPNetCore/Demo/DataGrid/CommandColumnCustomization/
+            col.Add().Caption(localizer["Publish"]).Name("Publish").Type(GridCommandColumnType.Buttons).Width(52).ShowInColumnChooser(false)
+            .Buttons(b => b.Add().Hint(localizer["PublishProductHint"]).Icon("upload").OnClick("PublishProduct"));
+            col.AddFor(m => m.MasterProductCode).Visible(false).AllowEditing(false).CalculateSortValue("MasterProduct.Code");
+            col.AddFor(m => m.Code).SortOrder(SortOrder.Asc);
+            col.AddFor(m => m.Name).SetCellValue("setNameValue");
+            col.AddFor(m => m.Description).Visible(false).SetCellValue("setDescriptionValue");
+            col.AddFor(m => m.GlobalizedName).GlobalText().Visible(false);
+            col.AddFor(m => m.GlobalizedDescription).GlobalText().Visible(false);
+            col.AddFor(m => m.GlobalizedLongDescription).GlobalHTML().Visible(false);
+            col.AddFor(m => m.DefaultBarcode).Visible(false);
+            col.AddFor(m => m.Nature).LookupEnum(typeof(ProductNature));
+            col.AddFor(m => m.ProductTypeID).LookupProductType(organizationID)
+            .CalculateDisplayValue(nameof(ProductViewModel.ProductTypeName))
+            .CalculateSortValue("ProductType.Name")
+            .CellTemplate(new JS($"corprio.ui.launchAppCellTemplate('{organizationID}','ProductType','ProductTypeID')"));
+            col.AddFor(m => m.BrandID).LookupBrand(organizationID)
+            .CalculateDisplayValue(nameof(ProductViewModel.BrandName))
+            .CalculateSortValue("Brand.Name")
+            .CellTemplate(new JS($"corprio.ui.launchAppCellTemplate('{organizationID}','Brand','BrandID')"));
+            col.AddFor(m => m.StockUOMCode).Caption(localizer["UnitOfMeasure"]).Visible(false);
+            col.AddFor(m => m.Model);
+            col.AddFor(m => m.ListPrice_CurrencyCode).Caption(localizer["ListPriceCurrency"]).Visible(false);
+            col.AddFor(m => m.ListPrice_Value).Caption(localizer["ListPriceValue"]).DataType(GridColumnDataType.Number).CalculateDisplayValue(new JS("displayListPrice")).CalculateSortValue("ListPrice_Value");
+            col.AddFor(m => m.GrossWeight).Visible(false);
+            col.AddFor(m => m.NetWeight).Visible(false);
+            col.AddFor(m => m.WeightUnit).Visible(false).Lookup(lookup =>
+            lookup.DataSource(Corprio.Global.Measure.Lists.WeightUnitList()).DisplayExpr("Value").ValueExpr("Key").AllowClearing(true));
+            col.AddFor(m => m.Length).DataType(GridColumnDataType.Number).Visible(false);
+            col.AddFor(m => m.Width).DataType(GridColumnDataType.Number).Visible(false);
+            col.AddFor(m => m.Height).DataType(GridColumnDataType.Number).Visible(false);
+            col.AddFor(m => m.LengthUnit).Visible(false).Lookup(lookup =>
+            lookup.DataSource(Corprio.Global.Measure.Lists.LengthUnitList()).DisplayExpr("Value").ValueExpr("Key").AllowClearing(true));
+            col.AddFor(m => m.Image01).Visible(false).ImageColumn(uploadUrl: Url.Action("upload", "image"), cellDisplayTemplate: "imageCellDisplay", imageSpec: localizer["ProductImageSpec"]);
+            col.AddFor(m => m.Tags)
+            .CalculateFilterExpression("filterTag")
+            .FilterOperations(new GridFilterOperations[] { GridFilterOperations.Equal })
+            .CellTemplate(new JS("TagsCellTemplate"))
+            .EditCellTemplate(new TemplateName("TagsEditTemplate"))
+            .AllowSorting(false);
+            col.AddFor(m => m.IsMasterProduct).Visible(false).CellTemplate(new JS(@$"corprio.ui.boolColumnCellTemplate('{Corprio.DataModel.Resources.Resource.IsMasterProduct}')"));
+            col.AddFor(m => m.Disabled).FilterValue(false).Width(60).CellTemplate(new JS(@$"corprio.ui.boolColumnCellTemplate('{Corprio.DataModel.Resources.Resource.IsDisabled}')"));
+            col.AddShortDateTimeFor(m => m.CreateDate, User.UserSettings()).Visible(false).AllowEditing(false);
+            col.AddShortDateTimeFor(m => m.LastUpdateDate, User.UserSettings()).Visible(false).AllowEditing(false);
+        })        
+        .Toolbar(toolbar => toolbar.Items(items =>
+        {
+            // redirect to ProductMaster
+            items.Add().Location(ToolbarItemLocation.Before).ShowText(ToolbarItemShowTextMode.Always)
+            .Widget(w => w.Button().Text(globalLocalizer["Add New"]).Type(ButtonType.Default)
+            .OnClick($"function(e){{ window.open(`{masterProductUrl}/{organizationID}/Product/Add`, '_blank').focus() }}"));
+            items.Add().Name(DataGridToolbarItem.ColumnChooserButton).Location(ToolbarItemLocation.After);
+            items.Add().Name(DataGridToolbarItem.ExportButton).Location(ToolbarItemLocation.After);
+        }))
+    )
+    <div class="d-flex justify-content-center my-3">
+        <div id="load-indicator-bottom"></div>
+    </div>
+</div>
+<vc:static-data model="@StaticDataRequestViewModel.All(true)" org-info="true" />
+<script>
+    const viewSettingConfig = corprio.gridViewStateConfig("product", "grd");
+    const langs = StaticData.OrgInfo.SupportedLanguages;
+    const loadIndicatorTop = $('#load-indicator-top').dxLoadIndicator({ visible: false }).dxLoadIndicator('instance');
+    const loadIndicatorBottom = $('#load-indicator-bottom').dxLoadIndicator({ visible: false }).dxLoadIndicator('instance');
+    
+    function PublishProduct(e) {
+        console.log(e.row.data.ID);
+        var prompt = DevExpress.ui.dialog.custom({
+            title: "@encoder.Encode(localizer["PublishProduct"])",
+            messageHtml: "<p>@encoder.Encode(localizer["PublishProductPrompt"])</p>",
+            buttons: [{
+                text: "@encoder.Encode(localizer["Confirm"])",
+                onClick: function () {                                                            
+                    loadIndicatorTop.option('visible', true);
+                    loadIndicatorBottom.option('visible', true);
+                    $.ajax({
+                        url: "@Url.Action("PublishProduct", new { organizationID })",
+                        type: "POST",
+                        data: { productID: e.row.data.ID }
+                    }).done(function () {
+                        var message = DevExpress.ui.dialog.custom({
+                            title: "@encoder.Encode(localizer["PublicationCompletedTitle"])",
+                            messageHtml: "<p>@localizer["ProductPublicationCompletedMessage"]</p>",
+                        });
+                        message.show();
+                    }).fail(corprio.formatError)
+                    .always(() => { 
+                        loadIndicatorTop.option('visible', false);
+                        loadIndicatorBottom.option('visible', false);
+                    });
+                },
+                type: "default",
+            }, {
+                text: "@encoder.Encode(localizer["Cancel"])",
+                onClick: function () { console.log("Cancelled") },
+                type: "normal",
+            }]
+        });
+        prompt.show();
+    }
 
-<div class="container-fluid mt-md-4 mt-5 d-flex justify-content-center" style="max-width: 770px;">Product Publication</div>
+    function displayListPrice(rowData) {
+        if (rowData.ListPrice_Value === null || rowData.ListPrice_CurrencyCode == null)
+            return "";
+        else {
+            var dp = StaticData.CurrencyDecimals[rowData.ListPrice_CurrencyCode];
+            if (dp === null) dp = 2;
+            var numberFormat = new Intl.NumberFormat(corprio.getLang(), { style: 'currency', currency: rowData.ListPrice_CurrencyCode });
+            return numberFormat.format(rowData.ListPrice_Value);
+        }
+    }        
+
+    function imageCellDisplay(cellElement, cellInfo) {
+        if (cellInfo.value && cellInfo.value.UrlKey) cellElement.append($("<img>", { "src": '@corprio.ImageApi.UrlPrefix(organizationID, ImageSize.Thumbnail)' + cellInfo.value.UrlKey, "alt": cellInfo.data.Code }));
+    }
+
+    function setNameValue(newData, value, currentRowData) {
+        newData.Name = value;
+        if (!currentRowData.ID) newData.GlobalizedName = corprio.globalText.init(value, langs); //initialize global name for new record
+    }
+
+    function setDescriptionValue(newData, value, currentRowData) {
+        newData.Description = value;
+        if (!currentRowData.ID) newData.GlobalizedDescription = corprio.globalText.init(value, langs);//initialize global description for new record
+    }
+
+    //show tags
+    function TagsCellTemplate(container, options) {
+        var data = options.value;
+        var text = "";
+        $.each(data, (i, v) => {
+            if (i != 0)
+                text += ",";
+            text += v;
+        });
+        container.text(text);
+    }
+    function filterTag(filterValue, selectedFilterOperation) {
+        return ["EntityProperties.Any(Name==\"tag\" && Value==\"" + filterValue + "\")", "=", "true"];
+    }
+
+</script>
+@using (Html.DevExtreme().NamedTemplate("TagsEditTemplate"))
+{
+    @(Html.DevExtreme().TagBox()
+                .DataSource(d => d.ConfigController("ProductPublication", "GetDistinctProductPropertyValues", organizationID, "", new { propertyName = "tag" }))
+                .DataSourceOptions(option => option.PageSize(50).Paginate(true).SearchOperation(FilterOperations.Contains))
+                .Value(new JS("value"))
+                .AcceptCustomValue(true)
+                .HideSelectedItems(true)
+                .SearchEnabled(true)
+                .ApplyValueMode(EditorApplyValueMode.Instantly)
+                .OnValueChanged("function(e) {setValue(e.value);}")
+                .OnSelectionChanged("function(e) {component.updateDimensions}")
+            )
+}

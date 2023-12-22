@@ -1,5 +1,4 @@
 ﻿using Corprio.AspNetCore.Site.Controllers;
-using Corprio.CorprioAPIClient;
 using Corprio.SocialWorker.Models;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
@@ -9,38 +8,32 @@ using System.Threading.Tasks;
 using System;
 using System.Collections.Generic;
 using Serilog;
-using Corprio.DataModel.Business;
-using System.Net.Http.Headers;
-using Corprio.AspNetCore.Site.Filters;
-using Corprio.DataModel;
 using Corprio.DataModel.Business.Products;
 using System.Dynamic;
-using Corprio.DataModel.Business.Products.ViewModel;
 using Microsoft.Extensions.Configuration;
 using Corprio.SocialWorker.Helpers;
 using Corprio.Core;
 using System.Linq;
-using Corprio.SocialWorker.Dictionaries;
-using Corprio.DataModel.Shared;
-using Corprio.Core.Exceptions;
 
 namespace Corprio.SocialWorker.Controllers
 {
-    public class MetaApiController : OrganizationBaseController
-    {
+    public abstract class MetaApiController : OrganizationBaseController
+    {                
         readonly IConfiguration configuration;
-        public readonly string AppId;
-        public readonly string ApiVersion;
-        public readonly string AppSecret;
-        public readonly string BaseUrl;        
+        protected readonly string AppId;
+        protected readonly string ApiVersion;
+        protected readonly string AppSecret;
+        protected readonly string BaseUrl;
+        protected readonly string GoBuyClickUrl;
 
         public MetaApiController(IConfiguration configuration) : base()
-        {
+        {            
             this.configuration = configuration;
             AppId = configuration["MetaApiSetting:AppId"];
             ApiVersion = configuration["MetaApiSetting:ApiVersion"];
             BaseUrl = configuration["MetaApiSetting:BaseUrl"];            
             AppSecret = "b8956ab840c1d15a8bb0bee5551a6ccb"; // Put this in a vault!!!
+            GoBuyClickUrl = configuration["GoBuyClickUrl"];
         }                
         
         public override IActionResult Index([FromRoute] Guid organizationID) => base.Index(organizationID);
@@ -49,7 +42,7 @@ namespace Corprio.SocialWorker.Controllers
         /// Randomly generate an image URL for testing in development
         /// </summary>
         /// <returns>An image URL</returns>
-        public string GenerateImageUrlForDev()
+        protected string GenerateImageUrlForDev()
         {
             var imageUrls = new List<string>()
             {
@@ -95,7 +88,7 @@ namespace Corprio.SocialWorker.Controllers
         /// <param name="isCarouselItem">True if the media item is part of a carousel post</param>
         /// <param name="carouselChildren">Up to 10 container IDs of images/videos that will be part of the carousel post</param>
         /// <returns>ID of the media container</returns>
-        public async Task<string> MakeIgItemContainer(HttpClient httpClient, string igUserId, string accessToken, IgMediaType mediaType,
+        protected async Task<string> MakeIgItemContainer(HttpClient httpClient, string igUserId, string accessToken, IgMediaType mediaType,
             string mediaUrl = null, string caption = null, bool isCarouselItem = false, List<string> carouselChildren = null)
         {
             if (string.IsNullOrWhiteSpace(mediaUrl) && mediaType != IgMediaType.Carousel)
@@ -169,7 +162,7 @@ namespace Corprio.SocialWorker.Controllers
             {
                 Log.Error($"Encountered an error in creating container for {mediaUrl}. {payload?.Error?.CustomErrorMessage()}");
             }
-            return payload?.Id;
+            return payload?.MetaID;
         }
 
         /// <summary>
@@ -181,7 +174,7 @@ namespace Corprio.SocialWorker.Controllers
         /// <param name="accessToken">Page access token</param>
         /// <param name="mediaContainerId">ID of the media container to be published</param>
         /// <returns>ID of the published item</returns>
-        public async Task<string> PublishIgMedia(HttpClient httpClient, string igUserId, string accessToken, string mediaContainerId)
+        protected async Task<string> PublishIgMedia(HttpClient httpClient, string igUserId, string accessToken, string mediaContainerId)
         {
             dynamic queryParams = new ExpandoObject();
             queryParams.access_token = accessToken;
@@ -205,7 +198,7 @@ namespace Corprio.SocialWorker.Controllers
             {
                 Log.Error($"Encountered an error in publising media {mediaContainerId} for {igUserId}. {payload?.Error?.CustomErrorMessage()}");
             }
-            return payload?.Id;
+            return payload?.MetaID;
         }
 
         /// <summary>
@@ -218,10 +211,10 @@ namespace Corprio.SocialWorker.Controllers
         /// <param name="mediaUrls">List of publicly accessible URLs of the images to be posted</param>
         /// <param name="message">Message to be posted</param>
         /// <returns>ID of the media item posted</returns>
-        public async Task<string> MakeIgCarouselPost(HttpClient httpClient, string accessToken, string igUserId, List<string> mediaUrls, string message)
+        protected async Task<string> MakeIgCarouselPost(HttpClient httpClient, string accessToken, string igUserId, List<string> mediaUrls, string message)
         {
             // we need a cache mapping container Id against mediaUrl in case we sucessfully create ONLY 1 container (e.g., due to file size or format issue)
-            Dictionary<string, string> cache = new Dictionary<string, string>();
+            Dictionary<string, string> cache = new();
             foreach (string mediaUrl in mediaUrls)
             {
                 // note: image is hardcoded as the media type as we don't have a user case for posting video yet
@@ -239,13 +232,14 @@ namespace Corprio.SocialWorker.Controllers
                 if (cache.Count == 10) break;
             }
 
+            // IG does not allow text-only posts
             if (cache.Count == 0)
             {
                 Log.Error("Failed to create any image/video container for a carousel post.");
                 return null;
             }
 
-            // IG would return error message if there is only 1 few carousel item
+            // IG would return error message if there is only 1 carousel item
             if (cache.Count == 1)
             {
                 return await MakeIgNonCarouselPost(httpClient: httpClient, igUserId: igUserId, accessToken: accessToken,
@@ -273,7 +267,7 @@ namespace Corprio.SocialWorker.Controllers
         /// <param name="message">Message to be posted</param>
         /// <param name="mediaType">Type of media to be posted</param>
         /// <returns>ID of the media item posted</returns>
-        public async Task<string> MakeIgNonCarouselPost(HttpClient httpClient, string accessToken, string igUserId, string mediaUrl, string message, IgMediaType mediaType)
+        protected async Task<string> MakeIgNonCarouselPost(HttpClient httpClient, string accessToken, string igUserId, string mediaUrl, string message, IgMediaType mediaType)
         {
             string mediaContainerId = await MakeIgItemContainer(httpClient: httpClient, igUserId: igUserId, accessToken: accessToken,
                 mediaUrl: mediaUrl, caption: message, mediaType: mediaType);
@@ -295,13 +289,13 @@ namespace Corprio.SocialWorker.Controllers
         /// <param name="imageUrls">List of publicly accessible URLs of the images to be posted</param>
         /// <param name="message">Message to be posted</param>
         /// <returns>ID of the post</returns>
-        public async Task<string> MakeFbMultiPhotoPost(HttpClient httpClient, string accessToken, string pageId, List<string> imageUrls, string message)
+        protected async Task<string> MakeFbMultiPhotoPost(HttpClient httpClient, string accessToken, string pageId, List<string> imageUrls, string message)
         {
             List<string> photoIds = new();
             string photoId;
             foreach (string imageUrl in imageUrls)
             {
-                photoId = await ActionHelper.PostOrComment(httpClient: httpClient, accessToken: accessToken,
+                photoId = await ApiActionHelper.PostOrComment(httpClient: httpClient, accessToken: accessToken,
                     endPoint: $"{BaseUrl}/{ApiVersion}/{pageId}/photos",
                     mediaUrl: imageUrl, published: false);
                 if (string.IsNullOrWhiteSpace(photoId))
@@ -312,7 +306,7 @@ namespace Corprio.SocialWorker.Controllers
                 photoIds.Add(photoId);
             }
 
-            return await ActionHelper.PostOrComment(httpClient: httpClient, accessToken: accessToken,
+            return await ApiActionHelper.PostOrComment(httpClient: httpClient, accessToken: accessToken,
                 endPoint: $"{BaseUrl}/{ApiVersion}/{pageId}/feed",
                 message: message, photoIds: photoIds);
         }
@@ -322,7 +316,7 @@ namespace Corprio.SocialWorker.Controllers
         /// </summary>
         /// <param name="product">An object of Product class</param>
         /// <returns>A set of image IDs</returns>
-        public HashSet<Guid> ReturnImageUrls(Product product)
+        protected HashSet<Guid> ReturnImageUrls(Product product)
         {
             HashSet<Guid> validIds = new();
             if (product == null) return validIds;

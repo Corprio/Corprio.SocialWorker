@@ -2,7 +2,29 @@
 
 namespace Corprio.SocialWorker.Models
 {
-    public enum Platform
+    public enum BotLanguage
+    {
+        English,
+        SimplifiedChinese,
+        TraditionalChinese
+    }
+
+    public enum BotTopic
+    {
+        Limbo,
+        ProductOpen,
+        ProductYN,
+        ProductMC,
+        ProductVariationMC,
+        QuantityOpen,
+        CheckoutYN,
+        ClearCartYN,
+        EmailOpen,
+        EmailConfirmationOpen,
+        PromotionOpen
+    }
+
+    public enum MetaProduct
     {        
         Facebook,        
         Instagram

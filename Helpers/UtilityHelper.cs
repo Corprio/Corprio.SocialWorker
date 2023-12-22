@@ -10,6 +10,25 @@ namespace Corprio.SocialWorker.Helpers
     public class UtilityHelper
     {
         /// <summary>
+        /// Undo any sanitization done on the client-side first and - optionally - perform another sanitization.
+        /// (Note: we need to undo any sanitization done on the client-side first to prevent things like $ampamp or &amplt;)
+        /// </summary>
+        /// <param name="userInput">Input that may or may not have gone through client-side sanitization</param>
+        /// <param name="onceIsOK">True if no re-sanitization is required</param>
+        /// <returns></returns>
+        public static string UncleanAndClean(string userInput, bool onceIsOK = false)
+        {
+            if (string.IsNullOrWhiteSpace(userInput)) return string.Empty;
+            
+            userInput = userInput.Replace("&amp;", "&").Replace("&lt;", "<").Replace("&gt;", ">").Replace("&quot;", "\"").Replace("&#x27;", "'").Replace("&nbsp;", " ");
+            if (!onceIsOK)
+            {
+                userInput = userInput.Replace("&", "&amp;").Replace("<", "&lt;").Replace(">", "&gt;").Replace("\"", "&quot;").Replace("'", "&#x27;").Replace(" ", "&nbsp;");
+            }                        
+            return userInput;
+        }
+
+        /// <summary>
         /// Extract an entity ID from dynamic query results
         /// </summary>
         /// <param name="dynamicQueryResults">Dynamic query results</param>
@@ -35,20 +54,18 @@ namespace Corprio.SocialWorker.Helpers
         /// <returns>An enum of language</returns>
         public static BotLanguage NICAM(OrganizationCoreInfo coreInfo)
         {
-            BotLanguage lang;
-            if (coreInfo.DefaultLanguage == LocaleCode.Chinese_HongKong || coreInfo.DefaultLanguage == LocaleCode.Chinese_Taiwan)
+            string defaultLanguage = coreInfo == null ? LocaleCode.English : coreInfo.DefaultLanguage;            
+            switch (defaultLanguage)
             {
-                lang = BotLanguage.TraditionalChinese;
-            }
-            else if (coreInfo.DefaultLanguage == LocaleCode.Chinese || coreInfo.DefaultLanguage == LocaleCode.Chinese_Simplified)
-            {
-                lang = BotLanguage.SimplifiedChinese;
-            }
-            else
-            {
-                lang = BotLanguage.English;
-            }
-            return lang;
+                case LocaleCode.Chinese_HongKong:
+                case LocaleCode.Chinese_Taiwan:
+                    return BotLanguage.TraditionalChinese;                    
+                case LocaleCode.Chinese:
+                case LocaleCode.Chinese_Simplified:
+                    return BotLanguage.SimplifiedChinese;                    
+                default:
+                    return BotLanguage.English;                    
+            }                                    
         }
     }
 }

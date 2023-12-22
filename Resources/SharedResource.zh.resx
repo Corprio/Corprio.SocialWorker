@@ -372,4 +372,52 @@
   <data name="PublishProduct" xml:space="preserve">
     <value>发布商品</value>
   </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>取消</value>
+  </data>
+  <data name="CataloguePublicationCompletedMessage" xml:space="preserve">
+    <value>商品目录已成功发布到您的社交平台。</value>
+  </data>
+  <data name="Confirm" xml:space="preserve">
+    <value>确认</value>
+  </data>
+  <data name="ListPriceCurrency" xml:space="preserve">
+    <value>标价货币</value>
+  </data>
+  <data name="ListPriceValue" xml:space="preserve">
+    <value>标价数值</value>
+  </data>
+  <data name="ProductImageSpec" xml:space="preserve">
+    <value>推荐 480px X 480px png 或 jpg 文件</value>
+  </data>
+  <data name="ProductPublicationCompletedMessage" xml:space="preserve">
+    <value>商品已成功发布到您的社交平台。</value>
+  </data>
+  <data name="PublicationCompletedTitle" xml:space="preserve">
+    <value>发布成功</value>
+  </data>
+  <data name="Publish" xml:space="preserve">
+    <value>发布</value>
+  </data>
+  <data name="PublishCatalogueHint" xml:space="preserve">
+    <value>发布商品目录到 Facebook 和 Instagram</value>
+  </data>
+  <data name="PublishCataloguePrompt" xml:space="preserve">
+    <value>您想发布此商品目录吗？一则介绍它的贴文将会发布到您的 Facebook 专页和 Instagram 帐户。</value>
+  </data>
+  <data name="PublishProductHint" xml:space="preserve">
+    <value>发布商品到 Facebook 和 Instagram</value>
+  </data>
+  <data name="PublishProductPrompt" xml:space="preserve">
+    <value>您想发布此商品吗？一则介绍它的贴文将会发布到您的 Facebook 专页和 Instagram 帐户。</value>
+  </data>
+  <data name="UnitOfMeasure" xml:space="preserve">
+    <value>单位</value>
+  </data>
+  <data name="TemplateSavedMessage" xml:space="preserve">
+    <value>已储存范本的更新</value>
+  </data>
+  <data name="TemplateSavedTitle" xml:space="preserve">
+    <value>范本更新</value>
+  </data>
 </root>

@@ -378,4 +378,52 @@
   <data name="PublishProduct" xml:space="preserve">
     <value>Publish Product</value>
   </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="CataloguePublicationCompletedMessage" xml:space="preserve">
+    <value>The catalogue was successfully published to your social media.</value>
+  </data>
+  <data name="Confirm" xml:space="preserve">
+    <value>Confirm</value>
+  </data>
+  <data name="ListPriceCurrency" xml:space="preserve">
+    <value>Price currency</value>
+  </data>
+  <data name="ListPriceValue" xml:space="preserve">
+    <value>List Price Value</value>
+  </data>
+  <data name="ProductImageSpec" xml:space="preserve">
+    <value>Recommend 480px X 480px png or jpg file</value>
+  </data>
+  <data name="ProductPublicationCompletedMessage" xml:space="preserve">
+    <value>The product was successfully published to your social media.</value>
+  </data>
+  <data name="PublicationCompletedTitle" xml:space="preserve">
+    <value>Publication completed</value>
+  </data>
+  <data name="Publish" xml:space="preserve">
+    <value>Publish</value>
+  </data>
+  <data name="PublishCatalogueHint" xml:space="preserve">
+    <value>Publish a post to Facebook and Instagram</value>
+  </data>
+  <data name="PublishCataloguePrompt" xml:space="preserve">
+    <value>Do you want to publish this catalogue? A post will be made to your Facebook page(s) and Instagram account(s).</value>
+  </data>
+  <data name="PublishProductHint" xml:space="preserve">
+    <value>Publish a post to Facebook and Instagram</value>
+  </data>
+  <data name="PublishProductPrompt" xml:space="preserve">
+    <value>Do you want to publish this product? A post will be made to your Facebook page(s) and Instagram account(s).</value>
+  </data>
+  <data name="UnitOfMeasure" xml:space="preserve">
+    <value>Unit Of Measure</value>
+  </data>
+  <data name="TemplateSavedMessage" xml:space="preserve">
+    <value>The template was saved.</value>
+  </data>
+  <data name="TemplateSavedTitle" xml:space="preserve">
+    <value>Template saved</value>
+  </data>
 </root>

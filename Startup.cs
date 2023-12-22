@@ -8,6 +8,8 @@ using Corprio.AspNetCore.XtraReportSite;
 using Corprio.Core;
 using Microsoft.AspNetCore.Http;
 using Corprio.CorprioRestClient;
+using Corprio.SocialWorker.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace Corprio.SocialWorker
 {
@@ -25,6 +27,8 @@ namespace Corprio.SocialWorker
         {            
             services.AddCommonAppServices(Configuration);
             services.AddHttpClient();
+            services.AddDbContext<ApplicationDbContext>(options => options.UseSqlite(
+                Configuration.GetConnectionString("localDb")));
 
             CorprioApiSetting corprioApiSetting = new()
             {

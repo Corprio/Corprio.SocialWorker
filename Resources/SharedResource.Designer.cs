@@ -115,11 +115,38 @@ namespace Corprio.SocialWorker.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Cancel.
+        /// </summary>
+        public static string Cancel {
+            get {
+                return ResourceManager.GetString("Cancel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The catalogue was successfully published to your social media..
+        /// </summary>
+        public static string CataloguePublicationCompletedMessage {
+            get {
+                return ResourceManager.GetString("CataloguePublicationCompletedMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Chat.
         /// </summary>
         public static string Chat {
             get {
                 return ResourceManager.GetString("Chat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Confirm.
+        /// </summary>
+        public static string Confirm {
+            get {
+                return ResourceManager.GetString("Confirm", resourceCulture);
             }
         }
         
@@ -394,6 +421,24 @@ namespace Corprio.SocialWorker.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Price currency.
+        /// </summary>
+        public static string ListPriceCurrency {
+            get {
+                return ResourceManager.GetString("ListPriceCurrency", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to List Price Value.
+        /// </summary>
+        public static string ListPriceValue {
+            get {
+                return ResourceManager.GetString("ListPriceValue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to More apps from Corprio....
         /// </summary>
         public static string More_apps_from_Corprio___ {
@@ -511,11 +556,29 @@ namespace Corprio.SocialWorker.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Recommend 480px X 480px png or jpg file.
+        /// </summary>
+        public static string ProductImageSpec {
+            get {
+                return ResourceManager.GetString("ProductImageSpec", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Product Name.
         /// </summary>
         public static string ProductName {
             get {
                 return ResourceManager.GetString("ProductName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The product was successfully published to your social media..
+        /// </summary>
+        public static string ProductPublicationCompletedMessage {
+            get {
+                return ResourceManager.GetString("ProductPublicationCompletedMessage", resourceCulture);
             }
         }
         
@@ -529,6 +592,24 @@ namespace Corprio.SocialWorker.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Publication completed.
+        /// </summary>
+        public static string PublicationCompletedTitle {
+            get {
+                return ResourceManager.GetString("PublicationCompletedTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Publish.
+        /// </summary>
+        public static string Publish {
+            get {
+                return ResourceManager.GetString("Publish", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Publish Catalogue.
         /// </summary>
         public static string PublishCatalogue {
@@ -538,11 +619,47 @@ namespace Corprio.SocialWorker.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Publish a post to Facebook and Instagram.
+        /// </summary>
+        public static string PublishCatalogueHint {
+            get {
+                return ResourceManager.GetString("PublishCatalogueHint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Do you want to publish this catalogue? A post will be made to your Facebook page(s) and Instagram account(s)..
+        /// </summary>
+        public static string PublishCataloguePrompt {
+            get {
+                return ResourceManager.GetString("PublishCataloguePrompt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Publish Product.
         /// </summary>
         public static string PublishProduct {
             get {
                 return ResourceManager.GetString("PublishProduct", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Publish a post to Facebook and Instagram.
+        /// </summary>
+        public static string PublishProductHint {
+            get {
+                return ResourceManager.GetString("PublishProductHint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Do you want to publish this product? A post will be made to your Facebook page(s) and Instagram account(s)..
+        /// </summary>
+        public static string PublishProductPrompt {
+            get {
+                return ResourceManager.GetString("PublishProductPrompt", resourceCulture);
             }
         }
         
@@ -799,6 +916,24 @@ namespace Corprio.SocialWorker.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The template was saved..
+        /// </summary>
+        public static string TemplateSavedMessage {
+            get {
+                return ResourceManager.GetString("TemplateSavedMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Template saved.
+        /// </summary>
+        public static string TemplateSavedTitle {
+            get {
+                return ResourceManager.GetString("TemplateSavedTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Total Amount.
         /// </summary>
         public static string TotalAmount {
@@ -822,6 +957,15 @@ namespace Corprio.SocialWorker.Resources {
         public static string Unapprove {
             get {
                 return ResourceManager.GetString("Unapprove", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unit Of Measure.
+        /// </summary>
+        public static string UnitOfMeasure {
+            get {
+                return ResourceManager.GetString("UnitOfMeasure", resourceCulture);
             }
         }
         

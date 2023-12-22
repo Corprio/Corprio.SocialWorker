@@ -23,15 +23,18 @@ using System.Linq;
 using Corprio.SocialWorker.Dictionaries;
 using Corprio.DataModel.Shared;
 using Corprio.Core.Exceptions;
+using Corprio.Core.Utility;
+using Microsoft.EntityFrameworkCore;
 
 namespace Corprio.SocialWorker.Controllers
 {
     public class ConnectFacebookController : MetaApiController
     {
-        readonly IConfiguration configuration;              
+        private readonly ApplicationDbContext db;        
 
-        public ConnectFacebookController(IConfiguration configuration) : base(configuration)
-        {            
+        public ConnectFacebookController(ApplicationDbContext context, IConfiguration configuration) : base(configuration)
+        {
+            db = context;   
         }                
         
         public override IActionResult Index([FromRoute] Guid organizationID) => base.Index(organizationID);
@@ -706,14 +709,13 @@ namespace Corprio.SocialWorker.Controllers
         /// <summary>
         /// Register/refresh access token(s) and relevant FB pages and Meta user in the database
         /// </summary>
-        /// <param name="httpClient">HTTP client for executing API query</param>
-        /// <param name="corprioClient">Client for Api requests among Corprio projects</param>
+        /// <param name="httpClient">HTTP client for executing API query</param>        
         /// <param name="organizationID">Organization ID</param>
         /// <param name="metaId">Meta entity ID associated with the access token</param>
         /// <param name="token">Access token</param>
         /// <returns>Status code</returns>
         /// <exception cref="Exception"></exception>
-        public async Task<IActionResult> RefreshAccessToken([FromServices] HttpClient httpClient, [FromServices] APIClient corprioClient,
+        public async Task<IActionResult> RefreshAccessToken([FromServices] HttpClient httpClient, [FromServices] APIClient corprioClient, 
             [FromRoute] Guid organizationID, string metaId, string token)
         {            
             if (string.IsNullOrWhiteSpace(token) || string.IsNullOrWhiteSpace(metaId))
@@ -721,37 +723,69 @@ namespace Corprio.SocialWorker.Controllers
                         
             token = await GetLongLivedAccessToken(httpClient: httpClient, userAccessToken: token);
             if (string.IsNullOrWhiteSpace(token)) return StatusCode(400, "Failed to obtain long-lived user access token.");
-            var metaUser = new MetaUser() { Id = metaId, Token = token };
-            List<FbPage> fbPages = await GetMeAccounts(httpClient: httpClient, userId: metaId, userAccessToken: token)
-                ?? throw new Exception($"Encountered an error in retrieving pages on which {metaId} has a role.");
-                                    
-            foreach (FbPage page in fbPages)
+            MetaUser metaUser = db.MetaUsers.Include(x => x.Pages).FirstOrDefault(x => x.FacebookUserID == metaId);
+            bool newMetaUser = metaUser == null;
+            if (newMetaUser)
             {
-                metaUser.PageIds.Add(page.Id);
-                var metaPage = new MetaPage()
-                {                    
-                    Name = page.Name,
-                    PageId = page.Id,
-                    Token = page.AccessToken,
-                    // note: pages are NOT necessarily associated with any igUserId, so null is acceptable
-                    IgId = await GetIgUserId(httpClient: httpClient, accessToken: page.AccessToken, pageId: page.Id)
-                };
-                await corprioClient.ApplicationSubscriptionApi.SetCustomData(organizationID: organizationID, key: page.Id,
-                    value: System.Text.Json.JsonSerializer.Serialize(metaPage));
-                
-                if (!string.IsNullOrWhiteSpace(metaPage.IgId))
-                {
-                    await corprioClient.ApplicationSubscriptionApi.SetCustomData(organizationID: organizationID, key: metaPage.IgId,
-                        value: System.Text.Json.JsonSerializer.Serialize(page.Id));
-                }
-
-                await TurnOnNLP(httpClient: httpClient, accessToken: page.AccessToken, language: MetaLanguageModel.Chinese);
+                OrganizationCoreInfo coreInfo = await corprioClient.OrganizationApi.GetCoreInfo(organizationID);
+                metaUser = new MetaUser()
+                { 
+                    ID = Guid.NewGuid(), 
+                    FacebookUserID = metaId, 
+                    KeywordForShoppingIntention = BabelFish.Vocab["DefaultKeyWordForShoppingIntention"][UtilityHelper.NICAM(coreInfo)] };
+            }
+            metaUser.OrganizationID = organizationID;
+            metaUser.Token = token;
+            if (newMetaUser)
+            {
+                db.MetaUsers.Add(metaUser);
+            }
+            else
+            {
+                db.MetaUsers.Update(metaUser);
+            }
+            try
+            {
+                await db.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                Log.Error($"Failed to save Facebook user {metaUser.ID}. {ex.Message}");
+                throw;
             }
 
-            // note: only the custom data for Meta user and pages are over-written; the data for bots and page history remain intact
-            await corprioClient.ApplicationSubscriptionApi.SetCustomData(organizationID: organizationID, key: BabelFish.CustomDataKeyForMetaUser,
-                value: System.Text.Json.JsonSerializer.Serialize(metaUser));
+            List<FbPage> fbPages = await GetMeAccounts(httpClient: httpClient, userId: metaId, userAccessToken: token)
+                ?? throw new Exception($"Encountered an error in retrieving pages on which {metaId} has a role.");
 
+            bool newMetaPage;
+            foreach (FbPage page in fbPages)
+            {
+                MetaPage metaPage = metaUser.Pages.FirstOrDefault(x => x.PageId == page.Id);
+                newMetaPage = metaPage == null;
+                if (newMetaPage) metaPage = new MetaPage() { ID = Guid.NewGuid(), FacebookUserID = metaUser.ID, PageId = page.Id };
+                metaPage.Name = StringHelper.StringTruncate(page.Name, 300);
+                metaPage.Token = page.AccessToken;
+                metaPage.InstagramID = await GetIgUserId(httpClient: httpClient, accessToken: page.AccessToken, pageId: page.Id);
+
+                if (newMetaPage)
+                {
+                    db.MetaPages.Add(metaPage);
+                }
+                else
+                {
+                    db.MetaPages.Update(metaPage);
+                }
+                try
+                {
+                    await db.SaveChangesAsync();
+                }
+                catch (Exception ex)
+                {
+                    Log.Error($"Failed to save page {metaPage.ID}. {ex.Message}");
+                    throw;
+                }                
+            }
+            
             return StatusCode(200);
         }
     }

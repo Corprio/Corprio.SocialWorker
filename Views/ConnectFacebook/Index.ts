@@ -2,8 +2,6 @@ declare const vdata: {
     actions: {
         refreshAccessToken: string;
     };
-    applicationSetting: {
-    };
 };
 
 // 'business_management' is required for viewing pages managed by the user
@@ -62,9 +60,9 @@ document.addEventListener("DOMContentLoaded", (event) => {
 
 function statusChangeCallback(response: facebook.StatusResponse) {  // Called with the results from FB.getLoginStatus().
     console.log('statusChangeCallback');
-    console.log(response);
+    /*console.log(response);*/
     if (response?.status === 'connected') {
-        // Logged into your webpage and Facebook.
+        // Logged into Facebook.
         $('#loginBtn').hide();
         $('#logoutBtn').show();
         FB.api('/me', { fields: 'name' }, function (response: facebook.User) {            
@@ -74,7 +72,7 @@ function statusChangeCallback(response: facebook.StatusResponse) {  // Called wi
         getPages();
         refreshAccessToken(response.authResponse?.userID, response.authResponse?.accessToken);
     } else {
-        // Not logged into your webpage or we are unable to tell.
+        // Not logged into Facebook or we are unable to tell.
         $('#loginBtn').show();
         $('#logoutBtn').hide();
         $('#page-headline').text('Welcome to Corprio Social Worker!');        
@@ -83,8 +81,8 @@ function statusChangeCallback(response: facebook.StatusResponse) {  // Called wi
     }
 }
 
-function checkLoginState() {
-    // Called when a person is finished with the Login/Logout Button.    
+// Called when the user is finished with the Login/Logout Button.
+function checkLoginState() {    
     FB.getLoginStatus(function (response) {        
         statusChangeCallback(response)
     })
@@ -104,10 +102,32 @@ function refreshAccessToken(metaId: string, accessToken: string) {
     });
 }
 
+// turn on Meta's Built-in NLP to help detect locale (and meaning)
+// (note: we run this function on the client side to reduct workload on the server side)
+// https://developers.facebook.com/docs/graph-api/reference/page/nlp_configs/
+// https://developers.facebook.com/docs/messenger-platform/built-in-nlp/
+function turnOrNLP(page_id: string, page_access_token: string) {
+    console.log(`Turning on NLP for page ${page_id}`);
+    return FB.api(
+        `/${page_id}/nlp_configs`,
+        'post',
+        {
+            nlp_enabled: true,
+            model: 'CHINESE',
+            access_token: page_access_token
+        },
+        function (response: any) {
+            console.log('Response from nlp_configs:');
+            console.log(response);
+        }
+    );
+}
+
 // add webhooks to page subscriptions (IMPORTANT: subscribe to the fields as those subscribed on App level)
+// (note: we run this function on the client side to reduct workload on the server side)
 // https://developers.facebook.com/docs/messenger-platform/webhooks/#connect-your-app
 function addPageSubscriptions(page_id: string, page_access_token: string) {
-    console.log(`Subscribing to page ${page_id}...`);
+    console.log(`Subscribing to page ${page_id}`);
     return FB.api(
         `/${page_id}/subscribed_apps`,
         'post',
@@ -121,10 +141,10 @@ function addPageSubscriptions(page_id: string, page_access_token: string) {
             access_token: page_access_token,
         },
         function (response: any) {
+            console.log('Response from subscribed_apps:');
+            console.log(response);
             if (response && !response.error) {
-                console.log({ response });                
-            } else {
-                console.error(response?.error);
+                return turnOrNLP(page_id, page_access_token);
             }
         },
     )
@@ -133,8 +153,8 @@ function addPageSubscriptions(page_id: string, page_access_token: string) {
 function getPages() {
     FB.api('/me/accounts', function (response: facebook.AuthResponse | any) {
         if (response && !response.error) {
-            console.log('response from getPages()...');
-            console.log({ response });            
+            /*console.log('response from getPages()...');*/
+            /*console.log({ response });*/
             for (let i = 0; i < response.data.length; i++) {
                 const page_id = response.data[i].id;
                 const page_access_token = response.data[i].access_token;                

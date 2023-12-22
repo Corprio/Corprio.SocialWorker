@@ -14,9 +14,9 @@ var __webpack_exports__ = {};
 // This entry need to be wrapped in an IIFE because it uses a non-standard name for the exports (exports).
 (() => {
 var exports = __webpack_exports__;
-/*!********************************!*\
-  !*** ./Views/MetaApi/Index.ts ***!
-  \********************************/
+/*!****************************************!*\
+  !*** ./Views/ConnectFacebook/Index.ts ***!
+  \****************************************/
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 // 'business_management' is required for viewing pages managed by the user
@@ -70,9 +70,9 @@ document.addEventListener("DOMContentLoaded", (event) => {
 function statusChangeCallback(response) {
     var _a, _b;
     console.log('statusChangeCallback');
-    console.log(response);
+    /*console.log(response);*/
     if ((response === null || response === void 0 ? void 0 : response.status) === 'connected') {
-        // Logged into your webpage and Facebook.
+        // Logged into Facebook.
         $('#loginBtn').hide();
         $('#logoutBtn').show();
         FB.api('/me', { fields: 'name' }, function (response) {
@@ -83,7 +83,7 @@ function statusChangeCallback(response) {
         refreshAccessToken((_a = response.authResponse) === null || _a === void 0 ? void 0 : _a.userID, (_b = response.authResponse) === null || _b === void 0 ? void 0 : _b.accessToken);
     }
     else {
-        // Not logged into your webpage or we are unable to tell.
+        // Not logged into Facebook or we are unable to tell.
         $('#loginBtn').show();
         $('#logoutBtn').hide();
         $('#page-headline').text('Welcome to Corprio Social Worker!');
@@ -91,8 +91,8 @@ function statusChangeCallback(response) {
             'Once it is done, Corprio Social Worker can do the following magic for you: ');
     }
 }
+// Called when the user is finished with the Login/Logout Button.
 function checkLoginState() {
-    // Called when a person is finished with the Login/Logout Button.    
     FB.getLoginStatus(function (response) {
         statusChangeCallback(response);
     });
@@ -110,10 +110,26 @@ function refreshAccessToken(metaId, accessToken) {
         console.log(`Failed to pass the token for ${metaId} to backend.`);
     });
 }
+// turn on Meta's Built-in NLP to help detect locale (and meaning)
+// (note: we run this function on the client side to reduct workload on the server side)
+// https://developers.facebook.com/docs/graph-api/reference/page/nlp_configs/
+// https://developers.facebook.com/docs/messenger-platform/built-in-nlp/
+function turnOrNLP(page_id, page_access_token) {
+    console.log(`Turning on NLP for page ${page_id}`);
+    return FB.api(`/${page_id}/nlp_configs`, 'post', {
+        nlp_enabled: true,
+        model: 'CHINESE',
+        access_token: page_access_token
+    }, function (response) {
+        console.log('Response from nlp_configs:');
+        console.log(response);
+    });
+}
 // add webhooks to page subscriptions (IMPORTANT: subscribe to the fields as those subscribed on App level)
+// (note: we run this function on the client side to reduct workload on the server side)
 // https://developers.facebook.com/docs/messenger-platform/webhooks/#connect-your-app
 function addPageSubscriptions(page_id, page_access_token) {
-    console.log(`Subscribing to page ${page_id}...`);
+    console.log(`Subscribing to page ${page_id}`);
     return FB.api(`/${page_id}/subscribed_apps`, 'post', {
         subscribed_fields: [
             'feed',
@@ -123,19 +139,18 @@ function addPageSubscriptions(page_id, page_access_token) {
         ],
         access_token: page_access_token,
     }, function (response) {
+        console.log('Response from subscribed_apps:');
+        console.log(response);
         if (response && !response.error) {
-            console.log({ response });
-        }
-        else {
-            console.error(response === null || response === void 0 ? void 0 : response.error);
+            return turnOrNLP(page_id, page_access_token);
         }
     });
 }
 function getPages() {
     FB.api('/me/accounts', function (response) {
         if (response && !response.error) {
-            console.log('response from getPages()...');
-            console.log({ response });
+            /*console.log('response from getPages()...');*/
+            /*console.log({ response });*/
             for (let i = 0; i < response.data.length; i++) {
                 const page_id = response.data[i].id;
                 const page_access_token = response.data[i].access_token;

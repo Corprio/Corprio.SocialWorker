@@ -7,7 +7,7 @@
     <Company>Popular IT</Company>
     <Copyright>Copyright 2023 Popular IT</Copyright>
     <PackageTags>corprio sales sales assistant</PackageTags>
-    <Description>Add-on web application in Corprio for adding sales orders and invoices using conversations with chatbot</Description>
+    <Description>A web application for handling sales inquiry and for automating product/catalogue publication to Facebook and Instagram</Description>
 	<JavaScriptTestRoot>Tests\</JavaScriptTestRoot>
 	<JavaScriptTestFramework>Jest</JavaScriptTestFramework>
 	<GenerateProgramFile>false</GenerateProgramFile>
@@ -29,6 +29,8 @@
 
   <ItemGroup>
     <None Remove="Views\Home\Index.ts" />
+    <None Remove="Views\Settings\Enums.ts" />
+    <None Remove="Views\Settings\Index.ts" />
   </ItemGroup>
 
   <ItemGroup>
@@ -36,6 +38,11 @@
     <PackageReference Include="Azure.Identity" Version="1.10.4" />
     <PackageReference Include="BuildBundlerMinifier" Version="3.2.449" />
     <PackageReference Include="Corprio.AspNetCore.XtraReportSite" Version="1.1.54.5" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="7.0.14" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="7.0.14">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="Microsoft.JavaScript.UnitTest" Version="1.5.10610.1">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -44,6 +51,8 @@
 
   <ItemGroup>
     <TypeScriptCompile Include="Views\ConnectFacebook\Index.ts" />
+    <TypeScriptCompile Include="Views\Settings\Enums.ts" />
+    <TypeScriptCompile Include="Views\Settings\Index.ts" />
   </ItemGroup>
 
   <ItemGroup>

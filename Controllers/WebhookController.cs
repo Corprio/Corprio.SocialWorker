@@ -12,22 +12,19 @@ using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Linq;
 using Corprio.CorprioAPIClient;
-using System.Dynamic;
 using Microsoft.Extensions.Configuration;
 using Corprio.SocialWorker.Helpers;
 using Corprio.SocialWorker.Dictionaries;
-using Corprio.AspNetCore.Site.Filters;
-using Corprio.DataModel;
-using Corprio.Core.Exceptions;
-using Corprio.DataModel.Business.Products.ViewModel;
-using Corprio.DataModel.Business.Products;
-using Corprio.DataModel.Business;
 using Corprio.DataModel.Shared;
+using System.Linq.Dynamic.Core;
+using Microsoft.EntityFrameworkCore;
+using Ganss.Xss;
 
 namespace Corprio.SocialWorker.Controllers
 {
     public class WebhookController : Controller
     {
+        private readonly ApplicationDbContext db;
         readonly IHttpClientFactory httpClientFactory;
         readonly IConfiguration configuration;
         
@@ -35,8 +32,9 @@ namespace Corprio.SocialWorker.Controllers
         private readonly string AppSecret;
         private readonly string BaseUrl;
 
-        public WebhookController(IHttpClientFactory httpClientFactory, IConfiguration configuration) : base()
+        public WebhookController(ApplicationDbContext context, IHttpClientFactory httpClientFactory, IConfiguration configuration) : base()
         {
+            db = context;
             this.httpClientFactory = httpClientFactory;
             this.configuration = configuration;
             
@@ -109,6 +107,23 @@ namespace Corprio.SocialWorker.Controllers
             return new Tuple<bool, string>((computedHash == metaHash), requestBody);
         }
         
+        public async Task<DbFriendlyBot> FindBot(MetaUser facebookUser, string interlocutorID)
+        {
+            DbFriendlyBot botStatus = facebookUser.Bots.FirstOrDefault(x => x.BuyerID == interlocutorID);
+            if (botStatus == null)
+            {
+                botStatus = new DbFriendlyBot()
+                {
+                    ID = Guid.NewGuid(),
+                    FacebookUserID = facebookUser.ID,
+                    BuyerID = interlocutorID
+                };
+                db.MetaBotStatuses.Add(botStatus);
+                await db.SaveChangesAsync();                
+            }
+            return botStatus;
+        }
+
         /// <summary>
         /// Respond to webhook triggered by feeds
         /// </summary>
@@ -128,66 +143,42 @@ namespace Corprio.SocialWorker.Controllers
                     //Guid productId = Guid.Parse("AF112F6B-2ABC-431C-A16F-ED4487BFD71F");
                     //MetaPost post = new() { IsFbPost = false };
                     //MetaPage page = new() { Token = "EAAEcibYeGIUBOZCjbwHaILofgZAajzBlzX9PFbDZCpLKafFPQjmrmEaNVZAVskYLKGNvSd0g8BT4DgbQAeRFoHf26sscYNGzCpjz7sfyFHuBRk6c5zvechmGliH2NHLO4JOaccoANwAvEAoT7GiJiW7QqAo204J4i3fZCOA2yDaNZCsdHomAEfKBOlaZBSH" };
+                    
+                    MetaPost post = db.MetaPosts
+                        .Include(x => x.FacebookPage)
+                        .ThenInclude(x => x.FacebookUser)
+                        .ThenInclude(x => x.Bots)
+                        .FirstOrDefault(x => x.PostId == change.Value.PostId);
+                    if (post?.FacebookPage?.FacebookUser?.OrganizationID == null)
+                    {
+                        Log.Error($"Failed to find post {change.Value.PostId} and its parent objects.");
+                        continue;
+                    }
 
-                    if (!BabelFish.Buy.Contains(change.Value.Message.ToUpper().Trim())) continue;
-
-                    // we use the post ID to find the organization ID, then use both IDs to find the page ID,
-                    // and finally use the page ID to find the token
-                    List<dynamic> queryResult = await corprioClient.ApplicationSubscriptionApi.QueryCustomData(
-                        new DataModel.DynamicQuery
-                        {
-                            Selector = "new (ApplicationSubscription.OrganizationID)",
-                            Where = "Key=@0",
-                            WhereArguments = new object[] { change.Value.PostId }
-                        });
-                    Guid organizationID = UtilityHelper.GetGuidFromDynamicQueryResult(queryResult, "OrganizationID");
-                    if (organizationID == Guid.Empty)
-                    {
-                        Log.Error($"Failed to get organization ID based on post ID {change.Value.PostId}.");
+                    // note: if the keyword is <a+>, then it was saved as &lt;a+&gt; in DB, while the user can input either <a+> or <A+>
+                    if (post.FacebookPage.FacebookUser.KeywordForShoppingIntention?.ToUpper() 
+                        != UtilityHelper.UncleanAndClean(change.Value.Message.Trim()).ToUpper()) 
                         continue;
-                    }
-                    MetaPost post = null;
-                    string customData = await corprioClient.ApplicationSubscriptionApi.GetCustomData(organizationID: organizationID, key: change.Value.PostId);
-                    if (!string.IsNullOrWhiteSpace(customData))
-                    {
-                        post = JsonConvert.DeserializeObject<MetaPost>(customData)!;
-                    }
-                    if (string.IsNullOrWhiteSpace(post?.PageId))
-                    {
-                        Log.Error($"Failed to get page ID based on post ID {change.Value.PostId}.");
-                        continue;
-                    }
-                    MetaPage page = null;
-                    customData = await corprioClient.ApplicationSubscriptionApi.GetCustomData(organizationID: organizationID, key: post.PageId);
-                    if (!string.IsNullOrWhiteSpace(customData))
-                    {
-                        page = JsonConvert.DeserializeObject<MetaPage>(customData)!;
-                    }
-                    if (string.IsNullOrWhiteSpace(page?.Token))
-                    {
-                        Log.Error($"Failed to get access token of page {post.PageId}.");
-                        continue;
-                    }
 
                     List<dynamic> existingProducts = await corprioClient.ProductApi.Query(
-                        organizationID: organizationID,
+                        organizationID: post.FacebookPage.FacebookUser.OrganizationID,
                         selector: "new (ID, EntityProperties)",
                         where: "EntityProperties.Any(Name==@0 && Value==@1)",
                         orderBy: "ID",
-                        whereArguments: new string[] { BabelFish.ProductEpName, change.Value.PostId },
+                        whereArguments: new string[] { BabelFish.ProductEpName, post.PostId },
                         skip: 0,
                         take: 1);
                     Guid productId = UtilityHelper.GetGuidFromDynamicQueryResult(existingProducts, "ID");
                     if (productId == Guid.Empty)
                     {
-                        Log.Error($"Failed to find the product posted as {change.Value.PostId}.");
+                        Log.Error($"Failed to find the product posted as {post.PostId}.");
                         continue;
                     }
 
-                    MetaChatBot botStatus = await ActionHelper.GetCustomData<MetaChatBot>(corprioClient: corprioClient,
-                        organizationID: organizationID, key: change.Value.From.Id);
-                    botStatus ??= new MetaChatBot() { Id = change.Value.From.Id };
-                    var bot = new DomesticHelper(client: corprioClient, organizationID: organizationID, botStatus: botStatus, pageName: page.Name);
+                    DbFriendlyBot botStatus = await FindBot(facebookUser: post.FacebookPage.FacebookUser, interlocutorID: change.Value.From.Id);
+                    var bot = new DomesticHelper(context: db, client: corprioClient, 
+                        organizationID: post.FacebookPage.FacebookUser.OrganizationID, 
+                        botStatus: botStatus, pageName: post.FacebookPage.Name);
                     string message;
                     try
                     {
@@ -205,12 +196,13 @@ namespace Corprio.SocialWorker.Controllers
                         continue;
                     }
 
-                    string endPoint = post.IsFbPost 
+                    string endPoint = post.PostedWith == MetaProduct.Facebook 
                         ? $"{BaseUrl}/{ApiVersion}/{change.Value.From.Id}/messages" 
-                        : $"{BaseUrl}/{ApiVersion}/me/messages";
-                    await ActionHelper.SendMessage(
+                        : $"{BaseUrl}/{ApiVersion}/me/messages";                    
+
+                    await ApiActionHelper.SendMessage(
                         httpClient: httpClient,
-                        accessToken: page.Token,
+                        accessToken: post.FacebookPage.Token,
                         endPoint: endPoint,
                         message: message,
                         recipientId: change.Value.From.Id);
@@ -235,51 +227,26 @@ namespace Corprio.SocialWorker.Controllers
             {
                 foreach (var messaging in entry.Messaging)
                 {                    
-                    if (string.IsNullOrWhiteSpace(messaging.Recipient?.Id))
+                    if (string.IsNullOrWhiteSpace(messaging.Recipient?.MetaID))
                     {
                         // note: we move on to the next message instead of throwing errors
                         Log.Error($"Recipient ID for \"{messaging.Message?.Text}\" is blank.");
                         continue;
                     }
                     
-                    List <dynamic> queryResult = await corprioClient.ApplicationSubscriptionApi.QueryCustomData(
-                        new DataModel.DynamicQuery {
-                            Selector = "new (ApplicationSubscription.OrganizationID)",
-                            Where = "Key=@0",
-                            WhereArguments = new object[] { messaging.Recipient.Id }
-                        });
-                    Guid organizationID = UtilityHelper.GetGuidFromDynamicQueryResult(queryResult, "OrganizationID");
-                    if (organizationID == Guid.Empty) 
+                    MetaPage page = payload.Object == "instagram"
+                        ? db.MetaPages.Include(x => x.FacebookUser).ThenInclude(x => x.Bots).FirstOrDefault(x => x.InstagramID == messaging.Recipient.MetaID)
+                        : db.MetaPages.Include(x => x.FacebookUser).ThenInclude(x => x.Bots).FirstOrDefault(x => x.PageId == messaging.Recipient.MetaID);
+                    if (page?.FacebookUser?.OrganizationID == null)
                     {
-                        Log.Error($"Failed to get organization ID based on page ID {messaging.Recipient.Id}.");
-                        continue;
-                    }
-
-                    string pageId = payload.Object == "instagram"
-                        ? await corprioClient.ApplicationSubscriptionApi.GetCustomData(organizationID: organizationID, key: messaging.Recipient.Id)
-                        : messaging.Recipient.Id;
-                    
-                    if (string.IsNullOrWhiteSpace(pageId))
-                    {
-                        Log.Error($"Failed to get ID of the page that received \"{messaging.Message?.Text}\".");
-                        continue;
-                    }
-                    MetaPage page = await ActionHelper.GetCustomData<MetaPage>(corprioClient: corprioClient, 
-                        organizationID: organizationID, key: pageId.Replace("\"", ""));  // need to replace the quotation marks returned by GetCustomData
-                    
-                    if (string.IsNullOrWhiteSpace(page?.Token))
-                    {
-                        // note: we move on to the next message instead of throwing errors
-                        Log.Error($"No page token can be found for {payload.Object} message recipient - {messaging.Recipient.Id}.");
+                        Log.Error($"Failed to find page based on recipient ID {messaging.Recipient.MetaID} and its associated objects.");
                         continue;
                     }
 
                     // assumption: senderId is the same regardless if (i) the sender made a comment on a post or (ii) sent a message via messenger
-                    MetaChatBot botStatus = await ActionHelper.GetCustomData<MetaChatBot>(corprioClient: corprioClient, 
-                        organizationID: organizationID, key: messaging.Sender.Id);
-                    botStatus ??= new MetaChatBot() { Id = messaging.Sender.Id };
-                    var bot = new DomesticHelper(client: corprioClient, organizationID: organizationID, botStatus: botStatus, 
-                        detectedLocales: messaging.Message?.NLP?.DetectedLocales, pageName: page.Name);
+                    DbFriendlyBot botStatus = await FindBot(facebookUser: page.FacebookUser, interlocutorID: messaging.Sender.MetaID);
+                    var bot = new DomesticHelper(context: db, client: corprioClient, organizationID: page.FacebookUser.OrganizationID, 
+                        botStatus: botStatus, detectedLocales: messaging.Message?.NLP?.DetectedLocales, pageName: page.Name);
                     string response;
                     try
                     {
@@ -293,13 +260,13 @@ namespace Corprio.SocialWorker.Controllers
                     // note: the bot must respond with something in 30 seconds (source: https://developers.facebook.com/docs/messenger-platform/policy/responsiveness)
                     if (string.IsNullOrWhiteSpace(response)) response = bot.ThusSpokeBabel("Err_DefaultMsg");
 
-                    string endPoint = payload.Object == "instagram" ? $"{BaseUrl}/{ApiVersion}/me/messages" : $"{BaseUrl}/{ApiVersion}/{messaging.Recipient.Id}/messages";
-                    await ActionHelper.SendMessage(
+                    string endPoint = payload.Object == "instagram" ? $"{BaseUrl}/{ApiVersion}/me/messages" : $"{BaseUrl}/{ApiVersion}/{messaging.Recipient.MetaID}/messages";
+                    await ApiActionHelper.SendMessage(
                         httpClient: httpClient,
                         accessToken: page.Token,
                         endPoint: endPoint,
                         message: response,
-                        recipientId: messaging.Sender.Id);
+                        recipientId: messaging.Sender.MetaID);
                 }
             }
             return StatusCode(200);
@@ -334,7 +301,7 @@ namespace Corprio.SocialWorker.Controllers
 
             // if the payload includes "Messaging" and one of its element has sender, then presumably it is for webhook on messages
             MessageWebhookPayload messageWebhookPayload = requestString == null ? null : JsonConvert.DeserializeObject<MessageWebhookPayload>(requestString)!;
-            if (messageWebhookPayload?.Entry?.Any(x => x.Messaging?.Any(y => !string.IsNullOrWhiteSpace(y.Sender?.Id)) ?? false) ?? false)
+            if (messageWebhookPayload?.Entry?.Any(x => x.Messaging?.Any(y => !string.IsNullOrWhiteSpace(y.Sender?.MetaID)) ?? false) ?? false)
             {                
                 return await HandleMessageWebhook(httpClient: httpClient, corprioClient: corprioClient, payload: messageWebhookPayload);
             }

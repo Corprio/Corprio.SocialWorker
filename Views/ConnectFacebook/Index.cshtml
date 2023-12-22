@@ -1,18 +1,16 @@
 ﻿@using Corprio.Core.Utility
 @{
-    ViewData["Title"] = "Permission Configuration";
+    ViewData["Title"] = "Connect Facebook";
     Guid organizationID = Context.SelectedOrganizationID() ?? Guid.Empty;
 }
 
-<script src="~/js/views/MetaApi/Index.js" asp-append-version="true"></script>
+<script src="~/js/views/ConnectFacebook/Index.js" asp-append-version="true"></script>
 <script>
     // use vdata to pass parameters to TS
     const vdata = {
         actions: {
             refreshAccessToken: '@StringHelper.Encode(@Url.Action("RefreshAccessToken", "ConnectFacebook", new { organizationID }))',
-        },
-        applicationSetting: {
-        }
+        },        
     };
 </script>
 <script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js"></script>
