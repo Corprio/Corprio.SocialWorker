@@ -6,27 +6,97 @@ using System.Linq.Dynamic.Core;
 using System.Linq;
 using Corprio.SocialWorker.Helpers;
 using Serilog;
+using Corprio.DataModel;
+using Corprio.CorprioRestClient;
+using Corprio.CorprioAPIClient;
+using Corprio.Core.Exceptions;
 
 namespace Corprio.SocialWorker.Controllers
 {
     public class SettingsController : AspNetCore.XtraReportSite.Controllers.BaseController
     {
         private readonly ApplicationDbContext db;
+        readonly APIClient corprio;
 
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="context"></param>
-        public SettingsController(ApplicationDbContext context) : base()
+        public SettingsController(ApplicationDbContext context, APIClient corprio) : base()
         {
             db = context;
+            this.corprio = corprio;
         }
-
+        
         public override IActionResult Index([FromRoute] Guid organizationID)
-        {
-            return View(organizationID);
+        {            
+            ApplicationSetting applicationSetting = new ApplicationSetting();
+
+            bool firstTime = false;  // if this is the first time the user visits Settings, then the profile needs to be saved
+            if (string.IsNullOrWhiteSpace(applicationSetting.EmailToReceiveOrder))
+            {
+                applicationSetting.EmailToReceiveOrder = User.Email();
+                firstTime = true;
+            }
+            
+            if (applicationSetting.DeliveryChargeProductID == null)
+            {
+                var productResult = corprio.ProductApi.Query(
+                    organizationID: organizationID,
+                    selector: "new(ID)",
+                    where: "Code=@0 and Disabled=false",
+                    whereArguments: new object[] { Constant.DefaultDeliveryChargeProductCode },
+                    orderBy: "").ConfigureAwait(false).GetAwaiter().GetResult();
+                if (productResult.Any())
+                {
+                    applicationSetting.DeliveryChargeProductID = Guid.Parse(productResult[0].ID);
+                    firstTime = true;
+                }
+            }
+            
+            if (applicationSetting.WarehouseID == null)
+            {
+                var warehouseResult = corprio.WarehouseApi.Query(
+                    organizationID: organizationID,
+                    dynamicQuery: new DynamicQuery()
+                    {
+                        Selector = "new(ID)",
+                        Where = "Code=@0 and Disabled=false",
+                        WhereArguments = new object[] { Constant.DefaultWarehouseCode },
+                        OrderBy = ""
+                    }).ConfigureAwait(false).GetAwaiter().GetResult();
+                if (warehouseResult.Any())
+                {
+                    applicationSetting.WarehouseID = Guid.Parse(warehouseResult[0].ID);
+                    firstTime = true;
+                }                
+            }
+
+            try
+            {
+                applicationSetting.IsSmtpSet = corprio.Execute<bool>(
+                    request: new CorprioRestClient.ApiRequest($"/organization/{organizationID}/IsSMTPSet", System.Net.Http.HttpMethod.Get)).ConfigureAwait(false).GetAwaiter().GetResult();
+            }
+            catch (ApiExecutionException ex)
+            {
+                Log.Error($"Failed to test the latest SMTP setting of organization {organizationID}. {ex.Message}");
+            }
+
+            //if (firstTime)
+            //{
+            //    db.MetaUsers.Update(metaUser);
+            //    await db.SaveChangesAsync();
+            //}
+
+            return View(applicationSetting);
         }
 
+        /// <summary>
+        /// Convert a string into an enum that indicates the purpose of a template
+        /// </summary>
+        /// <param name="messageTypeString">A string that indicates the purpose of a template</param>
+        /// <returns>Purpose of the template (e.g., product publication)</returns>
+        /// <exception cref="ArgumentException"></exception>
         public MessageType TranslateType(string messageTypeString)
         {
             var messageType = messageTypeString switch
@@ -38,12 +108,24 @@ namespace Corprio.SocialWorker.Controllers
             return messageType;
         }
 
+        /// <summary>
+        /// Retrieve the template in string format
+        /// </summary>
+        /// <param name="organizationID">Organization ID</param>
+        /// <param name="messageType">Purpose of the template (e.g., product publication)</param>
+        /// <returns>Template in string format</returns>
         public async Task<string> GetTemplate([FromRoute] Guid organizationID, string messageType)
         {
             var postTemplate = await DbActionHelper.GetTemplate(db: db, organizationID: organizationID, messageType: TranslateType(messageType));
             return postTemplate?.TemplateString;
         }
 
+        /// <summary>
+        /// Retrieve the keyword that indicates shopping intention
+        /// </summary>
+        /// <param name="organizationID">Organization ID</param>
+        /// <returns>Keyword that indicates shopping intention</returns>
+        /// <exception cref="Exception"></exception>
         public string GetKeyword([FromRoute] Guid organizationID)
         {
             MetaUser metaUser = db.MetaUsers.FirstOrDefault(x => x.OrganizationID == organizationID)
@@ -51,8 +133,16 @@ namespace Corprio.SocialWorker.Controllers
             return metaUser.KeywordForShoppingIntention;
         }
 
-        
 
+        /// <summary>
+        /// Save the template for publishing products/catalogues
+        /// </summary>
+        /// <param name="organizationID">Organization ID</param>
+        /// <param name="templateString">Publication template in string format</param>
+        /// <param name="messageType">Purpose of the template (e.g., product publication)</param>
+        /// <param name="keyword">Keyword that indicates shopping intention</param>
+        /// <returns>Status Code</returns>
+        /// <exception cref="Exception"></exception>
         public async Task<IActionResult> SaveTemplate([FromRoute] Guid organizationID, string templateString, string messageType, 
             string keyword = null)
         {

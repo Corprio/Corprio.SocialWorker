@@ -96,7 +96,7 @@ namespace Corprio.SocialWorker.Models
     public class TemplateComponent
     {
         public const string LineBreak = "%lineBreak%";
-        public const string Separator = "%;sep;%";        
+        public const string Separator = "%;sep;%";
         public const string DefaultMessage = "%defaultMessage%";
         // note: do not use the description in product list because it includes HTML tags
         public const string CatalogueName = "%catName%";

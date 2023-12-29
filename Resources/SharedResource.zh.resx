@@ -415,9 +415,84 @@
     <value>单位</value>
   </data>
   <data name="TemplateSavedMessage" xml:space="preserve">
-    <value>已储存范本的更新</value>
+    <value>已储存范本的更新。</value>
   </data>
   <data name="TemplateSavedTitle" xml:space="preserve">
     <value>范本更新</value>
+  </data>
+  <data name="CustomText" xml:space="preserve">
+    <value>自订文字</value>
+  </data>
+  <data name="DefaultSetting" xml:space="preserve">
+    <value>返回预设设定</value>
+  </data>
+  <data name="InvalidFeedback_KeywordLength" xml:space="preserve">
+    <value>关键字不能为空白且最多只可包含 10 个字元。</value>
+  </data>
+  <data name="InvalidFeedback_NoKeyword" xml:space="preserve">
+    <value>您的讯息须要提及关键字。</value>
+  </data>
+  <data name="PanelTitle_Catalogue" xml:space="preserve">
+    <value>商品目录发布</value>
+  </data>
+  <data name="PanelTitle_Product" xml:space="preserve">
+    <value>产品发布</value>
+  </data>
+  <data name="Panel_Blocks" xml:space="preserve">
+    <value>贴文范本</value>
+  </data>
+  <data name="Panel_Preview" xml:space="preserve">
+    <value>贴文预览</value>
+  </data>
+  <data name="Placeholder_Keyword" xml:space="preserve">
+    <value>（例如：「买」）</value>
+  </data>
+  <data name="Save" xml:space="preserve">
+    <value>储存</value>
+  </data>
+  <data name="StandardMessageComponent" xml:space="preserve">
+    <value>贴文基本组成部分</value>
+  </data>
+  <data name="Template_CatalogueCode" xml:space="preserve">
+    <value>商品目录编号</value>
+  </data>
+  <data name="Template_CatalogueEndDate" xml:space="preserve">
+    <value>商品目录结束日期（如适用）</value>
+  </data>
+  <data name="Template_CatalogueName" xml:space="preserve">
+    <value>商品目录名称</value>
+  </data>
+  <data name="Template_CatalogueStartDate" xml:space="preserve">
+    <value>商品目录开始日期</value>
+  </data>
+  <data name="Template_CatalogueURL" xml:space="preserve">
+    <value>商品目录网址</value>
+  </data>
+  <data name="Template_DefaultMessage" xml:space="preserve">
+    <value>预设号召讯息</value>
+  </data>
+  <data name="Template_Keyword" xml:space="preserve">
+    <value>关键字</value>
+  </data>
+  <data name="Template_NewLine" xml:space="preserve">
+    <value>新一行</value>
+  </data>
+  <data name="Template_ProductCode" xml:space="preserve">
+    <value>商品编号</value>
+  </data>
+  <data name="Template_ProductDescription" xml:space="preserve">
+    <value>商品描述</value>
+  </data>
+  <data name="Template_ProductName" xml:space="preserve">
+    <value>商品名称</value>
+  </data>
+  <data name="Template_ProductPrice" xml:space="preserve">
+    <value>商品价格</value>
+  </data>
+  <data name="Tooltip_Keyword" xml:space="preserve">
+    <value>如果有人以关键字回覆此贴文，聊天机器人会自动以私讯回覆。</value>
+  </data>
+  <data name="Tooltip_StandardMessageComponent" xml:space="preserve">
+    <value>贴文基本组成部分中的文字会根据产品而有所不同</value>
   </data>
 </root>

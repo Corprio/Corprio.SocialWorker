@@ -91,6 +91,7 @@ namespace Corprio.SocialWorker.Models
         public MetaBotStatus ReadyToWork()
         {
             if (this == null) return null;
+
             var bot = new MetaBotStatus()
             {
                 BuyerID = this.BuyerID,
@@ -103,18 +104,23 @@ namespace Corprio.SocialWorker.Models
                 OTP_Code = this.OTP_Code,
                 OTP_ExpiryTime = this.OTP_ExpiryTime,
             };
+
             if (!string.IsNullOrWhiteSpace(this.ProductMemoryString))
                 bot.ProductMemory = JsonConvert.DeserializeObject<List<KeyValuePair<Guid, string>>>(this.ProductMemoryString)!;
             bot.ProductMemory ??= new List<KeyValuePair<Guid, string>>();
+
             if (!string.IsNullOrWhiteSpace(this.VariationMemoryString))
                 bot.VariationMemory = JsonConvert.DeserializeObject<List<KeyValuePair<string, List<string>>>>(this.VariationMemoryString)!;
             bot.VariationMemory ??= new List<KeyValuePair<string, List<string>>>();
+
             if (!string.IsNullOrWhiteSpace(this.AttributeValueMemoryString))
                 bot.AttributeValueMemory = JsonConvert.DeserializeObject<List<KeyValuePair<string, string>>>(this.AttributeValueMemoryString)!;
             bot.AttributeValueMemory ??= new List<KeyValuePair<string, string>>();
+
             if (!string.IsNullOrWhiteSpace(this.CartString))
                 bot.Cart = JsonConvert.DeserializeObject<List<BotBasket>>(this.CartString)!;                                    
             bot.Cart ??= new List<BotBasket>();
+
             return bot;
         }
 

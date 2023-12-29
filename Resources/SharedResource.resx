@@ -426,4 +426,181 @@
   <data name="TemplateSavedTitle" xml:space="preserve">
     <value>Template saved</value>
   </data>
+  <data name="Basic" xml:space="preserve">
+    <value>Basic</value>
+  </data>
+  <data name="Basic_Desc" xml:space="preserve">
+    <value>Set options for managing sales orders</value>
+  </data>
+  <data name="CustomText" xml:space="preserve">
+    <value>CustomText</value>
+  </data>
+  <data name="DefaultDeliveryCharge" xml:space="preserve">
+    <value>Default delivery charge</value>
+  </data>
+  <data name="DefaultDeliveryCharge_Description" xml:space="preserve">
+    <value>The default delivery charge for new product catalogues.  You can adjust the delivery charge for each catalogue.</value>
+  </data>
+  <data name="DefaultEmailSubject" xml:space="preserve">
+    <value>Subject of email</value>
+  </data>
+  <data name="DefaultEmailSubject_Description" xml:space="preserve">
+    <value>Subject of the confirmation email sent to customer after order placement</value>
+  </data>
+  <data name="DefaultSetting" xml:space="preserve">
+    <value>Default Setting</value>
+  </data>
+  <data name="DeliveryChargeProductID" xml:space="preserve">
+    <value>Product for delivery charge</value>
+  </data>
+  <data name="DeliveryChargeProductID_Description" xml:space="preserve">
+    <value>The product used in sales orders for representing the delivery charge</value>
+  </data>
+  <data name="DeliveryMethod" xml:space="preserve">
+    <value>Delivery method</value>
+  </data>
+  <data name="DeliveryMethod_Desc" xml:space="preserve">
+    <value>Delivery methods</value>
+  </data>
+  <data name="EmailToReceiveOrder" xml:space="preserve">
+    <value>Email to receive order</value>
+  </data>
+  <data name="EmailToReceiveOrder_Description" xml:space="preserve">
+    <value>This email address will receive a notification email when you receive a new order. Multiple email addresses can be separated by semi-colon (;).</value>
+  </data>
+  <data name="ErrMailsToReceiveOrder" xml:space="preserve">
+    <value>If need more than one email addresses, then separate email addresses using semi-colon (;) without spaces in between, e.g. ada@mail.com;bob@mail.com</value>
+  </data>
+  <data name="FreeShippingAmount" xml:space="preserve">
+    <value>Free Shipping Amount</value>
+  </data>
+  <data name="FreeShippingAmountMsg" xml:space="preserve">
+    <value>If no free shipping policy is applicable, kindly leave this box blank.</value>
+  </data>
+  <data name="FreeShippingAmount_Description" xml:space="preserve">
+    <value>Customer can enjoy free shipping if total amount equals or more than this amount.</value>
+  </data>
+  <data name="InvalidFeedback_KeywordLength" xml:space="preserve">
+    <value>The keyword must not be blank and consist of up to 10 characters.</value>
+  </data>
+  <data name="InvalidFeedback_NoKeyword" xml:space="preserve">
+    <value>Your message should mention the keyword.</value>
+  </data>
+  <data name="MsgSMTPNotSet" xml:space="preserve">
+    <value>To enable sending emails, you must set up your email account in order to automate sending emails to your customers.</value>
+  </data>
+  <data name="MsgSMTPSet" xml:space="preserve">
+    <value>SMTP is set.</value>
+  </data>
+  <data name="PanelTitle_Catalogue" xml:space="preserve">
+    <value>Catalogue Publication</value>
+  </data>
+  <data name="PanelTitle_Product" xml:space="preserve">
+    <value>Product Publication</value>
+  </data>
+  <data name="Panel_Blocks" xml:space="preserve">
+    <value>Customized Template</value>
+  </data>
+  <data name="Panel_Preview" xml:space="preserve">
+    <value>Preview</value>
+  </data>
+  <data name="PaymentMethod" xml:space="preserve">
+    <value>Payment method</value>
+  </data>
+  <data name="PaymentMethod_Desc" xml:space="preserve">
+    <value>Set up methods for receiving payment. These payment methods will be available to your customers when they purchase from your catalogues.</value>
+  </data>
+  <data name="Placeholder_Keyword" xml:space="preserve">
+    <value>(For example: BUY)</value>
+  </data>
+  <data name="Save" xml:space="preserve">
+    <value>Save</value>
+  </data>
+  <data name="SelfPickUp" xml:space="preserve">
+    <value>Self pick-up</value>
+  </data>
+  <data name="SelfPickUpInstruction" xml:space="preserve">
+    <value>Self pick-up instruction to customer</value>
+  </data>
+  <data name="SelfPickUpInstruction_Desc" xml:space="preserve">
+    <value>Instruction to the customer for how to self pick-up their order. For example, you may include your store's contact and address here.</value>
+  </data>
+  <data name="SelfPickUp_Desc" xml:space="preserve">
+    <value>Offer the option for letting customers self pickup their order at your store</value>
+  </data>
+  <data name="SendConfirmationEmail" xml:space="preserve">
+    <value>Send confirmation email to customer</value>
+  </data>
+  <data name="SendConfirmationEmail_Description" xml:space="preserve">
+    <value>Send a confirmation email to the customer after order is placed</value>
+  </data>
+  <data name="SetPaymentMethods" xml:space="preserve">
+    <value>Set up payment methods</value>
+  </data>
+  <data name="SetUpNow" xml:space="preserve">
+    <value>Set up now</value>
+  </data>
+  <data name="ShipToCustomer" xml:space="preserve">
+    <value>Ship to customer</value>
+  </data>
+  <data name="ShipToCustomer_Desc" xml:space="preserve">
+    <value>Offer the option for shipping your customer's order to their delivery address</value>
+  </data>
+  <data name="SocialMediaTemplate" xml:space="preserve">
+    <value>Social Media Templates</value>
+  </data>
+  <data name="SocialMediaTemplate_Desc" xml:space="preserve">
+    <value>Configure templates for social media posts</value>
+  </data>
+  <data name="StandardMessageComponent" xml:space="preserve">
+    <value>Standard Message Component</value>
+  </data>
+  <data name="Template_CatalogueCode" xml:space="preserve">
+    <value>Catalogue Code</value>
+  </data>
+  <data name="Template_CatalogueEndDate" xml:space="preserve">
+    <value>Catalogue End Date (if any)</value>
+  </data>
+  <data name="Template_CatalogueName" xml:space="preserve">
+    <value>Catalogue Name</value>
+  </data>
+  <data name="Template_CatalogueStartDate" xml:space="preserve">
+    <value>Catalogue Start Date</value>
+  </data>
+  <data name="Template_CatalogueURL" xml:space="preserve">
+    <value>Catalogue URL</value>
+  </data>
+  <data name="Template_DefaultMessage" xml:space="preserve">
+    <value>Default Call-To-Action Message</value>
+  </data>
+  <data name="Template_Keyword" xml:space="preserve">
+    <value>Keyword</value>
+  </data>
+  <data name="Template_NewLine" xml:space="preserve">
+    <value>New Line</value>
+  </data>
+  <data name="Template_ProductCode" xml:space="preserve">
+    <value>Product Code</value>
+  </data>
+  <data name="Template_ProductDescription" xml:space="preserve">
+    <value>Product Description</value>
+  </data>
+  <data name="Template_ProductName" xml:space="preserve">
+    <value>Product Name</value>
+  </data>
+  <data name="Template_ProductPrice" xml:space="preserve">
+    <value>Product Price</value>
+  </data>
+  <data name="Tooltip_Keyword" xml:space="preserve">
+    <value>When someone replies to the post with the keyword, the chatbot will follow up with that person through private message.</value>
+  </data>
+  <data name="Tooltip_StandardMessageComponent" xml:space="preserve">
+    <value>Text within a standard message component will be updated according to the product being published</value>
+  </data>
+  <data name="WarehouseID" xml:space="preserve">
+    <value>Warehouse</value>
+  </data>
+  <data name="WarehouseID_Description" xml:space="preserve">
+    <value>Use this warehouse for creating new sales orders</value>
+  </data>
 </root>

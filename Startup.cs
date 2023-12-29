@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Http;
 using Corprio.CorprioRestClient;
 using Corprio.SocialWorker.Models;
 using Microsoft.EntityFrameworkCore;
+using Corprio.AspNetCore.Site.Services;
 
 namespace Corprio.SocialWorker
 {
@@ -29,6 +30,8 @@ namespace Corprio.SocialWorker
             services.AddHttpClient();
             services.AddDbContext<ApplicationDbContext>(options => options.UseSqlite(
                 Configuration.GetConnectionString("localDb")));
+
+            services.AddSingleton<GlobalListService>();
 
             CorprioApiSetting corprioApiSetting = new()
             {

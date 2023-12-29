@@ -97,6 +97,24 @@ namespace Corprio.SocialWorker.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Basic.
+        /// </summary>
+        public static string Basic {
+            get {
+                return ResourceManager.GetString("Basic", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Set options for managing sales orders.
+        /// </summary>
+        public static string Basic_Desc {
+            get {
+                return ResourceManager.GetString("Basic_Desc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Bill sales order.
         /// </summary>
         public static string BillSalesOrder {
@@ -196,6 +214,96 @@ namespace Corprio.SocialWorker.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to CustomText.
+        /// </summary>
+        public static string CustomText {
+            get {
+                return ResourceManager.GetString("CustomText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Default delivery charge.
+        /// </summary>
+        public static string DefaultDeliveryCharge {
+            get {
+                return ResourceManager.GetString("DefaultDeliveryCharge", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The default delivery charge for new product catalogues.  You can adjust the delivery charge for each catalogue..
+        /// </summary>
+        public static string DefaultDeliveryCharge_Description {
+            get {
+                return ResourceManager.GetString("DefaultDeliveryCharge_Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Subject of email.
+        /// </summary>
+        public static string DefaultEmailSubject {
+            get {
+                return ResourceManager.GetString("DefaultEmailSubject", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Subject of the confirmation email sent to customer after order placement.
+        /// </summary>
+        public static string DefaultEmailSubject_Description {
+            get {
+                return ResourceManager.GetString("DefaultEmailSubject_Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Default Setting.
+        /// </summary>
+        public static string DefaultSetting {
+            get {
+                return ResourceManager.GetString("DefaultSetting", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Product for delivery charge.
+        /// </summary>
+        public static string DeliveryChargeProductID {
+            get {
+                return ResourceManager.GetString("DeliveryChargeProductID", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The product used in sales orders for representing the delivery charge.
+        /// </summary>
+        public static string DeliveryChargeProductID_Description {
+            get {
+                return ResourceManager.GetString("DeliveryChargeProductID_Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Delivery method.
+        /// </summary>
+        public static string DeliveryMethod {
+            get {
+                return ResourceManager.GetString("DeliveryMethod", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Delivery methods.
+        /// </summary>
+        public static string DeliveryMethod_Desc {
+            get {
+                return ResourceManager.GetString("DeliveryMethod_Desc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Deposit amount.
         /// </summary>
         public static string DepositAmount {
@@ -219,6 +327,33 @@ namespace Corprio.SocialWorker.Resources {
         public static string Discounts {
             get {
                 return ResourceManager.GetString("Discounts", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Email to receive order.
+        /// </summary>
+        public static string EmailToReceiveOrder {
+            get {
+                return ResourceManager.GetString("EmailToReceiveOrder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This email address will receive a notification email when you receive a new order. Multiple email addresses can be separated by semi-colon (;)..
+        /// </summary>
+        public static string EmailToReceiveOrder_Description {
+            get {
+                return ResourceManager.GetString("EmailToReceiveOrder_Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to If need more than one email addresses, then separate email addresses using semi-colon (;) without spaces in between, e.g. ada@mail.com;bob@mail.com.
+        /// </summary>
+        public static string ErrMailsToReceiveOrder {
+            get {
+                return ResourceManager.GetString("ErrMailsToReceiveOrder", resourceCulture);
             }
         }
         
@@ -268,6 +403,33 @@ namespace Corprio.SocialWorker.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Free Shipping Amount.
+        /// </summary>
+        public static string FreeShippingAmount {
+            get {
+                return ResourceManager.GetString("FreeShippingAmount", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Customer can enjoy free shipping if total amount equals or more than this amount..
+        /// </summary>
+        public static string FreeShippingAmount_Description {
+            get {
+                return ResourceManager.GetString("FreeShippingAmount_Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to If no free shipping policy is applicable, kindly leave this box blank..
+        /// </summary>
+        public static string FreeShippingAmountMsg {
+            get {
+                return ResourceManager.GetString("FreeShippingAmountMsg", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to You will not be charged for using this app forever. Join Corprio now to get started..
         /// </summary>
         public static string FreeToUseDescription {
@@ -291,6 +453,24 @@ namespace Corprio.SocialWorker.Resources {
         public static string Home_page {
             get {
                 return ResourceManager.GetString("Home page", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The keyword must not be blank and consist of up to 10 characters..
+        /// </summary>
+        public static string InvalidFeedback_KeywordLength {
+            get {
+                return ResourceManager.GetString("InvalidFeedback_KeywordLength", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Your message should mention the keyword..
+        /// </summary>
+        public static string InvalidFeedback_NoKeyword {
+            get {
+                return ResourceManager.GetString("InvalidFeedback_NoKeyword", resourceCulture);
             }
         }
         
@@ -502,6 +682,24 @@ namespace Corprio.SocialWorker.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to To enable sending emails, you must set up your email account in order to automate sending emails to your customers..
+        /// </summary>
+        public static string MsgSMTPNotSet {
+            get {
+                return ResourceManager.GetString("MsgSMTPNotSet", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to SMTP is set..
+        /// </summary>
+        public static string MsgSMTPSet {
+            get {
+                return ResourceManager.GetString("MsgSMTPSet", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The sales order has been voided already!  It cannot be voided again..
         /// </summary>
         public static string OrderHasBeenVoided {
@@ -516,6 +714,42 @@ namespace Corprio.SocialWorker.Resources {
         public static string PaidAmount {
             get {
                 return ResourceManager.GetString("PaidAmount", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Customized Template.
+        /// </summary>
+        public static string Panel_Blocks {
+            get {
+                return ResourceManager.GetString("Panel_Blocks", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Preview.
+        /// </summary>
+        public static string Panel_Preview {
+            get {
+                return ResourceManager.GetString("Panel_Preview", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Catalogue Publication.
+        /// </summary>
+        public static string PanelTitle_Catalogue {
+            get {
+                return ResourceManager.GetString("PanelTitle_Catalogue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Product Publication.
+        /// </summary>
+        public static string PanelTitle_Product {
+            get {
+                return ResourceManager.GetString("PanelTitle_Product", resourceCulture);
             }
         }
         
@@ -543,6 +777,33 @@ namespace Corprio.SocialWorker.Resources {
         public static string PaymentLinkDesc {
             get {
                 return ResourceManager.GetString("PaymentLinkDesc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Payment method.
+        /// </summary>
+        public static string PaymentMethod {
+            get {
+                return ResourceManager.GetString("PaymentMethod", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Set up methods for receiving payment. These payment methods will be available to your customers when they purchase from your catalogues..
+        /// </summary>
+        public static string PaymentMethod_Desc {
+            get {
+                return ResourceManager.GetString("PaymentMethod_Desc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to (For example: BUY).
+        /// </summary>
+        public static string Placeholder_Keyword {
+            get {
+                return ResourceManager.GetString("Placeholder_Keyword", resourceCulture);
             }
         }
         
@@ -853,6 +1114,15 @@ namespace Corprio.SocialWorker.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Save.
+        /// </summary>
+        public static string Save {
+            get {
+                return ResourceManager.GetString("Save", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Input invoice number, sales order number, customer name, phone, product code or name to search.
         /// </summary>
         public static string SearchInvoiceTips {
@@ -880,11 +1150,83 @@ namespace Corprio.SocialWorker.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Self pick-up.
+        /// </summary>
+        public static string SelfPickUp {
+            get {
+                return ResourceManager.GetString("SelfPickUp", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Offer the option for letting customers self pickup their order at your store.
+        /// </summary>
+        public static string SelfPickUp_Desc {
+            get {
+                return ResourceManager.GetString("SelfPickUp_Desc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Self pick-up instruction to customer.
+        /// </summary>
+        public static string SelfPickUpInstruction {
+            get {
+                return ResourceManager.GetString("SelfPickUpInstruction", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Instruction to the customer for how to self pick-up their order. For example, you may include your store&apos;s contact and address here..
+        /// </summary>
+        public static string SelfPickUpInstruction_Desc {
+            get {
+                return ResourceManager.GetString("SelfPickUpInstruction_Desc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Send confirmation email to customer.
+        /// </summary>
+        public static string SendConfirmationEmail {
+            get {
+                return ResourceManager.GetString("SendConfirmationEmail", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Send a confirmation email to the customer after order is placed.
+        /// </summary>
+        public static string SendConfirmationEmail_Description {
+            get {
+                return ResourceManager.GetString("SendConfirmationEmail_Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Set up payment methods.
+        /// </summary>
+        public static string SetPaymentMethods {
+            get {
+                return ResourceManager.GetString("SetPaymentMethods", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Settings.
         /// </summary>
         public static string Settings {
             get {
                 return ResourceManager.GetString("Settings", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Set up now.
+        /// </summary>
+        public static string SetUpNow {
+            get {
+                return ResourceManager.GetString("SetUpNow", resourceCulture);
             }
         }
         
@@ -898,6 +1240,42 @@ namespace Corprio.SocialWorker.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Ship to customer.
+        /// </summary>
+        public static string ShipToCustomer {
+            get {
+                return ResourceManager.GetString("ShipToCustomer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Offer the option for shipping your customer&apos;s order to their delivery address.
+        /// </summary>
+        public static string ShipToCustomer_Desc {
+            get {
+                return ResourceManager.GetString("ShipToCustomer_Desc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Social Media Templates.
+        /// </summary>
+        public static string SocialMediaTemplate {
+            get {
+                return ResourceManager.GetString("SocialMediaTemplate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Configure templates for social media posts.
+        /// </summary>
+        public static string SocialMediaTemplate_Desc {
+            get {
+                return ResourceManager.GetString("SocialMediaTemplate_Desc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Warehouse for deducting stock.
         /// </summary>
         public static string SOWarehouseDesc {
@@ -907,11 +1285,128 @@ namespace Corprio.SocialWorker.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Standard Message Component.
+        /// </summary>
+        public static string StandardMessageComponent {
+            get {
+                return ResourceManager.GetString("StandardMessageComponent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Sub-total.
         /// </summary>
         public static string Subtotal {
             get {
                 return ResourceManager.GetString("Subtotal", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Catalogue Code.
+        /// </summary>
+        public static string Template_CatalogueCode {
+            get {
+                return ResourceManager.GetString("Template_CatalogueCode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Catalogue End Date (if any).
+        /// </summary>
+        public static string Template_CatalogueEndDate {
+            get {
+                return ResourceManager.GetString("Template_CatalogueEndDate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Catalogue Name.
+        /// </summary>
+        public static string Template_CatalogueName {
+            get {
+                return ResourceManager.GetString("Template_CatalogueName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Catalogue Start Date.
+        /// </summary>
+        public static string Template_CatalogueStartDate {
+            get {
+                return ResourceManager.GetString("Template_CatalogueStartDate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Catalogue URL.
+        /// </summary>
+        public static string Template_CatalogueURL {
+            get {
+                return ResourceManager.GetString("Template_CatalogueURL", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Default Call-To-Action Message.
+        /// </summary>
+        public static string Template_DefaultMessage {
+            get {
+                return ResourceManager.GetString("Template_DefaultMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Keyword.
+        /// </summary>
+        public static string Template_Keyword {
+            get {
+                return ResourceManager.GetString("Template_Keyword", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to New Line.
+        /// </summary>
+        public static string Template_NewLine {
+            get {
+                return ResourceManager.GetString("Template_NewLine", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Product Code.
+        /// </summary>
+        public static string Template_ProductCode {
+            get {
+                return ResourceManager.GetString("Template_ProductCode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Product Description.
+        /// </summary>
+        public static string Template_ProductDescription {
+            get {
+                return ResourceManager.GetString("Template_ProductDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Product Name.
+        /// </summary>
+        public static string Template_ProductName {
+            get {
+                return ResourceManager.GetString("Template_ProductName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Product Price.
+        /// </summary>
+        public static string Template_ProductPrice {
+            get {
+                return ResourceManager.GetString("Template_ProductPrice", resourceCulture);
             }
         }
         
@@ -930,6 +1425,24 @@ namespace Corprio.SocialWorker.Resources {
         public static string TemplateSavedTitle {
             get {
                 return ResourceManager.GetString("TemplateSavedTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to When someone replies to the post with the keyword, the chatbot will follow up with that person through private message..
+        /// </summary>
+        public static string Tooltip_Keyword {
+            get {
+                return ResourceManager.GetString("Tooltip_Keyword", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Text within a standard message component will be updated according to the product being published.
+        /// </summary>
+        public static string Tooltip_StandardMessageComponent {
+            get {
+                return ResourceManager.GetString("Tooltip_StandardMessageComponent", resourceCulture);
             }
         }
         
@@ -984,6 +1497,24 @@ namespace Corprio.SocialWorker.Resources {
         public static string Warehouse {
             get {
                 return ResourceManager.GetString("Warehouse", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Warehouse.
+        /// </summary>
+        public static string WarehouseID {
+            get {
+                return ResourceManager.GetString("WarehouseID", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Use this warehouse for creating new sales orders.
+        /// </summary>
+        public static string WarehouseID_Description {
+            get {
+                return ResourceManager.GetString("WarehouseID_Description", resourceCulture);
             }
         }
     }

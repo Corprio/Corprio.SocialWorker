@@ -213,6 +213,12 @@ namespace Corprio.SocialWorker.Controllers
         /// <returns>ID of the media item posted</returns>
         protected async Task<string> MakeIgCarouselPost(HttpClient httpClient, string accessToken, string igUserId, List<string> mediaUrls, string message)
         {
+            if (mediaUrls == null)
+            {
+                Log.Error("No media URLs were provided.");
+                return null;
+            }
+            
             // we need a cache mapping container Id against mediaUrl in case we sucessfully create ONLY 1 container (e.g., due to file size or format issue)
             Dictionary<string, string> cache = new();
             foreach (string mediaUrl in mediaUrls)
@@ -291,6 +297,12 @@ namespace Corprio.SocialWorker.Controllers
         /// <returns>ID of the post</returns>
         protected async Task<string> MakeFbMultiPhotoPost(HttpClient httpClient, string accessToken, string pageId, List<string> imageUrls, string message)
         {
+            if (imageUrls == null)
+            {
+                Log.Error("No image URLs were provided.");
+                return null;
+            }
+
             List<string> photoIds = new();
             string photoId;
             foreach (string imageUrl in imageUrls)

@@ -134,9 +134,9 @@ namespace Corprio.SocialWorker.Dictionaries
             },
             ["ThankYou"] = new Dictionary<BotLanguage, string>()
             {
-                [BotLanguage.English] = "Thank you for your order. Itemized below is your shopping cart. Please proceed to {0} to complete the transaction.\n{1}",
-                [BotLanguage.TraditionalChinese] = "謝謝您的訂單。下面列出了您購物車中的商品。請造訪 {0} 以完成支付。\n{1}",
-                [BotLanguage.SimplifiedChinese] = "谢谢您的订单。下面列出了您购物车中的商品。请造访 {0} 以完成支付。\n{1}",
+                [BotLanguage.English] = "Thank you for your order. Itemized below is your shopping cart.\n{0}Please proceed to {1} to complete the transaction.",
+                [BotLanguage.TraditionalChinese] = "謝謝您的訂單。下面列出了您購物車中的商品。\n{0}請造訪 {1} 以完成支付。",
+                [BotLanguage.SimplifiedChinese] = "谢谢您的订单。下面列出了您购物车中的商品。\n{0}请造访 {1} 以完成支付。",
             },
             ["Err_InvalidEmail"] = new Dictionary<BotLanguage, string>()
             {

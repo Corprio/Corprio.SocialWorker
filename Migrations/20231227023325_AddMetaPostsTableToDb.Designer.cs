@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Corprio.SocialWorker.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20231221043120_AddMetaPostsTableToDb")]
+    [Migration("20231227023325_AddMetaPostsTableToDb")]
     partial class AddMetaPostsTableToDb
     {
         /// <inheritdoc />
@@ -171,6 +171,11 @@ namespace Corprio.SocialWorker.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<Guid>("FacebookPageID")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("KeywordForShoppingIntention")
+                        .IsRequired()
+                        .HasMaxLength(10)
                         .HasColumnType("TEXT");
 
                     b.Property<DateTimeOffset>("LastUpdateDate")

@@ -16,12 +16,15 @@ using Corprio.Core.Exceptions;
 using Corprio.DataModel.Business.Partners;
 using Corprio.Core.Utility;
 using Corprio.DataModel.Shared;
+using Corprio.DataModel.Business.Sales.ViewModel;
+using Microsoft.Extensions.Configuration;
 
 namespace Corprio.SocialWorker.Helpers
 {
     public class DomesticHelper
     {
         private readonly ApplicationDbContext db;
+        readonly IConfiguration configuration;
         private readonly APIClient Client;
         private readonly Guid OrgID;
         private readonly string PageName;
@@ -41,12 +44,13 @@ namespace Corprio.SocialWorker.Helpers
         /// <param name="pageName">Name of the page being represented by the chat bot</param>
         /// <param name="detectedLocales">List of locales detected by Wit.ai</param>
         /// <exception cref="ArgumentException"></exception>
-        public DomesticHelper(ApplicationDbContext context, APIClient client, Guid organizationID, DbFriendlyBot botStatus, string pageName,
+        public DomesticHelper(ApplicationDbContext context, IConfiguration configuration, APIClient client, Guid organizationID, DbFriendlyBot botStatus, string pageName,
             List<DetectedLocale> detectedLocales = null)
         {
             if (string.IsNullOrWhiteSpace(pageName)) throw new ArgumentException("Page name cannot be blank.");
 
             db = context;
+            this.configuration = configuration;
             Client = client;
             OrgID = organizationID;
             PageName = pageName;
@@ -318,7 +322,7 @@ namespace Corprio.SocialWorker.Helpers
         {                        
             if (Bot.BuyerCorprioID == null)
             {
-                Log.Error("The bot was trying to process checkout when there was no valid customer ID.");
+                Log.Error("The bot was trying to process checkout but there was no valid customer ID.");
                 return await SoftReboot();
             }
             
@@ -357,14 +361,135 @@ namespace Corprio.SocialWorker.Helpers
                 await Save();
                 return await AskQuestion();
             }
+            
+            string checkoutURL = await CreateSalesOrder();
+            if (string.IsNullOrWhiteSpace(checkoutURL)) return await SoftReboot(clearCustomer: true, clearCart: true);
 
-            // TODO - the bot should also return a link for the user to input payment method, phone number, etc.
-            string checkoutURL = "<TODO - URL>";
             string cartItemString = CartItemString(showPrice: true, currencyCode: coreInfo.CurrencyCode);
             Bot.Cart.Clear();
             Bot.ThinkingOf = BotTopic.Limbo;
             await Save();
-            return ThusSpokeBabel(key: "ThankYou", placeholders: new List<string>() { checkoutURL, cartItemString });
+            return ThusSpokeBabel(key: "ThankYou", placeholders: new List<string>() { cartItemString, checkoutURL });
+        }
+
+        /// <summary>
+        /// Create sales order (including lines)
+        /// </summary>
+        /// <returns>URL to the created sales order</returns>
+        private async Task<string> CreateSalesOrder()
+        {
+            if (!(Bot.Cart?.Any() ?? false))
+            {
+                Log.Error("The bot was trying to create a sales order but the cart was empty.");
+                return null;
+            }
+
+            if (Bot.BuyerCorprioID == null)
+            {
+                Log.Error("The bot was trying to create a sales order but there was no valid customer ID.");
+                return null;
+            }
+            Customer customer = await Client.CustomerApi.Get(organizationID: OrgID, id: (Guid)Bot.BuyerCorprioID);
+            if (customer == null)
+            {
+                Log.Error("The bot was trying to create a sales order but no customer could be found.");
+                return null;
+            }
+
+            OrganizationCoreInfo coreInfo = await Client.OrganizationApi.GetCoreInfo(OrgID);
+            if (coreInfo == null)
+            {
+                Log.Error($"Failed to obtain core information for {OrgID}");
+                return null;
+            }
+
+            List<dynamic> warehouses = await Client.WarehouseApi.Query(organizationID: OrgID, 
+                dynamicQuery: new DynamicQuery() 
+                { 
+                    Selector = "new (ID)",
+                    Where = "Code=@0 and Disabled=false",
+                    WhereArguments = new object[] { Constant.DefaultWarehouseCode },
+                    OrderBy = "Code",
+                    Skip = 0,
+                    Take = 1
+                });
+            if (!warehouses.Any())
+            {
+                Log.Error("The bot was trying to create a sales order but the default warehouse could not be found.");
+                return null;
+            }
+            Guid defaultWarehouseID = Guid.Parse(warehouses[0].ID);            
+
+            Guid orderId;
+            try
+            {
+                orderId = await Client.SalesOrderApi.Add(organizationID: OrgID, salesOrder: new AddSalesOrderModel
+                {
+                    OrderDate = DateTimeOffset.Now,
+                    CustomerID = (Guid)Bot.BuyerCorprioID,
+                    CurrencyCode = coreInfo.CurrencyCode,
+                    BillAddress_Name = customer.BusinessPartner.PrimaryAddress_Name,
+                    BillAddress_Line1 = customer.BusinessPartner.PrimaryAddress_Line1,
+                    BillAddress_Line2 = customer.BusinessPartner.PrimaryAddress_Line2,
+                    BillAddress_City = customer.BusinessPartner.PrimaryAddress_City,
+                    BillAddress_State = customer.BusinessPartner.PrimaryAddress_State,
+                    BillAddress_PostalCode = customer.BusinessPartner.PrimaryAddress_PostalCode,
+                    BillAddress_CountryAlphaCode = customer.BusinessPartner.PrimaryAddress_CountryAlphaCode,
+                    BillAddress_Latitude = customer.BusinessPartner.PrimaryAddress_Latitude,
+                    BillAddress_Longitude = customer.BusinessPartner.PrimaryAddress_Longitude,
+                    DeliveryAddress_Name = customer.BusinessPartner.PrimaryAddress_Name,
+                    DeliveryAddress_Line1 = customer.BusinessPartner.PrimaryAddress_Line1,
+                    DeliveryAddress_Line2 = customer.BusinessPartner.PrimaryAddress_Line2,
+                    DeliveryAddress_City = customer.BusinessPartner.PrimaryAddress_City,
+                    DeliveryAddress_State = customer.BusinessPartner.PrimaryAddress_State,
+                    DeliveryAddress_PostalCode = customer.BusinessPartner.PrimaryAddress_PostalCode,
+                    DeliveryAddress_CountryAlphaCode = customer.BusinessPartner.PrimaryAddress_CountryAlphaCode,
+                    DeliveryAddress_Latitude = customer.BusinessPartner.PrimaryAddress_Latitude,
+                    DeliveryAddress_Longitude = customer.BusinessPartner.PrimaryAddress_Longitude,
+                    BillPhoneNumbers = new List<Global.Geography.PhoneNumber> { new Global.Geography.PhoneNumber
+                    {
+                        NumberType = Global.PhoneNumberType.Mobile,
+                        CountryCallingCode = customer.BusinessPartner.PrimaryMobilePhoneNumber_CountryCallingCode,
+                        NationalDestinationCode = customer.BusinessPartner.PrimaryMobilePhoneNumber_NationalDestinationCode,
+                        SubscriberNumber = customer.BusinessPartner.PrimaryMobilePhoneNumber_SubscriberNumber
+                    } },
+                    BillEmail = customer.BusinessPartner.PrimaryEmail,
+                    WarehouseID = defaultWarehouseID
+                });
+            }
+            catch (ApiExecutionException ex)
+            {
+                Log.Error($"The bot failed to create a sales order. {ex.Message}");
+                return null;
+            }
+
+            foreach (BotBasket basket in Bot.Cart)
+            {
+                try
+                {
+                    await Client.SalesOrderApi.AddLine(organizationID: OrgID,
+                        line: new AddSalesOrderLineModel
+                        {
+                            ProductID = basket.ProductID,
+                            Qty = basket.Quantity,
+                            SalesOrderID = orderId,
+                            UnitPrice = new Price
+                            {
+                                Value = basket.Price,
+                                UOMCode = basket.UOMCode,
+                                DiscountType = basket.DiscountType,
+                                DiscountValue = basket.Discount
+                            }
+                        });
+                }
+                catch (ApiExecutionException ex)
+                {
+                    Log.Error($"The bot failed to create sales order line for {basket.ProductID}. {ex.Message}");
+                    return null;
+                }
+            }
+
+            return $"{configuration["AppBaseUrl"]}/{OrgID}/checkout/{orderId}";
         }
 
         /// <summary>
@@ -674,6 +799,8 @@ namespace Corprio.SocialWorker.Helpers
         /// <returns></returns>
         private async Task<Tuple<bool, Guid>> GetCustomerIdByEmail(string emailAddress)
         {
+            Guid customerId = Guid.Empty;
+            
             List<dynamic> existingCustomers = await Client.CustomerApi.Query(
                 organizationID: OrgID,
                 selector: "new (ID)",
@@ -682,25 +809,28 @@ namespace Corprio.SocialWorker.Helpers
                 whereArguments: new string[] { emailAddress },
                 skip: 0,
                 take: 1);
-            Guid customerId = UtilityHelper.GetGuidFromDynamicQueryResult(existingCustomers, "ID");
-            if (customerId != Guid.Empty) return new Tuple<bool, Guid>(true, customerId);
+            if (existingCustomers.Any()) 
+            {
+                customerId = Guid.Parse(existingCustomers[0].ID);
+                return new Tuple<bool, Guid>(true, customerId);
+            }                        
 
             // note: we tentatively use the customer's email as the given name, because the latter cannot be blank
             string[] splits = emailAddress.Split("@");
             try
             {
-                customerId = await Client.CustomerApi.AddNew(organizationID: OrgID,
-                customer: new Customer()
-                {
-                    BusinessPartner = new BusinessPartner()
+                customerId = await Client.CustomerApi.AddNew(organizationID: OrgID, 
+                    customer: new Customer()
                     {
-                        PartnerType = BusinessPartnerType.Person,
-                        GivenName = StringHelper.StringTruncate(splits[0], 100),
-                        PrimaryEmail = emailAddress                        
-                    },
-                    Source = "Facebook/Instagram",
-                    EntityProperties = new List<EntityProperty>() { new EntityProperty() { Name = BabelFish.CustomerEpName, Value = Bot.BuyerID } }
-                });
+                        BusinessPartner = new BusinessPartner()
+                        {
+                            PartnerType = BusinessPartnerType.Person,
+                            GivenName = StringHelper.StringTruncate(splits[0], 100),
+                            PrimaryEmail = emailAddress                        
+                        },
+                        Source = "Facebook/Instagram",
+                        EntityProperties = new List<EntityProperty>() { new EntityProperty() { Name = BabelFish.CustomerEpName, Value = Bot.BuyerID } }
+                    });
             }
             catch (ApiExecutionException ex)
             {
@@ -720,7 +850,7 @@ namespace Corprio.SocialWorker.Helpers
             bool isValid = Regex.IsMatch(emailAddress, regex, RegexOptions.IgnoreCase);
             if (!isValid) return ThusSpokeBabel("Err_InvalidEmail");
 
-            // note: we don't care if this email address - and, by extension, the custoemr ID - is connected to another FB/IG ID,
+            // note: we don't care if this email address - and, by extension, the customer ID - is connected to another FB/IG ID,
             // because we allow one customer to be associated with more than one social media account
             Bot.BuyerEmail = emailAddress;
             (bool isExistingCustomer, Guid customerId) = await GetCustomerIdByEmail(emailAddress);
@@ -728,6 +858,12 @@ namespace Corprio.SocialWorker.Helpers
             {
                 await Save();
                 return await SendOTP();
+            }
+
+            if (customerId.Equals(Guid.Empty))
+            {
+                Log.Error($"Failed to retrieve/create a customer ID for email {Bot.BuyerEmail}");
+                return await SoftReboot(clearCustomer: true);
             }
 
             Bot.BuyerCorprioID = customerId;
@@ -743,7 +879,7 @@ namespace Corprio.SocialWorker.Helpers
         {
             if (Bot.BuyerCorprioID == null)
             {
-                Log.Error("The customer ID is null when the bot attempted to update the customer's entity properties.");
+                Log.Error("The customer ID was null when the bot attempted to update the customer's entity properties.");
                 return false;
             }
 
@@ -775,24 +911,22 @@ namespace Corprio.SocialWorker.Helpers
         /// <returns></returns>
         private async Task<string> ConfirmCustomer()
         {                                    
-            List<dynamic> existingCustomer = await Client.CustomerApi.Query(
+            List<dynamic> existingCustomers = await Client.CustomerApi.Query(
                 organizationID: OrgID,
-                selector: "new (ID, EntityProperties)",
+                selector: "new (ID)",
                 where: "EntityProperties.Any(Name==@0 && Value==@1)",
                 orderBy: "ID",
                 whereArguments: new string[] { BabelFish.CustomerEpName, Bot.BuyerID },
                 skip: 0,
-                take: 1);
-            Guid customerId = UtilityHelper.GetGuidFromDynamicQueryResult(existingCustomer, "ID");
-
-            if (customerId == Guid.Empty) 
+                take: 1);            
+            if (!existingCustomers.Any()) 
             {
                 Bot.ThinkingOf = BotTopic.EmailOpen;
                 await Save();
                 return await AskQuestion();
             }
 
-            Bot.BuyerCorprioID = customerId;
+            Bot.BuyerCorprioID = Guid.Parse(existingCustomers[0].ID);
             await Save();
             return await Checkout();
         }

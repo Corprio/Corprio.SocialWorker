@@ -42,9 +42,7 @@ namespace Corprio.SocialWorker.Models
     {
         /// <summary>
         /// Basket ID
-        /// </summary>
-        [Key]
-        [Required(ErrorMessageResourceType = typeof(Resource), ErrorMessageResourceName = "MsgRequired")]
+        /// </summary>        
         public Guid ID { get; set; }
         
         /// <summary>
@@ -54,26 +52,32 @@ namespace Corprio.SocialWorker.Models
 
         /// <summary>
         /// Name of the product.
-        /// </summary>        
-        [StringLength(300)]
+        /// </summary>                
         public string Name { get; set; }
 
         /// <summary>
         /// Quantity of the product.
-        /// </summary>
-        [Range(-Constant.QtyMaxValue, Constant.QtyMaxValue)]
+        /// </summary>        
         public decimal Quantity { get; set; }
 
         /// <summary>
         /// Price of the product.
-        /// </summary>
-        [Range(-Constant.MoneyMaxValue, Constant.MoneyMaxValue)]
+        /// </summary>        
         public decimal? Price { get; set; }
 
         /// <summary>
         /// UOM code of the product.
-        /// </summary>
-        [StringLength(Constant.UOMCodeMaxLength)]
+        /// </summary>        
         public string UOMCode { get; set; }
+
+        /// <summary>
+        /// Type of discount offered on the product.
+        /// </summary>
+        public DiscountType DiscountType { get; set; }
+
+        /// <summary>
+        /// Amount of discount offered on the product.
+        /// </summary>
+        public decimal Discount { get; set; }
     }
 }

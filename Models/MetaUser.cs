@@ -35,7 +35,7 @@ namespace Corprio.SocialWorker.Models
         public string Token { get; set; }
 
         /// <summary>
-        /// Key word for indicating purchase intention. The chatbot will 'reach out' to anyone who replies to a post with this key word.
+        /// Keyword for indicating purchase intention. This keyword will be assigned to the next FB/IG post.
         /// </summary>
         [Required(ErrorMessageResourceType = typeof(Resource), ErrorMessageResourceName = "MsgRequired")]
         [StringLength(10)]

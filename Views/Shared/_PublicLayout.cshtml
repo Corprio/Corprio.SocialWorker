@@ -1,0 +1,109 @@
+﻿@using Corprio.AspNetCore.Site.Utility
+@using Microsoft.Extensions.Options
+@using Microsoft.AspNetCore.Builder
+@using Microsoft.Extensions.Localization;
+@using Microsoft.AspNetCore.Http.Extensions;
+@inject IOptions<RequestLocalizationOptions> LocOptions
+@inject Corprio.AspNetCore.Site.Services.IUserPreferenceService userPreferenceService
+@inject Microsoft.Extensions.Configuration.IConfiguration configuration
+
+@{
+    string clientID = configuration["CorprioClientCredential:ClientID"];
+    Guid organizationID = Context.SelectedOrganizationID() ?? Guid.Empty;    
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="@localizer["PublicMetaDescription"]" />
+    <meta property="og:title" content="@ViewData["Title"] - @globalLocalizer[clientID]" />
+    <meta property="og:description" content="@localizer["PublicMetaDescription"]" />
+    <meta property="og:url" content="@Context.Request.GetDisplayUrl()" />
+    <meta property="og:image" content="@ViewData["MetaImage"]" />
+    <meta property="og:type" content="website" />
+    <meta name="author" content="Corprio">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="~/images/gbc-favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="~/images/gbc-favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest.json">
+
+    <title>@ViewData["Title"] - @globalLocalizer[clientID]</title>
+
+    <!--style sheets-->
+    <environment include="Development">
+        <link href="~/node_modules/bootstrap/dist/css/bootstrap.css" rel="stylesheet" />
+        <link href="~/css/dx.material.checkout-theme.css" rel="stylesheet" />
+        <!-- <link rel="stylesheet" href="~/@@corprio/aspnetcore-site/dist/css/corprio.css" /> -->
+        <link rel="stylesheet" href="~/node_modules/@("@")corprio/aspnetcore-site/dist/css/corprio.css" />
+        <!--<link rel="stylesheet" href="~/node_modules/@("@")corprio/aspnetcore-site/dist/css/corprio-app.css" />-->
+        <link rel="stylesheet" href="~/css/public.css" />
+    </environment>
+    <environment exclude="Development">
+        <link rel="stylesheet" href="https://ajax.aspnetcdn.com/ajax/bootstrap/4.6.0/css/bootstrap.min.css"
+        asp-fallback-href="~/node_modules/bootstrap/dist/css/bootstrap.min.css"
+        asp-fallback-test-class="sr-only" asp-fallback-test-property="position" asp-fallback-test-value="absolute" />
+        <link href="~/css/dx.material.checkout-theme.css" rel="stylesheet" />
+        <link rel="stylesheet" href="~/node_modules/@("@")corprio/aspnetcore-site/dist/css/corprio.min.css" asp-append-version="true" />
+        <!--<link rel="stylesheet" href="~/node_modules/@("@")corprio/aspnetcore-site/dist/css/corprio-app.min.css" asp-append-version="true" />-->
+        <link rel="stylesheet" href="~/css/public.min.css" asp-append-version="true" />
+    </environment>
+    <!--javascripts-->
+    <environment include="Development">
+        <script src="~/node_modules/jquery/dist/jquery.js"></script>
+        <script src="~/node_modules/bootstrap/dist/js/bootstrap.bundle.js"></script>
+        <script src="~/node_modules/jszip/dist/jszip.js"></script>
+        <script src="~/node_modules/devextreme/dist/js/dx.all.js"></script>
+        <script src="~/node_modules/devextreme-aspnet-data/js/dx.aspnet.data.js"></script>
+        <script src="~/node_modules/devextreme/dist/js/dx.aspnet.mvc.js"></script>
+        <script src="~/node_modules/@("@")corprio/aspnetcore-site/dist/js/corprio.bundle.js?v=2.5.26"></script>
+        <script src="~/node_modules/@("@")corprio/aspnetcore-site/@LanguageHelper.LoadMessagesJs()" type="module"></script>
+        @RenderSection("ScriptsDev", required: false)
+    </environment>
+    <environment exclude="Development">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.2.1/jszip.min.js"></script>
+        <script src="https://cdn3.devexpress.com/jslib/22.2.3/js/dx.all.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/devextreme-aspnet-data/2.8.2/dx.aspnet.data.min.js"></script>
+        <script src="https://cdn3.devexpress.com/jslib/22.2.3/js/dx.aspnet.mvc.js"></script>
+        <script src="~/node_modules/@("@")corprio/aspnetcore-site/dist/js/corprio.bundle.min.js?v=2.5.26"></script>
+        <script src="~/node_modules/@("@")corprio/aspnetcore-site/@LanguageHelper.LoadMessagesJs()" type="module"></script>
+        @RenderSection("ScriptsPro", required: false)
+    </environment>
+
+    <script src="https://kit.fontawesome.com/c498fa0e7a.js" crossorigin="anonymous"></script>
+    <script src="~/js/site.min.js" asp-append-version="true"></script>
+    <script>
+        DevExpress.localization.locale(corprio.getLang() || navigator.language || navigator.browserLanguage);
+    </script>
+    <script src="~/node_modules/moment/min/moment.min.js"></script>
+    @RenderSection("Style", required: false)
+    @RenderSection("Scripts", required: false)
+
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=@configuration["GAMeasurementID"]"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+
+        gtag('config', '@configuration["GAMeasurementID"]', {
+            'user_id': '@(organizationID)'
+        });
+    </script>
+</head>
+<body>
+    <div id="page">
+        <div id="content">
+            <div id="content-child">
+                @RenderBody()
+            </div>
+        </div>
+        <div id="footer" class="d-flex justify-content-center align-items-center">
+            <a href="@configuration["AppBaseUrl"]" class="link-grey" target="_blank">Powered By SocialWorker.Corprio</a>
+        </div>
+    </div>
+</body>
+</html>

@@ -182,6 +182,7 @@ namespace Corprio.SocialWorker.Controllers
                         {
                             ID = Guid.NewGuid(),
                             FacebookPageID = page.ID,
+                            KeywordForShoppingIntention = metaUser.KeywordForShoppingIntention,
                             PostId = postId,
                             PostedWith = MetaProduct.Instagram
                         };
@@ -214,6 +215,7 @@ namespace Corprio.SocialWorker.Controllers
                     { 
                         ID = Guid.NewGuid(),
                         FacebookPageID = page.ID,
+                        KeywordForShoppingIntention = metaUser.KeywordForShoppingIntention,
                         PostId = postId,
                         PostedWith = MetaProduct.Facebook                         
                     };

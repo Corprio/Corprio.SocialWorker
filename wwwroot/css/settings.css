@@ -1,0 +1,46 @@
+﻿.drag-block:hover {
+    cursor: grab;
+}
+
+.drag-block i:hover {
+    cursor: pointer;
+}
+
+.wrapper {
+    position: relative;
+}
+
+
+.besides-sidebar {
+    width: 100%;
+}
+
+.sidebar-wrapper {
+    flex: 0 0 250px;
+}
+
+.sidebar {
+    position: sticky;
+    top: 30px;
+}
+
+.besides-sidebar .card {
+    margin-bottom: 2rem;
+    background-color: #f3f9ff;
+}
+
+section {
+    padding-top: 1rem;
+    padding-bottom: 4rem;    
+}
+
+.nav-pills .nav-link.active, .nav-pills .show > .nav-link {
+    background-color: var(--light-blue);
+}
+/* media queries */
+
+@media screen and (max-width: 767px) {
+    .sidebar-wrapper.hidden {
+        flex: 0 0 0;
+    }
+}

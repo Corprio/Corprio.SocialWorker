@@ -732,17 +732,22 @@ namespace Corprio.SocialWorker.Controllers
                 { 
                     ID = Guid.NewGuid(), 
                     FacebookUserID = metaId, 
-                    KeywordForShoppingIntention = BabelFish.Vocab["DefaultKeyWordForShoppingIntention"][UtilityHelper.NICAM(coreInfo)] };
+                    KeywordForShoppingIntention = BabelFish.Vocab["DefaultKeyWordForShoppingIntention"][UtilityHelper.NICAM(coreInfo)] 
+                };
+
+                // TODO - create a new application setting
             }
             metaUser.OrganizationID = organizationID;
             metaUser.Token = token;
             if (newMetaUser)
             {
                 db.MetaUsers.Add(metaUser);
+                // TODO - add application setting
             }
             else
             {
                 db.MetaUsers.Update(metaUser);
+                // TODO - update application setting
             }
             try
             {

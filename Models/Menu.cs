@@ -23,7 +23,7 @@ namespace Corprio.SocialWorker.Models
                 new AppMenuItem {
                     ShowInBreadcrumb = false, Url = "/[organizationID]/Settings", Controller = "Settings",
                     ID = "Settings", Text = "Settings", Icon="fa-regular fa-gear"
-                },
+                },                
             }
         };
     }

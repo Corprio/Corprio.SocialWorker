@@ -28,24 +28,24 @@ namespace Corprio.SocialWorker.Helpers
             return userInput;
         }
 
-        /// <summary>
-        /// Extract an entity ID from dynamic query results
-        /// </summary>
-        /// <param name="dynamicQueryResults">Dynamic query results</param>
-        /// <param name="key">Key that is expected to correspond to an entity ID</param>
-        /// <returns>An entity ID</returns>
-        public static Guid GetGuidFromDynamicQueryResult(List<dynamic> dynamicQueryResults, string key)
-        {
-            Guid entityId = Guid.Empty;
-            if (dynamicQueryResults?.Any() ?? false)
-            {
-                foreach (var kvp in dynamicQueryResults[0])
-                {
-                    if (kvp.Key == key && Guid.TryParse(kvp.Value, out entityId)) break;
-                }
-            }
-            return entityId;
-        }
+        ///// <summary>
+        ///// Extract an entity ID from dynamic query results
+        ///// </summary>
+        ///// <param name="dynamicQueryResults">Dynamic query results</param>
+        ///// <param name="key">Key that is expected to correspond to an entity ID</param>
+        ///// <returns>An entity ID</returns>
+        //public static Guid GetGuidFromDynamicQueryResult(List<dynamic> dynamicQueryResults, string key)
+        //{
+        //    Guid entityId = Guid.Empty;
+        //    if (dynamicQueryResults?.Any() ?? false)
+        //    {
+        //        foreach (var kvp in dynamicQueryResults[0])
+        //        {
+        //            if (kvp.Key == key && Guid.TryParse(kvp.Value, out entityId)) break;
+        //        }
+        //    }
+        //    return entityId;
+        //}
 
         /// <summary>
         /// Determine the appropriate language based on the organization's default language

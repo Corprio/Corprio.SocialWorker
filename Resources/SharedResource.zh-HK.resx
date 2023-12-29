@@ -415,9 +415,84 @@
     <value>單位</value>
   </data>
   <data name="TemplateSavedMessage" xml:space="preserve">
-    <value>已儲存範本的更新</value>
+    <value>已儲存範本的更新。</value>
   </data>
   <data name="TemplateSavedTitle" xml:space="preserve">
     <value>範本更新</value>
+  </data>
+  <data name="CustomText" xml:space="preserve">
+    <value>自訂文字</value>
+  </data>
+  <data name="DefaultSetting" xml:space="preserve">
+    <value>返回預設設定</value>
+  </data>
+  <data name="InvalidFeedback_KeywordLength" xml:space="preserve">
+    <value>關鍵字不能為空白且最多只可包含 10 個字元。</value>
+  </data>
+  <data name="InvalidFeedback_NoKeyword" xml:space="preserve">
+    <value>您的訊息須要提及關鍵字。</value>
+  </data>
+  <data name="PanelTitle_Catalogue" xml:space="preserve">
+    <value>商品目錄發布</value>
+  </data>
+  <data name="PanelTitle_Product" xml:space="preserve">
+    <value>產品發布</value>
+  </data>
+  <data name="Panel_Blocks" xml:space="preserve">
+    <value>貼文範本</value>
+  </data>
+  <data name="Panel_Preview" xml:space="preserve">
+    <value>貼文預覽</value>
+  </data>
+  <data name="Placeholder_Keyword" xml:space="preserve">
+    <value>（例如：「買」）</value>
+  </data>
+  <data name="Save" xml:space="preserve">
+    <value>儲存</value>
+  </data>
+  <data name="StandardMessageComponent" xml:space="preserve">
+    <value>貼文基本組成部分</value>
+  </data>
+  <data name="Template_CatalogueCode" xml:space="preserve">
+    <value>商品目錄編號</value>
+  </data>
+  <data name="Template_CatalogueEndDate" xml:space="preserve">
+    <value>商品目錄結束日期（如適用）</value>
+  </data>
+  <data name="Template_CatalogueName" xml:space="preserve">
+    <value>商品目錄名稱</value>
+  </data>
+  <data name="Template_CatalogueStartDate" xml:space="preserve">
+    <value>商品目錄開始日期</value>
+  </data>
+  <data name="Template_CatalogueURL" xml:space="preserve">
+    <value>商品目錄網址</value>
+  </data>
+  <data name="Template_DefaultMessage" xml:space="preserve">
+    <value>預設號召訊息</value>
+  </data>
+  <data name="Template_Keyword" xml:space="preserve">
+    <value>關鍵字</value>
+  </data>
+  <data name="Template_NewLine" xml:space="preserve">
+    <value>新一行</value>
+  </data>
+  <data name="Template_ProductCode" xml:space="preserve">
+    <value>商品編號</value>
+  </data>
+  <data name="Template_ProductDescription" xml:space="preserve">
+    <value>商品描述</value>
+  </data>
+  <data name="Template_ProductName" xml:space="preserve">
+    <value>商品名稱</value>
+  </data>
+  <data name="Template_ProductPrice" xml:space="preserve">
+    <value>商品價格</value>
+  </data>
+  <data name="Tooltip_Keyword" xml:space="preserve">
+    <value>如果有人以關鍵字回覆此貼文，聊天機器人會自動以私訊回覆。</value>
+  </data>
+  <data name="Tooltip_StandardMessageComponent" xml:space="preserve">
+    <value>貼文基本組成部分中的文字會根據產品而有所不同</value>
   </data>
 </root>

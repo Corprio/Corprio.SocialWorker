@@ -31,6 +31,13 @@ namespace Corprio.SocialWorker.Models
         public string PostId { get; set; }
 
         /// <summary>
+        /// Keyword for indicating purchase intention. The chatbot will 'reach out' to anyone who replies to the post with this keyword.
+        /// </summary>
+        [Required(ErrorMessageResourceType = typeof(Resource), ErrorMessageResourceName = "MsgRequired")]
+        [StringLength(10)]
+        public string KeywordForShoppingIntention { get; set; } = "BUY";
+
+        /// <summary>
         /// Meta product with which the post was made (e.g., Instagram).
         /// </summary>
         public MetaProduct PostedWith { get; set; }

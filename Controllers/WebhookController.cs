@@ -18,7 +18,6 @@ using Corprio.SocialWorker.Dictionaries;
 using Corprio.DataModel.Shared;
 using System.Linq.Dynamic.Core;
 using Microsoft.EntityFrameworkCore;
-using Ganss.Xss;
 
 namespace Corprio.SocialWorker.Controllers
 {
@@ -155,28 +154,28 @@ namespace Corprio.SocialWorker.Controllers
                         continue;
                     }
 
-                    // note: if the keyword is <a+>, then it was saved as &lt;a+&gt; in DB, while the user can input either <a+> or <A+>
-                    if (post.FacebookPage.FacebookUser.KeywordForShoppingIntention?.ToUpper() 
-                        != UtilityHelper.UncleanAndClean(change.Value.Message.Trim()).ToUpper()) 
+                    // note 1: we use the keyword stored at the post level, NOT at the user level, because the keyword may be udpated after a post is made
+                    // note 2: if the keyword is, for example, <a+>, then it was saved as &lt;a+&gt; in DB, while the user can input either <a+> or <A+>
+                    if (post.KeywordForShoppingIntention?.ToUpper() != UtilityHelper.UncleanAndClean(change.Value.Message.Trim()).ToUpper()) 
                         continue;
 
                     List<dynamic> existingProducts = await corprioClient.ProductApi.Query(
                         organizationID: post.FacebookPage.FacebookUser.OrganizationID,
-                        selector: "new (ID, EntityProperties)",
+                        selector: "new (ID)",
                         where: "EntityProperties.Any(Name==@0 && Value==@1)",
                         orderBy: "ID",
                         whereArguments: new string[] { BabelFish.ProductEpName, post.PostId },
                         skip: 0,
-                        take: 1);
-                    Guid productId = UtilityHelper.GetGuidFromDynamicQueryResult(existingProducts, "ID");
-                    if (productId == Guid.Empty)
+                        take: 1);                    
+                    if (existingProducts.Count == 0)
                     {
                         Log.Error($"Failed to find the product posted as {post.PostId}.");
                         continue;
                     }
+                    Guid productId = Guid.Parse(existingProducts[0].ID);
 
                     DbFriendlyBot botStatus = await FindBot(facebookUser: post.FacebookPage.FacebookUser, interlocutorID: change.Value.From.Id);
-                    var bot = new DomesticHelper(context: db, client: corprioClient, 
+                    var bot = new DomesticHelper(context: db, configuration: configuration, client: corprioClient, 
                         organizationID: post.FacebookPage.FacebookUser.OrganizationID, 
                         botStatus: botStatus, pageName: post.FacebookPage.Name);
                     string message;
@@ -245,7 +244,7 @@ namespace Corprio.SocialWorker.Controllers
 
                     // assumption: senderId is the same regardless if (i) the sender made a comment on a post or (ii) sent a message via messenger
                     DbFriendlyBot botStatus = await FindBot(facebookUser: page.FacebookUser, interlocutorID: messaging.Sender.MetaID);
-                    var bot = new DomesticHelper(context: db, client: corprioClient, organizationID: page.FacebookUser.OrganizationID, 
+                    var bot = new DomesticHelper(context: db, configuration: configuration, client: corprioClient, organizationID: page.FacebookUser.OrganizationID, 
                         botStatus: botStatus, detectedLocales: messaging.Message?.NLP?.DetectedLocales, pageName: page.Name);
                     string response;
                     try

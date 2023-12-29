@@ -5,7 +5,7 @@
 namespace Corprio.SocialWorker.Migrations
 {
     /// <inheritdoc />
-    public partial class AddMetaTemplatesTableToDb : Migration
+    public partial class AddTemplatesTableToDb : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

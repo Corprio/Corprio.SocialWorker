@@ -116,6 +116,7 @@ namespace Corprio.SocialWorker.Migrations
                     ID = table.Column<Guid>(type: "TEXT", nullable: false),
                     FacebookPageID = table.Column<Guid>(type: "TEXT", nullable: false),
                     PostId = table.Column<string>(type: "TEXT", maxLength: 50, nullable: false),
+                    KeywordForShoppingIntention = table.Column<string>(type: "TEXT", maxLength: 10, nullable: false),
                     PostedWith = table.Column<int>(type: "INTEGER", nullable: false),
                     CreateDate = table.Column<DateTimeOffset>(type: "TEXT", nullable: false),
                     LastUpdateDate = table.Column<DateTimeOffset>(type: "TEXT", nullable: false),
