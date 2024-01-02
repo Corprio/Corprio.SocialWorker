@@ -333,9 +333,6 @@
   <data name="AddLine" xml:space="preserve">
     <value>添加产品</value>
   </data>
-  <data name="Chat" xml:space="preserve">
-    <value>聊天</value>
-  </data>
   <data name="Discounts" xml:space="preserve">
     <value>折扣</value>
   </data>
@@ -494,5 +491,152 @@
   </data>
   <data name="Tooltip_StandardMessageComponent" xml:space="preserve">
     <value>贴文基本组成部分中的文字会根据产品而有所不同</value>
+  </data>
+  <data name="DefaultDeliveryCharge" xml:space="preserve">
+    <value>预设运费</value>
+  </data>
+  <data name="DefaultDeliveryCharge_Description" xml:space="preserve">
+    <value>新产品目录的默认运费。 您可以调整每个目录的运费。</value>
+  </data>
+  <data name="DefaultEmailSubject" xml:space="preserve">
+    <value>电邮的主题</value>
+  </data>
+  <data name="DefaultEmailSubject_Description" xml:space="preserve">
+    <value>下订单后发送给客户的确认电子邮件的主题</value>
+  </data>
+  <data name="DeliveryChargeProductID" xml:space="preserve">
+    <value>运费商品</value>
+  </data>
+  <data name="DeliveryChargeProductID_Description" xml:space="preserve">
+    <value>销售订单中用于表示运费的产品</value>
+  </data>
+  <data name="DeliveryMethod" xml:space="preserve">
+    <value>送货方式</value>
+  </data>
+  <data name="DeliveryMethod_Desc" xml:space="preserve">
+    <value>送货方式</value>
+  </data>
+  <data name="EmailToReceiveOrder" xml:space="preserve">
+    <value>接收订单的电子邮件地址</value>
+  </data>
+  <data name="EmailToReceiveOrder_Description" xml:space="preserve">
+    <value>当您收到新订单时，此电子邮件地址将收到一封通知电子邮件。 多个电子邮件地址可以用分号 (;) 分隔。</value>
+  </data>
+  <data name="ErrMailsToReceiveOrder" xml:space="preserve">
+    <value>如果需要多个电子邮件地址，则使用分号 (;) 分隔电子邮件地址，中间不带空格，例如 ada@mail.com;bob@mail.com</value>
+  </data>
+  <data name="ErrMsg_CustomerNotFound" xml:space="preserve">
+    <value>找不到客户。</value>
+  </data>
+  <data name="ErrMsg_FailedToGetPages" xml:space="preserve">
+    <value>检索 {0} 具有角色的页面时遇到错误。</value>
+  </data>
+  <data name="ErrMsg_FailedToGetToken" xml:space="preserve">
+    <value>无法从 Facebook 获取用户访问令牌。</value>
+  </data>
+  <data name="ErrMsg_ProductNotFound" xml:space="preserve">
+    <value>找不到商品。</value>
+  </data>
+  <data name="ErrMsg_SalesOrderNotFound" xml:space="preserve">
+    <value>找不到销售订单。</value>
+  </data>
+  <data name="Error" xml:space="preserve">
+    <value>错误</value>
+  </data>
+  <data name="FB" xml:space="preserve">
+    <value>连接 Facebook</value>
+  </data>
+  <data name="FB_connected" xml:space="preserve">
+    <value>{0} 现已与 {1} 连接。</value>
+  </data>
+  <data name="FB_Desc1" xml:space="preserve">
+    <value>登录Facebook 把</value>
+  </data>
+  <data name="FB_Desc2" xml:space="preserve">
+    <value>连接到您的Facebook 页面和 Instagram 帐户</value>
+  </data>
+  <data name="FB_not_connected" xml:space="preserve">
+    <value>直到您再次登录 Facebook，{0} 与任何 Facebook 帐户的连接将在 60 天后过期。</value>
+  </data>
+  <data name="FreeShippingAmount" xml:space="preserve">
+    <value>免运费金额</value>
+  </data>
+  <data name="FreeShippingAmountMsg" xml:space="preserve">
+    <value>如没有免运费政策，请留空此处。</value>
+  </data>
+  <data name="FreeShippingAmount_Description" xml:space="preserve">
+    <value>如果总金额等于或超过此金额，客户可以享受免费送货。</value>
+  </data>
+  <data name="GetStarted" xml:space="preserve">
+    <value>系统设置</value>
+  </data>
+  <data name="MsgMissingDeliveryChargeProductError" xml:space="preserve">
+    <value>请在销售订单中选择代表运费的产品！</value>
+  </data>
+  <data name="MsgSettingSaved" xml:space="preserve">
+    <value>已保存所有更改</value>
+  </data>
+  <data name="MsgSMTPNotSet" xml:space="preserve">
+    <value>如要啟用發送電子郵件，您必須設置您的電子郵件帳戶，以便自動發送電子郵件給你客戶。</value>
+  </data>
+  <data name="MsgSMTPSet" xml:space="preserve">
+    <value>SMTP 已设置</value>
+  </data>
+  <data name="PaymentMethod" xml:space="preserve">
+    <value>收款方式</value>
+  </data>
+  <data name="PaymentMethod_Desc" xml:space="preserve">
+    <value>设置收款方式。当您的客户从您的产品目录中购买时，他们将可以使用这些支付方式。</value>
+  </data>
+  <data name="SelfPickUp" xml:space="preserve">
+    <value>客户自取</value>
+  </data>
+  <data name="SelfPickUpInstruction" xml:space="preserve">
+    <value>客户自取说明</value>
+  </data>
+  <data name="SelfPickUpInstruction_Desc" xml:space="preserve">
+    <value>向客户说明如何自行取货。 例如，您可以在此处包括您商店的联系方式和地址。</value>
+  </data>
+  <data name="SelfPickUp_Desc" xml:space="preserve">
+    <value>提供让客户在您的商店自行取货的选项</value>
+  </data>
+  <data name="SendConfirmationEmail" xml:space="preserve">
+    <value>向客户发送确认电子邮件</value>
+  </data>
+  <data name="SendConfirmationEmail_Description" xml:space="preserve">
+    <value>下订单后向客户发送确认电子邮件</value>
+  </data>
+  <data name="SetPaymentMethods" xml:space="preserve">
+    <value>设置收款方式</value>
+  </data>
+  <data name="SetUpNow" xml:space="preserve">
+    <value>前往设置</value>
+  </data>
+  <data name="ShipToCustomer" xml:space="preserve">
+    <value>运送给客户</value>
+  </data>
+  <data name="ShipToCustomer_Desc" xml:space="preserve">
+    <value>提供将客户的订单运送到他们的地址的选项</value>
+  </data>
+  <data name="SocialMediaTemplate" xml:space="preserve">
+    <value>帖子范本</value>
+  </data>
+  <data name="SocialMediaTemplate_Desc" xml:space="preserve">
+    <value>更新社交媒体帖子范本</value>
+  </data>
+  <data name="SOM" xml:space="preserve">
+    <value>销售订单管理</value>
+  </data>
+  <data name="SOM_Desc" xml:space="preserve">
+    <value>设置管理销售订单的选项</value>
+  </data>
+  <data name="Success" xml:space="preserve">
+    <value>成功</value>
+  </data>
+  <data name="WarehouseID" xml:space="preserve">
+    <value>仓库</value>
+  </data>
+  <data name="WarehouseID_Description" xml:space="preserve">
+    <value>使用此仓库创建新的销售订单</value>
   </data>
 </root>

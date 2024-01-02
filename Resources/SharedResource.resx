@@ -333,9 +333,6 @@
   <data name="AddLine" xml:space="preserve">
     <value>Add product</value>
   </data>
-  <data name="Chat" xml:space="preserve">
-    <value>Chat</value>
-  </data>
   <data name="Discounts" xml:space="preserve">
     <value>Discounts</value>
   </data>
@@ -362,12 +359,6 @@
   </data>
   <data name="UnitPrice" xml:space="preserve">
     <value>Unit Price</value>
-  </data>
-  <data name="InvoiceSummary" xml:space="preserve">
-    <value>Invoice Summary</value>
-  </data>
-  <data name="SalesOrderSummary" xml:space="preserve">
-    <value>Sales Order Summary</value>
   </data>
   <data name="ConnectFacebook" xml:space="preserve">
     <value>Connect Facebook</value>
@@ -426,12 +417,6 @@
   <data name="TemplateSavedTitle" xml:space="preserve">
     <value>Template saved</value>
   </data>
-  <data name="Basic" xml:space="preserve">
-    <value>Basic</value>
-  </data>
-  <data name="Basic_Desc" xml:space="preserve">
-    <value>Set options for managing sales orders</value>
-  </data>
   <data name="CustomText" xml:space="preserve">
     <value>CustomText</value>
   </data>
@@ -469,7 +454,19 @@
     <value>This email address will receive a notification email when you receive a new order. Multiple email addresses can be separated by semi-colon (;).</value>
   </data>
   <data name="ErrMailsToReceiveOrder" xml:space="preserve">
-    <value>If need more than one email addresses, then separate email addresses using semi-colon (;) without spaces in between, e.g. ada@mail.com;bob@mail.com</value>
+    <value>If more than one email addresses is needed, separate email addresses using semi-colon (;) without spaces in between, e.g. ada@mail.com;bob@mail.com</value>
+  </data>
+  <data name="FB" xml:space="preserve">
+    <value>Connect Facebook</value>
+  </data>
+  <data name="FB_connected" xml:space="preserve">
+    <value>{0} is now connected with {1}.</value>
+  </data>
+  <data name="FB_Desc1" xml:space="preserve">
+    <value>Log in to Facebook to connect</value>
+  </data>
+  <data name="FB_not_connected" xml:space="preserve">
+    <value>{0}'s connection with any Facebook account will expire in 60 days until you log in to Facebook again.</value>
   </data>
   <data name="FreeShippingAmount" xml:space="preserve">
     <value>Free Shipping Amount</value>
@@ -480,11 +477,17 @@
   <data name="FreeShippingAmount_Description" xml:space="preserve">
     <value>Customer can enjoy free shipping if total amount equals or more than this amount.</value>
   </data>
+  <data name="GetStarted" xml:space="preserve">
+    <value>Get Started</value>
+  </data>
   <data name="InvalidFeedback_KeywordLength" xml:space="preserve">
     <value>The keyword must not be blank and consist of up to 10 characters.</value>
   </data>
   <data name="InvalidFeedback_NoKeyword" xml:space="preserve">
     <value>Your message should mention the keyword.</value>
+  </data>
+  <data name="MsgMissingDeliveryChargeProductError" xml:space="preserve">
+    <value>Please select a product to represent the delivery charge in sales orders.</value>
   </data>
   <data name="MsgSMTPNotSet" xml:space="preserve">
     <value>To enable sending emails, you must set up your email account in order to automate sending emails to your customers.</value>
@@ -552,6 +555,12 @@
   <data name="SocialMediaTemplate_Desc" xml:space="preserve">
     <value>Configure templates for social media posts</value>
   </data>
+  <data name="SOM" xml:space="preserve">
+    <value>Sales Order Management</value>
+  </data>
+  <data name="SOM_Desc" xml:space="preserve">
+    <value>Set options for managing sales orders</value>
+  </data>
   <data name="StandardMessageComponent" xml:space="preserve">
     <value>Standard Message Component</value>
   </data>
@@ -602,5 +611,32 @@
   </data>
   <data name="WarehouseID_Description" xml:space="preserve">
     <value>Use this warehouse for creating new sales orders</value>
+  </data>
+  <data name="ErrMsg_CustomerNotFound" xml:space="preserve">
+    <value>The customer could not be found.</value>
+  </data>
+  <data name="ErrMsg_FailedToGetPages" xml:space="preserve">
+    <value>Encountered an error in retrieving pages on which {0} has a role.</value>
+  </data>
+  <data name="ErrMsg_FailedToGetToken" xml:space="preserve">
+    <value>Failed to obtain long-lived user access token from Facebook.</value>
+  </data>
+  <data name="ErrMsg_ProductNotFound" xml:space="preserve">
+    <value>The product could not be found.</value>
+  </data>
+  <data name="ErrMsg_SalesOrderNotFound" xml:space="preserve">
+    <value>The sales order could not be found.</value>
+  </data>
+  <data name="Error" xml:space="preserve">
+    <value>Error</value>
+  </data>
+  <data name="FB_Desc2" xml:space="preserve">
+    <value>with your Facebook page(s) and Instagram accounts</value>
+  </data>
+  <data name="MsgSettingSaved" xml:space="preserve">
+    <value>Changes saved</value>
+  </data>
+  <data name="Success" xml:space="preserve">
+    <value>Success</value>
   </data>
 </root>

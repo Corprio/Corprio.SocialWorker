@@ -12,7 +12,7 @@ const permissions: string[] = ['email', 'public_profile', 'business_management',
 // https://github.com/DefinitelyTyped/DefinitelyTyped/blob/master/types/facebook-js-sdk/index.d.ts
 /// <reference types="facebook-js-sdk" />
 
-// Reference for the order of the following three code blocks: https://www.devils-heaven.com/facebook-javascript-sdk-login
+// For the order of the following three code blocks, see: https://www.devils-heaven.com/facebook-javascript-sdk-login
 window.fbAsyncInit = function () {
     console.log('fbAsyncInit is doing its things...');       
     FB.init({
@@ -103,7 +103,7 @@ function refreshAccessToken(metaId: string, accessToken: string) {
 }
 
 // turn on Meta's Built-in NLP to help detect locale (and meaning)
-// (note: we run this function on the client side to reduct workload on the server side)
+// (note: we run this function on the client side to reduce workload on the server side)
 // https://developers.facebook.com/docs/graph-api/reference/page/nlp_configs/
 // https://developers.facebook.com/docs/messenger-platform/built-in-nlp/
 function turnOrNLP(page_id: string, page_access_token: string) {
@@ -124,7 +124,7 @@ function turnOrNLP(page_id: string, page_access_token: string) {
 }
 
 // add webhooks to page subscriptions (IMPORTANT: subscribe to the fields as those subscribed on App level)
-// (note: we run this function on the client side to reduct workload on the server side)
+// (note: we run this function on the client side to reduce workload on the server side)
 // https://developers.facebook.com/docs/messenger-platform/webhooks/#connect-your-app
 function addPageSubscriptions(page_id: string, page_access_token: string) {
     console.log(`Subscribing to page ${page_id}`);

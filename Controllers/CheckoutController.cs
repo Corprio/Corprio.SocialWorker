@@ -35,7 +35,7 @@ namespace Corprio.SocialWorker.Controllers
             var corprioClient = new APIClient(httpClient);
 
             SalesOrder salesOrder = await corprioClient.SalesOrderApi.Get(organizationID: organizationID, id: salesOrderID);
-            if (salesOrder == null) return NotFound(Resources.SharedResource.ResourceManager.GetString("ErrMsg_SalesOrderID"));
+            if (salesOrder == null) return NotFound(Resources.SharedResource.ResourceManager.GetString("ErrMsg_SalesOrderNotFound"));
 
             Customer customer = await corprioClient.CustomerApi.Get(organizationID: organizationID, id: salesOrder.CustomerID);
             if (customer == null) return NotFound(Resources.SharedResource.ResourceManager.GetString("ErrMsg_CustomerNotFound"));

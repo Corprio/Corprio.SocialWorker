@@ -6,91 +6,22 @@ using System.Linq.Dynamic.Core;
 using System.Linq;
 using Corprio.SocialWorker.Helpers;
 using Serilog;
-using Corprio.DataModel;
-using Corprio.CorprioRestClient;
-using Corprio.CorprioAPIClient;
-using Corprio.Core.Exceptions;
 
 namespace Corprio.SocialWorker.Controllers
 {
-    public class SettingsController : AspNetCore.XtraReportSite.Controllers.BaseController
+    public class TemplateController : AspNetCore.XtraReportSite.Controllers.BaseController
     {
-        private readonly ApplicationDbContext db;
-        readonly APIClient corprio;
+        private readonly ApplicationDbContext db;        
 
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="context"></param>
-        public SettingsController(ApplicationDbContext context, APIClient corprio) : base()
+        public TemplateController(ApplicationDbContext context) : base()
         {
-            db = context;
-            this.corprio = corprio;
+            db = context;            
         }
-        
-        public override IActionResult Index([FromRoute] Guid organizationID)
-        {            
-            ApplicationSetting applicationSetting = new ApplicationSetting();
-
-            bool firstTime = false;  // if this is the first time the user visits Settings, then the profile needs to be saved
-            if (string.IsNullOrWhiteSpace(applicationSetting.EmailToReceiveOrder))
-            {
-                applicationSetting.EmailToReceiveOrder = User.Email();
-                firstTime = true;
-            }
-            
-            if (applicationSetting.DeliveryChargeProductID == null)
-            {
-                var productResult = corprio.ProductApi.Query(
-                    organizationID: organizationID,
-                    selector: "new(ID)",
-                    where: "Code=@0 and Disabled=false",
-                    whereArguments: new object[] { Constant.DefaultDeliveryChargeProductCode },
-                    orderBy: "").ConfigureAwait(false).GetAwaiter().GetResult();
-                if (productResult.Any())
-                {
-                    applicationSetting.DeliveryChargeProductID = Guid.Parse(productResult[0].ID);
-                    firstTime = true;
-                }
-            }
-            
-            if (applicationSetting.WarehouseID == null)
-            {
-                var warehouseResult = corprio.WarehouseApi.Query(
-                    organizationID: organizationID,
-                    dynamicQuery: new DynamicQuery()
-                    {
-                        Selector = "new(ID)",
-                        Where = "Code=@0 and Disabled=false",
-                        WhereArguments = new object[] { Constant.DefaultWarehouseCode },
-                        OrderBy = ""
-                    }).ConfigureAwait(false).GetAwaiter().GetResult();
-                if (warehouseResult.Any())
-                {
-                    applicationSetting.WarehouseID = Guid.Parse(warehouseResult[0].ID);
-                    firstTime = true;
-                }                
-            }
-
-            try
-            {
-                applicationSetting.IsSmtpSet = corprio.Execute<bool>(
-                    request: new CorprioRestClient.ApiRequest($"/organization/{organizationID}/IsSMTPSet", System.Net.Http.HttpMethod.Get)).ConfigureAwait(false).GetAwaiter().GetResult();
-            }
-            catch (ApiExecutionException ex)
-            {
-                Log.Error($"Failed to test the latest SMTP setting of organization {organizationID}. {ex.Message}");
-            }
-
-            //if (firstTime)
-            //{
-            //    db.MetaUsers.Update(metaUser);
-            //    await db.SaveChangesAsync();
-            //}
-
-            return View(applicationSetting);
-        }
-
+                
         /// <summary>
         /// Convert a string into an enum that indicates the purpose of a template
         /// </summary>

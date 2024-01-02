@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Corprio.DataModel;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -6,28 +7,29 @@ using System.Threading.Tasks;
 
 namespace Corprio.SocialWorker.Models
 {
-    public class ApplicationSetting
-    {
-        public Guid Id { get; set; }
-
+    public class ApplicationSetting : Entity
+    {        
         /// <summary>
-        /// ID of Facebook user in Corprio
+        /// Organization ID
         /// </summary>
-        public Guid MetaUserID { get; set; }
+        public Guid OrganizationID { get; set; }
         
         /// <summary>
-        /// Whether an email will be sent to the customer to confirm his order
+        /// Whether an email will be sent to the customer to confirm his order.
         /// </summary>
         [Display(Name = "SendConfirmationEmail", Description = "SendConfirmationEmail_Description", ResourceType = typeof(Resources.SharedResource))]
         public bool SendConfirmationEmail { get; set; } = false;
 
         /// <summary>
-        /// Default subject of email
+        /// Default subject of email.
         /// </summary>
         [Display(Name = "DefaultEmailSubject", Description = "DefaultEmailSubject_Description", ResourceType = typeof(Resources.SharedResource))]
         [StringLength(200)]
         public string DefaultEmailSubject { get; set; } = "Thank you for your order";
 
+        /// <summary>
+        /// True if the user has completed SMTP setting.
+        /// </summary>
         public bool IsSmtpSet { get; set; }
 
         /// <summary>
@@ -82,7 +84,5 @@ namespace Corprio.SocialWorker.Models
         [Display(Name = "FreeShippingAmount", Description = "FreeShippingAmount_Description", ResourceType = typeof(Resources.SharedResource))]
         [Range(0, 9999999)]
         public decimal? FreeShippingAmount { get; set; }
-
-
     }
 }

@@ -5,6 +5,7 @@ declare const vdata: {
     actions: {
         getKeyword: string;
         getTemplate: string;
+        refreshAccessToken: string;
         saveTemplate: string;
     };
     localizer: {
@@ -14,6 +15,8 @@ declare const vdata: {
         catalogueStartDate: string;
         catalogueUrl: string;
         defaultMessage: string;
+        fbConnected: string;
+        fbNotConnected: string;
         newLine: string;
         productCode: string;
         productDescription: string;
@@ -22,6 +25,7 @@ declare const vdata: {
         productReplyKeyword: string;
         saveTemplateMessage: string;
         saveTemplateTitle: string;
+        shortName: string;
     };
     sampleValues: {
         catalogueURL: string;
@@ -30,6 +34,9 @@ declare const vdata: {
     };
     settings: {
         env: string;
+        metaApiID: string;
+        metaApiVersion: string;
+        sendConfirmationEmail: string;
     };
     templateComponents: {
         catalogueCodeValue: string;
@@ -51,6 +58,14 @@ declare const vdata: {
         separator: string;
     };
 };
+
+// https://github.com/DefinitelyTyped/DefinitelyTyped/blob/master/types/facebook-js-sdk/index.d.ts
+/// <reference types="facebook-js-sdk" />
+
+// 'business_management' is required for viewing pages managed by the user
+const permissions: string[] = ['email', 'public_profile', 'business_management', 'pages_manage_metadata',
+    'pages_messaging', 'pages_manage_posts', 'pages_manage_engagement', 'instagram_basic', 'instagram_content_publish',
+    'instagram_manage_comments', 'instagram_manage_messages'];
 
 // magic numbers
 const DataSet_TrueValue = 'true-value';  // this attribute contains the value of a standard component (e.g., %lineBreak%)
@@ -458,9 +473,7 @@ function addComponent(messageType: MessageType) {
  * Assign values to global variables
  * @returns
  */
-function initializeGlobalVariables() {
-    loadIndicatorTop = $(Selector.loadIndicator_Top).dxLoadIndicator({ visible: false }).dxLoadIndicator('instance');
-    
+function initializeGlobalVariables() {        
     selectorMapping[MessageType.CATALOGUE].validSelectOptions[vdata.templateComponents.newLineValue] = { panel: '&#9166;', preview: '\n' };
     selectorMapping[MessageType.CATALOGUE].validSelectOptions[vdata.templateComponents.defaultMessageValue] = { panel: '{'+ vdata.localizer.defaultMessage +'}', preview: vdata.sampleValues.defaultCatalogueMessage };
     selectorMapping[MessageType.CATALOGUE].validSelectOptions[vdata.templateComponents.catalogueNameValue] = { panel: '{'+ vdata.localizer.catalogueName +'}', preview: 'Example Catalogue' };
@@ -483,13 +496,13 @@ function initializeGlobalVariables() {
 }
 
 /**
- * Render the template and preview panels and assign event listeners to relevant DOM elements
+ * Assign event listeners to DOM elements related to social media templates
  * @param messageType-Publication of products or catalogues
  */
-async function preparePanels(messageType: MessageType) {    
+function AssignEventListenersForTemplates(messageType: MessageType) {    
     // currently only product posts have a keyword that may trigger the chatbot
     if (messageType === MessageType.PRODUCT) {
-        await restoreKeyword();
+        /*if (fbLoggedIn) { await restoreKeyword(); }*/
 
         $(Selector.keywordInput_Product).on('keyup', function () {
             const keyword = sanitizeInput(String($(this).val()).trim());
@@ -499,7 +512,7 @@ async function preparePanels(messageType: MessageType) {
         });
     }
 
-    await restoreTemplate(messageType);
+    /*if (fbLoggedIn) { await restoreTemplate(messageType); }*/
     $(selectorMapping[messageType].customTextAddButton).on('click', function () { addText(messageType) });
     $(selectorMapping[messageType].customTextInput).on('keydown', function (event) {        
         if (event.key === 'Enter') {
@@ -514,22 +527,293 @@ async function preparePanels(messageType: MessageType) {
     $(selectorMapping[messageType].blockPanel).on('dragover', function (event: Event) { handleDragOver(event) });
 }
 
-function submitSetting() {
-    // TODO
+
+/**
+ * React to change in the user's Facebook login status
+ * @param response-Facebook's response to getLoginStatus()
+ */
+function handleFbLoginStatusChange(response: facebook.StatusResponse) {
+    /*console.log(response);*/
+    if (response?.status === 'connected') {                
+        $(Selector.loginButton).hide();
+        $(Selector.logoutButton).show();
+        FB.api('/me', { fields: 'name' }, function (response: facebook.User) {
+            const alert =
+                `<div class="alert alert-success">` +
+                    `<i class="fa-regular fa-circle-check"></i>` +
+                    `&nbsp;${vdata.localizer.fbConnected.replaceAll('{0}', vdata.localizer.shortName).replaceAll('{1}', response.name)}` +
+                `</div>`
+            $(Selector.fbDialogue).empty().append(alert);
+        });
+        /*The following functions run in a non-blocking manner because there is no interdependence*/
+        getPages();
+        refreshAccessToken(response.authResponse?.userID, response.authResponse?.accessToken, false);
+    } else {                
+        $(Selector.loginButton).show();
+        $(Selector.logoutButton).hide();
+        const alert =
+            `<div class="alert alert-warning">` +
+                `<i class="fa-regular fa-circle-exclamation"></i>` +
+                `&nbsp;${vdata.localizer.fbNotConnected.replaceAll('{0}', vdata.localizer.shortName)}` +
+            `</div>`
+        $(Selector.fbDialogue).empty().append(alert);
+
+        $(selectorMapping[MessageType.PRODUCT].saveTemplateButton).attr("disabled", "disabled");
+        $(selectorMapping[MessageType.CATALOGUE].saveTemplateButton).attr("disabled", "disabled");
+        $(selectorMapping[MessageType.PRODUCT].blockPanel).empty();
+        $(selectorMapping[MessageType.CATALOGUE].blockPanel).empty();
+        $(selectorMapping[MessageType.PRODUCT].previewPanel).empty();
+        $(selectorMapping[MessageType.CATALOGUE].previewPanel).empty();
+    }
 }
+
+/**
+ * Check the user's FB login status
+ */
+function checkLoginState() {
+    FB.getLoginStatus(function (response) {
+        handleFbLoginStatusChange(response)
+    })
+}
+
+/**
+ * Pass the short-lived user access token to server
+ * @param metaId-Facebook user ID
+ * @param accessToken-Short-lived user access token 
+ * @param reAssignMetaProfile-True if the Facebook account can be reassigned from one organization to another
+ * @returns
+ */
+function refreshAccessToken(metaId: string, accessToken: string, reAssignMetaProfile: boolean) {
+    return $.ajax({
+        type: 'POST',
+        url: vdata.actions.refreshAccessToken,
+        data: {
+            metaId: metaId,
+            token: accessToken,
+            reAssignMetaProfile: reAssignMetaProfile
+        },
+        success: async function () {
+            console.log(`Token for ${metaId} is fed to backend successfully.`);
+            initializeGlobalVariables();  // initialize global variables again because theoritically fbAsyncInit and its callbacks can all run before DOM is loaded
+            loadIndicatorTop.option('visible', true);
+            await restoreKeyword();
+            await restoreTemplate(MessageType.PRODUCT);
+            await restoreTemplate(MessageType.CATALOGUE);
+            loadIndicatorTop.option('visible', false);
+            $(selectorMapping[MessageType.PRODUCT].saveTemplateButton).removeAttr("disabled");
+            $(selectorMapping[MessageType.CATALOGUE].saveTemplateButton).removeAttr("disabled");
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+            if (jqXHR.status !== 409) {
+                console.log(`Failed to pass the token for ${metaId} to backend. Text status: ${textStatus}. Error: ${errorThrown}.`);
+                return;
+            }
+            
+            FB.api('/me', { fields: 'name' }, function (response: facebook.User) {
+                var prompt = DevExpress.ui.dialog.custom({
+                    title: 'Warning - Facebook Account Already Connected',
+                    messageHtml:
+                        `<div>` +
+                            `<p class="mb-0">Facebook account <b>${response.name}</b> is already connected to another organization.</p>` +
+                            `<p>Do you want to terminate that connection and connect <b>${response.name}</b> with <b>${vdata.localizer.shortName}</b>?</p>` +
+                            `<p>If you want to connect another Facebook account with <b>${vdata.localizer.shortName}</b>, please log in with a different Facebook account.</p>` +
+                        `</div>`,
+                    buttons: [{
+                        text: 'Confirm',
+                        onClick: function () {
+                            refreshAccessToken(metaId, accessToken, true);
+                        },
+                        type: 'danger',
+                    }, {
+                        text: 'Cancel',
+                        onClick: function () { FB.logout(checkLoginState); },
+                        type: 'default',
+                    }]
+                });
+                prompt.show();
+            });            
+        }
+    });
+}
+
+/**
+ * Turn on Meta's Built-in NLP to help detect locale (and meaning)
+ * (note: we run this function on the client side to reduce workload on the server side)
+ * https://developers.facebook.com/docs/graph-api/reference/page/nlp_configs/
+ * https://developers.facebook.com/docs/messenger-platform/built-in-nlp/
+ * @param page_id-ID of Facebook page
+ * @param page_access_token-Page access token
+ * @returns
+ */
+function turnOrNLP(page_id: string, page_access_token: string) {
+    console.log(`Turning on NLP for page ${page_id}`);
+    return FB.api(
+        `/${page_id}/nlp_configs`,
+        'post',
+        {
+            nlp_enabled: true,
+            model: 'CHINESE',
+            access_token: page_access_token
+        },
+        function (response: any) {
+            console.log('Response from nlp_configs:');
+            console.log(response);
+        }
+    );
+}
+
+/**
+ * Add webhooks to page subscriptions (IMPORTANT: subscribe to the fields as those subscribed on App level)
+ * (note: we run this function on the client side to reduce workload on the server side)
+ * https://developers.facebook.com/docs/messenger-platform/webhooks/#connect-your-app
+ * @param page_id-ID of Facebook page
+ * @param page_access_token-Page access token
+ * @returns
+ */
+function addPageSubscriptions(page_id: string, page_access_token: string) {
+    console.log(`Subscribing to page ${page_id}`);
+    return FB.api(
+        `/${page_id}/subscribed_apps`,
+        'post',
+        {
+            subscribed_fields: [
+                'feed',
+                // webhook for pages: https://developers.facebook.com/docs/graph-api/webhooks/getting-started/webhooks-for-pages/
+                'messages',
+                // any other webhook event: https://developers.facebook.com/docs/messenger-platform/webhook/#events
+            ],
+            access_token: page_access_token,
+        },
+        function (response: any) {
+            console.log('Response from subscribed_apps:');
+            console.log(response);
+            if (response && !response.error) {
+                return turnOrNLP(page_id, page_access_token);
+            }
+        },
+    )
+}
+
+/**
+ * Query the pages on which the user has a role and trigger webhook subscription for each of them  
+ */
+function getPages() {
+    FB.api('/me/accounts', function (response: facebook.AuthResponse | any) {
+        if (response && !response.error) {
+            /*console.log('response from getPages()...');*/
+            /*console.log({ response });*/
+            for (let i = 0; i < response.data.length; i++) {
+                const page_id = response.data[i].id;
+                const page_access_token = response.data[i].access_token;
+                addPageSubscriptions(page_id, page_access_token);
+            }
+        } else {
+            console.error(response.error);
+        }
+    })
+}
+
+// The order of the following three code blocks is extremely important. It has to be:
+// (1) fbAsyncInit, (2) IIFE, then (3) whatever needs to run upon DOM being loaded
+// For reference, see: https://www.devils-heaven.com/facebook-javascript-sdk-login
+window.fbAsyncInit = function () {
+    console.log('fbAsyncInit is doing its things...');
+    FB.init({
+        appId: vdata.settings.metaApiID,
+        cookie: true,                     // Enable cookies to allow the server to access the session.
+        xfbml: true,                     // Parse social plugins on this webpage.
+        version: vdata.settings.metaApiVersion           // Use this Graph API version for this call.
+    });
+
+    FB.getLoginStatus(function (response) {   // Called after the JS SDK has been initialized.
+        handleFbLoginStatusChange(response);        // Returns the login status.
+    });
+};
+
+(function (element: Document, tagName: string, selector: string) {
+    var js, fjs = element.getElementsByTagName(tagName)[0];
+    if (element.getElementById(selector)) { return; }
+    js = element.createElement(tagName); js.id = selector;
+    js.src = "https://connect.facebook.net/en_US/sdk.js";
+    fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk')
+);
 
 // initialize global variables and restore the saved templates
 $(async function () {
-    $('.save-setting-btn').on('click', submitSetting);
+    // prevent 'Enter' from triggering form submission
+    $(window).on('keydown', function (event) {
+        if (event.key == 'Enter') {
+            event.preventDefault();
+            return false;
+        }
+    });
 
+    // facebook-related stuff
+    $(Selector.loginButton).on('click', function () {
+        console.log('Logging into Facebook...');
+        FB.login((response: facebook.StatusResponse) => {
+            if (response.authResponse) {
+                //user just authorized your app                
+                checkLoginState();
+            }
+        }, {
+            scope: permissions.toString(),
+            return_scopes: true
+        });
+    });
+
+    $(Selector.logoutButton).on('click', function () {
+        console.log('Logging out from Facebook...')
+        FB.logout(checkLoginState);
+    }); 
+    
+    // UX-related stuff    
+    $("#smtp-dialogue").toggle(vdata.settings.sendConfirmationEmail.toLowerCase() === 'true');
+    
+    $(".page-title button").on('click', function() {
+        $(".sidebar-wrapper").toggleClass("hidden", $(".sidebar").hasClass("show"));
+    });
+    
+    const sections = $($('section').get().reverse()); //sections from bottom to top for optimization
+    const navPillLinks = $('#settings-nav > li > a');
+    $('#main').on('scroll', function () {
+        let scrollPosition = $('#main').scrollTop();
+
+        sections.each(function () {
+            const currentSection = $(this);
+            const sectionTop = currentSection[0].offsetTop;
+
+            if (scrollPosition + 50 >= sectionTop) {
+                const id = currentSection.attr('id');
+                const navPillLink = $(`#settings-nav > li > a[href='#${id}']`)
+                if (!navPillLink.hasClass('active')) {
+                    navPillLinks.removeClass('active');
+                    navPillLink.addClass('active');
+                }
+                return false;
+            }
+        });
+        if (scrollPosition + 1 >= $('#main')[0].scrollHeight - $('#main').height()) {            
+            navPillLinks.removeClass('active');
+            navPillLinks.last().addClass('active');
+        }
+    })
+    
+    navPillLinks.on('click', function (e) {        
+        $(".sidebar-wrapper").addClass("hidden");
+        $(".sidebar").removeClass("show");
+
+    });       
+
+    // template-related stuff
     if (vdata.settings.env === "PRD") {
         $(Selector.catalogueSetting).hide();
     } else {
         $(Selector.catalogueSetting).show();
     }
-    initializeGlobalVariables();
-    loadIndicatorTop.option('visible', true);
-    await preparePanels(MessageType.CATALOGUE);    
-    await preparePanels(MessageType.PRODUCT);    
-    loadIndicatorTop.option('visible', false);    
+    loadIndicatorTop = $(Selector.loadIndicator_Top).dxLoadIndicator({ visible: false }).dxLoadIndicator('instance');
+    initializeGlobalVariables();    
+    AssignEventListenersForTemplates(MessageType.CATALOGUE);    
+    AssignEventListenersForTemplates(MessageType.PRODUCT);    
 });

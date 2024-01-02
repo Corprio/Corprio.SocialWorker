@@ -17,6 +17,7 @@ namespace Corprio.SocialWorker.Models
         public DbSet<DbFriendlyBot> MetaBotStatuses { get; set; }        
         public DbSet<MetaPost> MetaPosts { get; set; }
         public DbSet<PostTemplate> Templates { get; set; }
+        public DbSet<ApplicationSetting> Settings { get; set; }
 
         //// https://devblogs.microsoft.com/dotnet/announcing-ef7-release-candidate-2/
         //// Note: didn't use Json column to store the bot statuses because it does not support collection of primitive types

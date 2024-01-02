@@ -97,24 +97,6 @@ namespace Corprio.SocialWorker.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Basic.
-        /// </summary>
-        public static string Basic {
-            get {
-                return ResourceManager.GetString("Basic", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Set options for managing sales orders.
-        /// </summary>
-        public static string Basic_Desc {
-            get {
-                return ResourceManager.GetString("Basic_Desc", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Bill sales order.
         /// </summary>
         public static string BillSalesOrder {
@@ -147,15 +129,6 @@ namespace Corprio.SocialWorker.Resources {
         public static string CataloguePublicationCompletedMessage {
             get {
                 return ResourceManager.GetString("CataloguePublicationCompletedMessage", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Chat.
-        /// </summary>
-        public static string Chat {
-            get {
-                return ResourceManager.GetString("Chat", resourceCulture);
             }
         }
         
@@ -349,11 +322,110 @@ namespace Corprio.SocialWorker.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to If need more than one email addresses, then separate email addresses using semi-colon (;) without spaces in between, e.g. ada@mail.com;bob@mail.com.
+        ///   Looks up a localized string similar to If more than one email addresses is needed, separate email addresses using semi-colon (;) without spaces in between, e.g. ada@mail.com;bob@mail.com.
         /// </summary>
         public static string ErrMailsToReceiveOrder {
             get {
                 return ResourceManager.GetString("ErrMailsToReceiveOrder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The customer could not be found..
+        /// </summary>
+        public static string ErrMsg_CustomerNotFound {
+            get {
+                return ResourceManager.GetString("ErrMsg_CustomerNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Encountered an error in retrieving pages on which {0} has a role..
+        /// </summary>
+        public static string ErrMsg_FailedToGetPages {
+            get {
+                return ResourceManager.GetString("ErrMsg_FailedToGetPages", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Failed to obtain long-lived user access token from Facebook..
+        /// </summary>
+        public static string ErrMsg_FailedToGetToken {
+            get {
+                return ResourceManager.GetString("ErrMsg_FailedToGetToken", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The product could not be found..
+        /// </summary>
+        public static string ErrMsg_ProductNotFound {
+            get {
+                return ResourceManager.GetString("ErrMsg_ProductNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The sales order could not be found..
+        /// </summary>
+        public static string ErrMsg_SalesOrderNotFound {
+            get {
+                return ResourceManager.GetString("ErrMsg_SalesOrderNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Error.
+        /// </summary>
+        public static string Error {
+            get {
+                return ResourceManager.GetString("Error", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Connect Facebook.
+        /// </summary>
+        public static string FB {
+            get {
+                return ResourceManager.GetString("FB", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} is now connected with {1}..
+        /// </summary>
+        public static string FB_connected {
+            get {
+                return ResourceManager.GetString("FB_connected", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Log in to Facebook to connect.
+        /// </summary>
+        public static string FB_Desc1 {
+            get {
+                return ResourceManager.GetString("FB_Desc1", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to with your Facebook page(s) and Instagram accounts.
+        /// </summary>
+        public static string FB_Desc2 {
+            get {
+                return ResourceManager.GetString("FB_Desc2", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0}&apos;s connection with any Facebook account will expire in 60 days until you log in to Facebook again..
+        /// </summary>
+        public static string FB_not_connected {
+            get {
+                return ResourceManager.GetString("FB_not_connected", resourceCulture);
             }
         }
         
@@ -435,6 +507,15 @@ namespace Corprio.SocialWorker.Resources {
         public static string FreeToUseDescription {
             get {
                 return ResourceManager.GetString("FreeToUseDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Get Started.
+        /// </summary>
+        public static string GetStarted {
+            get {
+                return ResourceManager.GetString("GetStarted", resourceCulture);
             }
         }
         
@@ -565,15 +646,6 @@ namespace Corprio.SocialWorker.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Invoice Summary.
-        /// </summary>
-        public static string InvoiceSummary {
-            get {
-                return ResourceManager.GetString("InvoiceSummary", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Returned.
         /// </summary>
         public static string IsInvoiceReturned {
@@ -655,6 +727,15 @@ namespace Corprio.SocialWorker.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Please select a product to represent the delivery charge in sales orders..
+        /// </summary>
+        public static string MsgMissingDeliveryChargeProductError {
+            get {
+                return ResourceManager.GetString("MsgMissingDeliveryChargeProductError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Sorry, you do not have the &quot;Approve&quot; permission..
         /// </summary>
         public static string MsgNoApprovePermission {
@@ -678,6 +759,15 @@ namespace Corprio.SocialWorker.Resources {
         public static string MsgSalesOrderIsVoided {
             get {
                 return ResourceManager.GetString("MsgSalesOrderIsVoided", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Changes saved.
+        /// </summary>
+        public static string MsgSettingSaved {
+            get {
+                return ResourceManager.GetString("MsgSettingSaved", resourceCulture);
             }
         }
         
@@ -1069,15 +1159,6 @@ namespace Corprio.SocialWorker.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Sales Order Summary.
-        /// </summary>
-        public static string SalesOrderSummary {
-            get {
-                return ResourceManager.GetString("SalesOrderSummary", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Sales reps (sales representatives) are the sales persons who take the order or invoice in charge. When you want to trace an order or calculate commission for a staff, sales rep is helpful for you..
         /// </summary>
         public static string SalesRepDescription {
@@ -1276,6 +1357,24 @@ namespace Corprio.SocialWorker.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Sales Order Management.
+        /// </summary>
+        public static string SOM {
+            get {
+                return ResourceManager.GetString("SOM", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Set options for managing sales orders.
+        /// </summary>
+        public static string SOM_Desc {
+            get {
+                return ResourceManager.GetString("SOM_Desc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Warehouse for deducting stock.
         /// </summary>
         public static string SOWarehouseDesc {
@@ -1299,6 +1398,15 @@ namespace Corprio.SocialWorker.Resources {
         public static string Subtotal {
             get {
                 return ResourceManager.GetString("Subtotal", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Success.
+        /// </summary>
+        public static string Success {
+            get {
+                return ResourceManager.GetString("Success", resourceCulture);
             }
         }
         

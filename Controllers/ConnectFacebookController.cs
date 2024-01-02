@@ -583,65 +583,89 @@ namespace Corprio.SocialWorker.Controllers
         //    return new Tuple<bool, List<string>>(success, errorMessages);
         //}
 
-        /// <summary>
-        /// Query Meta to obtain the ID of IG Professional account linked to a particular FB page
-        /// </summary>
-        /// <param name="httpClient">HTTP client for executing API query</param>
-        /// <param name="accessToken">Page access token</param>
-        /// <param name="pageId">Page ID</param>
-        /// <returns>ID of IG user</returns>
-        public async Task<string> GetIgUserId(HttpClient httpClient, string accessToken, string pageId)
-        {            
-            var httpRequest = new HttpRequestMessage()
-            {
-                Method = HttpMethod.Get,
-                RequestUri = new System.Uri($"{BaseUrl}/{ApiVersion}/{pageId}?fields=instagram_business_account"),                
-            };
-            httpRequest.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
-            HttpResponseMessage response = await httpClient.SendAsync(httpRequest);
-            if (!response.IsSuccessStatusCode)
-            {
-                Log.Error($"HTTP request to obtain Instagram Professional account ID fails. Response: {System.Text.Json.JsonSerializer.Serialize(response)}");
-                return null;
-            }
-            string responseString = await response.Content.ReadAsStringAsync();
-            FbPagePayload payload = response?.Content == null ? new() : JsonConvert.DeserializeObject<FbPagePayload>(responseString)!;
-            if (payload?.Error != null)
-            {
-                Log.Error($"Encountered an error in obtaining IG user ID for {pageId}. {payload?.Error?.CustomErrorMessage()}");
-            }
-            return payload?.InstagramBusinessAccount?.Id;
-        }
+        ///// <summary>
+        ///// Query Meta to obtain the ID of IG Professional account linked to a particular FB page
+        ///// </summary>
+        ///// <param name="httpClient">HTTP client for executing API query</param>
+        ///// <param name="accessToken">Page access token</param>
+        ///// <param name="pageId">Page ID</param>
+        ///// <returns>ID of IG user</returns>
+        //public async Task<string> GetIgUserId(HttpClient httpClient, string accessToken, string pageId)
+        //{            
+        //    var httpRequest = new HttpRequestMessage()
+        //    {
+        //        Method = HttpMethod.Get,
+        //        RequestUri = new System.Uri($"{BaseUrl}/{ApiVersion}/{pageId}?fields=instagram_business_account"),
+        //    };
+        //    httpRequest.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+        //    HttpResponseMessage response = await httpClient.SendAsync(httpRequest);
+        //    if (!response.IsSuccessStatusCode)
+        //    {
+        //        Log.Error($"HTTP request to obtain Instagram Professional account ID fails. Response: {System.Text.Json.JsonSerializer.Serialize(response)}");
+        //        return null;
+        //    }
+        //    string responseString = await response.Content.ReadAsStringAsync();
+        //    FbPagePayload payload = response?.Content == null ? new() : JsonConvert.DeserializeObject<FbPagePayload>(responseString)!;
+        //    if (payload?.Error != null)
+        //    {
+        //        Log.Error($"Encountered an error in obtaining IG user ID for {pageId}. {payload?.Error?.CustomErrorMessage()}");
+        //    }
+        //    return payload?.InstagramBusinessAccount?.Id;
+        //}
 
         /// <summary>
-        /// Get a list of FB pages on which the user has a role
+        /// Get information from Facebook API
         /// </summary>
-        /// <param name="httpClient">HTTP client for executing API query</param>
-        /// <param name="userId">ID of the user in question</param>
+        /// <param name="httpClient">HTTP client for executing API query</param>        
         /// <param name="userAccessToken">User access token</param>
-        /// <returns>List of FB pages on which the user has a role</returns>
-        public async Task<List<FbPage>> GetMeAccounts(HttpClient httpClient, string userId, string userAccessToken)
-        {            
+        /// <param name="endPoint">Endpoint at which the query is performed</param>
+        /// <returns>API response in string format</returns>
+        public async Task<string> GetQuery(HttpClient httpClient, string userAccessToken, string endPoint)
+        {
             var httpRequest = new HttpRequestMessage()
             {
                 Method = HttpMethod.Get,
-                RequestUri = new System.Uri($"{BaseUrl}/{userId}/accounts"),                                
+                RequestUri = new Uri(endPoint),
             };
             httpRequest.Headers.Authorization = new AuthenticationHeaderValue("Bearer", userAccessToken);
             HttpResponseMessage response = await httpClient.SendAsync(httpRequest);
             if (!response.IsSuccessStatusCode)
             {
-                Log.Error($"HTTP request to obtain get Facebook pages fails. Response: {System.Text.Json.JsonSerializer.Serialize(response)}");
-                return null;
+                Log.Error($"HTTP request to get Facebook account info fails. Response: {System.Text.Json.JsonSerializer.Serialize(response)}");
+                return string.Empty;
             }
-            string responseString = await response.Content.ReadAsStringAsync();
-            MeAccountsPayload payload = JsonConvert.DeserializeObject<MeAccountsPayload>(responseString)!;
-            if (payload?.Error != null)
-            {
-                Log.Error($"Encountered an error when getting pages owned by {userId}. {payload?.Error?.CustomErrorMessage()}");
-            }
-            return payload?.Data;
+            return await response.Content.ReadAsStringAsync();            
         }
+
+        ///// <summary>
+        ///// Get a list of FB pages on which the user has a role
+        ///// </summary>
+        ///// <param name="httpClient">HTTP client for executing API query</param>
+        ///// <param name="userId">ID of the user in question</param>
+        ///// <param name="userAccessToken">User access token</param>
+        ///// <returns>List of FB pages on which the user has a role</returns>
+        //public async Task<List<FbPage>> GetMeAccounts(HttpClient httpClient, string userId, string userAccessToken)
+        //{            
+        //    var httpRequest = new HttpRequestMessage()
+        //    {
+        //        Method = HttpMethod.Get,
+        //        RequestUri = new System.Uri($"{BaseUrl}/{userId}/accounts"),
+        //    };
+        //    httpRequest.Headers.Authorization = new AuthenticationHeaderValue("Bearer", userAccessToken);
+        //    HttpResponseMessage response = await httpClient.SendAsync(httpRequest);
+        //    if (!response.IsSuccessStatusCode)
+        //    {
+        //        Log.Error($"HTTP request to obtain get Facebook pages fails. Response: {System.Text.Json.JsonSerializer.Serialize(response)}");
+        //        return null;
+        //    }
+        //    string responseString = await response.Content.ReadAsStringAsync();
+        //    MeAccountsPayload payload = JsonConvert.DeserializeObject<MeAccountsPayload>(responseString)!;
+        //    if (payload?.Error != null)
+        //    {
+        //        Log.Error($"Encountered an error when getting pages owned by {userId}. {payload?.Error?.CustomErrorMessage()}");
+        //    }
+        //    return payload?.Data;
+        //}
 
         /// <summary>
         /// Get a long-lived user access token from Meta
@@ -705,7 +729,7 @@ namespace Corprio.SocialWorker.Controllers
             }
             return payload?.Success ?? false;
         }
-        
+
         /// <summary>
         /// Register/refresh access token(s) and relevant FB pages and Meta user in the database
         /// </summary>
@@ -713,16 +737,19 @@ namespace Corprio.SocialWorker.Controllers
         /// <param name="organizationID">Organization ID</param>
         /// <param name="metaId">Meta entity ID associated with the access token</param>
         /// <param name="token">Access token</param>
+        /// <param name="reAssignMetaProfile">True if the Facebook account can be reassigned from one organization to another</param>
         /// <returns>Status code</returns>
         /// <exception cref="Exception"></exception>
         public async Task<IActionResult> RefreshAccessToken([FromServices] HttpClient httpClient, [FromServices] APIClient corprioClient, 
-            [FromRoute] Guid organizationID, string metaId, string token)
+            [FromRoute] Guid organizationID, string metaId, string token, bool reAssignMetaProfile)
         {            
             if (string.IsNullOrWhiteSpace(token) || string.IsNullOrWhiteSpace(metaId))
                 return StatusCode(400, "Token and Meta entity ID cannot be blank. ");
-                        
+            
             token = await GetLongLivedAccessToken(httpClient: httpClient, userAccessToken: token);
-            if (string.IsNullOrWhiteSpace(token)) return StatusCode(400, "Failed to obtain long-lived user access token.");
+            if (string.IsNullOrWhiteSpace(token)) return StatusCode(500, Resources.SharedResource.ResourceManager.GetString("ErrMsg_FailedToGetToken"));
+
+            string responseString;  // response from the GET requests below will be assigned to this variable
             MetaUser metaUser = db.MetaUsers.Include(x => x.Pages).FirstOrDefault(x => x.FacebookUserID == metaId);
             bool newMetaUser = metaUser == null;
             if (newMetaUser)
@@ -732,22 +759,28 @@ namespace Corprio.SocialWorker.Controllers
                 { 
                     ID = Guid.NewGuid(), 
                     FacebookUserID = metaId, 
-                    KeywordForShoppingIntention = BabelFish.Vocab["DefaultKeyWordForShoppingIntention"][UtilityHelper.NICAM(coreInfo)] 
-                };
-
-                // TODO - create a new application setting
+                    KeywordForShoppingIntention = BabelFish.Vocab["DefaultKeyWordForShoppingIntention"][UtilityHelper.NICAM(coreInfo)],
+                    OrganizationID = organizationID,
+                };                
             }
-            metaUser.OrganizationID = organizationID;
+            else if (metaUser.OrganizationID != organizationID && !organizationID.Equals(Guid.Empty))
+            {
+                if (!reAssignMetaProfile)
+                {                    
+                    // note: the client-side must expect 409 = conflict of organization IDs
+                    return StatusCode(409, "Conflict of organization ID.");
+                }
+                metaUser.OrganizationID = organizationID;
+            }
+
             metaUser.Token = token;
             if (newMetaUser)
             {
-                db.MetaUsers.Add(metaUser);
-                // TODO - add application setting
+                db.MetaUsers.Add(metaUser);                
             }
             else
             {
-                db.MetaUsers.Update(metaUser);
-                // TODO - update application setting
+                db.MetaUsers.Update(metaUser);                
             }
             try
             {
@@ -757,10 +790,15 @@ namespace Corprio.SocialWorker.Controllers
             {
                 Log.Error($"Failed to save Facebook user {metaUser.ID}. {ex.Message}");
                 throw;
-            }
+            }            
 
-            List<FbPage> fbPages = await GetMeAccounts(httpClient: httpClient, userId: metaId, userAccessToken: token)
-                ?? throw new Exception($"Encountered an error in retrieving pages on which {metaId} has a role.");
+            responseString = await GetQuery(httpClient: httpClient, userAccessToken: token, endPoint: $"{BaseUrl}/{metaId}/accounts");            
+            MeAccountsPayload payload = JsonConvert.DeserializeObject<MeAccountsPayload>(responseString)!;
+            if (payload?.Error != null)
+            {
+                Log.Error($"Encountered an error when getting pages owned by {metaId}. {payload?.Error?.CustomErrorMessage()}");
+            }
+            List<FbPage> fbPages = payload?.Data ?? throw new Exception(string.Format(Resources.SharedResource.ErrMsg_FailedToGetPages, metaId));
 
             bool newMetaPage;
             foreach (FbPage page in fbPages)
@@ -770,7 +808,15 @@ namespace Corprio.SocialWorker.Controllers
                 if (newMetaPage) metaPage = new MetaPage() { ID = Guid.NewGuid(), FacebookUserID = metaUser.ID, PageId = page.Id };
                 metaPage.Name = StringHelper.StringTruncate(page.Name, 300);
                 metaPage.Token = page.AccessToken;
-                metaPage.InstagramID = await GetIgUserId(httpClient: httpClient, accessToken: page.AccessToken, pageId: page.Id);
+
+                // note: not every FB page is associated with an IG account
+                responseString = await GetQuery(httpClient: httpClient, userAccessToken: page.AccessToken, endPoint: $"{BaseUrl}/{ApiVersion}/{page.Id}?fields=instagram_business_account");
+                FbPagePayload pagePayload = JsonConvert.DeserializeObject<FbPagePayload>(responseString)!;
+                if (pagePayload?.Error != null)
+                {
+                    Log.Error($"Encountered an error in obtaining IG user ID for {page.Id}. {payload?.Error?.CustomErrorMessage()}");
+                }
+                metaPage.InstagramID = pagePayload?.InstagramBusinessAccount?.Id;
 
                 if (newMetaPage)
                 {

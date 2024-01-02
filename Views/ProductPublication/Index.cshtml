@@ -53,10 +53,10 @@
             col.AddFor(m => m.GrossWeight).Visible(false);
             col.AddFor(m => m.NetWeight).Visible(false);
             col.AddFor(m => m.WeightUnit).Visible(false).Lookup(lookup =>
-            lookup.DataSource(Corprio.Global.Measure.Lists.WeightUnitList()).DisplayExpr("Value").ValueExpr("Key").AllowClearing(true));
-            col.AddFor(m => m.Length).DataType(GridColumnDataType.Number).Visible(false);
-            col.AddFor(m => m.Width).DataType(GridColumnDataType.Number).Visible(false);
-            col.AddFor(m => m.Height).DataType(GridColumnDataType.Number).Visible(false);
+                lookup.DataSource(Corprio.Global.Measure.Lists.WeightUnitList()).DisplayExpr("Value").ValueExpr("Key").AllowClearing(true));
+            col.AddFor(m => m.Length).Visible(false);
+            col.AddFor(m => m.Width).Visible(false);
+            col.AddFor(m => m.Height).Visible(false);
             col.AddFor(m => m.LengthUnit).Visible(false).Lookup(lookup =>
             lookup.DataSource(Corprio.Global.Measure.Lists.LengthUnitList()).DisplayExpr("Value").ValueExpr("Key").AllowClearing(true));
             col.AddFor(m => m.Image01).Visible(false).ImageColumn(uploadUrl: Url.Action("upload", "image"), cellDisplayTemplate: "imageCellDisplay", imageSpec: localizer["ProductImageSpec"]);
@@ -67,7 +67,8 @@
             .EditCellTemplate(new TemplateName("TagsEditTemplate"))
             .AllowSorting(false);
             col.AddFor(m => m.IsMasterProduct).Visible(false).CellTemplate(new JS(@$"corprio.ui.boolColumnCellTemplate('{Corprio.DataModel.Resources.Resource.IsMasterProduct}')"));
-            col.AddFor(m => m.Disabled).FilterValue(false).Width(60).CellTemplate(new JS(@$"corprio.ui.boolColumnCellTemplate('{Corprio.DataModel.Resources.Resource.IsDisabled}')"));
+            // the data type needs to be explicitly set to avoid loading the data twice (i.e., error W1005)
+            col.AddFor(m => m.Disabled).DataType(GridColumnDataType.Boolean).FilterValue(false).Width(60).CellTemplate(new JS(@$"corprio.ui.boolColumnCellTemplate('{Corprio.DataModel.Resources.Resource.IsDisabled}')"));
             col.AddShortDateTimeFor(m => m.CreateDate, User.UserSettings()).Visible(false).AllowEditing(false);
             col.AddShortDateTimeFor(m => m.LastUpdateDate, User.UserSettings()).Visible(false).AllowEditing(false);
         })        

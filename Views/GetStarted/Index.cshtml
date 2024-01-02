@@ -1,0 +1,436 @@
+﻿@using Corprio.AspNetCore.Site.Extensions
+@using Corprio.Core.Utility
+@using Corprio.DataModel.Business
+@using Corprio.SocialWorker.Models
+@using Corprio.SocialWorker.Dictionaries
+@using Corprio.SocialWorker.Helpers
+@inject Corprio.CorprioAPIClient.APIClient corprioApi
+@inject Microsoft.Extensions.Configuration.IConfiguration configuration
+@model ApplicationSetting
+@{
+    ViewData["Title"] = @localizer["GetStarted"];
+    string metaApiID = configuration["MetaApiSetting:AppId"];
+    string metaApiVersion = configuration["MetaApiSetting:ApiVersion"];
+
+    string env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "PRD";
+    Guid organizationID = Context.SelectedOrganizationID() ?? Guid.Empty;
+    OrganizationCoreInfo orgInfo = organizationID.Equals(Guid.Empty) ? null : await corprioApi.OrganizationApi.GetCoreInfo(organizationID: organizationID);    
+    bool authorizedToUpdate = orgInfo == null ? false : orgInfo.OwnerID == Context.User.GetUserID();  // true if the current user can update the application setting
+
+    string defaultCatalogueMessage = BabelFish.Vocab["VisitCatalogue"][UtilityHelper.NICAM(orgInfo)];
+    string sampleShortName = orgInfo == null ? orgInfo.ShortName : "MyCompany";
+    string catalogueURL = $"{configuration["GoBuyClickUrl"]}/Catalogue/{sampleShortName}/SAMPLE_CATALOGUE";
+    string defaultProductMessage = BabelFish.Vocab["HowToBuy"][UtilityHelper.NICAM(orgInfo)].Replace("{0}", "Example Product");
+    
+    string messageType_CataloguePost = nameof(MessageType.CataloguePost);
+    string messageType_ProductPost = nameof(MessageType.ProductPost);
+    string separator = TemplateComponent.Separator;
+    string defaultTemplate_catalogue = string.Join(separator, DefaultTemplate.DefaultTempalte_Catalogue);
+    string defaultTemplate_product = string.Join(separator, DefaultTemplate.DefaultTempalte_Product);
+}
+<link rel="stylesheet" href="~/css/getstarted.css" />
+<script src="~/js/views/GetStarted/Index.js" asp-append-version="true"></script>
+<script>            
+    // use vdata to pass parameters to TS
+    const vdata = {
+        actions: {
+            refreshAccessToken: '@StringHelper.Encode(@Url.Action("RefreshAccessToken", "ConnectFacebook", new { organizationID }))',
+            getKeyword: '@StringHelper.Encode(@Url.Action("GetKeyword", "Template", new { organizationID }))',
+            getTemplate: '@StringHelper.Encode(@Url.Action("GetTemplate", "Template", new { organizationID }))',
+            saveTemplate: '@StringHelper.Encode(@Url.Action("SaveTemplate", "Template", new { organizationID }))',
+        },
+        sampleValues: {
+            catalogueURL: "@catalogueURL",
+            defaultCatalogueMessage: "@defaultCatalogueMessage",
+            defaultProductMessage: "@defaultProductMessage",
+        },
+        settings: {
+            env: "@env",
+            metaApiID: "@metaApiID",
+            metaApiVersion: "@metaApiVersion",
+            sendConfirmationEmail: "@Model.SendConfirmationEmail",
+        },
+        templateComponents: {
+            catalogueCodeValue: "@TemplateComponent.CatalogueCode",
+            catalogueEndDateValue: "@TemplateComponent.CatalogueEndDate",
+            catalogueNameValue: "@TemplateComponent.CatalogueName",
+            catalogueStartDateValue: "@TemplateComponent.CatalogueStartDate",            
+            catalogueUrlValue: "@TemplateComponent.CatalogueUrl",
+            defaultMessageValue: "@TemplateComponent.DefaultMessage",
+            defaultTemplate_catalogue: "@defaultTemplate_catalogue",
+            defaultTemplate_product: "@defaultTemplate_product",
+            messageType_CataloguePost: "@messageType_CataloguePost",
+            messageType_ProductPost: "@messageType_ProductPost",
+            newLineValue: "@TemplateComponent.LineBreak",
+            productNameValue: "@TemplateComponent.ProductName",
+            productCodeValue: "@TemplateComponent.ProductCode",
+            productDescriptionValue: "@TemplateComponent.ProductDescription",
+            productListPriceValue: "@TemplateComponent.ProductListPrice",
+            productReplyKeyword: "@TemplateComponent.Keyword",
+            separator: "@separator"
+        },
+        localizer: {
+            catalogueCode: '@StringHelper.Encode(localizer["Template_CatalogueCode"])',
+            catalogueEndDate: '@StringHelper.Encode(localizer["Template_CatalogueEndDate"])',
+            catalogueName: '@StringHelper.Encode(localizer["Template_CatalogueName"])',
+            catalogueStartDate: '@StringHelper.Encode(localizer["Template_CatalogueStartDate"])',
+            catalogueUrl: '@StringHelper.Encode(localizer["Template_CatalogueURL"])',
+            fbConnected: '@StringHelper.Encode(localizer["FB_connected"])',
+            fbNotConnected: '@StringHelper.Encode(localizer["FB_not_connected"])',
+            defaultMessage: '@StringHelper.Encode(localizer["Template_DefaultMessage"])',
+            newLine: '@StringHelper.Encode(localizer["Template_NewLine"])',
+            productName: '@StringHelper.Encode(localizer["Template_ProductName"])',
+            productCode: '@StringHelper.Encode(localizer["Template_ProductCode"])',
+            productDescription: '@StringHelper.Encode(localizer["Template_ProductDescription"])',
+            productListPrice: '@StringHelper.Encode(localizer["Template_ProductPrice"])',
+            productReplyKeyword: '@StringHelper.Encode(localizer["Template_Keyword"])',
+            saveTemplateTitle: '@StringHelper.Encode(localizer["TemplateSavedTitle"])',
+            saveTemplateMessage: '@StringHelper.Encode(localizer["TemplateSavedMessage"])',
+            shortName: '@orgInfo?.ShortName',
+        }
+    };
+</script>
+<script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js"></script>
+
+<div class="m-4">
+    <h4 class="page-title d-md-none ">
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#settings-sidebar">
+            <i class="fa-light fa-bars"></i>
+        </button>
+        @ViewData["Title"]
+    </h4>
+    
+    <div class="wrapper d-flex">        
+        <div class="sidebar-wrapper hidden">
+            <div id="settings-sidebar" class="sidebar collapse navbar-collapse d-md-block">
+                <div class="pr-5">
+                    <h4 class="page-title d-none d-md-block">@ViewData["Title"]</h4>
+                    <ul id="settings-nav" class="nav nav-pills flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#fb-section">@localizer["FB"]</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#som-section">@localizer["SOM"]</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#delivery-section">@localizer["DeliveryMethod"]</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#payment-section">@localizer["PaymentMethod"]</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#template-section">@localizer["SocialMediaTemplate"]</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <div class="besides-sidebar tab-content">
+            <section id="fb-section" class="active">
+                <div class="title-border-l">
+                    <h4>@localizer["FB"]</h4>
+                    <p>@localizer["FB_Desc1"] <b>@orgInfo?.ShortName</b> @localizer["FB_Desc2"]</p>
+                </div>
+                                
+                <button class="btn btn-primary mt-2" id="loginBtn" style="display: block;">Continue with Facebook</button>
+                <button class="btn btn-primary mt-2" id="logoutBtn" style="display: none;">Logout from Facebook</button>
+
+                <div id="fb-dialogue" class="mt-2"></div>
+            </section>
+            
+            @*The form element is only applicable to SOM, delivery and payment methods*@
+            <form id="settings-form"  asp-action="save" asp-route-organizationID="@organizationID" enctype="multipart/form-data" onsubmit="return submitChanges()">
+                <section id="som-section">
+                    <div class="title-border-l">
+                        <h4>@localizer["SOM"]</h4>
+                        <p>@localizer["SOM_Desc"]</p>
+                    </div>
+
+                    <div class="form-group" id="emailConfirmationWrapper">
+                        @Html.DevExtreme().CheckBoxFor(m => m.SendConfirmationEmail).OnValueChanged("sendConfirmationEmail_Changed").ID("emailConfirmation")
+                        <help-label asp-for="SendConfirmationEmail"></help-label>
+                    </div>
+
+                    <div id="smtp-dialogue" style="display: none;">
+                        @if (Model.IsSmtpSet)
+                        {
+                            <div class="alert alert-success">
+                                <i class="fa-regular fa-circle-check"></i>
+                                @localizer["MsgSMTPSet"]
+                                <div class="mt-2 d-flex justify-content-end">
+                                    <a class="btn btn-primary" href="@($"{configuration["CorprioPortalUrl"]}/{Context.SelectedOrganizationID()??Guid.Empty}/organization/smtpsetting")" target="_blank" id="setUpNowBtn">
+                                        @localizer["SetUpNow"]
+                                        <i class="fa-regular fa-arrow-up-right-from-square"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="alert alert-warning">
+                                <i class="fa-regular fa-circle-exclamation"></i>
+                                @localizer["MsgSMTPNotSet"]
+                                <div class="mt-2 d-flex justify-content-end">
+                                    <a class="btn btn-primary" href="@($"{configuration["CorprioPortalUrl"]}/{Context.SelectedOrganizationID()??Guid.Empty}/organization/smtpsetting")" target="_blank" id="setUpNowBtn">
+                                        @localizer["SetUpNow"]
+                                        <i class="fa-regular fa-arrow-up-right-from-square"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        }
+
+                        <div class="form-group">
+                            <help-label asp-for="DefaultEmailSubject" class="required"></help-label>
+                            @Html.DevExtreme().TextBoxFor(m => m.DefaultEmailSubject).Disabled(!authorizedToUpdate).Width("100%")
+                        </div>
+
+                    </div>
+                    <div class="form-group">
+                        <help-label asp-for="EmailToReceiveOrder" class="required"></help-label>
+                        @Html.DevExtreme().TextBoxFor(m => m.EmailToReceiveOrder).Disabled(!authorizedToUpdate).Width("100%")
+                    </div>
+                    <div class="form-group">
+                        <help-label asp-for="WarehouseID" class="required"></help-label>
+                        @Html.DevExtreme().SelectBoxFor2(m => m.WarehouseID).LookupWarehouse(organizationID).Value(Model.WarehouseID).PreSelect()
+                    </div>
+                    <button class="btn btn-outline-info mb-3 save-setting-btn" type="button">@localizer["Save"]</button>
+                </section>
+
+                <section id="delivery-section">
+                    <div class="title-border-l">
+                        <h4>@localizer["DeliveryMethod"]</h4>
+                        <p>@localizer["DeliveryMethod_Desc"]</p>
+                    </div>
+
+                    <div class="form-group">
+                        @Html.DevExtreme().CheckBoxFor(m => m.SelfPickUp).ID("SelfPickUp")
+                        <help-label asp-for="SelfPickUp"></help-label>
+                    </div>
+                    <div class="ml-4">
+                        <div class="form-group">
+                            <help-label asp-for="SelfPickUpInstruction"></help-label>
+                            @Html.DevExtreme().TextAreaFor2(m => m.SelfPickUpInstruction).ID("SelfPickUpInstruction").AutoResizeEnabled(true)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.DevExtreme().CheckBoxFor(m => m.ShipToCustomer).ID("ShipToCustomer")
+                        <help-label asp-for="ShipToCustomer"></help-label>
+                    </div>
+                    <div class="ml-4">
+                        <div class="form-group">
+                            <help-label asp-for="DeliveryCharge"></help-label>
+                            @Html.DevExtreme().NumberBoxFor(m => m.DeliveryCharge).ID("DeliveryCharge").OnInitialized("numberBoxCurrFormat")
+                        </div>
+                        <div class="form-group">
+                            <help-label asp-for="FreeShippingAmount"></help-label>
+                            @Html.DevExtreme().NumberBoxFor(m => m.FreeShippingAmount).ID("FreeShippingAmount").OnInitialized("numberBoxCurrFormat").ShowClearButton(true).Placeholder(localizer["FreeShippingAmountMsg"])
+                        </div>
+                        <div class="form-group">
+                            <help-label asp-for="DeliveryChargeProductID"></help-label>                        
+                            @Html.DevExtreme().SelectBoxFor2(m => m.DeliveryChargeProductID).ID("DeliveryChargeProductID").LookupProduct(organizationID).ShowClearButton(true)
+                        </div>
+                    </div>
+                    <button class="btn btn-outline-info mb-3 save-setting-btn" type="button">@localizer["Save"]</button>
+                </section>
+
+                <section id="payment-section">
+                    <div class="title-border-l">
+                        <h4>@localizer["PaymentMethod"]</h4>
+                        <p>@localizer["PaymentMethod_Desc"]</p>
+                    </div>
+                    <a class="btn btn-white" href="@(configuration["PaymentAppUrl"] + "/" + organizationID + "/PaymentMethod")" target="_blank" id="paymentMethodBtn">
+                        @localizer["SetPaymentMethods"]
+                        <i class="fa-regular fa-arrow-up-right-from-square ml-1"></i>
+                    </a>
+                </section>
+            </form>
+
+            <section id="template-section">
+                <div class="title-border-l">
+                    <h4>@localizer["SocialMediaTemplate"]</h4>
+                    <p>@localizer["SocialMediaTemplate_Desc"]</p>
+                </div>
+
+                <div class="d-flex justify-content-center my-3">
+                    <div id="load-indicator-top"></div>
+                </div>
+                
+                <div class="row mb-2">
+                    <div class="col-sm">
+                        <h5 class="mb-2">@localizer["Panel_Blocks"] - @localizer["PanelTitle_Product"]</h5>
+                        <div id="block-panel-product" class="rounded border border-success bg-white py-1 mb-3" style="min-width:100px; min-height:100px;">&nbsp;</div>
+                        <div class="input-group mb-3">
+                            <label class="my-1 mr-2" for="component-select-product">
+                                @localizer["StandardMessageComponent"]                                
+                                <a class="helpicon " tabindex="-1" data-toggle="popover" data-trigger="hover" data-container="body" data-placement="top" data-html="true" data-content="@localizer["Tooltip_StandardMessageComponent"]" data-original-title="" title="">
+                                    <i class="fa-regular fa-circle-question" aria-hidden="true"></i>
+                                </a>
+                            </label>
+                            <select id="component-select-product" class="custom-select">
+                                <option selected disabled value="">---</option>
+                                <option value="@TemplateComponent.LineBreak">@localizer["Template_NewLine"]</option>
+                                <option value="@TemplateComponent.ProductName">@localizer["Template_ProductName"]</option>
+                                <option value="@TemplateComponent.ProductCode">@localizer["Template_ProductCode"]</option>
+                                <option value="@TemplateComponent.ProductDescription">@localizer["Template_ProductDescription"]</option>
+                                <option value="@TemplateComponent.ProductListPrice">@localizer["Template_ProductPrice"]</option>
+                                <option value="@TemplateComponent.DefaultMessage">@localizer["Template_DefaultMessage"]</option>
+                                <option value="@TemplateComponent.Keyword">@localizer["Template_Keyword"]</option>
+                            </select>
+                            <div class="input-group-append">
+                                <button id="component-btn-product" class="btn btn-outline-primary" type="button" data-toggle="tooltip" data-placement="right" title="@localizer["Tooltip_StandardMessageComponent"]">@globalLocalizer["Add"]</button>
+                            </div>
+                            <div class="invalid-feedback">@localizer["InvalidFeedback_NoKeyword"]</div>
+                        </div>
+
+                        <div class="input-group mb-3">
+                            <label class="my-1 mr-2" for="custom-input-product">
+                                @localizer["CustomText"]
+                            </label>
+                            <input type="text" id="custom-input-product" class="form-control" placeholder="@localizer["CustomText"]" aria-label="Custom Text" aria-describedby="basic-addon2">
+                            <div class="input-group-append">
+                                <button id="custom-btn-product" class="btn btn-outline-primary" type="button">@globalLocalizer["Add"]</button>
+                            </div>
+                        </div>
+
+                        <div class="input-group mb-3">
+                            <label class="my-1 mr-2" for="keyword-input-product">
+                                @localizer["Template_Keyword"]
+                                <a class="helpicon " tabindex="-1" data-toggle="popover" data-trigger="hover" data-container="body" data-placement="top" data-html="true" data-content="@localizer["Tooltip_Keyword"]" data-original-title="" title="">
+                                    <i class="fa-regular fa-circle-question" aria-hidden="true"></i>
+                                </a>
+                            </label>
+                            <input type="text" id="keyword-input-product" class="form-control" placeholder="@localizer["Placeholder_Keyword"]">
+                            <div class="invalid-feedback">@localizer["InvalidFeedback_KeywordLength"]</div>
+                        </div>
+
+                        <button id="restore-default-btn-product" class="btn btn-outline-danger mb-3" type="button">@localizer["DefaultSetting"]</button>
+                        <button id="save-template-btn-product" class="btn btn-outline-info mb-3" type="button">@localizer["Save"]</button>
+                    </div>
+
+                    <div class="col-sm">
+                        <h5 class="mb-2">@localizer["Panel_Preview"]</h5>
+                        <div id="preview-panel-product" class="rounded border border-success p-2 bg-white" style="min-width:100px; min-height:100px;">&nbsp;</div>
+                    </div>
+                </div>
+
+                <div id="catalogue-setting" class="mt-4">
+                    <div class="row mb-2">
+                        <div class="col-sm">
+                            <h5 class="mb-2">@localizer["Panel_Blocks"] - @localizer["PanelTitle_Catalogue"]</h5>
+                            <div id="block-panel-catalogue" class="rounded border border-success bg-white py-1 mb-3" style="min-width:100px; min-height:100px;">&nbsp;</div>
+                            <div class="input-group mb-3">
+                                <label class="my-1 mr-2" for="component-select-catalogue">
+                                    @localizer["StandardMessageComponent"]
+                                    <a class="helpicon " tabindex="-1" data-toggle="popover" data-trigger="hover" data-container="body" data-placement="top" data-html="true" data-content="@localizer["Tooltip_StandardMessageComponent"]" data-original-title="" title="">
+                                        <i class="fa-regular fa-circle-question" aria-hidden="true"></i>
+                                    </a>                                    
+                                </label>
+                                <select id="component-select-catalogue" class="custom-select">
+                                    <option selected disabled value="">---</option>
+                                    <option value="@TemplateComponent.LineBreak">@localizer["Template_NewLine"]</option>
+                                    <option value="@TemplateComponent.CatalogueName">@localizer["Template_CatalogueName"]</option>
+                                    <option value="@TemplateComponent.CatalogueCode">@localizer["Template_CatalogueCode"]</option>
+                                    <option value="@TemplateComponent.CatalogueStartDate">@localizer["Template_CatalogueStartDate"]</option>
+                                    <option value="@TemplateComponent.CatalogueEndDate">@localizer["Template_CatalogueEndDate"]</option>
+                                    <option value="@TemplateComponent.CatalogueUrl">@localizer["Template_CatalogueURL"]</option>
+                                    <option value="@TemplateComponent.DefaultMessage">@localizer["Template_DefaultMessage"]</option>
+                                </select>
+                                <div class="input-group-append">
+                                    <button id="component-btn-catalogue" class="btn btn-outline-primary" type="button" data-toggle="tooltip" data-placement="right" title="@localizer["Tooltip_StandardMessageComponent"]">@globalLocalizer["Add"]</button>
+                                </div>
+                            </div>
+
+                            <div class="input-group mb-3">
+                                <label class="my-1 mr-2" for="custom-input-catalogue">
+                                    @localizer["CustomText"]
+                                </label>
+                                <input type="text" id="custom-input-catalogue" class="form-control" placeholder="@localizer["CustomText"]" aria-label="Custom Text" aria-describedby="basic-addon2">
+                                <div class="input-group-append">
+                                    <button id="custom-btn-catalogue" class="btn btn-outline-primary" type="button">@globalLocalizer["Add"]</button>
+                                </div>
+                            </div>
+                            <button id="restore-default-btn-catalogue" class="btn btn-outline-danger mb-3" type="button">@localizer["DefaultSetting"]</button>
+                            <button id="save-template-btn-catalogue" class="btn btn-outline-info mb-3" type="button">@localizer["Save"]</button>
+                        </div>
+
+                        <div class="col-sm">
+                            <h5 class="mb-2">@localizer["Panel_Preview"]</h5>
+                            <div id="preview-panel-catalogue" class="rounded border border-success p-2 bg-white" style="min-width:100px; min-height:100px;">&nbsp;</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>                
+    </div>        
+</div>
+
+<vc:static-data model="@StaticDataRequestViewModel.All(true)" org-info="true" />
+<script>    
+    function sendConfirmationEmail_Changed(e) {        
+        $("#smtp-dialogue").toggle(e.value);
+    }
+
+    function numberBoxCurrFormat(e) {
+        if (corprio.getLang() == "en" && StaticData.OrgInfo.CurrencyCode == "USD") {
+            e.component.option("format", "US$#,##0.##;(US$#,##0.##)")
+        } else {            
+            e.component.option("format", `${StaticData.OrgInfo.CurrencyCode}#,##0.##;(${StaticData.OrgInfo.CurrencyCode}#,##0.##)`)
+        }
+    }
+
+    /** validate data before submitting changes */
+    function submitChanges() {
+        let validationResult = DevExpress.validationEngine.validateGroup();
+        if (validationResult.isValid) {
+            if ($("#ShipToCustomer").dxCheckBox("option", "value") && $("#DeliveryCharge").dxNumberBox("option", "value") > 0) {
+                const selProduct = $("#DeliveryChargeProductID").dxSelectBox("instance");
+                if (!selProduct.option("value")) {
+                    selProduct.option("validationStatus", "invalid");
+                    DevExpress.ui.dialog.alert("@encoder.Encode(localizer["MsgMissingDeliveryChargeProductError"])", "@encoder.Encode(localizer["Error"])");
+                    return false;
+                }
+            }
+        }
+        else { 
+            return false; 
+        }
+    }
+
+    $(function() {
+        $('.save-setting-btn').on('click', function() {
+            console.log('CLICKED');
+            let validationResult = DevExpress.validationEngine.validateGroup();
+
+            if (validationResult.isValid) {
+                if ($("#ShipToCustomer").dxCheckBox("option", "value") && $("#DeliveryCharge").dxNumberBox("option", "value") > 0) {
+                    const selProduct = $("#DeliveryChargeProductID").dxSelectBox("instance");
+                    if (!selProduct.option("value")) {
+                        selProduct.option("validationStatus", "invalid");
+                        DevExpress.ui.dialog.alert("@encoder.Encode(localizer["MsgMissingDeliveryChargeProductError"])", "@encoder.Encode(localizer["Error"])");
+                        return false;
+                    }
+                }
+            }
+            else {
+                return false;
+            }                
+
+            // TODO - make the following line acceptable to TypeScript
+            savedData = new FormData($("#settings-form")[0]);
+
+            $.ajax({
+                type: 'POST',
+                url: '/@(organizationID)/GetStarted/Save',
+                data: savedData,
+                cache: false,
+                contentType: false,
+                processData: false,
+                success: function (result) {
+                    DevExpress.ui.notify('@encoder.Encode(localizer["MsgSettingSaved"])', 'success');
+                },
+                error: corprio.formatError
+            })
+        });
+    })
+</script>

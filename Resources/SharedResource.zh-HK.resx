@@ -333,9 +333,6 @@
   <data name="AddLine" xml:space="preserve">
     <value>添加產品</value>
   </data>
-  <data name="Chat" xml:space="preserve">
-    <value>聊天</value>
-  </data>
   <data name="Discounts" xml:space="preserve">
     <value>折扣</value>
   </data>
@@ -494,5 +491,152 @@
   </data>
   <data name="Tooltip_StandardMessageComponent" xml:space="preserve">
     <value>貼文基本組成部分中的文字會根據產品而有所不同</value>
+  </data>
+  <data name="DefaultDeliveryCharge" xml:space="preserve">
+    <value>預設運費</value>
+  </data>
+  <data name="DefaultDeliveryCharge_Description" xml:space="preserve">
+    <value>新產品目錄的預設運費。您可以調整每個目錄的運費。</value>
+  </data>
+  <data name="DefaultEmailSubject" xml:space="preserve">
+    <value>電子郵件的主題</value>
+  </data>
+  <data name="DefaultEmailSubject_Description" xml:space="preserve">
+    <value>下訂單後發送給客戶的確認電子郵件的主題</value>
+  </data>
+  <data name="DeliveryChargeProductID" xml:space="preserve">
+    <value>運費商品</value>
+  </data>
+  <data name="DeliveryChargeProductID_Description" xml:space="preserve">
+    <value>銷售訂單中用於表示運費的產品</value>
+  </data>
+  <data name="DeliveryMethod" xml:space="preserve">
+    <value>送貨方式</value>
+  </data>
+  <data name="DeliveryMethod_Desc" xml:space="preserve">
+    <value>送貨方式</value>
+  </data>
+  <data name="EmailToReceiveOrder" xml:space="preserve">
+    <value>接收訂單的電子郵件地址</value>
+  </data>
+  <data name="EmailToReceiveOrder_Description" xml:space="preserve">
+    <value>當您收到新訂單時，此電子郵件地址將收到一封通知電子郵件。多個電子郵件地址可以用分號 (;) 分隔。</value>
+  </data>
+  <data name="ErrMailsToReceiveOrder" xml:space="preserve">
+    <value>如果需要多個電子郵件地址，則使用分號 (;) 分隔電子郵件地址，中間不帶空格，例如 ada@mail.com;bob@mail.com</value>
+  </data>
+  <data name="ErrMsg_CustomerNotFound" xml:space="preserve">
+    <value>找不到客戶。</value>
+  </data>
+  <data name="ErrMsg_FailedToGetPages" xml:space="preserve">
+    <value>檢索 {0} 具有角色的頁面時遇到錯誤。</value>
+  </data>
+  <data name="ErrMsg_FailedToGetToken" xml:space="preserve">
+    <value>無法從 Facebook 取得使用者存取權令牌。</value>
+  </data>
+  <data name="ErrMsg_ProductNotFound" xml:space="preserve">
+    <value>找不到商品。</value>
+  </data>
+  <data name="ErrMsg_SalesOrderNotFound" xml:space="preserve">
+    <value>找不到銷售訂單。</value>
+  </data>
+  <data name="Error" xml:space="preserve">
+    <value>錯誤</value>
+  </data>
+  <data name="FB" xml:space="preserve">
+    <value>連結 Facebook</value>
+  </data>
+  <data name="FB_connected" xml:space="preserve">
+    <value>{0} 現已與 {1} 連接。</value>
+  </data>
+  <data name="FB_Desc1" xml:space="preserve">
+    <value>登入Facebook 把</value>
+  </data>
+  <data name="FB_Desc2" xml:space="preserve">
+    <value>連接到您的Facebook 頁面和 Instagram 帳戶</value>
+  </data>
+  <data name="FB_not_connected" xml:space="preserve">
+    <value>直到您再次登入 Facebook，{0} 與任何 Facebook 帳號的連結將在 60 天後過期。</value>
+  </data>
+  <data name="FreeShippingAmount" xml:space="preserve">
+    <value>免運費金額</value>
+  </data>
+  <data name="FreeShippingAmountMsg" xml:space="preserve">
+    <value>如沒有免運費政策，請留空此處。</value>
+  </data>
+  <data name="FreeShippingAmount_Description" xml:space="preserve">
+    <value>如果總金額等於或超過此金額，客戶可以享受免費送貨。</value>
+  </data>
+  <data name="GetStarted" xml:space="preserve">
+    <value>系統設定</value>
+  </data>
+  <data name="MsgMissingDeliveryChargeProductError" xml:space="preserve">
+    <value>請在銷售訂單中選擇代表運費的產品！</value>
+  </data>
+  <data name="MsgSettingSaved" xml:space="preserve">
+    <value>已儲存所有更改</value>
+  </data>
+  <data name="MsgSMTPNotSet" xml:space="preserve">
+    <value>如要啟用發送電子郵件，您必須設定您的電子郵件帳戶，以便自動發送電子郵件給您客戶。</value>
+  </data>
+  <data name="MsgSMTPSet" xml:space="preserve">
+    <value>SMTP 已設定</value>
+  </data>
+  <data name="PaymentMethod" xml:space="preserve">
+    <value>收款方式</value>
+  </data>
+  <data name="PaymentMethod_Desc" xml:space="preserve">
+    <value>設定收款方式。當您的客戶從您的產品目錄中購買時，他們將可以使用這些付款方式。</value>
+  </data>
+  <data name="SelfPickUp" xml:space="preserve">
+    <value>客戶自取</value>
+  </data>
+  <data name="SelfPickUpInstruction" xml:space="preserve">
+    <value>客戶自取說明</value>
+  </data>
+  <data name="SelfPickUpInstruction_Desc" xml:space="preserve">
+    <value>向顧客說明如何自行取貨。例如，您可以在此處包括您商店的聯絡資訊和地址。</value>
+  </data>
+  <data name="SelfPickUp_Desc" xml:space="preserve">
+    <value>提供讓顧客在您的商店自行取貨的選項</value>
+  </data>
+  <data name="SendConfirmationEmail" xml:space="preserve">
+    <value>向客戶發送確認電子郵件</value>
+  </data>
+  <data name="SendConfirmationEmail_Description" xml:space="preserve">
+    <value>下訂單後向客戶發送確認電子郵件</value>
+  </data>
+  <data name="SetPaymentMethods" xml:space="preserve">
+    <value>設定收款方式</value>
+  </data>
+  <data name="SetUpNow" xml:space="preserve">
+    <value>前往設定</value>
+  </data>
+  <data name="ShipToCustomer" xml:space="preserve">
+    <value>運送給客戶</value>
+  </data>
+  <data name="ShipToCustomer_Desc" xml:space="preserve">
+    <value>提供將客戶的訂單運送到他們的地址的選項</value>
+  </data>
+  <data name="SocialMediaTemplate" xml:space="preserve">
+    <value>貼文範本</value>
+  </data>
+  <data name="SocialMediaTemplate_Desc" xml:space="preserve">
+    <value>更新社交媒體貼文範本</value>
+  </data>
+  <data name="SOM" xml:space="preserve">
+    <value>銷售訂單管理</value>
+  </data>
+  <data name="SOM_Desc" xml:space="preserve">
+    <value>設定管理銷售訂單的選項</value>
+  </data>
+  <data name="Success" xml:space="preserve">
+    <value>成功</value>
+  </data>
+  <data name="WarehouseID" xml:space="preserve">
+    <value>倉庫</value>
+  </data>
+  <data name="WarehouseID_Description" xml:space="preserve">
+    <value>使用此倉庫建立新的銷售訂單</value>
   </data>
 </root>

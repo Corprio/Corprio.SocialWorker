@@ -30,9 +30,9 @@
   <ItemGroup>
     <None Remove="Views\Checkout\Index.ts" />
     <None Remove="Views\Home\Index.ts" />
-    <None Remove="Views\Settings\Enums.ts" />
-    <None Remove="Views\Settings\Index.ts" />
-    <None Remove="Views\Settings\Interfaces.ts" />
+    <None Remove="Views\GetStarted\Enums.ts" />
+    <None Remove="Views\GetStarted\Index.ts" />
+    <None Remove="Views\GetStarted\Interfaces.ts" />
   </ItemGroup>
 
   <ItemGroup>
@@ -54,9 +54,9 @@
   <ItemGroup>
     <TypeScriptCompile Include="Views\Checkout\Index.ts" />
     <TypeScriptCompile Include="Views\ConnectFacebook\Index.ts" />
-    <TypeScriptCompile Include="Views\Settings\Interfaces.ts" />
-    <TypeScriptCompile Include="Views\Settings\Enums.ts" />
-    <TypeScriptCompile Include="Views\Settings\Index.ts" />
+    <TypeScriptCompile Include="Views\GetStarted\Interfaces.ts" />
+    <TypeScriptCompile Include="Views\GetStarted\Enums.ts" />
+    <TypeScriptCompile Include="Views\GetStarted\Index.ts" />
   </ItemGroup>
 
   <ItemGroup>
