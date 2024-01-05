@@ -1,0 +1,36 @@
+﻿:root {
+    --img-width: 100px;
+    --img-md-width: 50px;
+}
+
+.cart-image {
+    width: var(--img-width);
+}
+
+.empty-image {
+    background-color: #ececec;
+    color: #cdcdcd;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: var(--img-width);
+}
+
+    .empty-image i {
+        font-size: calc(var(--img-width)*3/4);
+    }
+
+@media screen and (max-width: 767px) {    
+
+    .cart-image {
+        width: var(--img-md-width);
+    }
+
+    .empty-image {
+        width: var(--img-md-width);
+    }
+
+        .empty-image i {
+            font-size: calc(var(--img-md-width)*3/4);
+        }
+}

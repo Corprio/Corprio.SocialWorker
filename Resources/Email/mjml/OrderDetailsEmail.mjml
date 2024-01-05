@@ -1,0 +1,232 @@
+﻿<mjml>
+	<mj-head>
+		<mj-style>
+
+			.bolded-text{
+			font-weight: bold;
+			}
+
+			.align-left{
+			text-align: left;
+			}
+
+			.align-right{
+			text-align: right;
+			}
+			.normal-text, .normal-text td, .normal-text div{
+			font-size: 10px;
+			line-height: 1.5;
+			color: #333333;
+			font-family: helvetica;
+			}
+
+			.section-heading, .section-heading td, .section-heading div{
+			font-size: 12px;
+			line-height: 0.8;
+			color: #555555;
+			font-family: helvetica;
+			font-weight: bold;
+			}
+
+			.table-cell{
+			font-size: 9px;
+			padding:5px 0px;
+			border-bottom: 1px solid #aaaaaa;
+			font-family: helvetica;
+			line-height: 1.8;
+			}
+
+			.product-image{
+			width: 30px;
+			height: 30px;
+			object-fit:cover;
+			}
+
+			.title, .title td, .title div{
+			font-size: 12px;
+			color:#555555;
+			line-height: 2;
+			font-family: helvetica;
+			font-weight: bold;
+			}
+
+			@media (min-width:480px) {
+			.bolded-text{
+			font-weight: bold;
+			}
+
+			.align-left{
+			text-align: left;
+			}
+
+			.align-right{
+			text-align: right;
+			}
+			.normal-text, .normal-text td, .normal-text div{
+			font-size: 13px;
+			line-height: 2;
+			color: #333333;
+			font-family: helvetica;
+			}
+
+			.section-heading, .section-heading td, .section-heading div{
+			font-size: 16px;
+			line-height: 1;
+			color: #555555;
+			font-family: helvetica;
+			font-weight: bold;
+			}
+
+			.table-cell{
+			font-size: 13px;
+			padding:8px 0px;
+			border-bottom: 1px solid #aaaaaa;
+			font-family: helvetica;
+			line-height: 1.8;
+			}
+
+			.product-image{
+			width: 50px;
+			height: 50px;
+			object-fit:cover;
+			}
+
+			.title, .title td, .title div{
+			font-size: 18px;
+			color:#555555;
+			line-height: 2;
+			font-family: helvetica;
+			font-weight: bold;
+			}
+
+			.pointer{
+			cursor: pointer;
+			}
+			}
+		</mj-style>
+	</mj-head>
+	<mj-body width="800px">
+		<mj-section>
+			<mj-column>
+
+				<mj-image width="200px" src="${logoImageUrl}" alt="logo image"></mj-image>
+
+			</mj-column>
+		</mj-section>
+		<mj-section border-top="3px solid #eeeeee">
+			<mj-column>
+				<mj-text padding="10px 0px">
+					<div class="title">${thankYouMessage}</div>
+				</mj-text>
+				<mj-text padding="10px 0px" css-class="normal-text">
+					<div>
+						${ThanksOrderFooter}
+					</div>
+				</mj-text>
+
+				<mj-text padding="10px 0px" css-class="normal-text">
+					<div>${CompletePayment}</div>
+				</mj-text>
+
+				<mj-text padding="10px 0px" css-class="normal-text pointer">
+					<a href="${paymentLink}">${paymentLink}</a>
+				</mj-text>
+
+				<mj-text padding="10px 0px" css-class="normal-text">
+					<div>${OrderDetails}</div>
+				</mj-text>
+				<mj-table padding="10px 0px" css-class="normal-text">
+					<tr>
+						<td class="bolded-text">${OrderNum}</td>
+						<td>${documentNum}</td>
+					</tr>
+					<tr>
+						<td class="bolded-text">${OrderDate}</td>
+						<td>${orderDate}</td>
+					</tr>
+				</mj-table>
+				<mj-text padding="10px 0px" css-class="section-heading">
+					<div>${BillTo}</div>
+				</mj-text>
+				<mj-divider padding="10px 0px" border-color="#555555" border-width="2px" padding-top="0px"></mj-divider>
+				<mj-table padding="10px 0px" css-class="normal-text">
+					<tr>
+						<td class="bolded-text">${CustomerName}</td>
+						<td>${billName}</td>
+					</tr>
+					<tr>
+						<td class="bolded-text">${Email}</td>
+						<td>${billEmail}</td>
+					</tr>
+					<tr>
+						<td class="bolded-text">${ContactPhone}</td>
+						<td>${billPhoneNumbers}</td>
+					</tr>
+					<tr>
+						<td class="bolded-text">${DeliveryMethod}</td>
+						<td>${deliveryMethod}</td>
+					</tr>
+				</mj-table>
+
+				<mj-text padding="10px 0px" css-class="section-heading">
+					<div>${DeliverTo}</div>
+				</mj-text>
+				<mj-divider padding="10px 0px" border-color="#555555" border-width="2px" padding-top="0px"></mj-divider>
+				<mj-table padding="10px 0px" css-class="normal-text">
+					<tr>
+						<td class="bolded-text">${DeliveryAddress}</td>
+						<td>${deliveryAddress}</td>
+					</tr>
+					<tr>
+						<td class="bolded-text">${Recipient}</td>
+						<td>${deliveryContact_DisplayName}</td>
+					</tr>
+					<tr>
+						<td class="bolded-text">${ContactPhone}</td>
+						<td>${deliveryPhoneNumbers}</td>
+					</tr>
+				</mj-table>
+
+			</mj-column>
+		</mj-section>
+		<mj-section>
+			<mj-column>
+				<mj-table padding="10px 0px">
+					<tr>
+						<th class="align-left table-cell">${LineNum}</th>
+						<th class="align-left table-cell">${Image}</th>
+						<th class="align-left table-cell">${ProductDescription}</th>
+						<th class="align-right table-cell">${Qty}</th>
+						<th class="align-right table-cell">${UnitPrice}</th>
+					</tr>
+					<tr>
+						<td class="align-left table-cell">${p-lineNum}</td>
+						<td class="align-left table-cell">
+							<img class="product-image" src="${p-imageUrl}" alt=""/>
+						</td>
+						<td class="align-left table-cell">
+							${p-name}
+							<br/>
+							<small>${ProductCode} : ${p-code}</small>
+							<br/>
+							<small>${Remark} : ${p-remark}</small>
+						</td>
+						<td class="align-right table-cell">
+							${p-qty}<small>${p-uomCode}</small>
+						</td>
+						<td class="align-right table-cell">${p-price}</td>
+					</tr>
+					<tr>
+						<td class="align-left table-cell bolded-text" colspan="4">${TotalAmount}</td>
+						<td class="align-right table-cell bolded-text">${amount}</td>
+					</tr>
+				</mj-table>
+				<mj-text padding="10px 0px" css-class="normal-text">
+					<div>
+						<span class="bolded-text">${Remark}</span>: <span>${remark}</span>
+					</div>
+				</mj-text>
+			</mj-column>
+		</mj-section>
+	</mj-body>
+</mjml>

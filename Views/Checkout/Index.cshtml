@@ -1,28 +1,47 @@
 ﻿@using Corprio.SocialWorker.Models
 @using Corprio.Core.Utility
+@using Corprio.DataModel.Business
+@using System.Globalization
 @inject Corprio.AspNetCore.Site.Services.GlobalListService Options
 @inject System.Text.Encodings.Web.JavaScriptEncoder encoder
-
+@inject Microsoft.Extensions.Configuration.IConfiguration configuration
 @model CheckoutViewModel
 @{
     Layout = "_PublicLayout";
     Guid organizationID = Context.SelectedOrganizationID() ?? Guid.Empty;    
+    string appUrl = configuration["AppBaseUrl"];
+    string paymentPortalUrl = configuration["PaymentAppUrl"];
+    
+    bool hasFreeShippingPolicy = Model.FreeShippingAmount.HasValue;
+    decimal freeShippingAmount = hasFreeShippingPolicy ? Model.FreeShippingAmount.Value : 0;
 }
 
+<link rel="stylesheet" href="~/css/checkout.css" />
 <script src="~/js/views/Checkout/Index.js" asp-append-version="true"></script>
 <script>
     const vdata = {
         actions: {
             deleteSalesOrderLine: '@StringHelper.Encode(@Url.Action("DeleteSalesOrderLine", "Checkout", new { organizationID }))',
             editSalesOrderLine: '@StringHelper.Encode(@Url.Action("EditSalesOrderLine", "Checkout", new { organizationID }))',
-            updateDeliveryAddress: '@StringHelper.Encode(@Url.Action("UpdateDeliveryAddress", "Checkout", new { organizationID }))',
+            finalizeSalesOrder: '@StringHelper.Encode(@Url.Action("FinalizeSalesOrder", "Checkout", new { organizationID }))',
         },
         localizer: {
         },
         settings: {
+            allowSelfPickup: "@Model.AllowSelfPickUp",
+            appUrl: "@appUrl",
+            billedPersonFamilyName: "@Model.BillPerson.FamilyName",
+            billedPersonGivenName: "@Model.BillPerson.GivenName",
+            currencyCode: "@Model.CurrencyCode",
+            defaultCountryCode: "@Model.DefaultCountryCode",
+            deliveryChargeAmount: "@Model.DeliveryCharge",
+            freeShippingAmount: "@freeShippingAmount",
+            hasFreeShipping: "@hasFreeShippingPolicy",
             organizationID: "@Model.OrganizationID",
+            paymentPortalUrl: "@paymentPortalUrl",
+            provideShipping: "@Model.ProvideDelivery",
             salesOrderID: "@Model.SalesOrderID",
-            separator: "@CheckoutConstants.Separator"
+            separator: "@CheckoutConstants.Separator",
         },
     };
 </script>
@@ -32,67 +51,171 @@
     </div>
 
     <div>
-        <div class="d-flex justify-content-between">
-            <div class="input-group mb-3">
-                <label class="my-1 mr-2" for="document-date">@globalLocalizer["OrderDate"]</label>
-                <input type="text" id="document-date" value="@Model.OrderDate.ToString("d")" disabled />
+        <div id="reminderPopup"></div>
+
+        <div class="row mb-4">
+            <div class="col">
+                <div class="input-group mb-3 mr-2">
+                    <label class="my-1 mr-2" for="document-date">@localizer["OrderDate"]</label>
+                    <input type="text" id="document-date" class="text-right" value="@Model.OrderDate.ToString("d", new CultureInfo("zh-HK"))" disabled />
+                </div>
             </div>
 
-            <div class="input-group mb-3">
-                <label class="my-1 mr-2" for="document-number">@globalLocalizer["DocumentNum"]</label>
-                <input type="text" id="document-number" value="@Model.DocumentNum" disabled />
+            <div class="col">
+                <div class="input-group mb-3 mr-2">
+                    <label class="my-1 mr-2" for="document-number">@localizer["DocumentNum"]</label>
+                    <input type="text" id="document-number" class="text-right" value="@Model.DocumentNum" disabled />
+                </div>
             </div>
-        </div>                
-        <br />
-                
-        <h4>Shopping Cart</h4>
-        <table class="table">
-            <thead>
-                <tr>
-                    <th scope="col">Product Name</th>
-                    <th scope="col">Price</th>
-                    <th scope="col">Quantity</th>
-                    <th scope="col">Unit of Measure</th>
-                    <th scope="col">Options</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (OrderLine line in Model.Lines)
-                {
-                    <tr>
-                        <td>@line.ProductName</td>
-                        <td>@line.Price.ToString("0.00")</td>
-                        <td class="sales-order-line-qty">
-                            <input type="number" class="qty-face-value" disabled value="@line.Quantity.ToString("0.00")" />
-                            <input type="hidden" class="qty-true-value" disabled value="@line.Quantity" />
-                            <div class="invalid-feedback">Quantity must be a positive number</div>
-                        </td>
-                        <td>@line.UOMCode</td>
-                        <td>
-                            <input type="hidden" disabled value="@line.SalesOrderLineID" />
-                            <button class="btn edit-line-btn"><i class="fa-regular fa-pen-to-square"></i></button>
-                            <button class="btn save-line-btn"><i class="fa-regular fa-floppy-disk"></i></button>
-                            <button class="btn delete-line-btn"><i class="fa-solid fa-trash"></i></button>                            
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-        <br />
-
-        <h4>Delivery Address</h4>        
-        <div id="delivery-address" class="form-group" style="max-width:700px;">                        
-            @Html.DevExtreme().TextBoxFor(m => m.DeliveryAddress_Line1).ID("Address_Line1").Placeholder("Line 1")
-            @Html.DevExtreme().TextBoxFor(m => m.DeliveryAddress_Line2).ID("Address_Line2").Placeholder("Line 2")
-            @Html.DevExtreme().TextBoxFor(m => m.DeliveryAddress_City).ID("Address_City").Placeholder("City")
-            @Html.DevExtreme().TextBoxFor(m => m.DeliveryAddress_State).ID("Address_State").Placeholder("State")
-            @Html.DevExtreme().TextBoxFor(m => m.DeliveryAddress_PostalCode).ID("Address_PostalCode").Placeholder("Postal Code")
-            @(Html.DevExtreme().SelectBoxFor(m => m.DeliveryAddress_CountryAlphaCode).ID("Address_CountryAlphaCode")
-                .DataSource(Options.CountrySelectionList).DisplayExpr("Value").ValueExpr("Key").Placeholder("Country Code")
-                .SearchEnabled(true))            
-            <div id="address-feedback1" class="invalid-feedback">Line 1 cannot be blank</div>
-            <div id="address-feedback2" class="invalid-feedback">Invalid country code</div>
         </div>
-        <button id="confirm-address-btn" class="btn btn-primary">Confirm</button>
+        
+        <h4>@localizer["ShoppingCart"]</h4>
+        <div class="table-responsive">
+            <table class="table lined-border">
+                <thead>
+                    <tr>
+                        <th scope="col">@localizer["Product"]</th>                        
+                        <th scope="col" class="dx-text-content-alignment-left d-flex">
+                            <div class="flex-even">@localizer["ProductName"]</div>
+                            <div class="flex-even">@localizer["ProductDesc"]</div>
+                        </th>
+                        <th scope="col">@localizer["Price"]</th>
+                        <th scope="col">@localizer["Qty"]</th>                        
+                    </tr>
+                </thead>
+                <tbody id="cart-items">
+                    @foreach (OrderLine line in Model.Lines)
+                    {
+                        <tr class="orderline-row">
+                            <td>
+                                <div>
+                                    @if (!string.IsNullOrEmpty(line.URL))
+                                    {
+                                        <img src="@line.URL" alt="@line.ProductName" class="cart-image img-cover square" />
+                                    }
+                                    else
+                                    {
+                                        <div class="empty-image rounded"><i class="fa-solid fa-image square"></i></div>
+                                    }
+                                </div>
+                                <div class="flex-even">
+                                    <input type="hidden" disabled value="@line.SalesOrderLineID" />
+                                    <button class="btn edit-line-btn" title="@localizer["Edit"]"><i class="fa-regular fa-pen-to-square"></i></button>
+                                    <button class="btn save-line-btn" title="@localizer["Save"]"><i class="fa-regular fa-floppy-disk"></i></button>
+                                    <button class="btn delete-line-btn" title="@localizer["Delete"]"><i class="fa-solid fa-trash"></i></button>
+                                </div>
+                            </td>
+                            <td class="text-left d-flex">
+                                <div class="flex-even mr-2">@line.ProductName</div>
+                                <div class="flex-even">@line.ProductDesc</div>
+                            </td>
+                            <td class="sales-order-line-price">
+                                @Model.CurrencyCode @line.NetUnitPrice.ToString("N2")
+                                <input type="hidden" class="price-true-value" disabled value="@line.NetUnitPrice" />
+                            </td>                            
+                            <td class="sales-order-line-qty">
+                                <input type="number" class="qty-face-value text-right pr-2" disabled value="@line.Quantity.ToString("N2")" />
+                                <input type="hidden" class="qty-true-value" disabled value="@line.Quantity" />
+                                <div class="invalid-feedback">@localizer["InvalidFeedback_Quantity"]</div>
+                            </td>                            
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <div class="mr-2">
+            <div class="mb-2">
+                <div class="d-flex justify-content-between">
+                    <div>@localizer["Subtotal"]</div>
+                    <div id="order-subtotal"></div>
+                </div>
+            </div>
+            
+            <div id="delivery-charge-div" class="mb-2">
+                <div class="d-flex justify-content-between">
+                    <div>@localizer["DeliveryCharge"]</div>
+                    <div id="delivery-charge-amt"></div>
+                </div>
+            </div>
+
+            <div id="free-shipping-div" class="mb-2">
+                <div class="d-flex justify-content-between">
+                    <div>@localizer["FreeShipping"]</div>
+                    <div id="free-shipping-amt" class="text-danger"></div>
+                </div>
+            </div>
+
+            <div class="border-top mb-2 pt-2">
+                <div class="d-flex justify-content-between">
+                    <b>@localizer["TotalAmount"]</b>
+                    <b id="order-total"></b>
+                </div>
+            </div>                        
+        </div>        
+        <br />
+
+        <h4>@localizer["Buyer"]</h4>
+        <div id="bill-person" class="ml-4 mb-2"></div>
+
+        <h4>@localizer["DeliveryMethod"]</h4>                        
+        <input type="hidden" id="delivery-method-value" value="0" />
+        @if(!Model.AllowSelfPickUp && !Model.ProvideDelivery)
+        {
+            <div class="font-italic">@string.Format(localizer["Advice_NoDeliveryMethod"], Model.OrganizationShortName, Model.OrganizationEmailAddress)</div>
+        }
+        else
+        {            
+            @if (Model.AllowSelfPickUp)
+            {                
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="radio-delivery-method" id="radio-self-pickup">
+                    <label class="form-check-label" for="radio-self-pickup">@localizer["SelfPickUp"]</label>
+                </div>
+                <div class="ml-4 mb-2">
+                    <h6>@localizer["Advice_FollowPickupInstruction"]</h6>
+                    @if (!string.IsNullOrWhiteSpace(Model.SelfPickUpInstruction))
+                    {
+                        <div class="mb-3">@Model.SelfPickUpInstruction</div>
+                    }
+                    else
+                    {
+                        <div class="font-italic">@string.Format(localizer["Advice_NoPickupInstruction"], Model.OrganizationShortName, Model.OrganizationEmailAddress)</div>
+                    }
+                </div>
+            }
+
+            @if (Model.ProvideDelivery)
+            {                
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="radio-delivery-method" id="radio-shipping">
+                    <label class="form-check-label" for="radio-shipping">@localizer["Shipping"]</label>
+                </div>
+                <div class="ml-4 mb-2">
+                    <h6>@localizer["Advice_ConfirmAddress"]</h6>
+                    <div id="delivery-address" class="form-group" style="max-width:700px;">
+                        @Html.DevExtreme().TextBoxFor(m => m.DeliveryAddress_Line1).ID("Address_Line1").Placeholder("Line 1")
+                        @Html.DevExtreme().TextBoxFor(m => m.DeliveryAddress_Line2).ID("Address_Line2").Placeholder("Line 2")
+                        @Html.DevExtreme().TextBoxFor(m => m.DeliveryAddress_City).ID("Address_City").Placeholder("City")
+                        @Html.DevExtreme().TextBoxFor(m => m.DeliveryAddress_State).ID("Address_State").Placeholder("State")
+                        @Html.DevExtreme().TextBoxFor(m => m.DeliveryAddress_PostalCode).ID("Address_PostalCode").Placeholder("Postal Code")
+                        @(Html.DevExtreme().SelectBoxFor(m => m.DeliveryAddress_CountryAlphaCode).ID("Address_CountryAlphaCode")
+                            .DataSource(Options.CountrySelectionList).DisplayExpr("Value").ValueExpr("Key").Placeholder("Country Code")
+                            .SearchEnabled(true))
+                        <div id="address-feedback1" class="invalid-feedback">@localizer["InvalidFeedback_AddressLine1"]</div>
+                        <div id="address-feedback2" class="invalid-feedback">@localizer["InvalidFeedback_CountryCode"]</div>
+                    </div>
+                </div>
+            }
+        }
+        @if (Model.ProvideDelivery && hasFreeShippingPolicy)
+        {
+            <div class="d-flex justify-content-center mt-2 mb-2">
+                <b class="m-0 text-primary">@string.Format(localizer["Advice_GetFreeShipping"], Model.CurrencyCode, Model.FreeShippingAmount?.ToString("N2"))</b>
+            </div>            
+        }        
+        <div class="d-flex justify-content-center mt-2 mb-2">
+            <button id="confirm-address-btn" class="btn btn-info">@localizer["ProceesToPayment"]</button>
+        </div>                
     </div>
 </div>
+<vc:static-data model="@StaticDataRequestViewModel.All(true)" org-info="true" />

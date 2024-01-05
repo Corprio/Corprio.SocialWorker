@@ -371,7 +371,7 @@ namespace Corprio.SocialWorker.Helpers
             await Save();
             return ThusSpokeBabel(key: "ThankYou", placeholders: new List<string>() { cartItemString, checkoutURL });
         }
-
+        
         /// <summary>
         /// Create sales order (including lines)
         /// </summary>
@@ -403,22 +403,12 @@ namespace Corprio.SocialWorker.Helpers
                 return null;
             }
 
-            List<dynamic> warehouses = await Client.WarehouseApi.Query(organizationID: OrgID, 
-                dynamicQuery: new DynamicQuery() 
-                { 
-                    Selector = "new (ID)",
-                    Where = "Code=@0 and Disabled=false",
-                    WhereArguments = new object[] { Constant.DefaultWarehouseCode },
-                    OrderBy = "Code",
-                    Skip = 0,
-                    Take = 1
-                });
-            if (!warehouses.Any())
+            ApplicationSetting applicationSetting = db.Settings.FirstOrDefault(x => x.OrganizationID == OrgID);
+            if (applicationSetting?.WarehouseID == null)
             {
-                Log.Error("The bot was trying to create a sales order but the default warehouse could not be found.");
+                Log.Error($"Failed to obtain application setting for {OrgID}");
                 return null;
-            }
-            Guid defaultWarehouseID = Guid.Parse(warehouses[0].ID);            
+            }            
 
             Guid orderId;
             try
@@ -454,7 +444,7 @@ namespace Corprio.SocialWorker.Helpers
                         SubscriberNumber = customer.BusinessPartner.PrimaryMobilePhoneNumber_SubscriberNumber
                     } },
                     BillEmail = customer.BusinessPartner.PrimaryEmail,
-                    WarehouseID = defaultWarehouseID
+                    WarehouseID = applicationSetting.WarehouseID,
                 });
             }
             catch (ApiExecutionException ex)

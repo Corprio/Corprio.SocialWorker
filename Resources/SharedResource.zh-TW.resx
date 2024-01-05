@@ -340,7 +340,7 @@
     <value>發票機器人</value>
   </data>
   <data name="ProductName" xml:space="preserve">
-    <value>產品名稱</value>
+    <value>商品名稱</value>
   </data>
   <data name="Qty" xml:space="preserve">
     <value>數量</value>
@@ -496,7 +496,7 @@
     <value>預設運費</value>
   </data>
   <data name="DefaultDeliveryCharge_Description" xml:space="preserve">
-    <value>新產品目錄的預設運費。您可以調整每個目錄的運費。</value>
+    <value>商品的預設運費。您可以調整每個商品的運費。</value>
   </data>
   <data name="DefaultEmailSubject" xml:space="preserve">
     <value>電子郵件的主題</value>
@@ -586,7 +586,7 @@
     <value>收款方式</value>
   </data>
   <data name="PaymentMethod_Desc" xml:space="preserve">
-    <value>設定收款方式。當您的客戶從您的產品目錄中購買時，他們將可以使用這些付款方式。</value>
+    <value>設定收款方式。當您的客戶購買商品時，他們將可以使用這些付款方式。</value>
   </data>
   <data name="SelfPickUp" xml:space="preserve">
     <value>客戶自取</value>
@@ -638,5 +638,95 @@
   </data>
   <data name="WarehouseID_Description" xml:space="preserve">
     <value>使用此倉庫建立新的銷售訂單</value>
+  </data>
+  <data name="ErrMsg_AppSettingNotFound" xml:space="preserve">
+    <value>找不到相關的應用程式設定。</value>
+  </data>
+  <data name="Advice_ConfirmAddress" xml:space="preserve">
+    <value>請確認或提供您的送貨地址。</value>
+  </data>
+  <data name="Advice_FollowPickupInstruction" xml:space="preserve">
+    <value>請按照以下說明領取您購買的商品。</value>
+  </data>
+  <data name="Advice_GetFreeShipping" xml:space="preserve">
+    <value>購買滿 {0} {1} 即可享有免運服務。</value>
+  </data>
+  <data name="Advice_NoDeliveryMethod" xml:space="preserve">
+    <value>{0} 未指定交付方式。請發送電子郵件至 {1} 與 {0} 聯繫。</value>
+  </data>
+  <data name="Advice_NoPickupInstruction" xml:space="preserve">
+    <value>{0} 未指定任何指令。請發送電子郵件至 {1} 與 {0} 聯繫。</value>
+  </data>
+  <data name="AppName" xml:space="preserve">
+    <value>Corprio.SocialWorker</value>
+  </data>
+  <data name="Checkout" xml:space="preserve">
+    <value>結帳</value>
+  </data>
+  <data name="ConfirmationEmailNotSent" xml:space="preserve">
+    <value>訂單 {0} 的確認電子郵件發送失敗</value>
+  </data>
+  <data name="Delete" xml:space="preserve">
+    <value>刪除</value>
+  </data>
+  <data name="DeliveryCharge" xml:space="preserve">
+    <value>運費</value>
+  </data>
+  <data name="DeliveryMethodTBD" xml:space="preserve">
+    <value>由於商家未指定送貨方式，建議顧客透過電子郵件聯絡商家。</value>
+  </data>
+  <data name="DocumentNum" xml:space="preserve">
+    <value>文件號碼</value>
+  </data>
+  <data name="Edit" xml:space="preserve">
+    <value>更改</value>
+  </data>
+  <data name="EmailNotSentMessage" xml:space="preserve">
+    <value>&lt;html&gt;&lt;body&gt;&lt;p&gt;您的客戶輸入了無效的電子郵件地址&lt;b&gt;{0}&lt;/b&gt;&lt;/p&gt;&lt;p&gt;訂單 {1} 確認電子郵件發送失敗。 &lt;/p&gt; &lt;/內文&gt;&lt;html&gt;</value>
+  </data>
+  <data name="ErrMsg_OrganizationInfoNotFound" xml:space="preserve">
+    <value>無法找到該商戶的相關資訊。</value>
+  </data>
+  <data name="FreeShipping" xml:space="preserve">
+    <value>免運費</value>
+  </data>
+  <data name="InvalidFeedback_AddressLine1" xml:space="preserve">
+    <value>位址第 1 行不能為空</value>
+  </data>
+  <data name="InvalidFeedback_CountryCode" xml:space="preserve">
+    <value>請選擇一個有效的國家</value>
+  </data>
+  <data name="InvalidFeedback_Quantity" xml:space="preserve">
+    <value>數量必須是正數</value>
+  </data>
+  <data name="Options" xml:space="preserve">
+    <value>選項</value>
+  </data>
+  <data name="OrderDate" xml:space="preserve">
+    <value>訂購日期</value>
+  </data>
+  <data name="Price" xml:space="preserve">
+    <value>單價</value>
+  </data>
+  <data name="ProceesToPayment" xml:space="preserve">
+    <value>付款</value>
+  </data>
+  <data name="Product" xml:space="preserve">
+    <value>商品</value>
+  </data>
+  <data name="ProductDesc" xml:space="preserve">
+    <value>描述</value>
+  </data>
+  <data name="Shipping" xml:space="preserve">
+    <value>送貨</value>
+  </data>
+  <data name="ShoppingCart" xml:space="preserve">
+    <value>購物車</value>
+  </data>
+  <data name="UOM" xml:space="preserve">
+    <value>單位</value>
+  </data>
+  <data name="YouReceivedNewOrder" xml:space="preserve">
+    <value>您有新訂單</value>
   </data>
 </root>

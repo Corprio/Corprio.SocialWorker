@@ -15,18 +15,25 @@ namespace Corprio.SocialWorker.Controllers
     public class GetStartedController : AspNetCore.XtraReportSite.Controllers.BaseController
     {
         private readonly ApplicationDbContext db;
-        readonly APIClient corprio;
+        readonly APIClient corprioClient;
 
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="context"></param>
-        public GetStartedController(ApplicationDbContext context, APIClient corprio) : base()
+        /// <param name="client">Client for Api requests among Corprio projects</param>
+        public GetStartedController(ApplicationDbContext context, APIClient client) : base()
         {
             db = context;
-            this.corprio = corprio;
+            corprioClient = client;
         }
         
+        /// <summary>
+        /// Save the application setting
+        /// </summary>
+        /// <param name="organizationID">Organization ID</param>
+        /// <param name="model">Application setting submitted from the client side</param>
+        /// <returns>Status code</returns>
         public async Task<IActionResult> Save([FromRoute] Guid organizationID, [FromForm] ApplicationSetting model)
         {
             model.OrganizationID = organizationID;
@@ -47,6 +54,11 @@ namespace Corprio.SocialWorker.Controllers
             return StatusCode(200);
         }
         
+        /// <summary>
+        /// Retrieve/initialize application setting and render the relevant view
+        /// </summary>
+        /// <param name="organizationID">Organization ID</param>
+        /// <returns>View</returns>
         public override IActionResult Index([FromRoute] Guid organizationID)
         {
             ApplicationSetting applicationSetting = db.Settings.FirstOrDefault(x => x.OrganizationID == organizationID);
@@ -66,7 +78,7 @@ namespace Corprio.SocialWorker.Controllers
             
             if (applicationSetting.DeliveryChargeProductID == null)
             {
-                var productResult = corprio.ProductApi.Query(
+                var productResult = corprioClient.ProductApi.Query(
                     organizationID: organizationID,
                     selector: "new(ID)",
                     where: "Code=@0 and Disabled=false",
@@ -81,7 +93,7 @@ namespace Corprio.SocialWorker.Controllers
             
             if (applicationSetting.WarehouseID == null)
             {
-                var warehouseResult = corprio.WarehouseApi.Query(
+                var warehouseResult = corprioClient.WarehouseApi.Query(
                     organizationID: organizationID,
                     dynamicQuery: new DynamicQuery()
                     {
@@ -99,7 +111,7 @@ namespace Corprio.SocialWorker.Controllers
 
             try
             {
-                applicationSetting.IsSmtpSet = corprio.Execute<bool>(
+                applicationSetting.IsSmtpSet = corprioClient.Execute<bool>(
                     request: new CorprioRestClient.ApiRequest($"/organization/{organizationID}/IsSMTPSet", System.Net.Http.HttpMethod.Get)).ConfigureAwait(false).GetAwaiter().GetResult();
             }
             catch (ApiExecutionException ex)

@@ -81,18 +81,7 @@
     <script src="~/node_modules/moment/min/moment.min.js"></script>
     @RenderSection("Style", required: false)
     @RenderSection("Scripts", required: false)
-
-    <!-- Global site tag (gtag.js) - Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=@configuration["GAMeasurementID"]"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag() { dataLayer.push(arguments); }
-        gtag('js', new Date());
-
-        gtag('config', '@configuration["GAMeasurementID"]', {
-            'user_id': '@(organizationID)'
-        });
-    </script>
+    
 </head>
 <body>
     <div id="page">
@@ -102,7 +91,7 @@
             </div>
         </div>
         <div id="footer" class="d-flex justify-content-center align-items-center">
-            <a href="@configuration["AppBaseUrl"]" class="link-grey" target="_blank">Powered By SocialWorker.Corprio</a>
+            <a href="@configuration["AppBaseUrl"]" class="link-grey" target="_blank">Powered By Corprio.SocialWorker</a>
         </div>
     </div>
 </body>

@@ -14,6 +14,7 @@ using Microsoft.Extensions.Configuration;
 using Corprio.SocialWorker.Helpers;
 using Corprio.Core;
 using System.Linq;
+using System.Net.Http.Headers;
 
 namespace Corprio.SocialWorker.Controllers
 {
@@ -36,7 +37,67 @@ namespace Corprio.SocialWorker.Controllers
             GoBuyClickUrl = configuration["GoBuyClickUrl"];
         }                
         
-        public override IActionResult Index([FromRoute] Guid organizationID) => base.Index(organizationID);
+        public override IActionResult Index([FromRoute] Guid organizationID)
+        {
+            return base.Index(organizationID);
+        }
+
+        /// <summary>
+        /// Get information from Facebook API
+        /// </summary>
+        /// <param name="httpClient">HTTP client for executing API query</param>        
+        /// <param name="userAccessToken">User access token</param>
+        /// <param name="endPoint">Endpoint at which the query is performed</param>
+        /// <returns>API response in string format</returns>
+        protected async Task<string> GetQuery(HttpClient httpClient, string userAccessToken, string endPoint)
+        {
+            var httpRequest = new HttpRequestMessage()
+            {
+                Method = HttpMethod.Get,
+                RequestUri = new Uri(endPoint),
+            };
+            httpRequest.Headers.Authorization = new AuthenticationHeaderValue("Bearer", userAccessToken);
+            HttpResponseMessage response = await httpClient.SendAsync(httpRequest);
+            if (!response.IsSuccessStatusCode)
+            {
+                Log.Error($"HTTP request to get Facebook account info fails. Response: {System.Text.Json.JsonSerializer.Serialize(response)}");
+                return string.Empty;
+            }
+            return await response.Content.ReadAsStringAsync();
+        }
+
+        /// <summary>
+        /// Turn on Meta's Built-in NLP to help detect locale (and meaning)
+        /// https://developers.facebook.com/docs/graph-api/reference/page/nlp_configs/
+        /// https://developers.facebook.com/docs/messenger-platform/built-in-nlp/
+        /// </summary>
+        /// <param name="httpClient">HTTP client for executing API query</param>
+        /// <param name="accessToken">Page access token</param>
+        /// <param name="language">Language to be selected as the default model</param>
+        /// <returns>True if the operation succeeds</returns>
+        protected async Task<bool> TurnOnNLP(HttpClient httpClient, string accessToken, MetaLanguageModel language)
+        {
+            var queryParams = new { nlp_enabled = true, model = EnumHelper.GetDescription(language), access_token = accessToken };
+            var httpRequest = new HttpRequestMessage()
+            {
+                Method = HttpMethod.Post,
+                RequestUri = new System.Uri($"{BaseUrl}/{ApiVersion}/me/nlp_configs"),
+                Content = new StringContent(content: System.Text.Json.JsonSerializer.Serialize(queryParams), encoding: Encoding.UTF8, mediaType: "application/json")
+            };
+            HttpResponseMessage response = await httpClient.SendAsync(httpRequest);
+            if (!response.IsSuccessStatusCode)
+            {
+                Log.Error($"HTTP request to turn on NLP failed. Response: {System.Text.Json.JsonSerializer.Serialize(response)}");
+                return false;
+            }
+            string responseString = await response.Content.ReadAsStringAsync();
+            ActionResultPayload payload = JsonConvert.DeserializeObject<ActionResultPayload>(responseString)!;
+            if (payload?.Error != null)
+            {
+                Log.Error($"Encountered an error when configuring NLP setting. {payload?.Error?.CustomErrorMessage()}");
+            }
+            return payload?.Success ?? false;
+        }
 
         /// <summary>
         /// Randomly generate an image URL for testing in development
@@ -321,25 +382,6 @@ namespace Corprio.SocialWorker.Controllers
             return await ApiActionHelper.PostOrComment(httpClient: httpClient, accessToken: accessToken,
                 endPoint: $"{BaseUrl}/{ApiVersion}/{pageId}/feed",
                 message: message, photoIds: photoIds);
-        }
-
-        /// <summary>
-        /// Extract non-null image IDs from a product
-        /// </summary>
-        /// <param name="product">An object of Product class</param>
-        /// <returns>A set of image IDs</returns>
-        protected HashSet<Guid> ReturnImageUrls(Product product)
-        {
-            HashSet<Guid> validIds = new();
-            if (product == null) return validIds;
-
-            List<Guid?> imageIDs = new() { product.Image01ID, product.Image02ID, product.Image03ID, product.Image04ID,
-                product.Image05ID, product.Image06ID, product.Image07ID, product.Image08ID };
-            foreach (Guid? imageID in imageIDs)
-            {
-                if (imageID.HasValue) validIds.Add(imageID.Value);
-            }
-            return validIds;
-        }
+        }        
     }
 }

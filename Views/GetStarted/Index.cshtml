@@ -14,7 +14,7 @@
 
     string env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "PRD";
     Guid organizationID = Context.SelectedOrganizationID() ?? Guid.Empty;
-    OrganizationCoreInfo orgInfo = organizationID.Equals(Guid.Empty) ? null : await corprioApi.OrganizationApi.GetCoreInfo(organizationID: organizationID);    
+    OrganizationCoreInfo orgInfo = organizationID.Equals(Guid.Empty) ? null : await corprioApi.OrganizationApi.GetCoreInfo(organizationID: organizationID);
     bool authorizedToUpdate = orgInfo == null ? false : orgInfo.OwnerID == Context.User.GetUserID();  // true if the current user can update the application setting
 
     string defaultCatalogueMessage = BabelFish.Vocab["VisitCatalogue"][UtilityHelper.NICAM(orgInfo)];
@@ -38,6 +38,25 @@
             getKeyword: '@StringHelper.Encode(@Url.Action("GetKeyword", "Template", new { organizationID }))',
             getTemplate: '@StringHelper.Encode(@Url.Action("GetTemplate", "Template", new { organizationID }))',
             saveTemplate: '@StringHelper.Encode(@Url.Action("SaveTemplate", "Template", new { organizationID }))',
+        },
+        localizer: {
+            catalogueCode: '@StringHelper.Encode(localizer["Template_CatalogueCode"])',
+            catalogueEndDate: '@StringHelper.Encode(localizer["Template_CatalogueEndDate"])',
+            catalogueName: '@StringHelper.Encode(localizer["Template_CatalogueName"])',
+            catalogueStartDate: '@StringHelper.Encode(localizer["Template_CatalogueStartDate"])',
+            catalogueUrl: '@StringHelper.Encode(localizer["Template_CatalogueURL"])',
+            fbConnected: '@StringHelper.Encode(localizer["FB_connected"])',
+            fbNotConnected: '@StringHelper.Encode(localizer["FB_not_connected"])',
+            defaultMessage: '@StringHelper.Encode(localizer["Template_DefaultMessage"])',
+            newLine: '@StringHelper.Encode(localizer["Template_NewLine"])',
+            productName: '@StringHelper.Encode(localizer["Template_ProductName"])',
+            productCode: '@StringHelper.Encode(localizer["Template_ProductCode"])',
+            productDescription: '@StringHelper.Encode(localizer["Template_ProductDescription"])',
+            productListPrice: '@StringHelper.Encode(localizer["Template_ProductPrice"])',
+            productReplyKeyword: '@StringHelper.Encode(localizer["Template_Keyword"])',
+            saveTemplateTitle: '@StringHelper.Encode(localizer["TemplateSavedTitle"])',
+            saveTemplateMessage: '@StringHelper.Encode(localizer["TemplateSavedMessage"])',
+            shortName: '@orgInfo?.ShortName',
         },
         sampleValues: {
             catalogueURL: "@catalogueURL",
@@ -68,26 +87,7 @@
             productListPriceValue: "@TemplateComponent.ProductListPrice",
             productReplyKeyword: "@TemplateComponent.Keyword",
             separator: "@separator"
-        },
-        localizer: {
-            catalogueCode: '@StringHelper.Encode(localizer["Template_CatalogueCode"])',
-            catalogueEndDate: '@StringHelper.Encode(localizer["Template_CatalogueEndDate"])',
-            catalogueName: '@StringHelper.Encode(localizer["Template_CatalogueName"])',
-            catalogueStartDate: '@StringHelper.Encode(localizer["Template_CatalogueStartDate"])',
-            catalogueUrl: '@StringHelper.Encode(localizer["Template_CatalogueURL"])',
-            fbConnected: '@StringHelper.Encode(localizer["FB_connected"])',
-            fbNotConnected: '@StringHelper.Encode(localizer["FB_not_connected"])',
-            defaultMessage: '@StringHelper.Encode(localizer["Template_DefaultMessage"])',
-            newLine: '@StringHelper.Encode(localizer["Template_NewLine"])',
-            productName: '@StringHelper.Encode(localizer["Template_ProductName"])',
-            productCode: '@StringHelper.Encode(localizer["Template_ProductCode"])',
-            productDescription: '@StringHelper.Encode(localizer["Template_ProductDescription"])',
-            productListPrice: '@StringHelper.Encode(localizer["Template_ProductPrice"])',
-            productReplyKeyword: '@StringHelper.Encode(localizer["Template_Keyword"])',
-            saveTemplateTitle: '@StringHelper.Encode(localizer["TemplateSavedTitle"])',
-            saveTemplateMessage: '@StringHelper.Encode(localizer["TemplateSavedMessage"])',
-            shortName: '@orgInfo?.ShortName',
-        }
+        }        
     };
 </script>
 <script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js"></script>

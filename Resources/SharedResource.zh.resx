@@ -340,7 +340,7 @@
     <value>发票机器人</value>
   </data>
   <data name="ProductName" xml:space="preserve">
-    <value>产品名称</value>
+    <value>商品名称</value>
   </data>
   <data name="Qty" xml:space="preserve">
     <value>数量</value>
@@ -496,7 +496,7 @@
     <value>预设运费</value>
   </data>
   <data name="DefaultDeliveryCharge_Description" xml:space="preserve">
-    <value>新产品目录的默认运费。 您可以调整每个目录的运费。</value>
+    <value>商品的默认运费。 您可以调整每个商品的运费。</value>
   </data>
   <data name="DefaultEmailSubject" xml:space="preserve">
     <value>电邮的主题</value>
@@ -586,7 +586,7 @@
     <value>收款方式</value>
   </data>
   <data name="PaymentMethod_Desc" xml:space="preserve">
-    <value>设置收款方式。当您的客户从您的产品目录中购买时，他们将可以使用这些支付方式。</value>
+    <value>设置收款方式。当您的客户购买商品时，他们将可以使用这些支付方式。</value>
   </data>
   <data name="SelfPickUp" xml:space="preserve">
     <value>客户自取</value>
@@ -638,5 +638,95 @@
   </data>
   <data name="WarehouseID_Description" xml:space="preserve">
     <value>使用此仓库创建新的销售订单</value>
+  </data>
+  <data name="ErrMsg_AppSettingNotFound" xml:space="preserve">
+    <value>找不到相关的应用程序设置。</value>
+  </data>
+  <data name="Advice_ConfirmAddress" xml:space="preserve">
+    <value>请确认或提供您的送货地址。</value>
+  </data>
+  <data name="Advice_FollowPickupInstruction" xml:space="preserve">
+    <value>请按照以下说明领取您购买的商品。</value>
+  </data>
+  <data name="Advice_GetFreeShipping" xml:space="preserve">
+    <value>购买满 {0} {1} 即可享受免费送货服务。</value>
+  </data>
+  <data name="Advice_NoDeliveryMethod" xml:space="preserve">
+    <value>{0} 未指定交付方式。请发送电子邮件至 {1} 与 {0} 联系。</value>
+  </data>
+  <data name="Advice_NoPickupInstruction" xml:space="preserve">
+    <value>{0} 未指定任何指令。请发送电子邮件至 {1} 与 {0} 联系。</value>
+  </data>
+  <data name="AppName" xml:space="preserve">
+    <value>Corprio.SocialWorker</value>
+  </data>
+  <data name="Checkout" xml:space="preserve">
+    <value>结账</value>
+  </data>
+  <data name="ConfirmationEmailNotSent" xml:space="preserve">
+    <value>订单 {0} 的确认电子邮件发送失败</value>
+  </data>
+  <data name="Delete" xml:space="preserve">
+    <value>删除</value>
+  </data>
+  <data name="DeliveryCharge" xml:space="preserve">
+    <value>运费</value>
+  </data>
+  <data name="DeliveryMethodTBD" xml:space="preserve">
+    <value>由于商家未指定送货方式，建议顾客通过电子邮件联系商家。</value>
+  </data>
+  <data name="DocumentNum" xml:space="preserve">
+    <value>文件号码</value>
+  </data>
+  <data name="Edit" xml:space="preserve">
+    <value>更改</value>
+  </data>
+  <data name="EmailNotSentMessage" xml:space="preserve">
+    <value>&lt;html&gt;&lt;body&gt;&lt;p&gt;您的客户输入了无效的电子邮件地址&lt;b&gt;{0}&lt;/b&gt;&lt;/p&gt;&lt;p&gt;订单 {1} 确认电子邮件发送失败。&lt;/p&gt; &lt;/正文&gt;&lt;html&gt;</value>
+  </data>
+  <data name="ErrMsg_OrganizationInfoNotFound" xml:space="preserve">
+    <value>无法找到该商户的相关信息。</value>
+  </data>
+  <data name="FreeShipping" xml:space="preserve">
+    <value>免运费</value>
+  </data>
+  <data name="InvalidFeedback_AddressLine1" xml:space="preserve">
+    <value>地址第 1 行不能为空</value>
+  </data>
+  <data name="InvalidFeedback_CountryCode" xml:space="preserve">
+    <value>请选择一个有效的国家</value>
+  </data>
+  <data name="InvalidFeedback_Quantity" xml:space="preserve">
+    <value>数量必须是正数</value>
+  </data>
+  <data name="Options" xml:space="preserve">
+    <value>选项</value>
+  </data>
+  <data name="OrderDate" xml:space="preserve">
+    <value>订购日期</value>
+  </data>
+  <data name="Price" xml:space="preserve">
+    <value>单价</value>
+  </data>
+  <data name="ProceesToPayment" xml:space="preserve">
+    <value>付款</value>
+  </data>
+  <data name="Product" xml:space="preserve">
+    <value>商品</value>
+  </data>
+  <data name="ProductDesc" xml:space="preserve">
+    <value>描述</value>
+  </data>
+  <data name="Shipping" xml:space="preserve">
+    <value>送货</value>
+  </data>
+  <data name="ShoppingCart" xml:space="preserve">
+    <value>购物车</value>
+  </data>
+  <data name="UOM" xml:space="preserve">
+    <value>单位</value>
+  </data>
+  <data name="YouReceivedNewOrder" xml:space="preserve">
+    <value>您有新订单</value>
   </data>
 </root>

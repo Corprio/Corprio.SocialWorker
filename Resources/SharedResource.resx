@@ -424,7 +424,7 @@
     <value>Default delivery charge</value>
   </data>
   <data name="DefaultDeliveryCharge_Description" xml:space="preserve">
-    <value>The default delivery charge for new product catalogues.  You can adjust the delivery charge for each catalogue.</value>
+    <value>The default delivery charge for a product.  You can adjust the delivery charge for each product.</value>
   </data>
   <data name="DefaultEmailSubject" xml:space="preserve">
     <value>Subject of email</value>
@@ -511,7 +511,7 @@
     <value>Payment method</value>
   </data>
   <data name="PaymentMethod_Desc" xml:space="preserve">
-    <value>Set up methods for receiving payment. These payment methods will be available to your customers when they purchase from your catalogues.</value>
+    <value>Set up methods for receiving payment. These payment methods will be available to your customers when they purchase your products.</value>
   </data>
   <data name="Placeholder_Keyword" xml:space="preserve">
     <value>(For example: BUY)</value>
@@ -638,5 +638,95 @@
   </data>
   <data name="Success" xml:space="preserve">
     <value>Success</value>
+  </data>
+  <data name="ErrMsg_AppSettingNotFound" xml:space="preserve">
+    <value>The relevant application setting could not be found.</value>
+  </data>
+  <data name="Advice_ConfirmAddress" xml:space="preserve">
+    <value>Please confirm/provide your delivery Address.</value>
+  </data>
+  <data name="Advice_FollowPickupInstruction" xml:space="preserve">
+    <value>Please follow the instructions below to pick up your purchase.</value>
+  </data>
+  <data name="Advice_GetFreeShipping" xml:space="preserve">
+    <value>Purchase {0} {1} to enjoy free delivery.</value>
+  </data>
+  <data name="Advice_NoDeliveryMethod" xml:space="preserve">
+    <value>{0} did not specify a delivery method. Please contact {0} at {1}.</value>
+  </data>
+  <data name="Advice_NoPickupInstruction" xml:space="preserve">
+    <value>{0} did not specify any instruction. Please contact {0} at {1}.</value>
+  </data>
+  <data name="AppName" xml:space="preserve">
+    <value>Corprio.SocialWorker</value>
+  </data>
+  <data name="Checkout" xml:space="preserve">
+    <value>Checkout</value>
+  </data>
+  <data name="ConfirmationEmailNotSent" xml:space="preserve">
+    <value>The confirmation email for order {0} failed to be sent</value>
+  </data>
+  <data name="Delete" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+  <data name="DeliveryCharge" xml:space="preserve">
+    <value>Delivery Charge</value>
+  </data>
+  <data name="DeliveryMethodTBD" xml:space="preserve">
+    <value>Since delivery method was not configured, the customer was advised to contact the merchant via email.</value>
+  </data>
+  <data name="DocumentNum" xml:space="preserve">
+    <value>Document no.</value>
+  </data>
+  <data name="Edit" xml:space="preserve">
+    <value>Edit</value>
+  </data>
+  <data name="EmailNotSentMessage" xml:space="preserve">
+    <value>&lt;html&gt;&lt;body&gt;&lt;p&gt;Your customer has input an invalid email address &lt;b&gt;{0}&lt;/b&gt;&lt;/p&gt;&lt;p&gt;The order {1} confirmation email failed to be sent.&lt;/p&gt;&lt;/body&gt;&lt;html&gt;</value>
+  </data>
+  <data name="ErrMsg_OrganizationInfoNotFound" xml:space="preserve">
+    <value>The merchant's information could not be found.</value>
+  </data>
+  <data name="FreeShipping" xml:space="preserve">
+    <value>Free Shipping</value>
+  </data>
+  <data name="InvalidFeedback_AddressLine1" xml:space="preserve">
+    <value>Line 1 cannot be blank</value>
+  </data>
+  <data name="InvalidFeedback_CountryCode" xml:space="preserve">
+    <value>Invalid country code</value>
+  </data>
+  <data name="InvalidFeedback_Quantity" xml:space="preserve">
+    <value>Quantity must be a positive number</value>
+  </data>
+  <data name="Options" xml:space="preserve">
+    <value>Options</value>
+  </data>
+  <data name="OrderDate" xml:space="preserve">
+    <value>Order date</value>
+  </data>
+  <data name="Price" xml:space="preserve">
+    <value>Price</value>
+  </data>
+  <data name="ProceesToPayment" xml:space="preserve">
+    <value>Proceed To Payment</value>
+  </data>
+  <data name="Product" xml:space="preserve">
+    <value>Product</value>
+  </data>
+  <data name="ProductDesc" xml:space="preserve">
+    <value>Description</value>
+  </data>
+  <data name="Shipping" xml:space="preserve">
+    <value>Shipping</value>
+  </data>
+  <data name="ShoppingCart" xml:space="preserve">
+    <value>Shopping Cart</value>
+  </data>
+  <data name="UOM" xml:space="preserve">
+    <value>Unit of Measure</value>
+  </data>
+  <data name="YouReceivedNewOrder" xml:space="preserve">
+    <value>You have received a new order</value>
   </data>
 </root>

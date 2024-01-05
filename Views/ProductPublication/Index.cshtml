@@ -22,7 +22,7 @@
         .ConfigDataSource(controllerName: "ProductPublication", organizationID: organizationID)
         .ElementAttr("class", "clickable-row")
         .NoDataText(localizer["noData"])
-        // redirect to ProductMaster        
+        // redirect to ProductMaster
         .OnRowClick($"function(e){{ window.open(`{masterProductUrl}/{organizationID}/Product/Edit/productid`.replace('productid', e.key), '_blank').focus() }}")
         .Columns(col =>
         {
@@ -37,7 +37,7 @@
             col.AddFor(m => m.GlobalizedDescription).GlobalText().Visible(false);
             col.AddFor(m => m.GlobalizedLongDescription).GlobalHTML().Visible(false);
             col.AddFor(m => m.DefaultBarcode).Visible(false);
-            col.AddFor(m => m.Nature).LookupEnum(typeof(ProductNature));
+            col.AddFor(m => m.Nature).LookupEnum(typeof(ProductNature)).Visible(false);
             col.AddFor(m => m.ProductTypeID).LookupProductType(organizationID)
             .CalculateDisplayValue(nameof(ProductViewModel.ProductTypeName))
             .CalculateSortValue("ProductType.Name")

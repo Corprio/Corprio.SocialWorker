@@ -118,7 +118,7 @@ namespace Corprio.SocialWorker.Controllers
             string message = template.ProductPostMessage(product: product, coreInfo: coreInfo, keyword: metaUser.KeywordForShoppingIntention);
 
             // we need to use a set because child products may share the same image(s) with their parent or peers
-            HashSet<Guid> imageIds = ReturnImageUrls(product);
+            HashSet<Guid> imageIds = UtilityHelper.ReturnImageUrls(product);
             if (product.IsMasterProduct && (product.Variations?.Any() ?? false))
             {
                 PagedList<Product> childProducts;
@@ -139,7 +139,7 @@ namespace Corprio.SocialWorker.Controllers
 
                     foreach (Product childProduct in childProducts.Items)
                     {
-                        imageIds.UnionWith(ReturnImageUrls(childProduct));
+                        imageIds.UnionWith(UtilityHelper.ReturnImageUrls(childProduct));
                     }
                 }
                 while (childProducts?.HasNextPage ?? false);

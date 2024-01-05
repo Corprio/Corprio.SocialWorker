@@ -4,6 +4,7 @@ using System.Linq;
 using Corprio.DataModel.Business;
 using Corprio.Global.Globalization;
 using Corprio.SocialWorker.Models;
+using Corprio.DataModel.Business.Products;
 
 namespace Corprio.SocialWorker.Helpers
 {
@@ -66,6 +67,25 @@ namespace Corprio.SocialWorker.Helpers
                 default:
                     return BotLanguage.English;                    
             }                                    
+        }
+
+        /// <summary>
+        /// Extract non-null image IDs from a product
+        /// </summary>
+        /// <param name="product">An object of Product class</param>
+        /// <returns>A set of image IDs</returns>
+        public static HashSet<Guid> ReturnImageUrls(Product product)
+        {
+            HashSet<Guid> validIds = new();
+            if (product == null) return validIds;
+
+            List<Guid?> imageIDs = new() { product.Image01ID, product.Image02ID, product.Image03ID, product.Image04ID,
+                product.Image05ID, product.Image06ID, product.Image07ID, product.Image08ID };
+            foreach (Guid? imageID in imageIDs)
+            {
+                if (imageID.HasValue) validIds.Add(imageID.Value);
+            }
+            return validIds;
         }
     }
 }

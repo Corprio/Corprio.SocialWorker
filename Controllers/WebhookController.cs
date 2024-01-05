@@ -127,7 +127,7 @@ namespace Corprio.SocialWorker.Controllers
         /// Respond to webhook triggered by feeds
         /// </summary>
         /// <param name="httpClient">HTTP client for executing API query</param>
-        /// <param name="payload">Webhook payload</param>
+        /// <param name="corprioClient">Client for Api requests among Corprio projects</param>
         /// <param name="payload">Webhook payload</param>
         /// <returns>Status code</returns>
         public async Task<IActionResult> HandleFeedWebhook(HttpClient httpClient, APIClient corprioClient, FeedWebhookPayload payload)
