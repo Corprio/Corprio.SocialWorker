@@ -6,14 +6,14 @@
     <Authors>Corprio</Authors>
     <Company>Popular IT</Company>
     <Copyright>Copyright 2023 Popular IT</Copyright>
-    <PackageTags>corprio sales sales assistant</PackageTags>
+    <PackageTags>corprio social worker</PackageTags>
     <Description>A web application for handling sales inquiry and for automating product/catalogue publication to Facebook and Instagram</Description>
 	<JavaScriptTestRoot>Tests\</JavaScriptTestRoot>
 	<JavaScriptTestFramework>Jest</JavaScriptTestFramework>
 	<GenerateProgramFile>false</GenerateProgramFile>
 	<UserSecretsId>7173AE0C-B16C-40C5-B589-E46477EED957</UserSecretsId>
 	<TypeScriptCompileBlocked>true</TypeScriptCompileBlocked>
-	<Title>Corprio Sales Assistant Application</Title>	
+	<Title>Corprio Social Worker Application</Title>	
   </PropertyGroup>
 
   <ItemGroup>
@@ -28,18 +28,31 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="Views\Checkout\enums.ts" />
     <None Remove="Views\Checkout\Index.ts" />
+    <None Remove="Views\Checkout\Interfaces.ts" />
+    <None Remove="Views\ReconnectFacebook\Index.ts" />
     <None Remove="Views\Home\Index.ts" />
     <None Remove="Views\GetStarted\Enums.ts" />
     <None Remove="Views\GetStarted\Index.ts" />
     <None Remove="Views\GetStarted\Interfaces.ts" />
+    <None Remove="Views\Shared\Constants.ts" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="wwwroot\css\fonts\Roboto-300.woff2" />
+    <None Include="wwwroot\css\fonts\Roboto-400.woff2" />
+    <None Include="wwwroot\css\fonts\Roboto-500.woff2" />
+    <None Include="wwwroot\css\fonts\Roboto-700.woff2" />
+    <None Include="wwwroot\css\icons\dxicons.woff2" />
+    <None Include="wwwroot\css\icons\dxiconsmaterial.woff2" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Azure.Extensions.AspNetCore.Configuration.Secrets" Version="1.3.0" />
     <PackageReference Include="Azure.Identity" Version="1.10.4" />
     <PackageReference Include="BuildBundlerMinifier" Version="3.2.449" />
-    <PackageReference Include="Corprio.AspNetCore.XtraReportSite" Version="1.1.54.5" />
+    <PackageReference Include="Corprio.AspNetCore.XtraReportSite" Version="1.1.60" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="7.0.14" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="7.0.14">
       <PrivateAssets>all</PrivateAssets>
@@ -53,10 +66,14 @@
 
   <ItemGroup>
     <TypeScriptCompile Include="Views\Checkout\Index.ts" />
+    <TypeScriptCompile Include="Views\Checkout\Enums.ts" />
+    <TypeScriptCompile Include="Views\Checkout\Interfaces.ts" />
+    <TypeScriptCompile Include="Views\ReconnectFacebook\Index.ts" />
     <TypeScriptCompile Include="Views\ConnectFacebook\Index.ts" />
     <TypeScriptCompile Include="Views\GetStarted\Interfaces.ts" />
     <TypeScriptCompile Include="Views\GetStarted\Enums.ts" />
     <TypeScriptCompile Include="Views\GetStarted\Index.ts" />
+    <TypeScriptCompile Include="Views\Shared\Constants.ts" />
   </ItemGroup>
 
   <ItemGroup>

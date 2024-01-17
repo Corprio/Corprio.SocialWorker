@@ -16,10 +16,10 @@ namespace Corprio.SocialWorker.Migrations
                 columns: table => new
                 {
                     ID = table.Column<Guid>(type: "TEXT", nullable: false),
+                    Dormant = table.Column<bool>(type: "INTEGER", nullable: false),
                     FacebookUserID = table.Column<string>(type: "TEXT", maxLength: 50, nullable: false),
                     OrganizationID = table.Column<Guid>(type: "TEXT", nullable: false),
                     Token = table.Column<string>(type: "TEXT", maxLength: 2000, nullable: false),
-                    KeywordForShoppingIntention = table.Column<string>(type: "TEXT", maxLength: 10, nullable: false),
                     CreateDate = table.Column<DateTimeOffset>(type: "TEXT", nullable: false),
                     LastUpdateDate = table.Column<DateTimeOffset>(type: "TEXT", nullable: false),
                     CreatedBy = table.Column<string>(type: "TEXT", maxLength: 200, nullable: true),
@@ -30,20 +30,6 @@ namespace Corprio.SocialWorker.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_MetaUsers", x => x.ID);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Templates",
-                columns: table => new
-                {
-                    ID = table.Column<Guid>(type: "TEXT", nullable: false),
-                    OrganizationID = table.Column<Guid>(type: "TEXT", nullable: false),
-                    MessageType = table.Column<int>(type: "INTEGER", nullable: false),
-                    TemplateString = table.Column<string>(type: "TEXT", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Templates", x => x.ID);
                 });
 
             migrationBuilder.CreateTable(
@@ -160,9 +146,6 @@ namespace Corprio.SocialWorker.Migrations
 
             migrationBuilder.DropTable(
                 name: "MetaPosts");
-
-            migrationBuilder.DropTable(
-                name: "Templates");
 
             migrationBuilder.DropTable(
                 name: "MetaPages");

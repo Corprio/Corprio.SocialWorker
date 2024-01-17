@@ -18,6 +18,7 @@ using Microsoft.EntityFrameworkCore;
 using Corprio.AspNetCore.Site.Filters;
 using DevExtreme.AspNet.Mvc;
 using Corprio.DevExtremeLib;
+using Corprio.AspNetCore.Site.Services;
 
 namespace Corprio.SocialWorker.Controllers
 {
@@ -62,15 +63,16 @@ namespace Corprio.SocialWorker.Controllers
         /// <param name="httpClient">HTTP client for executing API query</param>
         /// <param name="corprioClient">Client for Api requests among Corprio projects</param>
         /// <param name="organizationID">Organization ID</param>
+        /// <param name="applicationSettingService">Application setting service</param>
         /// <param name="productlistID">Entity ID of product list</param>
         /// <returns>(1) True if the whole operation is completed and (2) list of any error messages</returns>
         [HttpPost]
         public async Task<IActionResult> PublishCatalogue([FromServices] HttpClient httpClient, [FromServices] APIClient corprioClient,
-            [FromRoute] Guid organizationID, Guid productlistID)
+            [FromServices] ApplicationSettingService applicationSettingService, [FromRoute] Guid organizationID, Guid productlistID)
         {
             if (productlistID.Equals(Guid.Empty)) throw new Exception("Product list ID is invalid.");            
-            MetaUser metaUser = db.MetaUsers.Include(x => x.Pages).FirstOrDefault(x => x.OrganizationID == organizationID)
-                ?? throw new Exception($"Failed to get Meta user for {organizationID}.");
+            MetaUser metaUser = db.MetaUsers.Include(x => x.Pages).FirstOrDefault(x => x.OrganizationID == organizationID && x.Dormant == false)
+                ?? throw new Exception(Resources.SharedResource.ResourceManager.GetString("ErrMsg_ValidMetaProfileNotFound"));
 
             List<string> errorMessages = new();
             if (metaUser.Pages.Count == 0)
@@ -84,8 +86,9 @@ namespace Corprio.SocialWorker.Controllers
                 ?? throw new Exception($"Product list {productlistID} could not be found.");
             OrganizationCoreInfo coreInfo = await corprioClient.OrganizationApi.GetCoreInfo(organizationID)
                 ?? throw new Exception($"Failed to get core information of organization {organizationID}.");
-            PostTemplate template = await DbActionHelper.GetTemplate(db: db, organizationID: organizationID, messageType: MessageType.CataloguePost);
-            string message = template.CataloguePostMessage(productList: productList, coreInfo: coreInfo, goBuyClickUrl: GoBuyClickUrl);                        
+            ApplicationSetting applicationSetting = await applicationSettingService.GetSetting<ApplicationSetting>(organizationID) 
+                ?? throw new Exception($"Failed to retrieve application setting of organization {organizationID}.");            
+            string message = applicationSetting.CataloguePostMessage(productList: productList, coreInfo: coreInfo, goBuyClickUrl: GoBuyClickUrl);                        
 
             PagedList<ProductInfo> products;
             List<string> imageUrls = new();

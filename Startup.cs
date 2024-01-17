@@ -11,6 +11,7 @@ using Corprio.CorprioRestClient;
 using Corprio.SocialWorker.Models;
 using Microsoft.EntityFrameworkCore;
 using Corprio.AspNetCore.Site.Services;
+using Corprio.SocialWorker.Services;
 
 namespace Corprio.SocialWorker
 {
@@ -40,7 +41,8 @@ namespace Corprio.SocialWorker
             };
 
             //add HTTP client for accessing API without user login
-            services.AddClientAccessTokenHttpClient("webhookClient", "default", client => { client.ConfigureForCorprio(corprioApiSetting); });            
+            services.AddClientAccessTokenHttpClient("webhookClient", "default", client => { client.ConfigureForCorprio(corprioApiSetting); });
+            services.AddSingleton<IProductTourService, ProductTourService>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

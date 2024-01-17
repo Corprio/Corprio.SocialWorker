@@ -1,0 +1,61 @@
+﻿@using Corprio.Core.Utility
+@inject Microsoft.Extensions.Configuration.IConfiguration configuration
+@inject Corprio.CorprioAPIClient.APIClient corprioApi
+@{
+    ViewData["Title"] = "ReconnectFacebook";
+    string metaApiID = configuration["MetaApiSetting:AppId"];
+    string metaApiVersion = configuration["MetaApiSetting:ApiVersion"];
+    Guid organizationID = Context.SelectedOrganizationID() ?? Guid.Empty;
+    string shortName = await corprioApi.OrganizationApi.GetShortName(organizationID);
+}
+
+<script src="~/js/views/ReconnectFacebook/Index.js" asp-append-version="true"></script>
+<script>
+    // use vdata to pass parameters to TS
+    const vdata = {
+        actions: {
+            refreshAccessToken: '@StringHelper.Encode(@Url.Action("RefreshAccessToken", "ConnectFacebook", new { organizationID }))',
+        },
+        localizer: {
+            cancel: '@StringHelper.Encode(@localizer["Cancel"])',
+            confirm: '@StringHelper.Encode(@localizer["Confirm"])',
+            confirmation: '@StringHelper.Encode(@localizer["Confirmation"])',
+            fbConnected: '@StringHelper.Encode(localizer["FB_connected"])',
+            fbNotConnected: '@StringHelper.Encode(localizer["FB_not_connected"])',
+            finalWarning: '@StringHelper.Encode(localizer["Warning_final"])',            
+        },
+        settings: {
+            metaApiID: "@metaApiID",
+            metaApiVersion: "@metaApiVersion",
+            shortName: "@shortName",
+        },
+    };
+</script>
+<script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js"></script>
+
+<div class="container-fluid mt-md-4 mt-5 d-flex justify-content-center" style="max-width: 770px;">
+    <div>        
+        <div id="reconnect-warning" style="display: block;">
+            <h3>@localizer["Warning_header1"]</h3>
+            <h5>@localizer["Warning_header2"]</h5>
+            <br />
+            <p>
+                <b>@localizer["Warning_num1"]</b>@localizer["Warning_para1"]<b>@localizer["Warning_num2"]</b>@localizer["Warning_para2"]
+            </p>
+            <ul class="fa-ul">
+                <li class="mb-2">
+                    <span class="fa-li"><i class="fas fa-circle-exclamation"></i></span>
+                    @localizer["Warning_consequence1"]
+                </li>
+                <li class="mb-2">
+                    <span class="fa-li"><i class="fas fa-circle-exclamation"></i></span>
+                    @localizer["Warning_consequence2"]
+                </li>
+            </ul>
+        </div>
+        <button class="btn btn-primary mt-2" id="loginBtn" style="display: block;">@localizer["ReconnectFacebook"]</button>
+        <button class="btn btn-primary mt-2" id="logoutBtn" style="display: none;">@localizer["LogoutFB"]</button>
+
+        <div id="reconnect-dialogue" class="mt-3"></div>
+    </div>
+</div>

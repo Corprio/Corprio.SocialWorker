@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Corprio.SocialWorker.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20231227023325_AddMetaPostsTableToDb")]
+    [Migration("20240116095423_AddMetaPostsTableToDb")]
     partial class AddMetaPostsTableToDb
     {
         /// <inheritdoc />
@@ -222,14 +222,12 @@ namespace Corprio.SocialWorker.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("TEXT");
 
+                    b.Property<bool>("Dormant")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("FacebookUserID")
                         .IsRequired()
                         .HasMaxLength(50)
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("KeywordForShoppingIntention")
-                        .IsRequired()
-                        .HasMaxLength(10)
                         .HasColumnType("TEXT");
 
                     b.Property<DateTimeOffset>("LastUpdateDate")
@@ -255,26 +253,6 @@ namespace Corprio.SocialWorker.Migrations
                     b.HasKey("ID");
 
                     b.ToTable("MetaUsers");
-                });
-
-            modelBuilder.Entity("Corprio.SocialWorker.Models.PostTemplate", b =>
-                {
-                    b.Property<Guid>("ID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("MessageType")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<Guid>("OrganizationID")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("TemplateString")
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("ID");
-
-                    b.ToTable("Templates");
                 });
 
             modelBuilder.Entity("Corprio.SocialWorker.Models.DbFriendlyBot", b =>

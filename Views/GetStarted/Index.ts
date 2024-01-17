@@ -1,12 +1,11 @@
 import { MessageType, Selector } from './Enums';
-import { TemplateDetails, Selected, DraggedBlock } from './Interfaces';
+import { DraggedBlock, Selected, TemplateDetails, StringifiedTemplate } from './Interfaces';
+import { PERMISSIONS } from '../Shared/Constants';
 
 declare const vdata: {
     actions: {
-        getKeyword: string;
-        getTemplate: string;
         refreshAccessToken: string;
-        saveTemplate: string;
+        saveSetting: string;
     };
     localizer: {
         catalogueCode: string;
@@ -15,17 +14,27 @@ declare const vdata: {
         catalogueStartDate: string;
         catalogueUrl: string;
         defaultMessage: string;
+        error: string;
+        fbAlreadyConnected: string;
         fbConnected: string;
         fbNotConnected: string;
+        msgMissingDeliveryChargeProductError: string;
+        msgSettingSaved: string;
         newLine: string;
         productCode: string;
         productDescription: string;
         productListPrice: string;
         productName: string;
+        productPublicPrice: string;
         productReplyKeyword: string;
+        reconnectFacebook: string;
         saveTemplateMessage: string;
         saveTemplateTitle: string;
-        shortName: string;
+    };
+    model: {
+        catalogueTemplate: string;
+        keyword: string;
+        productTemplate: string;
     };
     sampleValues: {
         catalogueURL: string;
@@ -36,7 +45,9 @@ declare const vdata: {
         env: string;
         metaApiID: string;
         metaApiVersion: string;
+        organizationID: string;
         sendConfirmationEmail: string;
+        shortName: string;
     };
     templateComponents: {
         catalogueCodeValue: string;
@@ -47,13 +58,12 @@ declare const vdata: {
         defaultMessageValue: string;
         defaultTemplate_catalogue: string;
         defaultTemplate_product: string;
-        messageType_CataloguePost: string;
-        messageType_ProductPost: string;
         newLineValue: string;
         productCodeValue: string;
         productDescriptionValue: string;
         productListPriceValue: string;
         productNameValue: string;
+        productPublicPriceValue: string;
         productReplyKeyword: string;
         separator: string;
     };
@@ -62,19 +72,17 @@ declare const vdata: {
 // https://github.com/DefinitelyTyped/DefinitelyTyped/blob/master/types/facebook-js-sdk/index.d.ts
 /// <reference types="facebook-js-sdk" />
 
-// 'business_management' is required for viewing pages managed by the user
-const permissions: string[] = ['email', 'public_profile', 'business_management', 'pages_manage_metadata',
-    'pages_messaging', 'pages_manage_posts', 'pages_manage_engagement', 'instagram_basic', 'instagram_content_publish',
-    'instagram_manage_comments', 'instagram_manage_messages'];
+
+
 
 // magic numbers
-const DataSet_TrueValue = 'true-value';  // this attribute contains the value of a standard component (e.g., %lineBreak%)
-const DataSet_Reordered = 'reordered';  // this attribute indicates if the block will be moved to another position
-const DataSet_Swapped = 'swapped';  // this attribute indicates if the block will give up its position to the reordered block
+const DATASET_TRUEVALUE = 'true-value';  // this attribute contains the value of a standard component (e.g., %lineBreak%)
+const DATASET_REORDERED = 'reordered';  // this attribute indicates if the block will be moved to another position
+const DATASET_SWAPPED = 'swapped';  // this attribute indicates if the block will give up its position to the reordered block
 
 // the following dictionary maps the message type to the relevant selectors
 const selectorMapping: Record<MessageType, Selected> = {
-    'catalogue': {
+    'CataloguePost': {
         blockPanel: Selector.blockPanel_Catalogue,
         blockPanelInput_Last: Selector.blockPanel_Catalogue_Input_Last,
         componentSelect: Selector.componentSelect_Catalogue,
@@ -88,7 +96,7 @@ const selectorMapping: Record<MessageType, Selected> = {
         dragBlock_Last: Selector.blockPanel_Catalogue_DragBlock_Last,
         validSelectOptions: {},
     },
-    'product': {
+    'ProductPost': {
         blockPanel: Selector.blockPanel_Product,
         blockPanelInput_Last: Selector.blockPanel_Product_Input_Last,
         componentSelect: Selector.componentSelect_Product,
@@ -115,14 +123,14 @@ const draggedBlock: DraggedBlock = { value: null, type: null };
 
 /**
  * 'Remember' details of the block being dragged
- * @param obj
+ * @param obj-The HTML element that triggers this function (we can't simply use 'this' because this function is called inside an anonymous function)
  * @param messageType-Publication of products or catalogues
  */
 function handleDragStart(obj: HTMLElement, messageType: MessageType) {    
     const $dragged = $(obj);
-    draggedBlock.value = ($dragged.data(DataSet_TrueValue) in validSelectOptions) ? $dragged.data(DataSet_TrueValue) : String($dragged.find('input').val());
+    draggedBlock.value = ($dragged.data(DATASET_TRUEVALUE) in validSelectOptions) ? $dragged.data(DATASET_TRUEVALUE) : String($dragged.find('input').val());
     draggedBlock.type = messageType;
-    $dragged.data(DataSet_Reordered, true);
+    $dragged.data(DATASET_REORDERED, true);
 }
 
 /**
@@ -150,20 +158,20 @@ function handleDrop(ev: Event, messageType: MessageType) {
 
     let deadend = true;  // if true, then the dragged block is moved to the end
     if ($target.is('span')) {
-        $target.data(DataSet_Swapped, true);
+        $target.data(DATASET_SWAPPED, true);
         deadend = false;
     }    
 
     let templateString = '';    
     $(selectorMapping[messageType].blockPanel).children('span').each(function () {
         
-        if ($(this).data(DataSet_Reordered)) { return; }
+        if ($(this).data(DATASET_REORDERED)) { return; }
 
-        if ($(this).data(DataSet_Swapped)) {
+        if ($(this).data(DATASET_SWAPPED)) {
             templateString += draggedBlock.value + vdata.templateComponents.separator;
         }
 
-        const key = $(this).data(DataSet_TrueValue);
+        const key = $(this).data(DATASET_TRUEVALUE);
         if (key in selectorMapping[messageType].validSelectOptions) {
             templateString += key + vdata.templateComponents.separator;
         } else {
@@ -197,28 +205,10 @@ function customTextBlock(text: string) {
  * @returns A HTML element, or a block, that represents the standard message component
  */
 function standardComponentBlock(dataset: string, text: string) {
-    return `<span draggable="true" data-${DataSet_TrueValue}="${dataset}" class="rounded border border-secondary p-2 mx-1 mb-1 d-inline-block text-wrap drag-block">` +
+    return `<span draggable="true" data-${DATASET_TRUEVALUE}="${dataset}" class="rounded border border-secondary p-2 mx-1 mb-1 d-inline-block text-wrap drag-block">` +
                 `<input disabled value="${text}">` +
                 `<i class="fa-duotone fa-x ml-2 remove-btn"></i>` +
             `</span>`;    
-}
-
-/**
- * Convert the MessageType enum - which, at the risk of stating the obvious, is on the client-side - into the name of a similar enum on the server side
- * @param messageType-Publication of products or catalogues
- * @returns
- */
-function TranslateMessageType(messageType: MessageType): string {
-    let messageTypeString: string;
-    switch (messageType) {
-        case MessageType.CATALOGUE:
-            messageTypeString = vdata.templateComponents.messageType_CataloguePost;
-            break;
-        case MessageType.PRODUCT:
-            messageTypeString = vdata.templateComponents.messageType_ProductPost;
-            break;
-    }
-    return messageTypeString;
 }
 
 /**
@@ -226,12 +216,8 @@ function TranslateMessageType(messageType: MessageType): string {
  * @returns
  */
 function restoreKeyword() {
-    return $.post({
-        url: vdata.actions.getKeyword,
-    }).done((keyword: string) => {
-        selectorMapping[MessageType.PRODUCT].validSelectOptions[vdata.templateComponents.productReplyKeyword].preview = keyword;
-        $(Selector.keywordInput_Product).val(reverseSanitize(keyword));
-    }).fail(corprio.formatError);
+    selectorMapping[MessageType.ProductPost].validSelectOptions[vdata.templateComponents.productReplyKeyword].preview = vdata.model.keyword;
+    $(Selector.keywordInput_Product).val(reverseSanitize(vdata.model.keyword));
 }
 
 /**
@@ -240,18 +226,11 @@ function restoreKeyword() {
  * @returns
  */
 function restoreTemplate(messageType: MessageType) {    
-    return $.post({
-        url: vdata.actions.getTemplate,
-        data: {            
-            messageType: TranslateMessageType(messageType)
-        }
-    }).done((templateString: string) => {        
-        if (templateString) {
-            const templateArray = templateString.split(vdata.templateComponents.separator);
-            renderTemplate(templateArray, messageType);
-            renderPreview(messageType);
-        }        
-    }).fail(corprio.formatError);
+    const templateString = messageType === MessageType.CataloguePost ? vdata.model.catalogueTemplate : vdata.model.productTemplate;
+    if (!templateString) { return; }
+    const templateArray = templateString.split(vdata.templateComponents.separator);
+    renderTemplate(templateArray, messageType);
+    renderPreview(messageType);
 }
 
 /**
@@ -285,10 +264,10 @@ function renderTemplate(templateArray: string[], messageType: MessageType) {
 function restoreDefaultTemplate(messageType: MessageType) {    
     let defaultTemplate: string[];
     switch (messageType) {
-        case MessageType.CATALOGUE:
+        case MessageType.CataloguePost:
             defaultTemplate = vdata.templateComponents.defaultTemplate_catalogue.split(vdata.templateComponents.separator);
             break;
-        case MessageType.PRODUCT:
+        case MessageType.ProductPost:
             defaultTemplate = vdata.templateComponents.defaultTemplate_product.split(vdata.templateComponents.separator);
             break;
     }
@@ -313,66 +292,39 @@ function validateKeyword(keyword: string): boolean {
     return true;
 }
 
-/**
- * Trigger the backend to save the template (and keyword)
- * @param messageType-Publication of products or catalogues
- * @returns
- */
-function saveTemplate(messageType: MessageType) {    
-    loadIndicatorTop.option('visible', true);
-    let keyword:string = null;
-
-    if (messageType === MessageType.PRODUCT) {
-        keyword = sanitizeInput(String($(Selector.keywordInput_Product).val()).trim());
-        if (!validateKeyword(keyword)) {
-            loadIndicatorTop.option('visible', false);
-            return;
-        }
+function stringifyTemplate(messageType: MessageType): StringifiedTemplate {
+    const result: StringifiedTemplate = {
+        isValid: messageType === MessageType.CataloguePost,  // note: there is no validation for catalogue post template
+        keyword: '',
+        templateString: ''
+    };
+    
+    if (messageType === MessageType.ProductPost) {
+        result.keyword = sanitizeInput(String($(Selector.keywordInput_Product).val()).trim());
+        if (!validateKeyword(result.keyword)) { return result; }
     }
-
-    let templateString = '';
+    
     let containKeyword = false;
-    $(selectorMapping[messageType].blockPanel).children('span').each(function () {        
-        const key = $(this).data(DataSet_TrueValue);
+    $(selectorMapping[messageType].blockPanel).children('span').each(function () {
+        const key = $(this).data(DATASET_TRUEVALUE);
         if (key in selectorMapping[messageType].validSelectOptions) {
-            templateString += key + vdata.templateComponents.separator;
+            result.templateString += key + vdata.templateComponents.separator;
             if (key === vdata.templateComponents.productReplyKeyword || key === vdata.templateComponents.defaultMessageValue) { containKeyword = true; }
         } else {
-            templateString += sanitizeInput(String($(this).find('input').val())) + vdata.templateComponents.separator;                        
+            result.templateString += sanitizeInput(String($(this).find('input').val())) + vdata.templateComponents.separator;
         }
     });
 
-    if (messageType === MessageType.PRODUCT) {
+    if (messageType === MessageType.ProductPost) {
 
         if (containKeyword) {
             $(Selector.componentSelect_Product).removeClass('is-invalid');
+            result.isValid = true;
         } else {
-            $(Selector.componentSelect_Product).addClass('is-invalid');
-            loadIndicatorTop.option('visible', false);
-            return;
-        }        
-    }
-
-    if (!templateString) {
-        loadIndicatorTop.option('visible', false);
-        return;
-    }
-    
-    return $.post({
-        url: vdata.actions.saveTemplate,
-        data: {
-            templateString: templateString,
-            messageType: TranslateMessageType(messageType),
-            keyWord: keyword
+            $(Selector.componentSelect_Product).addClass('is-invalid');            
         }
-    }).done(function () {
-        var message = DevExpress.ui.dialog.custom({
-            title: vdata.localizer.saveTemplateTitle,
-            messageHtml: vdata.localizer.saveTemplateMessage            
-        });
-        message.show();
-    }).fail(corprio.formatError)
-    .always(() => { loadIndicatorTop.option('visible', false); });
+    }
+    return result;
 }
 
 /**
@@ -385,13 +337,13 @@ function renderPreview(messageType: MessageType) {
     let preview = '';
     const space = '&nbsp;';
     $(selectorMapping[messageType].blockPanel).children('span').each(function () {        
-        const key = $(this).data(DataSet_TrueValue);
+        const key = $(this).data(DATASET_TRUEVALUE);
         if (key in selectorMapping[messageType].validSelectOptions) {
             if (key === vdata.templateComponents.newLineValue) {
                 $(selectorMapping[messageType].previewPanel).append(`<p class="m-0 text-truncate">${preview ? preview : space}</p>`);
                 preview = '';
             } else {
-                preview += (messageType === MessageType.PRODUCT && key === vdata.templateComponents.defaultMessageValue)
+                preview += (messageType === MessageType.ProductPost && key === vdata.templateComponents.defaultMessageValue)
                     ? selectorMapping[messageType].validSelectOptions[key].preview.replaceAll('{1}', selectorMapping[messageType].validSelectOptions[vdata.templateComponents.productReplyKeyword].preview)
                     : selectorMapping[messageType].validSelectOptions[key].preview;
             }            
@@ -426,7 +378,7 @@ function sanitizeInput(text: string) {
 
 /**
  * Remove a block, which can be a standard message component or a custom text, from the template
- * @param obj-The button that was clicked to trigger this function
+ * @param obj-The HTML element that triggers this function (we can't simply use 'this' because this function is called inside an anonymous function)
  * @param messageType-Publication of products or catalogues
  * @returns
  */
@@ -473,24 +425,27 @@ function addComponent(messageType: MessageType) {
  * Assign values to global variables
  * @returns
  */
-function initializeGlobalVariables() {        
-    selectorMapping[MessageType.CATALOGUE].validSelectOptions[vdata.templateComponents.newLineValue] = { panel: '&#9166;', preview: '\n' };
-    selectorMapping[MessageType.CATALOGUE].validSelectOptions[vdata.templateComponents.defaultMessageValue] = { panel: '{'+ vdata.localizer.defaultMessage +'}', preview: vdata.sampleValues.defaultCatalogueMessage };
-    selectorMapping[MessageType.CATALOGUE].validSelectOptions[vdata.templateComponents.catalogueNameValue] = { panel: '{'+ vdata.localizer.catalogueName +'}', preview: 'Example Catalogue' };
-    selectorMapping[MessageType.CATALOGUE].validSelectOptions[vdata.templateComponents.catalogueCodeValue] = { panel: '{'+ vdata.localizer.catalogueEndDate +'}', preview: 'EXAMPLE' };
-    selectorMapping[MessageType.CATALOGUE].validSelectOptions[vdata.templateComponents.catalogueStartDateValue] = { panel: '{'+ vdata.localizer.catalogueStartDate +'}', preview: '01/12/2023' };
-    selectorMapping[MessageType.CATALOGUE].validSelectOptions[vdata.templateComponents.catalogueEndDateValue] = { panel: '{'+ vdata.localizer.catalogueEndDate +'}', preview: '31/12/2023' };
-    selectorMapping[MessageType.CATALOGUE].validSelectOptions[vdata.templateComponents.catalogueUrlValue] = { panel: '{'+ vdata.localizer.catalogueUrl +'}', preview: vdata.sampleValues.catalogueURL };
-    
-    selectorMapping[MessageType.PRODUCT].validSelectOptions[vdata.templateComponents.newLineValue] = { panel: '&#9166;', preview: '\n' };
-    selectorMapping[MessageType.PRODUCT].validSelectOptions[vdata.templateComponents.defaultMessageValue] = { panel: '{'+ vdata.localizer.defaultMessage +'}', preview: vdata.sampleValues.defaultProductMessage };
-    selectorMapping[MessageType.PRODUCT].validSelectOptions[vdata.templateComponents.productNameValue] = { panel: '{'+ vdata.localizer.productName +'}', preview: 'Example Product' };
-    selectorMapping[MessageType.PRODUCT].validSelectOptions[vdata.templateComponents.productCodeValue] = { panel: '{'+ vdata.localizer.productCode +'}', preview: 'EXAMPLE' };
-    selectorMapping[MessageType.PRODUCT].validSelectOptions[vdata.templateComponents.productDescriptionValue] = { panel: '{'+ vdata.localizer.productDescription +'}', preview: 'G.O.A.T.' };
-    selectorMapping[MessageType.PRODUCT].validSelectOptions[vdata.templateComponents.productListPriceValue] = { panel: '{'+ vdata.localizer.productListPrice +'}', preview: 'HKD888.88' };
-    selectorMapping[MessageType.PRODUCT].validSelectOptions[vdata.templateComponents.productReplyKeyword] = { panel: '{'+ vdata.localizer.productReplyKeyword +'}', preview: 'BUY' };
+function initializeGlobalVariables() {
+    loadIndicatorTop = $(Selector.loadIndicator_Top).dxLoadIndicator({ visible: false }).dxLoadIndicator('instance');
 
-    validSelectOptions = { ...selectorMapping[MessageType.CATALOGUE].validSelectOptions, ...selectorMapping[MessageType.PRODUCT].validSelectOptions };
+    selectorMapping[MessageType.CataloguePost].validSelectOptions[vdata.templateComponents.newLineValue] = { panel: '&#9166;', preview: '\n' };
+    selectorMapping[MessageType.CataloguePost].validSelectOptions[vdata.templateComponents.defaultMessageValue] = { panel: '{'+ vdata.localizer.defaultMessage +'}', preview: vdata.sampleValues.defaultCatalogueMessage };
+    selectorMapping[MessageType.CataloguePost].validSelectOptions[vdata.templateComponents.catalogueNameValue] = { panel: '{'+ vdata.localizer.catalogueName +'}', preview: 'Example Catalogue' };
+    selectorMapping[MessageType.CataloguePost].validSelectOptions[vdata.templateComponents.catalogueCodeValue] = { panel: '{'+ vdata.localizer.catalogueEndDate +'}', preview: 'EXAMPLE' };
+    selectorMapping[MessageType.CataloguePost].validSelectOptions[vdata.templateComponents.catalogueStartDateValue] = { panel: '{'+ vdata.localizer.catalogueStartDate +'}', preview: '01/12/2023' };
+    selectorMapping[MessageType.CataloguePost].validSelectOptions[vdata.templateComponents.catalogueEndDateValue] = { panel: '{'+ vdata.localizer.catalogueEndDate +'}', preview: '31/12/2023' };
+    selectorMapping[MessageType.CataloguePost].validSelectOptions[vdata.templateComponents.catalogueUrlValue] = { panel: '{'+ vdata.localizer.catalogueUrl +'}', preview: vdata.sampleValues.catalogueURL };
+    
+    selectorMapping[MessageType.ProductPost].validSelectOptions[vdata.templateComponents.newLineValue] = { panel: '&#9166;', preview: '\n' };
+    selectorMapping[MessageType.ProductPost].validSelectOptions[vdata.templateComponents.defaultMessageValue] = { panel: '{'+ vdata.localizer.defaultMessage +'}', preview: vdata.sampleValues.defaultProductMessage };
+    selectorMapping[MessageType.ProductPost].validSelectOptions[vdata.templateComponents.productNameValue] = { panel: '{'+ vdata.localizer.productName +'}', preview: 'Example Product' };
+    selectorMapping[MessageType.ProductPost].validSelectOptions[vdata.templateComponents.productCodeValue] = { panel: '{'+ vdata.localizer.productCode +'}', preview: 'EXAMPLE' };
+    selectorMapping[MessageType.ProductPost].validSelectOptions[vdata.templateComponents.productDescriptionValue] = { panel: '{'+ vdata.localizer.productDescription +'}', preview: 'G.O.A.T.' };
+    selectorMapping[MessageType.ProductPost].validSelectOptions[vdata.templateComponents.productListPriceValue] = { panel: '{' + vdata.localizer.productListPrice + '}', preview: 'HKD888' };
+    selectorMapping[MessageType.ProductPost].validSelectOptions[vdata.templateComponents.productPublicPriceValue] = { panel: '{' + vdata.localizer.productPublicPrice + '}', preview: 'HKD888.88' };
+    selectorMapping[MessageType.ProductPost].validSelectOptions[vdata.templateComponents.productReplyKeyword] = { panel: '{'+ vdata.localizer.productReplyKeyword +'}', preview: 'BUY' };
+
+    validSelectOptions = { ...selectorMapping[MessageType.CataloguePost].validSelectOptions, ...selectorMapping[MessageType.ProductPost].validSelectOptions };
 
     return;
 }
@@ -501,8 +456,7 @@ function initializeGlobalVariables() {
  */
 function AssignEventListenersForTemplates(messageType: MessageType) {    
     // currently only product posts have a keyword that may trigger the chatbot
-    if (messageType === MessageType.PRODUCT) {
-        /*if (fbLoggedIn) { await restoreKeyword(); }*/
+    if (messageType === MessageType.ProductPost) {        
 
         $(Selector.keywordInput_Product).on('keyup', function () {
             const keyword = sanitizeInput(String($(this).val()).trim());
@@ -511,8 +465,7 @@ function AssignEventListenersForTemplates(messageType: MessageType) {
             renderPreview(messageType);
         });
     }
-
-    /*if (fbLoggedIn) { await restoreTemplate(messageType); }*/
+    
     $(selectorMapping[messageType].customTextAddButton).on('click', function () { addText(messageType) });
     $(selectorMapping[messageType].customTextInput).on('keydown', function (event) {        
         if (event.key === 'Enter') {
@@ -520,8 +473,7 @@ function AssignEventListenersForTemplates(messageType: MessageType) {
         }
     });
     $(selectorMapping[messageType].componentAddButton).on('click', function () { addComponent(messageType) });
-    $(selectorMapping[messageType].restoreDefaultButton).on('click', function () { restoreDefaultTemplate(messageType) });
-    $(selectorMapping[messageType].saveTemplateButton).on('click', function () { saveTemplate(messageType) });
+    $(selectorMapping[messageType].restoreDefaultButton).on('click', function () { restoreDefaultTemplate(messageType) });    
 
     $(selectorMapping[messageType].blockPanel).on('drop', function (event: Event) { handleDrop(event, messageType) });
     $(selectorMapping[messageType].blockPanel).on('dragover', function (event: Event) { handleDragOver(event) });
@@ -539,32 +491,80 @@ function handleFbLoginStatusChange(response: facebook.StatusResponse) {
         $(Selector.logoutButton).show();
         FB.api('/me', { fields: 'name' }, function (response: facebook.User) {
             const alert =
-                `<div class="alert alert-success">` +
+                `<div class="alert alert-success my-3">` +
                     `<i class="fa-regular fa-circle-check"></i>` +
-                    `&nbsp;${vdata.localizer.fbConnected.replaceAll('{0}', vdata.localizer.shortName).replaceAll('{1}', response.name)}` +
+                    `&nbsp;${vdata.localizer.fbConnected.replaceAll('{0}', response.name).replaceAll('{1}', vdata.settings.shortName)}` +
                 `</div>`
             $(Selector.fbDialogue).empty().append(alert);
+            $(Selector.fbDialogue2).empty();
         });
         /*The following functions run in a non-blocking manner because there is no interdependence*/
         getPages();
-        refreshAccessToken(response.authResponse?.userID, response.authResponse?.accessToken, false);
+        refreshAccessToken(response.authResponse?.userID, response.authResponse?.accessToken);
     } else {                
         $(Selector.loginButton).show();
         $(Selector.logoutButton).hide();
         const alert =
             `<div class="alert alert-warning">` +
                 `<i class="fa-regular fa-circle-exclamation"></i>` +
-                `&nbsp;${vdata.localizer.fbNotConnected.replaceAll('{0}', vdata.localizer.shortName)}` +
+                `&nbsp;${vdata.localizer.fbNotConnected.replaceAll('{0}', vdata.settings.shortName)}` +
             `</div>`
         $(Selector.fbDialogue).empty().append(alert);
-
-        $(selectorMapping[MessageType.PRODUCT].saveTemplateButton).attr("disabled", "disabled");
-        $(selectorMapping[MessageType.CATALOGUE].saveTemplateButton).attr("disabled", "disabled");
-        $(selectorMapping[MessageType.PRODUCT].blockPanel).empty();
-        $(selectorMapping[MessageType.CATALOGUE].blockPanel).empty();
-        $(selectorMapping[MessageType.PRODUCT].previewPanel).empty();
-        $(selectorMapping[MessageType.CATALOGUE].previewPanel).empty();
+        
+        $(Selector.saveSettingButtons).attr('disabled', 'disabled');
+        $(selectorMapping[MessageType.ProductPost].blockPanel).empty();
+        $(selectorMapping[MessageType.CataloguePost].blockPanel).empty();
+        $(selectorMapping[MessageType.ProductPost].previewPanel).empty();
+        $(selectorMapping[MessageType.CataloguePost].previewPanel).empty();
     }
+}
+
+/**
+ * Validate and submit the setting to backend for saving 
+ */
+function saveSettings() {
+    let validationResult = DevExpress.validationEngine.validateGroup();
+    if (!validationResult.isValid) { return; }
+    
+    if ($("#ShipToCustomer").dxCheckBox("option", "value") && $("#DeliveryCharge").dxNumberBox("option", "value") > 0) {
+        const $deliveryChargeProduct = $("#DeliveryChargeProductID").dxSelectBox("instance");
+        if (!$deliveryChargeProduct.option("value")) {
+            $deliveryChargeProduct.option("validationStatus", "invalid");
+            DevExpress.ui.dialog.alert(vdata.localizer.msgMissingDeliveryChargeProductError, vdata.localizer.error);
+            return;
+        }
+    }
+    
+    const productTemplate: StringifiedTemplate = stringifyTemplate(MessageType.ProductPost);
+    if (!productTemplate.isValid) { return; }    
+    // fill in the hidden text boxes so that the template will be captured in the form data
+    $('#ProductPostTemplate').val(productTemplate.templateString);
+    $('#KeywordForShoppingIntention').val(productTemplate.keyword);
+    
+    const catalogueTemplate: StringifiedTemplate = vdata.settings.env === "PRD"
+        ? { isValid: true, keyword: '', templateString: '' }
+        : stringifyTemplate(MessageType.CataloguePost);
+    if (!catalogueTemplate.isValid) { return; }
+    // ditto
+    $('#CataloguePostTemplate').val(catalogueTemplate.templateString);
+    
+    const savedData = new FormData(<HTMLFormElement>$("#settings-form")[0]);
+    if (!savedData) {
+        console.log('Failed to find a form with selector "#settings-form"');
+        return;
+    }
+    $.ajax({
+        type: 'POST',
+        url: `/${vdata.settings.organizationID}/GetStarted/Save`,
+        data: savedData,
+        cache: false,
+        contentType: false,
+        processData: false,
+        success: function (result) {
+            DevExpress.ui.notify(vdata.localizer.msgSettingSaved, 'success');
+        },
+        error: corprio.formatError
+    })
 }
 
 /**
@@ -580,58 +580,42 @@ function checkLoginState() {
  * Pass the short-lived user access token to server
  * @param metaId-Facebook user ID
  * @param accessToken-Short-lived user access token 
- * @param reAssignMetaProfile-True if the Facebook account can be reassigned from one organization to another
  * @returns
  */
-function refreshAccessToken(metaId: string, accessToken: string, reAssignMetaProfile: boolean) {
+function refreshAccessToken(metaId: string, accessToken: string) {
     return $.ajax({
         type: 'POST',
         url: vdata.actions.refreshAccessToken,
         data: {
             metaId: metaId,
-            token: accessToken,
-            reAssignMetaProfile: reAssignMetaProfile
+            token: accessToken,            
         },
-        success: async function () {
+        success: function () {
             console.log(`Token for ${metaId} is fed to backend successfully.`);
-            initializeGlobalVariables();  // initialize global variables again because theoritically fbAsyncInit and its callbacks can all run before DOM is loaded
-            loadIndicatorTop.option('visible', true);
-            await restoreKeyword();
-            await restoreTemplate(MessageType.PRODUCT);
-            await restoreTemplate(MessageType.CATALOGUE);
-            loadIndicatorTop.option('visible', false);
-            $(selectorMapping[MessageType.PRODUCT].saveTemplateButton).removeAttr("disabled");
-            $(selectorMapping[MessageType.CATALOGUE].saveTemplateButton).removeAttr("disabled");
+            initializeGlobalVariables();  // initialize global variables again because theoritically fbAsyncInit and its callbacks can all run before DOM is loaded            
+            restoreKeyword();
+            restoreTemplate(MessageType.ProductPost);
+            restoreTemplate(MessageType.CataloguePost);            
+            $(Selector.saveSettingButtons).removeAttr('disabled');
         },
         error: function (jqXHR, textStatus, errorThrown) {
+            $(Selector.saveSettingButtons).attr('disabled', 'disabled');
+
+            // note: 409 means that another organization is connected with the Facebook account
             if (jqXHR.status !== 409) {
-                console.log(`Failed to pass the token for ${metaId} to backend. Text status: ${textStatus}. Error: ${errorThrown}.`);
-                return;
+                $(Selector.fbDialogue2).empty();                
+                return corprio.formatError(jqXHR, textStatus, errorThrown);                
             }
-            
+
             FB.api('/me', { fields: 'name' }, function (response: facebook.User) {
-                var prompt = DevExpress.ui.dialog.custom({
-                    title: 'Warning - Facebook Account Already Connected',
-                    messageHtml:
-                        `<div>` +
-                            `<p class="mb-0">Facebook account <b>${response.name}</b> is already connected to another organization.</p>` +
-                            `<p>Do you want to terminate that connection and connect <b>${response.name}</b> with <b>${vdata.localizer.shortName}</b>?</p>` +
-                            `<p>If you want to connect another Facebook account with <b>${vdata.localizer.shortName}</b>, please log in with a different Facebook account.</p>` +
-                        `</div>`,
-                    buttons: [{
-                        text: 'Confirm',
-                        onClick: function () {
-                            refreshAccessToken(metaId, accessToken, true);
-                        },
-                        type: 'danger',
-                    }, {
-                        text: 'Cancel',
-                        onClick: function () { FB.logout(checkLoginState); },
-                        type: 'default',
-                    }]
-                });
-                prompt.show();
-            });            
+                const alert =
+                    `<div class="alert alert-danger">` +
+                        `<i class="fa-regular fa-circle-exclamation"></i>` +
+                        `&nbsp;${vdata.localizer.fbAlreadyConnected.replaceAll('{0}', response.name).replaceAll('{1}', vdata.settings.shortName).replaceAll('{2}', vdata.localizer.reconnectFacebook)}` +
+                    `</div>`
+                $(Selector.fbDialogue2).empty().append(alert);
+                return FB.logout(checkLoginState);
+            });
         }
     });
 }
@@ -720,9 +704,9 @@ window.fbAsyncInit = function () {
     console.log('fbAsyncInit is doing its things...');
     FB.init({
         appId: vdata.settings.metaApiID,
-        cookie: true,                     // Enable cookies to allow the server to access the session.
-        xfbml: true,                     // Parse social plugins on this webpage.
-        version: vdata.settings.metaApiVersion           // Use this Graph API version for this call.
+        cookie: true,  // Enable cookies to allow the server to access the session.
+        xfbml: true,  // Parse social plugins on this webpage.
+        version: vdata.settings.metaApiVersion
     });
 
     FB.getLoginStatus(function (response) {   // Called after the JS SDK has been initialized.
@@ -740,7 +724,7 @@ window.fbAsyncInit = function () {
 );
 
 // initialize global variables and restore the saved templates
-$(async function () {
+$(function () {
     // prevent 'Enter' from triggering form submission
     $(window).on('keydown', function (event) {
         if (event.key == 'Enter') {
@@ -758,7 +742,7 @@ $(async function () {
                 checkLoginState();
             }
         }, {
-            scope: permissions.toString(),
+            scope: PERMISSIONS.toString(),
             return_scopes: true
         });
     });
@@ -812,8 +796,11 @@ $(async function () {
     } else {
         $(Selector.catalogueSetting).show();
     }
-    loadIndicatorTop = $(Selector.loadIndicator_Top).dxLoadIndicator({ visible: false }).dxLoadIndicator('instance');
+    
     initializeGlobalVariables();    
-    AssignEventListenersForTemplates(MessageType.CATALOGUE);    
-    AssignEventListenersForTemplates(MessageType.PRODUCT);    
+    AssignEventListenersForTemplates(MessageType.CataloguePost);    
+    AssignEventListenersForTemplates(MessageType.ProductPost);
+    $(Selector.saveSettingButtons).on('click', saveSettings);
+    
+    corprio.page.initTour({ defaultTour: 'getstarted.index', autoStart: true, driverCssLoaded: true });
 });

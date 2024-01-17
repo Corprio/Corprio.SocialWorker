@@ -483,8 +483,8 @@
   <data name="Template_ProductName" xml:space="preserve">
     <value>商品名称</value>
   </data>
-  <data name="Template_ProductPrice" xml:space="preserve">
-    <value>商品价格</value>
+  <data name="Template_ProductListPrice" xml:space="preserve">
+    <value>商品建议售价</value>
   </data>
   <data name="Tooltip_Keyword" xml:space="preserve">
     <value>如果有人以关键字回覆此贴文，聊天机器人会自动以私讯回覆。</value>
@@ -547,7 +547,7 @@
     <value>连接 Facebook</value>
   </data>
   <data name="FB_connected" xml:space="preserve">
-    <value>{0} 现已与 {1} 连接。</value>
+    <value>Facebook 帐号 {0} 现已与 {1} 连接。</value>
   </data>
   <data name="FB_Desc1" xml:space="preserve">
     <value>登录Facebook 把</value>
@@ -642,14 +642,14 @@
   <data name="ErrMsg_AppSettingNotFound" xml:space="preserve">
     <value>找不到相关的应用程序设置。</value>
   </data>
+  <data name="AddNewProduct" xml:space="preserve">
+    <value>添加产品</value>
+  </data>
   <data name="Advice_ConfirmAddress" xml:space="preserve">
     <value>请确认或提供您的送货地址。</value>
   </data>
   <data name="Advice_FollowPickupInstruction" xml:space="preserve">
     <value>请按照以下说明领取您购买的商品。</value>
-  </data>
-  <data name="Advice_GetFreeShipping" xml:space="preserve">
-    <value>购买满 {0} {1} 即可享受免费送货服务。</value>
   </data>
   <data name="Advice_NoDeliveryMethod" xml:space="preserve">
     <value>{0} 未指定交付方式。请发送电子邮件至 {1} 与 {0} 联系。</value>
@@ -660,8 +660,26 @@
   <data name="AppName" xml:space="preserve">
     <value>Corprio.SocialWorker</value>
   </data>
+  <data name="BillTo" xml:space="preserve">
+    <value>买方</value>
+  </data>
+  <data name="CancelOrder" xml:space="preserve">
+    <value>取消订单</value>
+  </data>
+  <data name="CannotEdit_PaymentProcessing" xml:space="preserve">
+    <value>该订单已进入付款程序，因此无法更改。</value>
+  </data>
+  <data name="CannotEdit_VoidedOrPaid" xml:space="preserve">
+    <value>该订单已作废或已付款，因此无法更改。</value>
+  </data>
   <data name="Checkout" xml:space="preserve">
     <value>结账</value>
+  </data>
+  <data name="ConfirmAddProduct" xml:space="preserve">
+    <value>您确定要添加新产品吗？该销售订单将作废，您需要通过 Messenger 要求聊天机器人添加产品到购物车。</value>
+  </data>
+  <data name="Confirmation" xml:space="preserve">
+    <value>请确认</value>
   </data>
   <data name="ConfirmationEmailNotSent" xml:space="preserve">
     <value>订单 {0} 的确认电子邮件发送失败</value>
@@ -690,11 +708,29 @@
   <data name="FreeShipping" xml:space="preserve">
     <value>免运费</value>
   </data>
+  <data name="FreeShippingHint1" xml:space="preserve">
+    <value>{0} 或以上订单免运费。</value>
+  </data>
+  <data name="FreeShippingHint2" xml:space="preserve">
+    <value>多购买 {0} 即可享免运费。</value>
+  </data>
+  <data name="FreeShippingQualified" xml:space="preserve">
+    <value>成就解锁：免费送货。</value>
+  </data>
   <data name="InvalidFeedback_AddressLine1" xml:space="preserve">
     <value>地址第 1 行不能为空</value>
   </data>
   <data name="InvalidFeedback_CountryCode" xml:space="preserve">
     <value>请选择一个有效的国家</value>
+  </data>
+  <data name="InvalidFeedback_FamilyName" xml:space="preserve">
+    <value>请输入姓氏。</value>
+  </data>
+  <data name="InvalidFeedback_GivenName" xml:space="preserve">
+    <value>请输入名字。</value>
+  </data>
+  <data name="InvalidFeedback_InvalidPhoneNumber" xml:space="preserve">
+    <value>请提供有效的电话号码。</value>
   </data>
   <data name="InvalidFeedback_Quantity" xml:space="preserve">
     <value>数量必须是正数</value>
@@ -708,14 +744,20 @@
   <data name="Price" xml:space="preserve">
     <value>单价</value>
   </data>
-  <data name="ProceesToPayment" xml:space="preserve">
+  <data name="ProceedToPayment" xml:space="preserve">
     <value>付款</value>
+  </data>
+  <data name="Processing" xml:space="preserve">
+    <value>处理中</value>
   </data>
   <data name="Product" xml:space="preserve">
     <value>商品</value>
   </data>
   <data name="ProductDesc" xml:space="preserve">
     <value>描述</value>
+  </data>
+  <data name="Receipient" xml:space="preserve">
+    <value>收件人</value>
   </data>
   <data name="Shipping" xml:space="preserve">
     <value>送货</value>
@@ -728,5 +770,116 @@
   </data>
   <data name="YouReceivedNewOrder" xml:space="preserve">
     <value>您有新订单</value>
+  </data>
+  <data name="CheckoutPage" xml:space="preserve">
+    <value>结账页面</value>
+  </data>
+  <data name="CheckoutPage_Desc" xml:space="preserve">
+    <value>设定结账页面向客户显示的内容。</value>
+  </data>
+  <data name="Colour" xml:space="preserve">
+    <value>颜色</value>
+  </data>
+  <data name="EditQuantity" xml:space="preserve">
+    <value>编辑数量</value>
+  </data>
+  <data name="EditVariant" xml:space="preserve">
+    <value>更改选择</value>
+  </data>
+  <data name="ErrMsg_ChatbotNotFound" xml:space="preserve">
+    <value>我们尝试将此销售订单恢复到与您对话的聊天机器人，但失败。请确认您是否希望取消此订单。</value>
+  </data>
+  <data name="ErrMsg_OutOfStock" xml:space="preserve">
+    <value>{0} 缺货。</value>
+  </data>
+  <data name="ErrMsg_QuantityNotPositive" xml:space="preserve">
+    <value>商品数量必须为正数。</value>
+  </data>
+  <data name="ErrMsg_UnselectedVariations" xml:space="preserve">
+    <value>请选择：{0}。</value>
+  </data>
+  <data name="ErrMsg_ValidMetaProfileNotFound" xml:space="preserve">
+    <value>该公司没有与任何 Facebook 帐户建立有效连接。</value>
+  </data>
+  <data name="FB_AlreadyConnected" xml:space="preserve">
+    <value>Facebook 帐号 {0} 已与另一家公司连结。如果您希望将 {1} 与 {0} 连结，请造访 {2}。</value>
+  </data>
+  <data name="Footer" xml:space="preserve">
+    <value>预设页脚</value>
+  </data>
+  <data name="Footer_Description" xml:space="preserve">
+    <value>页脚将显示在结帐页面中，在购物车之后。</value>
+  </data>
+  <data name="LoginFB" xml:space="preserve">
+    <value>登入 Facebook</value>
+  </data>
+  <data name="LogoutFB" xml:space="preserve">
+    <value>登出 Facebook</value>
+  </data>
+  <data name="PoweredBy" xml:space="preserve">
+    <value>由 {0} 提供支持</value>
+  </data>
+  <data name="ReconnectFacebook" xml:space="preserve">
+    <value>重置 Facebook 连接</value>
+  </data>
+  <data name="RemainingStockMessage" xml:space="preserve">
+    <value>{0} 的剩余库存：{1}。</value>
+  </data>
+  <data name="RemainingStockTitle" xml:space="preserve">
+    <value>库存</value>
+  </data>
+  <data name="Size" xml:space="preserve">
+    <value>尺寸</value>
+  </data>
+  <data name="Template_ProductPublicPrice" xml:space="preserve">
+    <value>商品公开售价</value>
+  </data>
+  <data name="ThankYouMessage" xml:space="preserve">
+    <value>感谢页面中显示的信息</value>
+  </data>
+  <data name="ThankYouMessage_Description" xml:space="preserve">
+    <value>此信息显示在感谢页面的顶部。</value>
+  </data>
+  <data name="ThankYouPage" xml:space="preserve">
+    <value>感谢页面</value>
+  </data>
+  <data name="ThankYouPage_Desc" xml:space="preserve">
+    <value>设定在客户下订单后将显示给他们的内容。此内容也将通过电子邮件发送给客户，以确认他们的订单。</value>
+  </data>
+  <data name="Title_EditVariant" xml:space="preserve">
+    <value>更改选择</value>
+  </data>
+  <data name="Warning_consequence1" xml:space="preserve">
+    <value>您将无法发布目前与 Facebook 连结的公司的产品和/或目录。</value>
+  </data>
+  <data name="Warning_consequence2" xml:space="preserve">
+    <value>聊天机器人将无法替目前与 Facebook 连结的公司回覆私人讯息或评论。</value>
+  </data>
+  <data name="Warning_consequence3" xml:space="preserve">
+    <value>您的社交媒体范本、交付方式等配置将重设为预设值。</value>
+  </data>
+  <data name="Warning_DeleteProduct" xml:space="preserve">
+    <value>你确定删除该产品吗？此操作无法撤消。</value>
+  </data>
+  <data name="Warning_final" xml:space="preserve">
+    <value>你确定吗？此操作将无法撤消。</value>
+  </data>
+  <data name="Warning_header1" xml:space="preserve">
+    <value>重要讯息</value>
+  </data>
+  <data name="Warning_header2" xml:space="preserve">
+    <value>请仔细阅读以下文字。</value>
+  </data>
+  <data name="Warning_num1" xml:space="preserve">
+    <value>一个</value>
+  </data>
+  <data name="Warning_num2" xml:space="preserve">
+    <value>一家</value>
+  </data>
+  <data name="Warning_para1" xml:space="preserve">
+    <value>Facebook 帐号（包括其 Facebook 专页和关联的 Instagram 帐号）只能与</value>
+  </data>
+  <data name="Warning_para2" xml:space="preserve">
+    <value>公司连接。重置Facebook 帐号的连接将会导致以下后果：</value>
   </data>
 </root>

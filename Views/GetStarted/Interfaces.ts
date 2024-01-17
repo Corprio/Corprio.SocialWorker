@@ -24,3 +24,9 @@ export interface Selected {
     dragBlock_Last: Selector,
     validSelectOptions: Record<string, TemplateDetails>
 }
+
+export interface StringifiedTemplate {
+    isValid: boolean,
+    keyword: string,
+    templateString: string
+}

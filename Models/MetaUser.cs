@@ -12,6 +12,11 @@ namespace Corprio.SocialWorker.Models
     public class MetaUser : Entity
     {                
         /// <summary>
+        /// True if the user elected to terminate the connection between an organization and Facebook account
+        /// </summary>
+        public bool Dormant { get; set; }
+        
+        /// <summary>
         /// User ID in Facebook.
         /// </summary>
         [Required(ErrorMessageResourceType = typeof(Resource), ErrorMessageResourceName = "MsgRequired")]
@@ -33,14 +38,7 @@ namespace Corprio.SocialWorker.Models
         [Required(ErrorMessageResourceType = typeof(Resource), ErrorMessageResourceName = "MsgRequired")]
         [StringLength(2000, MinimumLength = 1)]
         public string Token { get; set; }
-
-        /// <summary>
-        /// Keyword for indicating purchase intention. This keyword will be assigned to the next FB/IG post.
-        /// </summary>
-        [Required(ErrorMessageResourceType = typeof(Resource), ErrorMessageResourceName = "MsgRequired")]
-        [StringLength(10)]
-        public string KeywordForShoppingIntention { get; set; } = "BUY";
-
+        
         /// <summary>
         /// Facebook pages on which the user has a role.
         /// </summary>        

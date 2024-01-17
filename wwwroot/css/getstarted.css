@@ -1,4 +1,17 @@
-﻿.drag-block:hover {
+﻿.sticky-bar {
+    background-color: var(--faint-grey);
+    position: sticky;
+    bottom: 0px;
+    z-index: 200;
+}
+
+.setting-panel {
+    max-width: 580px;
+    min-width: 100px;
+    min-height: 100px;
+}
+
+.drag-block:hover {
     cursor: grab;
 }
 
@@ -9,7 +22,6 @@
 .wrapper {
     position: relative;
 }
-
 
 .besides-sidebar {
     width: 100%;

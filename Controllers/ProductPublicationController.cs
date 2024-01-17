@@ -19,6 +19,9 @@ using Corprio.AspNetCore.Site.Filters;
 using Corprio.DevExtremeLib;
 using DevExtreme.AspNet.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Corprio.DataModel.Business.Sales;
+using Corprio.Global.Measure;
+using Corprio.AspNetCore.Site.Services;
 
 namespace Corprio.SocialWorker.Controllers
 {
@@ -43,7 +46,7 @@ namespace Corprio.SocialWorker.Controllers
         public override IActionResult Index([FromRoute] Guid organizationID)
         {
             return View(organizationID);
-        }                
+        }
 
         /// <summary>
         /// Retrieve entity property values
@@ -90,18 +93,19 @@ namespace Corprio.SocialWorker.Controllers
         /// </summary>
         /// <param name="httpClient">HTTP client for executing API query</param>
         /// <param name="corprioClient">Client for Api requests among Corprio projects</param>
+        /// <param name="applicationSettingService">Application setting service</param>
         /// <param name="organizationID">Organization ID</param>
         /// <param name="productID">ID of the product to be published</param>
         /// <returns>Status code</returns>
         /// <exception cref="Exception"></exception>
         [HttpPost]
-        public async Task<IActionResult> PublishProduct([FromServices] HttpClient httpClient, [FromServices] APIClient corprioClient, 
-            [FromRoute] Guid organizationID, Guid productID)
+        public async Task<IActionResult> PublishProduct([FromServices] HttpClient httpClient, [FromServices] APIClient corprioClient,
+            [FromServices] ApplicationSettingService applicationSettingService, [FromRoute] Guid organizationID, Guid productID)
         {
             if (productID.Equals(Guid.Empty)) throw new Exception("Product ID is invalid.");
             List<string> errorMessages = new();
-            MetaUser metaUser = db.MetaUsers.Include(x => x.Pages).FirstOrDefault(x => x.OrganizationID == organizationID) 
-                ?? throw new Exception($"Failed to get Meta user for {organizationID}.");
+            MetaUser metaUser = db.MetaUsers.Include(x => x.Pages).FirstOrDefault(x => x.OrganizationID == organizationID && x.Dormant == false)
+                ?? throw new Exception(Resources.SharedResource.ResourceManager.GetString("ErrMsg_ValidMetaProfileNotFound"));
 
             if (metaUser.Pages.Count == 0)
             {
@@ -114,8 +118,19 @@ namespace Corprio.SocialWorker.Controllers
                 ?? throw new Exception($"Product {productID} cannot be found.");
             OrganizationCoreInfo coreInfo = await corprioClient.OrganizationApi.GetCoreInfo(organizationID)
                 ?? throw new Exception($"Failed to get core information of organization {organizationID}.");
-            PostTemplate template = await DbActionHelper.GetTemplate(db: db, organizationID: organizationID, messageType: MessageType.ProductPost);                        
-            string message = template.ProductPostMessage(product: product, coreInfo: coreInfo, keyword: metaUser.KeywordForShoppingIntention);
+            ApplicationSetting applicationSetting = await applicationSettingService.GetSetting<ApplicationSetting>(organizationID)
+                ?? throw new Exception($"Failed to retrieve application setting of organization {organizationID}.");            
+            PriceWithCurrency price = null;
+            if (applicationSetting.ProductPostTemplate?.Contains(TemplateComponent.ProductPublicPrice) ?? false)
+            {
+                price = await corprioClient.SellingPriceApi.GetPriceForCustomerPriceGroup(
+                    organizationID: organizationID,
+                    productID: productID,
+                    customerPriceGroupID: CustomerPriceGroup.PublicGroupID,
+                    quantity: new Quantity { UOMCode = product.ListPrice_UOMCode, Value = 1 },
+                    currencyCode: coreInfo.CurrencyCode);
+            }
+            string message = applicationSetting.ProductPostMessage(product: product, coreInfo: coreInfo, publicPrice: price);
 
             // we need to use a set because child products may share the same image(s) with their parent or peers
             HashSet<Guid> imageIds = UtilityHelper.ReturnImageUrls(product);
@@ -182,7 +197,7 @@ namespace Corprio.SocialWorker.Controllers
                         {
                             ID = Guid.NewGuid(),
                             FacebookPageID = page.ID,
-                            KeywordForShoppingIntention = metaUser.KeywordForShoppingIntention,
+                            KeywordForShoppingIntention = applicationSetting.KeywordForShoppingIntention,
                             PostId = postId,
                             PostedWith = MetaProduct.Instagram
                         };
@@ -215,7 +230,7 @@ namespace Corprio.SocialWorker.Controllers
                     { 
                         ID = Guid.NewGuid(),
                         FacebookPageID = page.ID,
-                        KeywordForShoppingIntention = metaUser.KeywordForShoppingIntention,
+                        KeywordForShoppingIntention = applicationSetting.KeywordForShoppingIntention,
                         PostId = postId,
                         PostedWith = MetaProduct.Facebook                         
                     };

@@ -126,11 +126,23 @@ namespace Corprio.SocialWorker.Dictionaries
                 [BotLanguage.TraditionalChinese] = "請輸入一個正數。",
                 [BotLanguage.SimplifiedChinese] = "请输入一个正数。",
             },
+            ["Err_NonPositiveInteger"] = new Dictionary<BotLanguage, string>()
+            {
+                [BotLanguage.English] = "Please input a positive integer. ",
+                [BotLanguage.TraditionalChinese] = "請輸入一個正整數。",
+                [BotLanguage.SimplifiedChinese] = "请输入一个正整数。",
+            },
             ["Err_NotUnderstand"] = new Dictionary<BotLanguage, string>()
             {
                 [BotLanguage.English] = "I don't understand the input. ",
                 [BotLanguage.TraditionalChinese] = "我不明白輸入的內容。",
                 [BotLanguage.SimplifiedChinese] = "我不明白输入的内容。",
+            },
+            ["Err_OutOfStock"] = new Dictionary<BotLanguage, string>()
+            {
+                [BotLanguage.English] = "Sorry, {0} is out of stock. ",
+                [BotLanguage.TraditionalChinese] = "抱歉，{0} 缺貨。",
+                [BotLanguage.SimplifiedChinese] = "抱歉，{0} 缺货。",
             },
             ["Err_ProductNotFound"] = new Dictionary<BotLanguage, string>()
             {

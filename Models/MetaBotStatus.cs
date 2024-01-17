@@ -41,24 +41,24 @@ namespace Corprio.SocialWorker.Models
     public class BotBasket
     {
         /// <summary>
-        /// Basket ID
-        /// </summary>        
-        public Guid ID { get; set; }
-        
-        /// <summary>
-        /// Corprio entity ID of the product.
+        /// If true, then the bot needs to check if the basket quantity is greater than the stock level
         /// </summary>
-        public Guid ProductID { get; set; }
+        public bool DisallowOutOfStock { get; set; }        
 
+        /// <summary>
+        /// Amount of discount offered on the product.
+        /// </summary>
+        public decimal Discount { get; set; }
+
+        /// <summary>
+        /// Type of discount offered on the product.
+        /// </summary>
+        public DiscountType DiscountType { get; set; }
+        
         /// <summary>
         /// Name of the product.
         /// </summary>                
         public string Name { get; set; }
-
-        /// <summary>
-        /// Quantity of the product.
-        /// </summary>        
-        public decimal Quantity { get; set; }
 
         /// <summary>
         /// Price of the product.
@@ -66,18 +66,23 @@ namespace Corprio.SocialWorker.Models
         public decimal? Price { get; set; }
 
         /// <summary>
+        /// Corprio entity ID of the product.
+        /// </summary>
+        public Guid ProductID { get; set; }
+
+        /// <summary>
+        /// Stock level (excluding reserved stock) of the product
+        /// </summary>
+        public decimal ProductStockLevel { get; set; }
+
+        /// <summary>
+        /// Quantity of the product.
+        /// </summary>        
+        public decimal Quantity { get; set; }
+        
+        /// <summary>
         /// UOM code of the product.
         /// </summary>        
-        public string UOMCode { get; set; }
-
-        /// <summary>
-        /// Type of discount offered on the product.
-        /// </summary>
-        public DiscountType DiscountType { get; set; }
-
-        /// <summary>
-        /// Amount of discount offered on the product.
-        /// </summary>
-        public decimal Discount { get; set; }
+        public string UOMCode { get; set; }        
     }
 }

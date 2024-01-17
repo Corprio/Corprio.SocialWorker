@@ -17,79 +17,6 @@ namespace Corprio.SocialWorker.Migrations
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "7.0.14");
 
-            modelBuilder.Entity("Corprio.SocialWorker.Models.ApplicationSetting", b =>
-                {
-                    b.Property<Guid>("ID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("ApplicationID")
-                        .HasMaxLength(200)
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTimeOffset>("CreateDate")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("CreatedBy")
-                        .HasMaxLength(200)
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("DefaultEmailSubject")
-                        .HasMaxLength(200)
-                        .HasColumnType("TEXT");
-
-                    b.Property<decimal>("DeliveryCharge")
-                        .HasColumnType("TEXT");
-
-                    b.Property<Guid?>("DeliveryChargeProductID")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("EmailToReceiveOrder")
-                        .HasMaxLength(200)
-                        .HasColumnType("TEXT");
-
-                    b.Property<decimal?>("FreeShippingAmount")
-                        .HasColumnType("TEXT");
-
-                    b.Property<bool>("IsSmtpSet")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<DateTimeOffset>("LastUpdateDate")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("LastUpdatedBy")
-                        .HasMaxLength(200)
-                        .HasColumnType("TEXT");
-
-                    b.Property<Guid>("OrganizationID")
-                        .HasColumnType("TEXT");
-
-                    b.Property<byte[]>("RowVersion")
-                        .IsConcurrencyToken()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("BLOB");
-
-                    b.Property<bool>("SelfPickUp")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("SelfPickUpInstruction")
-                        .HasColumnType("TEXT");
-
-                    b.Property<bool>("SendConfirmationEmail")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<bool>("ShipToCustomer")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<Guid?>("WarehouseID")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("ID");
-
-                    b.ToTable("Settings");
-                });
-
             modelBuilder.Entity("Corprio.SocialWorker.Models.DbFriendlyBot", b =>
                 {
                     b.Property<Guid>("ID")
@@ -292,14 +219,12 @@ namespace Corprio.SocialWorker.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("TEXT");
 
+                    b.Property<bool>("Dormant")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("FacebookUserID")
                         .IsRequired()
                         .HasMaxLength(50)
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("KeywordForShoppingIntention")
-                        .IsRequired()
-                        .HasMaxLength(10)
                         .HasColumnType("TEXT");
 
                     b.Property<DateTimeOffset>("LastUpdateDate")
@@ -325,26 +250,6 @@ namespace Corprio.SocialWorker.Migrations
                     b.HasKey("ID");
 
                     b.ToTable("MetaUsers");
-                });
-
-            modelBuilder.Entity("Corprio.SocialWorker.Models.PostTemplate", b =>
-                {
-                    b.Property<Guid>("ID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("MessageType")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<Guid>("OrganizationID")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("TemplateString")
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("ID");
-
-                    b.ToTable("Templates");
                 });
 
             modelBuilder.Entity("Corprio.SocialWorker.Models.DbFriendlyBot", b =>

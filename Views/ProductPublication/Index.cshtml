@@ -12,10 +12,7 @@
 <div class="m-4">
     <div class="title-border-l">
         <h4>@localizer["PublishProduct"]</h4>
-    </div>
-    <div class="d-flex justify-content-center my-3">
-        <div id="load-indicator-top"></div>
-    </div>
+    </div>    
     @(
         Html.DevExtreme().DataGrid<ProductViewModel>()
         .StandardGrid()
@@ -81,17 +78,23 @@
             items.Add().Name(DataGridToolbarItem.ColumnChooserButton).Location(ToolbarItemLocation.After);
             items.Add().Name(DataGridToolbarItem.ExportButton).Location(ToolbarItemLocation.After);
         }))
-    )
-    <div class="d-flex justify-content-center my-3">
-        <div id="load-indicator-bottom"></div>
-    </div>
+    )    
+    <div id="load-panel"></div>
 </div>
 <vc:static-data model="@StaticDataRequestViewModel.All(true)" org-info="true" />
 <script>
     const viewSettingConfig = corprio.gridViewStateConfig("product", "grd");
-    const langs = StaticData.OrgInfo.SupportedLanguages;
-    const loadIndicatorTop = $('#load-indicator-top').dxLoadIndicator({ visible: false }).dxLoadIndicator('instance');
-    const loadIndicatorBottom = $('#load-indicator-bottom').dxLoadIndicator({ visible: false }).dxLoadIndicator('instance');
+    const langs = StaticData.OrgInfo.SupportedLanguages;    
+    function loadPanel() {
+        return $('#load-panel').dxLoadPanel({
+            message: '@encoder.Encode(localizer["Processing"])',
+            visible: false,
+            showIndicator: true,
+            showPane: true,
+            shading: true,
+            hideOnOutsideClick: false
+        }).dxLoadPanel('instance');
+    }
     
     function PublishProduct(e) {
         console.log(e.row.data.ID);
@@ -100,9 +103,8 @@
             messageHtml: "<p>@encoder.Encode(localizer["PublishProductPrompt"])</p>",
             buttons: [{
                 text: "@encoder.Encode(localizer["Confirm"])",
-                onClick: function () {                                                            
-                    loadIndicatorTop.option('visible', true);
-                    loadIndicatorBottom.option('visible', true);
+                onClick: function () {
+                    loadPanel().show();
                     $.ajax({
                         url: "@Url.Action("PublishProduct", new { organizationID })",
                         type: "POST",
@@ -114,9 +116,8 @@
                         });
                         message.show();
                     }).fail(corprio.formatError)
-                    .always(() => { 
-                        loadIndicatorTop.option('visible', false);
-                        loadIndicatorBottom.option('visible', false);
+                    .always(() => {                         
+                        loadPanel().hide();
                     });
                 },
                 type: "default",

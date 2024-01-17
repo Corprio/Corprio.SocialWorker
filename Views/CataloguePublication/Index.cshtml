@@ -12,10 +12,7 @@
 <div class="m-4">
     <div class="title-border-l">
         <h4>@localizer["PublishCatalogue"]</h4>
-    </div>
-    <div class="d-flex justify-content-center my-3">
-        <div id="load-indicator-top"></div>
-    </div>
+    </div>    
     @(
         Html.DevExtreme().DataGrid<CatalogueViewModel>()
         .StandardGrid(gridID: "catalogue-grid")
@@ -45,17 +42,22 @@
             .Widget(w => w.Button().Text(globalLocalizer["Add New"]).Type(ButtonType.Default)
             .OnClick($"function(e){{ window.open(`{goBuyClickUrl}/{organizationID}/Catalogue/Add`, '_blank').focus() }}"));
         }))
-    )
-    <div class="d-flex justify-content-center my-3">
-        <div id="load-indicator-bottom"></div>
-    </div>
+    )    
 </div>
 <vc:static-data model="@StaticDataRequestViewModel.All(true)" org-info="true" />
 <script>
     const viewSettingConfig = corprio.gridViewStateConfig("product", "grd");
     const langs = StaticData.OrgInfo.SupportedLanguages;
-    const loadIndicatorTop = $('#load-indicator-top').dxLoadIndicator({ visible: false }).dxLoadIndicator('instance');
-    const loadIndicatorBottom = $('#load-indicator-bottom').dxLoadIndicator({ visible: false }).dxLoadIndicator('instance');
+    function loadPanel() {
+        return $('#load-panel').dxLoadPanel({
+            message: '@encoder.Encode(localizer["Processing"])',
+            visible: false,
+            showIndicator: true,
+            showPane: true,
+            shading: true,
+            hideOnOutsideClick: false
+        }).dxLoadPanel('instance');
+    }
 
     function PublishCatalogue(e) {
         console.log(e.row.data.ID);
@@ -65,8 +67,7 @@
             buttons: [{
                 text: "@encoder.Encode(localizer["Confirm"])",
                 onClick: function () {
-                    loadIndicatorTop.option('visible', true);
-                    loadIndicatorBottom.option('visible', true);
+                    loadPanel().show();
                     $.ajax({
                         url: "@Url.Action("PublishCatalogue", new { organizationID })",
                         type: "POST",
@@ -78,10 +79,7 @@
                         });
                         message.show();
                     }).fail(corprio.formatError)
-                    .always(() => {
-                        loadIndicatorTop.option('visible', false);
-                        loadIndicatorBottom.option('visible', false);
-                    });
+                    .always(() => { loadPanel().hide(); });
                 },
                 type: "default",
             }, {

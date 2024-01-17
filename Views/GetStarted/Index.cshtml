@@ -21,9 +21,7 @@
     string sampleShortName = orgInfo == null ? orgInfo.ShortName : "MyCompany";
     string catalogueURL = $"{configuration["GoBuyClickUrl"]}/Catalogue/{sampleShortName}/SAMPLE_CATALOGUE";
     string defaultProductMessage = BabelFish.Vocab["HowToBuy"][UtilityHelper.NICAM(orgInfo)].Replace("{0}", "Example Product");
-    
-    string messageType_CataloguePost = nameof(MessageType.CataloguePost);
-    string messageType_ProductPost = nameof(MessageType.ProductPost);
+        
     string separator = TemplateComponent.Separator;
     string defaultTemplate_catalogue = string.Join(separator, DefaultTemplate.DefaultTempalte_Catalogue);
     string defaultTemplate_product = string.Join(separator, DefaultTemplate.DefaultTempalte_Product);
@@ -34,10 +32,8 @@
     // use vdata to pass parameters to TS
     const vdata = {
         actions: {
-            refreshAccessToken: '@StringHelper.Encode(@Url.Action("RefreshAccessToken", "ConnectFacebook", new { organizationID }))',
-            getKeyword: '@StringHelper.Encode(@Url.Action("GetKeyword", "Template", new { organizationID }))',
-            getTemplate: '@StringHelper.Encode(@Url.Action("GetTemplate", "Template", new { organizationID }))',
-            saveTemplate: '@StringHelper.Encode(@Url.Action("SaveTemplate", "Template", new { organizationID }))',
+            refreshAccessToken: '@StringHelper.Encode(@Url.Action("RefreshAccessToken", "ConnectFacebook", new { organizationID }))',            
+            saveSetting: '@StringHelper.Encode(@Url.Action("GetStarted", "Save", new { organizationID }))',            
         },
         localizer: {
             catalogueCode: '@StringHelper.Encode(localizer["Template_CatalogueCode"])',
@@ -45,18 +41,28 @@
             catalogueName: '@StringHelper.Encode(localizer["Template_CatalogueName"])',
             catalogueStartDate: '@StringHelper.Encode(localizer["Template_CatalogueStartDate"])',
             catalogueUrl: '@StringHelper.Encode(localizer["Template_CatalogueURL"])',
-            fbConnected: '@StringHelper.Encode(localizer["FB_connected"])',
-            fbNotConnected: '@StringHelper.Encode(localizer["FB_not_connected"])',
             defaultMessage: '@StringHelper.Encode(localizer["Template_DefaultMessage"])',
+            error: '@StringHelper.Encode(localizer["Error"])',
+            fbAlreadyConnected: '@StringHelper.Encode(localizer["FB_AlreadyConnected"])',
+            fbConnected: '@StringHelper.Encode(localizer["FB_connected"])',
+            fbNotConnected: '@StringHelper.Encode(localizer["FB_not_connected"])',            
+            msgMissingDeliveryChargeProductError: '@StringHelper.Encode(localizer["MsgMissingDeliveryChargeProductError"])',
+            msgSettingSaved: '@StringHelper.Encode(localizer["MsgSettingSaved"])',
             newLine: '@StringHelper.Encode(localizer["Template_NewLine"])',
-            productName: '@StringHelper.Encode(localizer["Template_ProductName"])',
             productCode: '@StringHelper.Encode(localizer["Template_ProductCode"])',
             productDescription: '@StringHelper.Encode(localizer["Template_ProductDescription"])',
-            productListPrice: '@StringHelper.Encode(localizer["Template_ProductPrice"])',
+            productListPrice: '@StringHelper.Encode(localizer["Template_ProductListPrice"])',
+            productName: '@StringHelper.Encode(localizer["Template_ProductName"])',
+            productPublicPrice: '@StringHelper.Encode(localizer["Template_ProductPublicPrice"])',
             productReplyKeyword: '@StringHelper.Encode(localizer["Template_Keyword"])',
+            reconnectFacebook: '@StringHelper.Encode(localizer["ReconnectFacebook"])',
             saveTemplateTitle: '@StringHelper.Encode(localizer["TemplateSavedTitle"])',
-            saveTemplateMessage: '@StringHelper.Encode(localizer["TemplateSavedMessage"])',
-            shortName: '@orgInfo?.ShortName',
+            saveTemplateMessage: '@StringHelper.Encode(localizer["TemplateSavedMessage"])',            
+        },
+        model: {
+            catalogueTemplate: '@StringHelper.Encode(Model.CataloguePostTemplate)',
+            keyword: '@StringHelper.Encode(Model.KeywordForShoppingIntention)',
+            productTemplate: '@StringHelper.Encode(Model.ProductPostTemplate)',
         },
         sampleValues: {
             catalogueURL: "@catalogueURL",
@@ -67,7 +73,9 @@
             env: "@env",
             metaApiID: "@metaApiID",
             metaApiVersion: "@metaApiVersion",
+            organizationID: "@organizationID",
             sendConfirmationEmail: "@Model.SendConfirmationEmail",
+            shortName: '@orgInfo?.ShortName',
         },
         templateComponents: {
             catalogueCodeValue: "@TemplateComponent.CatalogueCode",
@@ -77,14 +85,13 @@
             catalogueUrlValue: "@TemplateComponent.CatalogueUrl",
             defaultMessageValue: "@TemplateComponent.DefaultMessage",
             defaultTemplate_catalogue: "@defaultTemplate_catalogue",
-            defaultTemplate_product: "@defaultTemplate_product",
-            messageType_CataloguePost: "@messageType_CataloguePost",
-            messageType_ProductPost: "@messageType_ProductPost",
-            newLineValue: "@TemplateComponent.LineBreak",
-            productNameValue: "@TemplateComponent.ProductName",
+            defaultTemplate_product: "@defaultTemplate_product",            
+            newLineValue: "@TemplateComponent.LineBreak",            
             productCodeValue: "@TemplateComponent.ProductCode",
             productDescriptionValue: "@TemplateComponent.ProductDescription",
             productListPriceValue: "@TemplateComponent.ProductListPrice",
+            productNameValue: "@TemplateComponent.ProductName",
+            productPublicPriceValue: "@TemplateComponent.ProductPublicPrice",
             productReplyKeyword: "@TemplateComponent.Keyword",
             separator: "@separator"
         }        
@@ -98,49 +105,46 @@
             <i class="fa-light fa-bars"></i>
         </button>
         @ViewData["Title"]
-    </h4>
-    
-    <div class="wrapper d-flex">        
+    </h4>        
+                
+    <div class="wrapper d-flex mt-4">        
         <div class="sidebar-wrapper hidden">
             <div id="settings-sidebar" class="sidebar collapse navbar-collapse d-md-block">
                 <div class="pr-5">
                     <h4 class="page-title d-none d-md-block">@ViewData["Title"]</h4>
                     <ul id="settings-nav" class="nav nav-pills flex-column">
-                        <li class="nav-item">
-                            <a class="nav-link active" href="#fb-section">@localizer["FB"]</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#som-section">@localizer["SOM"]</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#delivery-section">@localizer["DeliveryMethod"]</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#payment-section">@localizer["PaymentMethod"]</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#template-section">@localizer["SocialMediaTemplate"]</a>
-                        </li>
+                        <li class="nav-item"><a class="nav-link active" href="#fb-section">@localizer["FB"]</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#som-section">@localizer["SOM"]</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#delivery-section">@localizer["DeliveryMethod"]</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#payment-section">@localizer["PaymentMethod"]</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#checkout-section">@localizer["CheckoutPage"]</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#thankyou-section">@localizer["ThankYouPage"]</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#template-section">@localizer["SocialMediaTemplate"]</a></li>
                     </ul>
                 </div>
             </div>
         </div>
         
-        <div class="besides-sidebar tab-content">
+        <div class="besides-sidebar tab-content">                        
             <section id="fb-section" class="active">
                 <div class="title-border-l">
                     <h4>@localizer["FB"]</h4>
                     <p>@localizer["FB_Desc1"] <b>@orgInfo?.ShortName</b> @localizer["FB_Desc2"]</p>
                 </div>
                                 
-                <button class="btn btn-primary mt-2" id="loginBtn" style="display: block;">Continue with Facebook</button>
-                <button class="btn btn-primary mt-2" id="logoutBtn" style="display: none;">Logout from Facebook</button>
+                <button class="btn btn-primary mt-2" id="loginBtn" style="display: block;">@localizer["LoginFB"]</button>
+                <button class="btn btn-primary mt-2" id="logoutBtn" style="display: none;">@localizer["LogoutFB"]</button>
 
                 <div id="fb-dialogue" class="mt-2"></div>
+                <div id="fb-dialogue2" class="mt-2"></div>
             </section>
             
-            @*The form element is only applicable to SOM, delivery and payment methods*@
-            <form id="settings-form"  asp-action="save" asp-route-organizationID="@organizationID" enctype="multipart/form-data" onsubmit="return submitChanges()">
+            @*The form element does not cover templates because user inputs to them will be captured in the hidden inputs below using JS *@
+            <form id="settings-form"  asp-action="save" asp-route-organizationID="@organizationID" enctype="multipart/form-data" onsubmit="return submitChanges()">                
+                @Html.DevExtreme().TextBoxFor(m => m.CataloguePostTemplate).Visible(false)
+                @Html.DevExtreme().TextBoxFor(m => m.KeywordForShoppingIntention).Visible(false)
+                @Html.DevExtreme().TextBoxFor(m => m.ProductPostTemplate).Visible(false)
+
                 <section id="som-section">
                     <div class="title-border-l">
                         <h4>@localizer["SOM"]</h4>
@@ -193,8 +197,7 @@
                     <div class="form-group">
                         <help-label asp-for="WarehouseID" class="required"></help-label>
                         @Html.DevExtreme().SelectBoxFor2(m => m.WarehouseID).LookupWarehouse(organizationID).Value(Model.WarehouseID).PreSelect()
-                    </div>
-                    <button class="btn btn-outline-info mb-3 save-setting-btn" type="button">@localizer["Save"]</button>
+                    </div>                    
                 </section>
 
                 <section id="delivery-section">
@@ -230,8 +233,7 @@
                             <help-label asp-for="DeliveryChargeProductID"></help-label>                        
                             @Html.DevExtreme().SelectBoxFor2(m => m.DeliveryChargeProductID).ID("DeliveryChargeProductID").LookupProduct(organizationID).ShowClearButton(true)
                         </div>
-                    </div>
-                    <button class="btn btn-outline-info mb-3 save-setting-btn" type="button">@localizer["Save"]</button>
+                    </div>                    
                 </section>
 
                 <section id="payment-section">
@@ -244,8 +246,42 @@
                         <i class="fa-regular fa-arrow-up-right-from-square ml-1"></i>
                     </a>
                 </section>
-            </form>
 
+                <section id="checkout-section">
+                    <div class="title-border-l">
+                        <h4>@localizer["CheckoutPage"]</h4>
+                        <p>@localizer["CheckoutPage_Desc"]</p>
+                    </div>
+                    <div class="form-group">
+                        <help-label asp-for="Footer"></help-label>
+                        @(Html.DevExtreme().HtmlEditorFor(m => m.Footer).Toolbar(t => t.StandardToolbar())
+                            .ImageUpload(img => img.Tabs(t =>
+                            {
+                                t.Add().Name(HtmlEditorImageUploadTab.File);
+                                t.Add().Name(HtmlEditorImageUploadTab.Url);
+                            }))
+                            .Disabled(!authorizedToUpdate).Width("100%"))
+                    </div>                    
+                </section>
+
+                <section id="thankyou-section">
+                    <div class="title-border-l">
+                        <h4>@localizer["ThankYouPage"]</h4>
+                        <p>@localizer["ThankYouPage_Desc"]</p>
+                    </div>                    
+                    <div class="form-group">
+                        <help-label asp-for="ThankYouMessage"></help-label>
+                        @(Html.DevExtreme().HtmlEditorFor(m => m.ThankYouMessage).Toolbar(t => t.StandardToolbar())
+                            .ImageUpload(img => img.Tabs(t =>
+                            {
+                                t.Add().Name(HtmlEditorImageUploadTab.File);
+                                t.Add().Name(HtmlEditorImageUploadTab.Url);
+                            }
+                            )).Disabled(!authorizedToUpdate).Width("100%"))
+                    </div>
+                </section>
+            </form>
+            
             <section id="template-section">
                 <div class="title-border-l">
                     <h4>@localizer["SocialMediaTemplate"]</h4>
@@ -259,7 +295,7 @@
                 <div class="row mb-2">
                     <div class="col-sm">
                         <h5 class="mb-2">@localizer["Panel_Blocks"] - @localizer["PanelTitle_Product"]</h5>
-                        <div id="block-panel-product" class="rounded border border-success bg-white py-1 mb-3" style="min-width:100px; min-height:100px;">&nbsp;</div>
+                        <div id="block-panel-product" class="rounded border border-success bg-white py-1 mb-3 setting-panel">&nbsp;</div>
                         <div class="input-group mb-3">
                             <label class="my-1 mr-2" for="component-select-product">
                                 @localizer["StandardMessageComponent"]                                
@@ -273,7 +309,8 @@
                                 <option value="@TemplateComponent.ProductName">@localizer["Template_ProductName"]</option>
                                 <option value="@TemplateComponent.ProductCode">@localizer["Template_ProductCode"]</option>
                                 <option value="@TemplateComponent.ProductDescription">@localizer["Template_ProductDescription"]</option>
-                                <option value="@TemplateComponent.ProductListPrice">@localizer["Template_ProductPrice"]</option>
+                                <option value="@TemplateComponent.ProductListPrice">@localizer["Template_ProductListPrice"]</option>
+                                <option value="@TemplateComponent.ProductPublicPrice">@localizer["Template_ProductPublicPrice"]</option>
                                 <option value="@TemplateComponent.DefaultMessage">@localizer["Template_DefaultMessage"]</option>
                                 <option value="@TemplateComponent.Keyword">@localizer["Template_Keyword"]</option>
                             </select>
@@ -300,17 +337,16 @@
                                     <i class="fa-regular fa-circle-question" aria-hidden="true"></i>
                                 </a>
                             </label>
-                            <input type="text" id="keyword-input-product" class="form-control" placeholder="@localizer["Placeholder_Keyword"]">
+                            <input type="text" id="keyword-input-product" class="form-control" placeholder="@localizer["Placeholder_Keyword"]">                            
                             <div class="invalid-feedback">@localizer["InvalidFeedback_KeywordLength"]</div>
                         </div>
 
-                        <button id="restore-default-btn-product" class="btn btn-outline-danger mb-3" type="button">@localizer["DefaultSetting"]</button>
-                        <button id="save-template-btn-product" class="btn btn-outline-info mb-3" type="button">@localizer["Save"]</button>
+                        <button id="restore-default-btn-product" class="btn btn-outline-danger mb-3" type="button">@localizer["DefaultSetting"]</button>                        
                     </div>
 
                     <div class="col-sm">
                         <h5 class="mb-2">@localizer["Panel_Preview"]</h5>
-                        <div id="preview-panel-product" class="rounded border border-success p-2 bg-white" style="min-width:100px; min-height:100px;">&nbsp;</div>
+                        <div id="preview-panel-product" class="rounded border border-success p-2 bg-white setting-panel">&nbsp;</div>
                     </div>
                 </div>
 
@@ -318,7 +354,7 @@
                     <div class="row mb-2">
                         <div class="col-sm">
                             <h5 class="mb-2">@localizer["Panel_Blocks"] - @localizer["PanelTitle_Catalogue"]</h5>
-                            <div id="block-panel-catalogue" class="rounded border border-success bg-white py-1 mb-3" style="min-width:100px; min-height:100px;">&nbsp;</div>
+                            <div id="block-panel-catalogue" class="rounded border border-success bg-white py-1 mb-3 setting-panel">&nbsp;</div>
                             <div class="input-group mb-3">
                                 <label class="my-1 mr-2" for="component-select-catalogue">
                                     @localizer["StandardMessageComponent"]
@@ -350,19 +386,22 @@
                                     <button id="custom-btn-catalogue" class="btn btn-outline-primary" type="button">@globalLocalizer["Add"]</button>
                                 </div>
                             </div>
-                            <button id="restore-default-btn-catalogue" class="btn btn-outline-danger mb-3" type="button">@localizer["DefaultSetting"]</button>
-                            <button id="save-template-btn-catalogue" class="btn btn-outline-info mb-3" type="button">@localizer["Save"]</button>
+                            <button id="restore-default-btn-catalogue" class="btn btn-outline-danger mb-3" type="button">@localizer["DefaultSetting"]</button>                            
                         </div>
 
                         <div class="col-sm">
                             <h5 class="mb-2">@localizer["Panel_Preview"]</h5>
-                            <div id="preview-panel-catalogue" class="rounded border border-success p-2 bg-white" style="min-width:100px; min-height:100px;">&nbsp;</div>
+                            <div id="preview-panel-catalogue" class="rounded border border-success p-2 bg-white setting-panel">&nbsp;</div>
                         </div>
                     </div>
                 </div>
             </section>
+
+            <div class="w-100 d-flex py-2 justify-content-between sticky-bar border-top">
+                <button class="btn btn-info ml-auto save-setting-btn">@localizer["Save"]</button>
+            </div>
         </div>                
-    </div>        
+    </div>
 </div>
 
 <vc:static-data model="@StaticDataRequestViewModel.All(true)" org-info="true" />
@@ -395,42 +434,5 @@
         else { 
             return false; 
         }
-    }
-
-    $(function() {
-        $('.save-setting-btn').on('click', function() {
-            console.log('CLICKED');
-            let validationResult = DevExpress.validationEngine.validateGroup();
-
-            if (validationResult.isValid) {
-                if ($("#ShipToCustomer").dxCheckBox("option", "value") && $("#DeliveryCharge").dxNumberBox("option", "value") > 0) {
-                    const selProduct = $("#DeliveryChargeProductID").dxSelectBox("instance");
-                    if (!selProduct.option("value")) {
-                        selProduct.option("validationStatus", "invalid");
-                        DevExpress.ui.dialog.alert("@encoder.Encode(localizer["MsgMissingDeliveryChargeProductError"])", "@encoder.Encode(localizer["Error"])");
-                        return false;
-                    }
-                }
-            }
-            else {
-                return false;
-            }                
-
-            // TODO - make the following line acceptable to TypeScript
-            savedData = new FormData($("#settings-form")[0]);
-
-            $.ajax({
-                type: 'POST',
-                url: '/@(organizationID)/GetStarted/Save',
-                data: savedData,
-                cache: false,
-                contentType: false,
-                processData: false,
-                success: function (result) {
-                    DevExpress.ui.notify('@encoder.Encode(localizer["MsgSettingSaved"])', 'success');
-                },
-                error: corprio.formatError
-            })
-        });
-    })
+    }    
 </script>

@@ -22,8 +22,8 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.Selector = exports.MessageType = void 0;
 var MessageType;
 (function (MessageType) {
-    MessageType["CATALOGUE"] = "catalogue";
-    MessageType["PRODUCT"] = "product";
+    MessageType["CataloguePost"] = "CataloguePost";
+    MessageType["ProductPost"] = "ProductPost";
 })(MessageType || (exports.MessageType = MessageType = {}));
 var Selector;
 (function (Selector) {
@@ -45,6 +45,7 @@ var Selector;
     Selector["customTextInput_Catalogue"] = "#custom-input-catalogue";
     Selector["customTextInput_Product"] = "#custom-input-product";
     Selector["fbDialogue"] = "#fb-dialogue";
+    Selector["fbDialogue2"] = "#fb-dialogue2";
     Selector["keywordInput_Product"] = "#keyword-input-product";
     Selector["loadIndicator_Top"] = "#load-indicator-top";
     Selector["loginButton"] = "#loginBtn";
@@ -53,6 +54,7 @@ var Selector;
     Selector["previewPanel_Product"] = "#preview-panel-product";
     Selector["restoreDefaultButton_Catalogue"] = "#restore-default-btn-catalogue";
     Selector["restoreDefaultButton_Product"] = "#restore-default-btn-product";
+    Selector["saveSettingButtons"] = ".save-setting-btn";
     Selector["saveTemplateButton_Catalogue"] = "#save-template-btn-catalogue";
     Selector["saveTemplateButton_Product"] = "#save-template-btn-product";
 })(Selector || (exports.Selector = Selector = {}));

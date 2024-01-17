@@ -23,8 +23,8 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.Selector = exports.MessageType = void 0;
 var MessageType;
 (function (MessageType) {
-    MessageType["CATALOGUE"] = "catalogue";
-    MessageType["PRODUCT"] = "product";
+    MessageType["CataloguePost"] = "CataloguePost";
+    MessageType["ProductPost"] = "ProductPost";
 })(MessageType || (exports.MessageType = MessageType = {}));
 var Selector;
 (function (Selector) {
@@ -46,6 +46,7 @@ var Selector;
     Selector["customTextInput_Catalogue"] = "#custom-input-catalogue";
     Selector["customTextInput_Product"] = "#custom-input-product";
     Selector["fbDialogue"] = "#fb-dialogue";
+    Selector["fbDialogue2"] = "#fb-dialogue2";
     Selector["keywordInput_Product"] = "#keyword-input-product";
     Selector["loadIndicator_Top"] = "#load-indicator-top";
     Selector["loginButton"] = "#loginBtn";
@@ -54,6 +55,7 @@ var Selector;
     Selector["previewPanel_Product"] = "#preview-panel-product";
     Selector["restoreDefaultButton_Catalogue"] = "#restore-default-btn-catalogue";
     Selector["restoreDefaultButton_Product"] = "#restore-default-btn-product";
+    Selector["saveSettingButtons"] = ".save-setting-btn";
     Selector["saveTemplateButton_Catalogue"] = "#save-template-btn-catalogue";
     Selector["saveTemplateButton_Product"] = "#save-template-btn-product";
 })(Selector || (exports.Selector = Selector = {}));
@@ -61,37 +63,70 @@ var Selector;
 
 /***/ }),
 
-/***/ "./Views/GetStarted/Index.ts":
+/***/ "./Views/Shared/Constants.ts":
+/*!***********************************!*\
+  !*** ./Views/Shared/Constants.ts ***!
+  \***********************************/
+/***/ ((__unused_webpack_module, exports) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.PERMISSIONS = void 0;
+// 'business_management' is required for viewing pages managed by the user
+exports.PERMISSIONS = ['email', 'public_profile', 'business_management', 'pages_manage_metadata',
+    'pages_messaging', 'pages_manage_posts', 'pages_manage_engagement', 'instagram_basic', 'instagram_content_publish',
+    'instagram_manage_comments', 'instagram_manage_messages'];
+
+
+/***/ })
+
+/******/ 	});
+/************************************************************************/
+/******/ 	// The module cache
+/******/ 	var __webpack_module_cache__ = {};
+/******/ 	
+/******/ 	// The require function
+/******/ 	function __webpack_require__(moduleId) {
+/******/ 		// Check if module is in cache
+/******/ 		var cachedModule = __webpack_module_cache__[moduleId];
+/******/ 		if (cachedModule !== undefined) {
+/******/ 			return cachedModule.exports;
+/******/ 		}
+/******/ 		// Create a new module (and put it into the cache)
+/******/ 		var module = __webpack_module_cache__[moduleId] = {
+/******/ 			// no module.id needed
+/******/ 			// no module.loaded needed
+/******/ 			exports: {}
+/******/ 		};
+/******/ 	
+/******/ 		// Execute the module function
+/******/ 		__webpack_modules__[moduleId](module, module.exports, __webpack_require__);
+/******/ 	
+/******/ 		// Return the exports of the module
+/******/ 		return module.exports;
+/******/ 	}
+/******/ 	
+/************************************************************************/
+var __webpack_exports__ = {};
+// This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
+(() => {
+var exports = __webpack_exports__;
 /*!***********************************!*\
   !*** ./Views/GetStarted/Index.ts ***!
   \***********************************/
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
-
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const Enums_1 = __webpack_require__(/*! ./Enums */ "./Views/GetStarted/Enums.ts");
+const Constants_1 = __webpack_require__(/*! ../Shared/Constants */ "./Views/Shared/Constants.ts");
 // https://github.com/DefinitelyTyped/DefinitelyTyped/blob/master/types/facebook-js-sdk/index.d.ts
 /// <reference types="facebook-js-sdk" />
-// 'business_management' is required for viewing pages managed by the user
-const permissions = ['email', 'public_profile', 'business_management', 'pages_manage_metadata',
-    'pages_messaging', 'pages_manage_posts', 'pages_manage_engagement', 'instagram_basic', 'instagram_content_publish',
-    'instagram_manage_comments', 'instagram_manage_messages'];
 // magic numbers
-const DataSet_TrueValue = 'true-value'; // this attribute contains the value of a standard component (e.g., %lineBreak%)
-const DataSet_Reordered = 'reordered'; // this attribute indicates if the block will be moved to another position
-const DataSet_Swapped = 'swapped'; // this attribute indicates if the block will give up its position to the reordered block
+const DATASET_TRUEVALUE = 'true-value'; // this attribute contains the value of a standard component (e.g., %lineBreak%)
+const DATASET_REORDERED = 'reordered'; // this attribute indicates if the block will be moved to another position
+const DATASET_SWAPPED = 'swapped'; // this attribute indicates if the block will give up its position to the reordered block
 // the following dictionary maps the message type to the relevant selectors
 const selectorMapping = {
-    'catalogue': {
+    'CataloguePost': {
         blockPanel: Enums_1.Selector.blockPanel_Catalogue,
         blockPanelInput_Last: Enums_1.Selector.blockPanel_Catalogue_Input_Last,
         componentSelect: Enums_1.Selector.componentSelect_Catalogue,
@@ -105,7 +140,7 @@ const selectorMapping = {
         dragBlock_Last: Enums_1.Selector.blockPanel_Catalogue_DragBlock_Last,
         validSelectOptions: {},
     },
-    'product': {
+    'ProductPost': {
         blockPanel: Enums_1.Selector.blockPanel_Product,
         blockPanelInput_Last: Enums_1.Selector.blockPanel_Product_Input_Last,
         componentSelect: Enums_1.Selector.componentSelect_Product,
@@ -128,14 +163,14 @@ let loadIndicatorTop;
 const draggedBlock = { value: null, type: null };
 /**
  * 'Remember' details of the block being dragged
- * @param obj
+ * @param obj-The HTML element that triggers this function (we can't simply use 'this' because this function is called inside an anonymous function)
  * @param messageType-Publication of products or catalogues
  */
 function handleDragStart(obj, messageType) {
     const $dragged = $(obj);
-    draggedBlock.value = ($dragged.data(DataSet_TrueValue) in validSelectOptions) ? $dragged.data(DataSet_TrueValue) : String($dragged.find('input').val());
+    draggedBlock.value = ($dragged.data(DATASET_TRUEVALUE) in validSelectOptions) ? $dragged.data(DATASET_TRUEVALUE) : String($dragged.find('input').val());
     draggedBlock.type = messageType;
-    $dragged.data(DataSet_Reordered, true);
+    $dragged.data(DATASET_REORDERED, true);
 }
 /**
  * Disable default behaviour when a HTML element is dragged
@@ -161,18 +196,18 @@ function handleDrop(ev, messageType) {
     }
     let deadend = true; // if true, then the dragged block is moved to the end
     if ($target.is('span')) {
-        $target.data(DataSet_Swapped, true);
+        $target.data(DATASET_SWAPPED, true);
         deadend = false;
     }
     let templateString = '';
     $(selectorMapping[messageType].blockPanel).children('span').each(function () {
-        if ($(this).data(DataSet_Reordered)) {
+        if ($(this).data(DATASET_REORDERED)) {
             return;
         }
-        if ($(this).data(DataSet_Swapped)) {
+        if ($(this).data(DATASET_SWAPPED)) {
             templateString += draggedBlock.value + vdata.templateComponents.separator;
         }
-        const key = $(this).data(DataSet_TrueValue);
+        const key = $(this).data(DATASET_TRUEVALUE);
         if (key in selectorMapping[messageType].validSelectOptions) {
             templateString += key + vdata.templateComponents.separator;
         }
@@ -205,39 +240,18 @@ function customTextBlock(text) {
  * @returns A HTML element, or a block, that represents the standard message component
  */
 function standardComponentBlock(dataset, text) {
-    return `<span draggable="true" data-${DataSet_TrueValue}="${dataset}" class="rounded border border-secondary p-2 mx-1 mb-1 d-inline-block text-wrap drag-block">` +
+    return `<span draggable="true" data-${DATASET_TRUEVALUE}="${dataset}" class="rounded border border-secondary p-2 mx-1 mb-1 d-inline-block text-wrap drag-block">` +
         `<input disabled value="${text}">` +
         `<i class="fa-duotone fa-x ml-2 remove-btn"></i>` +
         `</span>`;
-}
-/**
- * Convert the MessageType enum - which, at the risk of stating the obvious, is on the client-side - into the name of a similar enum on the server side
- * @param messageType-Publication of products or catalogues
- * @returns
- */
-function TranslateMessageType(messageType) {
-    let messageTypeString;
-    switch (messageType) {
-        case Enums_1.MessageType.CATALOGUE:
-            messageTypeString = vdata.templateComponents.messageType_CataloguePost;
-            break;
-        case Enums_1.MessageType.PRODUCT:
-            messageTypeString = vdata.templateComponents.messageType_ProductPost;
-            break;
-    }
-    return messageTypeString;
 }
 /**
  * Retreive the stored keyword from the backend and render it in the relevant input field
  * @returns
  */
 function restoreKeyword() {
-    return $.post({
-        url: vdata.actions.getKeyword,
-    }).done((keyword) => {
-        selectorMapping[Enums_1.MessageType.PRODUCT].validSelectOptions[vdata.templateComponents.productReplyKeyword].preview = keyword;
-        $(Enums_1.Selector.keywordInput_Product).val(reverseSanitize(keyword));
-    }).fail(corprio.formatError);
+    selectorMapping[Enums_1.MessageType.ProductPost].validSelectOptions[vdata.templateComponents.productReplyKeyword].preview = vdata.model.keyword;
+    $(Enums_1.Selector.keywordInput_Product).val(reverseSanitize(vdata.model.keyword));
 }
 /**
  * Retrieve the stored template from the backend and render it on the template and preview panels
@@ -245,18 +259,13 @@ function restoreKeyword() {
  * @returns
  */
 function restoreTemplate(messageType) {
-    return $.post({
-        url: vdata.actions.getTemplate,
-        data: {
-            messageType: TranslateMessageType(messageType)
-        }
-    }).done((templateString) => {
-        if (templateString) {
-            const templateArray = templateString.split(vdata.templateComponents.separator);
-            renderTemplate(templateArray, messageType);
-            renderPreview(messageType);
-        }
-    }).fail(corprio.formatError);
+    const templateString = messageType === Enums_1.MessageType.CataloguePost ? vdata.model.catalogueTemplate : vdata.model.productTemplate;
+    if (!templateString) {
+        return;
+    }
+    const templateArray = templateString.split(vdata.templateComponents.separator);
+    renderTemplate(templateArray, messageType);
+    renderPreview(messageType);
 }
 /**
  * Render the template panel
@@ -290,10 +299,10 @@ function renderTemplate(templateArray, messageType) {
 function restoreDefaultTemplate(messageType) {
     let defaultTemplate;
     switch (messageType) {
-        case Enums_1.MessageType.CATALOGUE:
+        case Enums_1.MessageType.CataloguePost:
             defaultTemplate = vdata.templateComponents.defaultTemplate_catalogue.split(vdata.templateComponents.separator);
             break;
-        case Enums_1.MessageType.PRODUCT:
+        case Enums_1.MessageType.ProductPost:
             defaultTemplate = vdata.templateComponents.defaultTemplate_product.split(vdata.templateComponents.separator);
             break;
     }
@@ -314,64 +323,41 @@ function validateKeyword(keyword) {
     $(Enums_1.Selector.keywordInput_Product).removeClass('is-invalid');
     return true;
 }
-/**
- * Trigger the backend to save the template (and keyword)
- * @param messageType-Publication of products or catalogues
- * @returns
- */
-function saveTemplate(messageType) {
-    loadIndicatorTop.option('visible', true);
-    let keyword = null;
-    if (messageType === Enums_1.MessageType.PRODUCT) {
-        keyword = sanitizeInput(String($(Enums_1.Selector.keywordInput_Product).val()).trim());
-        if (!validateKeyword(keyword)) {
-            loadIndicatorTop.option('visible', false);
-            return;
+function stringifyTemplate(messageType) {
+    const result = {
+        isValid: messageType === Enums_1.MessageType.CataloguePost,
+        keyword: '',
+        templateString: ''
+    };
+    if (messageType === Enums_1.MessageType.ProductPost) {
+        result.keyword = sanitizeInput(String($(Enums_1.Selector.keywordInput_Product).val()).trim());
+        if (!validateKeyword(result.keyword)) {
+            return result;
         }
     }
-    let templateString = '';
     let containKeyword = false;
     $(selectorMapping[messageType].blockPanel).children('span').each(function () {
-        const key = $(this).data(DataSet_TrueValue);
+        const key = $(this).data(DATASET_TRUEVALUE);
         if (key in selectorMapping[messageType].validSelectOptions) {
-            templateString += key + vdata.templateComponents.separator;
+            result.templateString += key + vdata.templateComponents.separator;
             if (key === vdata.templateComponents.productReplyKeyword || key === vdata.templateComponents.defaultMessageValue) {
                 containKeyword = true;
             }
         }
         else {
-            templateString += sanitizeInput(String($(this).find('input').val())) + vdata.templateComponents.separator;
+            result.templateString += sanitizeInput(String($(this).find('input').val())) + vdata.templateComponents.separator;
         }
     });
-    if (messageType === Enums_1.MessageType.PRODUCT) {
+    if (messageType === Enums_1.MessageType.ProductPost) {
         if (containKeyword) {
             $(Enums_1.Selector.componentSelect_Product).removeClass('is-invalid');
+            result.isValid = true;
         }
         else {
             $(Enums_1.Selector.componentSelect_Product).addClass('is-invalid');
-            loadIndicatorTop.option('visible', false);
-            return;
         }
     }
-    if (!templateString) {
-        loadIndicatorTop.option('visible', false);
-        return;
-    }
-    return $.post({
-        url: vdata.actions.saveTemplate,
-        data: {
-            templateString: templateString,
-            messageType: TranslateMessageType(messageType),
-            keyWord: keyword
-        }
-    }).done(function () {
-        var message = DevExpress.ui.dialog.custom({
-            title: vdata.localizer.saveTemplateTitle,
-            messageHtml: vdata.localizer.saveTemplateMessage
-        });
-        message.show();
-    }).fail(corprio.formatError)
-        .always(() => { loadIndicatorTop.option('visible', false); });
+    return result;
 }
 /**
  * Render the preview panel
@@ -383,14 +369,14 @@ function renderPreview(messageType) {
     let preview = '';
     const space = '&nbsp;';
     $(selectorMapping[messageType].blockPanel).children('span').each(function () {
-        const key = $(this).data(DataSet_TrueValue);
+        const key = $(this).data(DATASET_TRUEVALUE);
         if (key in selectorMapping[messageType].validSelectOptions) {
             if (key === vdata.templateComponents.newLineValue) {
                 $(selectorMapping[messageType].previewPanel).append(`<p class="m-0 text-truncate">${preview ? preview : space}</p>`);
                 preview = '';
             }
             else {
-                preview += (messageType === Enums_1.MessageType.PRODUCT && key === vdata.templateComponents.defaultMessageValue)
+                preview += (messageType === Enums_1.MessageType.ProductPost && key === vdata.templateComponents.defaultMessageValue)
                     ? selectorMapping[messageType].validSelectOptions[key].preview.replaceAll('{1}', selectorMapping[messageType].validSelectOptions[vdata.templateComponents.productReplyKeyword].preview)
                     : selectorMapping[messageType].validSelectOptions[key].preview;
             }
@@ -423,7 +409,7 @@ function sanitizeInput(text) {
 }
 /**
  * Remove a block, which can be a standard message component or a custom text, from the template
- * @param obj-The button that was clicked to trigger this function
+ * @param obj-The HTML element that triggers this function (we can't simply use 'this' because this function is called inside an anonymous function)
  * @param messageType-Publication of products or catalogues
  * @returns
  */
@@ -472,21 +458,23 @@ function addComponent(messageType) {
  * @returns
  */
 function initializeGlobalVariables() {
-    selectorMapping[Enums_1.MessageType.CATALOGUE].validSelectOptions[vdata.templateComponents.newLineValue] = { panel: '&#9166;', preview: '\n' };
-    selectorMapping[Enums_1.MessageType.CATALOGUE].validSelectOptions[vdata.templateComponents.defaultMessageValue] = { panel: '{' + vdata.localizer.defaultMessage + '}', preview: vdata.sampleValues.defaultCatalogueMessage };
-    selectorMapping[Enums_1.MessageType.CATALOGUE].validSelectOptions[vdata.templateComponents.catalogueNameValue] = { panel: '{' + vdata.localizer.catalogueName + '}', preview: 'Example Catalogue' };
-    selectorMapping[Enums_1.MessageType.CATALOGUE].validSelectOptions[vdata.templateComponents.catalogueCodeValue] = { panel: '{' + vdata.localizer.catalogueEndDate + '}', preview: 'EXAMPLE' };
-    selectorMapping[Enums_1.MessageType.CATALOGUE].validSelectOptions[vdata.templateComponents.catalogueStartDateValue] = { panel: '{' + vdata.localizer.catalogueStartDate + '}', preview: '01/12/2023' };
-    selectorMapping[Enums_1.MessageType.CATALOGUE].validSelectOptions[vdata.templateComponents.catalogueEndDateValue] = { panel: '{' + vdata.localizer.catalogueEndDate + '}', preview: '31/12/2023' };
-    selectorMapping[Enums_1.MessageType.CATALOGUE].validSelectOptions[vdata.templateComponents.catalogueUrlValue] = { panel: '{' + vdata.localizer.catalogueUrl + '}', preview: vdata.sampleValues.catalogueURL };
-    selectorMapping[Enums_1.MessageType.PRODUCT].validSelectOptions[vdata.templateComponents.newLineValue] = { panel: '&#9166;', preview: '\n' };
-    selectorMapping[Enums_1.MessageType.PRODUCT].validSelectOptions[vdata.templateComponents.defaultMessageValue] = { panel: '{' + vdata.localizer.defaultMessage + '}', preview: vdata.sampleValues.defaultProductMessage };
-    selectorMapping[Enums_1.MessageType.PRODUCT].validSelectOptions[vdata.templateComponents.productNameValue] = { panel: '{' + vdata.localizer.productName + '}', preview: 'Example Product' };
-    selectorMapping[Enums_1.MessageType.PRODUCT].validSelectOptions[vdata.templateComponents.productCodeValue] = { panel: '{' + vdata.localizer.productCode + '}', preview: 'EXAMPLE' };
-    selectorMapping[Enums_1.MessageType.PRODUCT].validSelectOptions[vdata.templateComponents.productDescriptionValue] = { panel: '{' + vdata.localizer.productDescription + '}', preview: 'G.O.A.T.' };
-    selectorMapping[Enums_1.MessageType.PRODUCT].validSelectOptions[vdata.templateComponents.productListPriceValue] = { panel: '{' + vdata.localizer.productListPrice + '}', preview: 'HKD888.88' };
-    selectorMapping[Enums_1.MessageType.PRODUCT].validSelectOptions[vdata.templateComponents.productReplyKeyword] = { panel: '{' + vdata.localizer.productReplyKeyword + '}', preview: 'BUY' };
-    validSelectOptions = Object.assign(Object.assign({}, selectorMapping[Enums_1.MessageType.CATALOGUE].validSelectOptions), selectorMapping[Enums_1.MessageType.PRODUCT].validSelectOptions);
+    loadIndicatorTop = $(Enums_1.Selector.loadIndicator_Top).dxLoadIndicator({ visible: false }).dxLoadIndicator('instance');
+    selectorMapping[Enums_1.MessageType.CataloguePost].validSelectOptions[vdata.templateComponents.newLineValue] = { panel: '&#9166;', preview: '\n' };
+    selectorMapping[Enums_1.MessageType.CataloguePost].validSelectOptions[vdata.templateComponents.defaultMessageValue] = { panel: '{' + vdata.localizer.defaultMessage + '}', preview: vdata.sampleValues.defaultCatalogueMessage };
+    selectorMapping[Enums_1.MessageType.CataloguePost].validSelectOptions[vdata.templateComponents.catalogueNameValue] = { panel: '{' + vdata.localizer.catalogueName + '}', preview: 'Example Catalogue' };
+    selectorMapping[Enums_1.MessageType.CataloguePost].validSelectOptions[vdata.templateComponents.catalogueCodeValue] = { panel: '{' + vdata.localizer.catalogueEndDate + '}', preview: 'EXAMPLE' };
+    selectorMapping[Enums_1.MessageType.CataloguePost].validSelectOptions[vdata.templateComponents.catalogueStartDateValue] = { panel: '{' + vdata.localizer.catalogueStartDate + '}', preview: '01/12/2023' };
+    selectorMapping[Enums_1.MessageType.CataloguePost].validSelectOptions[vdata.templateComponents.catalogueEndDateValue] = { panel: '{' + vdata.localizer.catalogueEndDate + '}', preview: '31/12/2023' };
+    selectorMapping[Enums_1.MessageType.CataloguePost].validSelectOptions[vdata.templateComponents.catalogueUrlValue] = { panel: '{' + vdata.localizer.catalogueUrl + '}', preview: vdata.sampleValues.catalogueURL };
+    selectorMapping[Enums_1.MessageType.ProductPost].validSelectOptions[vdata.templateComponents.newLineValue] = { panel: '&#9166;', preview: '\n' };
+    selectorMapping[Enums_1.MessageType.ProductPost].validSelectOptions[vdata.templateComponents.defaultMessageValue] = { panel: '{' + vdata.localizer.defaultMessage + '}', preview: vdata.sampleValues.defaultProductMessage };
+    selectorMapping[Enums_1.MessageType.ProductPost].validSelectOptions[vdata.templateComponents.productNameValue] = { panel: '{' + vdata.localizer.productName + '}', preview: 'Example Product' };
+    selectorMapping[Enums_1.MessageType.ProductPost].validSelectOptions[vdata.templateComponents.productCodeValue] = { panel: '{' + vdata.localizer.productCode + '}', preview: 'EXAMPLE' };
+    selectorMapping[Enums_1.MessageType.ProductPost].validSelectOptions[vdata.templateComponents.productDescriptionValue] = { panel: '{' + vdata.localizer.productDescription + '}', preview: 'G.O.A.T.' };
+    selectorMapping[Enums_1.MessageType.ProductPost].validSelectOptions[vdata.templateComponents.productListPriceValue] = { panel: '{' + vdata.localizer.productListPrice + '}', preview: 'HKD888' };
+    selectorMapping[Enums_1.MessageType.ProductPost].validSelectOptions[vdata.templateComponents.productPublicPriceValue] = { panel: '{' + vdata.localizer.productPublicPrice + '}', preview: 'HKD888.88' };
+    selectorMapping[Enums_1.MessageType.ProductPost].validSelectOptions[vdata.templateComponents.productReplyKeyword] = { panel: '{' + vdata.localizer.productReplyKeyword + '}', preview: 'BUY' };
+    validSelectOptions = Object.assign(Object.assign({}, selectorMapping[Enums_1.MessageType.CataloguePost].validSelectOptions), selectorMapping[Enums_1.MessageType.ProductPost].validSelectOptions);
     return;
 }
 /**
@@ -495,8 +483,7 @@ function initializeGlobalVariables() {
  */
 function AssignEventListenersForTemplates(messageType) {
     // currently only product posts have a keyword that may trigger the chatbot
-    if (messageType === Enums_1.MessageType.PRODUCT) {
-        /*if (fbLoggedIn) { await restoreKeyword(); }*/
+    if (messageType === Enums_1.MessageType.ProductPost) {
         $(Enums_1.Selector.keywordInput_Product).on('keyup', function () {
             const keyword = sanitizeInput(String($(this).val()).trim());
             selectorMapping[messageType].validSelectOptions[vdata.templateComponents.productReplyKeyword].preview = keyword;
@@ -504,7 +491,6 @@ function AssignEventListenersForTemplates(messageType) {
             renderPreview(messageType);
         });
     }
-    /*if (fbLoggedIn) { await restoreTemplate(messageType); }*/
     $(selectorMapping[messageType].customTextAddButton).on('click', function () { addText(messageType); });
     $(selectorMapping[messageType].customTextInput).on('keydown', function (event) {
         if (event.key === 'Enter') {
@@ -513,7 +499,6 @@ function AssignEventListenersForTemplates(messageType) {
     });
     $(selectorMapping[messageType].componentAddButton).on('click', function () { addComponent(messageType); });
     $(selectorMapping[messageType].restoreDefaultButton).on('click', function () { restoreDefaultTemplate(messageType); });
-    $(selectorMapping[messageType].saveTemplateButton).on('click', function () { saveTemplate(messageType); });
     $(selectorMapping[messageType].blockPanel).on('drop', function (event) { handleDrop(event, messageType); });
     $(selectorMapping[messageType].blockPanel).on('dragover', function (event) { handleDragOver(event); });
 }
@@ -528,31 +513,80 @@ function handleFbLoginStatusChange(response) {
         $(Enums_1.Selector.loginButton).hide();
         $(Enums_1.Selector.logoutButton).show();
         FB.api('/me', { fields: 'name' }, function (response) {
-            const alert = `<div class="alert alert-success">` +
+            const alert = `<div class="alert alert-success my-3">` +
                 `<i class="fa-regular fa-circle-check"></i>` +
-                `&nbsp;${vdata.localizer.fbConnected.replaceAll('{0}', vdata.localizer.shortName).replaceAll('{1}', response.name)}` +
+                `&nbsp;${vdata.localizer.fbConnected.replaceAll('{0}', response.name).replaceAll('{1}', vdata.settings.shortName)}` +
                 `</div>`;
             $(Enums_1.Selector.fbDialogue).empty().append(alert);
+            $(Enums_1.Selector.fbDialogue2).empty();
         });
         /*The following functions run in a non-blocking manner because there is no interdependence*/
         getPages();
-        refreshAccessToken((_a = response.authResponse) === null || _a === void 0 ? void 0 : _a.userID, (_b = response.authResponse) === null || _b === void 0 ? void 0 : _b.accessToken, false);
+        refreshAccessToken((_a = response.authResponse) === null || _a === void 0 ? void 0 : _a.userID, (_b = response.authResponse) === null || _b === void 0 ? void 0 : _b.accessToken);
     }
     else {
         $(Enums_1.Selector.loginButton).show();
         $(Enums_1.Selector.logoutButton).hide();
         const alert = `<div class="alert alert-warning">` +
             `<i class="fa-regular fa-circle-exclamation"></i>` +
-            `&nbsp;${vdata.localizer.fbNotConnected.replaceAll('{0}', vdata.localizer.shortName)}` +
+            `&nbsp;${vdata.localizer.fbNotConnected.replaceAll('{0}', vdata.settings.shortName)}` +
             `</div>`;
         $(Enums_1.Selector.fbDialogue).empty().append(alert);
-        $(selectorMapping[Enums_1.MessageType.PRODUCT].saveTemplateButton).attr("disabled", "disabled");
-        $(selectorMapping[Enums_1.MessageType.CATALOGUE].saveTemplateButton).attr("disabled", "disabled");
-        $(selectorMapping[Enums_1.MessageType.PRODUCT].blockPanel).empty();
-        $(selectorMapping[Enums_1.MessageType.CATALOGUE].blockPanel).empty();
-        $(selectorMapping[Enums_1.MessageType.PRODUCT].previewPanel).empty();
-        $(selectorMapping[Enums_1.MessageType.CATALOGUE].previewPanel).empty();
+        $(Enums_1.Selector.saveSettingButtons).attr('disabled', 'disabled');
+        $(selectorMapping[Enums_1.MessageType.ProductPost].blockPanel).empty();
+        $(selectorMapping[Enums_1.MessageType.CataloguePost].blockPanel).empty();
+        $(selectorMapping[Enums_1.MessageType.ProductPost].previewPanel).empty();
+        $(selectorMapping[Enums_1.MessageType.CataloguePost].previewPanel).empty();
     }
+}
+/**
+ * Validate and submit the setting to backend for saving
+ */
+function saveSettings() {
+    let validationResult = DevExpress.validationEngine.validateGroup();
+    if (!validationResult.isValid) {
+        return;
+    }
+    if ($("#ShipToCustomer").dxCheckBox("option", "value") && $("#DeliveryCharge").dxNumberBox("option", "value") > 0) {
+        const $deliveryChargeProduct = $("#DeliveryChargeProductID").dxSelectBox("instance");
+        if (!$deliveryChargeProduct.option("value")) {
+            $deliveryChargeProduct.option("validationStatus", "invalid");
+            DevExpress.ui.dialog.alert(vdata.localizer.msgMissingDeliveryChargeProductError, vdata.localizer.error);
+            return;
+        }
+    }
+    const productTemplate = stringifyTemplate(Enums_1.MessageType.ProductPost);
+    if (!productTemplate.isValid) {
+        return;
+    }
+    // fill in the hidden text boxes so that the template will be captured in the form data
+    $('#ProductPostTemplate').val(productTemplate.templateString);
+    $('#KeywordForShoppingIntention').val(productTemplate.keyword);
+    const catalogueTemplate = vdata.settings.env === "PRD"
+        ? { isValid: true, keyword: '', templateString: '' }
+        : stringifyTemplate(Enums_1.MessageType.CataloguePost);
+    if (!catalogueTemplate.isValid) {
+        return;
+    }
+    // ditto
+    $('#CataloguePostTemplate').val(catalogueTemplate.templateString);
+    const savedData = new FormData($("#settings-form")[0]);
+    if (!savedData) {
+        console.log('Failed to find a form with selector "#settings-form"');
+        return;
+    }
+    $.ajax({
+        type: 'POST',
+        url: `/${vdata.settings.organizationID}/GetStarted/Save`,
+        data: savedData,
+        cache: false,
+        contentType: false,
+        processData: false,
+        success: function (result) {
+            DevExpress.ui.notify(vdata.localizer.msgSettingSaved, 'success');
+        },
+        error: corprio.formatError
+    });
 }
 /**
  * Check the user's FB login status
@@ -566,57 +600,38 @@ function checkLoginState() {
  * Pass the short-lived user access token to server
  * @param metaId-Facebook user ID
  * @param accessToken-Short-lived user access token
- * @param reAssignMetaProfile-True if the Facebook account can be reassigned from one organization to another
  * @returns
  */
-function refreshAccessToken(metaId, accessToken, reAssignMetaProfile) {
+function refreshAccessToken(metaId, accessToken) {
     return $.ajax({
         type: 'POST',
         url: vdata.actions.refreshAccessToken,
         data: {
             metaId: metaId,
             token: accessToken,
-            reAssignMetaProfile: reAssignMetaProfile
         },
         success: function () {
-            return __awaiter(this, void 0, void 0, function* () {
-                console.log(`Token for ${metaId} is fed to backend successfully.`);
-                initializeGlobalVariables(); // initialize global variables again because theoritically fbAsyncInit and its callbacks can all run before DOM is loaded
-                loadIndicatorTop.option('visible', true);
-                yield restoreKeyword();
-                yield restoreTemplate(Enums_1.MessageType.PRODUCT);
-                yield restoreTemplate(Enums_1.MessageType.CATALOGUE);
-                loadIndicatorTop.option('visible', false);
-                $(selectorMapping[Enums_1.MessageType.PRODUCT].saveTemplateButton).removeAttr("disabled");
-                $(selectorMapping[Enums_1.MessageType.CATALOGUE].saveTemplateButton).removeAttr("disabled");
-            });
+            console.log(`Token for ${metaId} is fed to backend successfully.`);
+            initializeGlobalVariables(); // initialize global variables again because theoritically fbAsyncInit and its callbacks can all run before DOM is loaded            
+            restoreKeyword();
+            restoreTemplate(Enums_1.MessageType.ProductPost);
+            restoreTemplate(Enums_1.MessageType.CataloguePost);
+            $(Enums_1.Selector.saveSettingButtons).removeAttr('disabled');
         },
         error: function (jqXHR, textStatus, errorThrown) {
+            $(Enums_1.Selector.saveSettingButtons).attr('disabled', 'disabled');
+            // note: 409 means that another organization is connected with the Facebook account
             if (jqXHR.status !== 409) {
-                console.log(`Failed to pass the token for ${metaId} to backend. Text status: ${textStatus}. Error: ${errorThrown}.`);
-                return;
+                $(Enums_1.Selector.fbDialogue2).empty();
+                return corprio.formatError(jqXHR, textStatus, errorThrown);
             }
             FB.api('/me', { fields: 'name' }, function (response) {
-                var prompt = DevExpress.ui.dialog.custom({
-                    title: 'Warning - Facebook Account Already Connected',
-                    messageHtml: `<div>` +
-                        `<p class="mb-0">Facebook account <b>${response.name}</b> is already connected to another organization.</p>` +
-                        `<p>Do you want to terminate that connection and connect <b>${response.name}</b> with <b>${vdata.localizer.shortName}</b>?</p>` +
-                        `<p>If you want to connect another Facebook account with <b>${vdata.localizer.shortName}</b>, please log in with a different Facebook account.</p>` +
-                        `</div>`,
-                    buttons: [{
-                            text: 'Confirm',
-                            onClick: function () {
-                                refreshAccessToken(metaId, accessToken, true);
-                            },
-                            type: 'danger',
-                        }, {
-                            text: 'Cancel',
-                            onClick: function () { FB.logout(checkLoginState); },
-                            type: 'default',
-                        }]
-                });
-                prompt.show();
+                const alert = `<div class="alert alert-danger">` +
+                    `<i class="fa-regular fa-circle-exclamation"></i>` +
+                    `&nbsp;${vdata.localizer.fbAlreadyConnected.replaceAll('{0}', response.name).replaceAll('{1}', vdata.settings.shortName).replaceAll('{2}', vdata.localizer.reconnectFacebook)}` +
+                    `</div>`;
+                $(Enums_1.Selector.fbDialogue2).empty().append(alert);
+                return FB.logout(checkLoginState);
             });
         }
     });
@@ -695,7 +710,7 @@ window.fbAsyncInit = function () {
         appId: vdata.settings.metaApiID,
         cookie: true,
         xfbml: true,
-        version: vdata.settings.metaApiVersion // Use this Graph API version for this call.
+        version: vdata.settings.metaApiVersion
     });
     FB.getLoginStatus(function (response) {
         handleFbLoginStatusChange(response); // Returns the login status.
@@ -713,112 +728,77 @@ window.fbAsyncInit = function () {
 }(document, 'script', 'facebook-jssdk'));
 // initialize global variables and restore the saved templates
 $(function () {
-    return __awaiter(this, void 0, void 0, function* () {
-        // prevent 'Enter' from triggering form submission
-        $(window).on('keydown', function (event) {
-            if (event.key == 'Enter') {
-                event.preventDefault();
+    // prevent 'Enter' from triggering form submission
+    $(window).on('keydown', function (event) {
+        if (event.key == 'Enter') {
+            event.preventDefault();
+            return false;
+        }
+    });
+    // facebook-related stuff
+    $(Enums_1.Selector.loginButton).on('click', function () {
+        console.log('Logging into Facebook...');
+        FB.login((response) => {
+            if (response.authResponse) {
+                //user just authorized your app                
+                checkLoginState();
+            }
+        }, {
+            scope: Constants_1.PERMISSIONS.toString(),
+            return_scopes: true
+        });
+    });
+    $(Enums_1.Selector.logoutButton).on('click', function () {
+        console.log('Logging out from Facebook...');
+        FB.logout(checkLoginState);
+    });
+    // UX-related stuff    
+    $("#smtp-dialogue").toggle(vdata.settings.sendConfirmationEmail.toLowerCase() === 'true');
+    $(".page-title button").on('click', function () {
+        $(".sidebar-wrapper").toggleClass("hidden", $(".sidebar").hasClass("show"));
+    });
+    const sections = $($('section').get().reverse()); //sections from bottom to top for optimization
+    const navPillLinks = $('#settings-nav > li > a');
+    $('#main').on('scroll', function () {
+        let scrollPosition = $('#main').scrollTop();
+        sections.each(function () {
+            const currentSection = $(this);
+            const sectionTop = currentSection[0].offsetTop;
+            if (scrollPosition + 50 >= sectionTop) {
+                const id = currentSection.attr('id');
+                const navPillLink = $(`#settings-nav > li > a[href='#${id}']`);
+                if (!navPillLink.hasClass('active')) {
+                    navPillLinks.removeClass('active');
+                    navPillLink.addClass('active');
+                }
                 return false;
             }
         });
-        // facebook-related stuff
-        $(Enums_1.Selector.loginButton).on('click', function () {
-            console.log('Logging into Facebook...');
-            FB.login((response) => {
-                if (response.authResponse) {
-                    //user just authorized your app                
-                    checkLoginState();
-                }
-            }, {
-                scope: permissions.toString(),
-                return_scopes: true
-            });
-        });
-        $(Enums_1.Selector.logoutButton).on('click', function () {
-            console.log('Logging out from Facebook...');
-            FB.logout(checkLoginState);
-        });
-        // UX-related stuff    
-        $("#smtp-dialogue").toggle(vdata.settings.sendConfirmationEmail.toLowerCase() === 'true');
-        $(".page-title button").on('click', function () {
-            $(".sidebar-wrapper").toggleClass("hidden", $(".sidebar").hasClass("show"));
-        });
-        const sections = $($('section').get().reverse()); //sections from bottom to top for optimization
-        const navPillLinks = $('#settings-nav > li > a');
-        $('#main').on('scroll', function () {
-            let scrollPosition = $('#main').scrollTop();
-            sections.each(function () {
-                const currentSection = $(this);
-                const sectionTop = currentSection[0].offsetTop;
-                if (scrollPosition + 50 >= sectionTop) {
-                    const id = currentSection.attr('id');
-                    const navPillLink = $(`#settings-nav > li > a[href='#${id}']`);
-                    if (!navPillLink.hasClass('active')) {
-                        navPillLinks.removeClass('active');
-                        navPillLink.addClass('active');
-                    }
-                    return false;
-                }
-            });
-            if (scrollPosition + 1 >= $('#main')[0].scrollHeight - $('#main').height()) {
-                navPillLinks.removeClass('active');
-                navPillLinks.last().addClass('active');
-            }
-        });
-        navPillLinks.on('click', function (e) {
-            $(".sidebar-wrapper").addClass("hidden");
-            $(".sidebar").removeClass("show");
-        });
-        // template-related stuff
-        if (vdata.settings.env === "PRD") {
-            $(Enums_1.Selector.catalogueSetting).hide();
+        if (scrollPosition + 1 >= $('#main')[0].scrollHeight - $('#main').height()) {
+            navPillLinks.removeClass('active');
+            navPillLinks.last().addClass('active');
         }
-        else {
-            $(Enums_1.Selector.catalogueSetting).show();
-        }
-        loadIndicatorTop = $(Enums_1.Selector.loadIndicator_Top).dxLoadIndicator({ visible: false }).dxLoadIndicator('instance');
-        initializeGlobalVariables();
-        AssignEventListenersForTemplates(Enums_1.MessageType.CATALOGUE);
-        AssignEventListenersForTemplates(Enums_1.MessageType.PRODUCT);
     });
+    navPillLinks.on('click', function (e) {
+        $(".sidebar-wrapper").addClass("hidden");
+        $(".sidebar").removeClass("show");
+    });
+    // template-related stuff
+    if (vdata.settings.env === "PRD") {
+        $(Enums_1.Selector.catalogueSetting).hide();
+    }
+    else {
+        $(Enums_1.Selector.catalogueSetting).show();
+    }
+    initializeGlobalVariables();
+    AssignEventListenersForTemplates(Enums_1.MessageType.CataloguePost);
+    AssignEventListenersForTemplates(Enums_1.MessageType.ProductPost);
+    $(Enums_1.Selector.saveSettingButtons).on('click', saveSettings);
+    corprio.page.initTour({ defaultTour: 'getstarted.index', autoStart: true, driverCssLoaded: true });
 });
 
+})();
 
-/***/ })
-
-/******/ 	});
-/************************************************************************/
-/******/ 	// The module cache
-/******/ 	var __webpack_module_cache__ = {};
-/******/ 	
-/******/ 	// The require function
-/******/ 	function __webpack_require__(moduleId) {
-/******/ 		// Check if module is in cache
-/******/ 		var cachedModule = __webpack_module_cache__[moduleId];
-/******/ 		if (cachedModule !== undefined) {
-/******/ 			return cachedModule.exports;
-/******/ 		}
-/******/ 		// Create a new module (and put it into the cache)
-/******/ 		var module = __webpack_module_cache__[moduleId] = {
-/******/ 			// no module.id needed
-/******/ 			// no module.loaded needed
-/******/ 			exports: {}
-/******/ 		};
-/******/ 	
-/******/ 		// Execute the module function
-/******/ 		__webpack_modules__[moduleId].call(module.exports, module, module.exports, __webpack_require__);
-/******/ 	
-/******/ 		// Return the exports of the module
-/******/ 		return module.exports;
-/******/ 	}
-/******/ 	
-/************************************************************************/
-/******/ 	
-/******/ 	// startup
-/******/ 	// Load entry module and return exports
-/******/ 	// This entry module is referenced by other modules so it can't be inlined
-/******/ 	var __webpack_exports__ = __webpack_require__("./Views/GetStarted/Index.ts");
-/******/ 	
 /******/ 	return __webpack_exports__;
 /******/ })()
 ;

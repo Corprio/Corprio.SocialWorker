@@ -4,16 +4,31 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+using Corprio.DataModel.Resources;
+using Corprio.DataModel.Business.Products;
+using Corprio.DataModel.Business;
+using Corprio.SocialWorker.Dictionaries;
+using Corprio.SocialWorker.Helpers;
 
 namespace Corprio.SocialWorker.Models
 {
-    public class ApplicationSetting : Entity
-    {        
+    public class ApplicationSetting
+    {
         /// <summary>
-        /// Organization ID
+        /// Content appearing after shopping cart on checkout page
         /// </summary>
-        public Guid OrganizationID { get; set; }
-        
+        [Display(Name = "Footer", Description = "Footer_Description", ResourceType = typeof(Resources.SharedResource))]
+        //[StringLength(2000)]
+        public string Footer { get; set; } = "<p style='text-align: center;'><span style='font-family: Verdana; font-size: 1em;'>Check out now!</span></p>";
+
+        /// <summary>
+        /// Default message of thank you page
+        /// </summary>
+        [Display(Name = "ThankYouMessage", Description = "ThankYouMessage_Description", ResourceType = typeof(Resources.SharedResource))]
+        //[StringLength(5000)]
+        [Required]
+        public string ThankYouMessage { get; set; } = "<h3>Thank you for your order</h3>";
+
         /// <summary>
         /// Whether an email will be sent to the customer to confirm his order.
         /// </summary>
@@ -84,5 +99,94 @@ namespace Corprio.SocialWorker.Models
         [Display(Name = "FreeShippingAmount", Description = "FreeShippingAmount_Description", ResourceType = typeof(Resources.SharedResource))]
         [Range(0, 9999999)]
         public decimal? FreeShippingAmount { get; set; }
+
+        /// <summary>
+        /// Keyword for indicating purchase intention. This keyword will be assigned to the next FB/IG post.
+        /// </summary>
+        [Required(ErrorMessageResourceType = typeof(Resource), ErrorMessageResourceName = "MsgRequired")]
+        [StringLength(10)]
+        public string KeywordForShoppingIntention { get; set; }
+
+        public string ProductPostTemplate { get; set; }
+
+        public string ProductPostMessage(Product product, OrganizationCoreInfo coreInfo, PriceWithCurrency publicPrice)
+        {
+            if (product == null) return null;
+            string message = !string.IsNullOrWhiteSpace(ProductPostTemplate)
+                ? ProductPostTemplate
+                : string.Join(TemplateComponent.Separator, DefaultTemplate.DefaultTempalte_Product);            
+
+            message = message.Replace(TemplateComponent.LineBreak, "\n")
+                .Replace(TemplateComponent.DefaultMessage, BabelFish.Vocab["HowToBuy"][UtilityHelper.NICAM(coreInfo)].Replace("{0}", product.Name).Replace("{1}", KeywordForShoppingIntention))
+                .Replace(TemplateComponent.Keyword, KeywordForShoppingIntention)
+                .Replace(TemplateComponent.ProductName, product.Name)
+                .Replace(TemplateComponent.ProductCode, product.Code)
+                .Replace(TemplateComponent.ProductDescription, product.Description)
+                .Replace(TemplateComponent.ProductListPrice, $"{product.ListPrice_CurrencyCode}{product.ListPrice_Value:F2}")
+                .Replace(TemplateComponent.ProductPublicPrice, $"{publicPrice?.CurrencyCode}{publicPrice?.Price?.Value?.ToString("F2")}")
+                .Replace(TemplateComponent.Separator, "");
+            return UtilityHelper.UncleanAndClean(userInput: message, onceIsOK: true);
+        }
+
+        public string CataloguePostTemplate { get; set; }
+
+        public string CataloguePostMessage(ProductList productList, OrganizationCoreInfo coreInfo, string goBuyClickUrl)
+        {
+            if (productList == null) return null;
+            string message = !string.IsNullOrWhiteSpace(CataloguePostTemplate)
+                ? CataloguePostTemplate
+                : string.Join(TemplateComponent.Separator, DefaultTemplate.DefaultTempalte_Catalogue);
+            message = message.Replace(TemplateComponent.LineBreak, "\n")
+                .Replace(TemplateComponent.DefaultMessage, BabelFish.Vocab["VisitCatalogue"][UtilityHelper.NICAM(coreInfo)])
+                .Replace(TemplateComponent.CatalogueName, productList.Name)
+                .Replace(TemplateComponent.CatalogueCode, productList.Code)
+                .Replace(TemplateComponent.CatalogueEndDate, productList.EndDate?.ToString("u"))
+                .Replace(TemplateComponent.CatalogueStartDate, productList.StartDate.ToString("u"))
+                .Replace(TemplateComponent.CatalogueUrl, $"{goBuyClickUrl}/Catalogue/{coreInfo.ShortName}/{productList.Code}")
+                .Replace(TemplateComponent.Separator, "");
+            return UtilityHelper.UncleanAndClean(userInput: message, onceIsOK: true);
+        }
+    }
+
+    public class DefaultTemplate
+    {
+        public static readonly List<string> DefaultTempalte_Product = new()
+        {
+            TemplateComponent.ProductName,
+            "@",
+            TemplateComponent.ProductPublicPrice,
+            TemplateComponent.LineBreak,
+            TemplateComponent.ProductDescription,
+            TemplateComponent.LineBreak,
+            TemplateComponent.DefaultMessage
+        };
+
+        public static readonly List<string> DefaultTempalte_Catalogue = new()
+        {
+            TemplateComponent.CatalogueName,
+            TemplateComponent.LineBreak,
+            TemplateComponent.DefaultMessage,
+            TemplateComponent.LineBreak,
+            TemplateComponent.CatalogueUrl
+        };
+    }
+
+    public class TemplateComponent
+    {
+        public const string LineBreak = "%lineBreak%";
+        public const string Separator = "%;sep;%";
+        public const string DefaultMessage = "%defaultMessage%";
+        // note: do not use the description in product list because it includes HTML tags
+        public const string CatalogueName = "%catName%";
+        public const string CatalogueCode = "%catCode%";
+        public const string CatalogueUrl = "%catLink%";
+        public const string CatalogueEndDate = "%catEndDate%";
+        public const string CatalogueStartDate = "%catStartDate%";
+        public const string ProductName = "%productName%";
+        public const string ProductCode = "%productCode%";
+        public const string ProductDescription = "%productDescription%";
+        public const string ProductListPrice = "%productListPrice%";
+        public const string ProductPublicPrice = "%productPublicPrice%";
+        public const string Keyword = "%keyWord%";
     }
 }

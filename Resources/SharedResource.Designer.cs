@@ -70,6 +70,15 @@ namespace Corprio.SocialWorker.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Add New Product.
+        /// </summary>
+        public static string AddNewProduct {
+            get {
+                return ResourceManager.GetString("AddNewProduct", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Please confirm/provide your delivery Address..
         /// </summary>
         public static string Advice_ConfirmAddress {
@@ -84,15 +93,6 @@ namespace Corprio.SocialWorker.Resources {
         public static string Advice_FollowPickupInstruction {
             get {
                 return ResourceManager.GetString("Advice_FollowPickupInstruction", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Purchase {0} {1} to enjoy free delivery..
-        /// </summary>
-        public static string Advice_GetFreeShipping {
-            get {
-                return ResourceManager.GetString("Advice_GetFreeShipping", resourceCulture);
             }
         }
         
@@ -115,7 +115,7 @@ namespace Corprio.SocialWorker.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Corprio Sales Master is a free application software for managing your sales transactions such as orders and invoices.
+        ///   Looks up a localized string similar to Corprio Social Worker is a free application software for automating your product advertising and sales order handling.
         /// </summary>
         public static string AppDescription {
             get {
@@ -142,7 +142,7 @@ namespace Corprio.SocialWorker.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Manage your sales &lt;br&gt; easily and accurately.
+        ///   Looks up a localized string similar to Manage your Facebook presence &lt;br&gt; easily and accurately.
         /// </summary>
         public static string AppSlogan {
             get {
@@ -156,6 +156,15 @@ namespace Corprio.SocialWorker.Resources {
         public static string BillSalesOrder {
             get {
                 return ResourceManager.GetString("BillSalesOrder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Bill to.
+        /// </summary>
+        public static string BillTo {
+            get {
+                return ResourceManager.GetString("BillTo", resourceCulture);
             }
         }
         
@@ -178,6 +187,33 @@ namespace Corprio.SocialWorker.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Cancel Order.
+        /// </summary>
+        public static string CancelOrder {
+            get {
+                return ResourceManager.GetString("CancelOrder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The order cannot be updated because its payment is being processed..
+        /// </summary>
+        public static string CannotEdit_PaymentProcessing {
+            get {
+                return ResourceManager.GetString("CannotEdit_PaymentProcessing", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The order has been voided or paid and therefore cannot be edited..
+        /// </summary>
+        public static string CannotEdit_VoidedOrPaid {
+            get {
+                return ResourceManager.GetString("CannotEdit_VoidedOrPaid", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The catalogue was successfully published to your social media..
         /// </summary>
         public static string CataloguePublicationCompletedMessage {
@@ -196,11 +232,56 @@ namespace Corprio.SocialWorker.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Checkout Page.
+        /// </summary>
+        public static string CheckoutPage {
+            get {
+                return ResourceManager.GetString("CheckoutPage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Configure how the checkout page will appear to your customers..
+        /// </summary>
+        public static string CheckoutPage_Desc {
+            get {
+                return ResourceManager.GetString("CheckoutPage_Desc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Colour.
+        /// </summary>
+        public static string Colour {
+            get {
+                return ResourceManager.GetString("Colour", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Confirm.
         /// </summary>
         public static string Confirm {
             get {
                 return ResourceManager.GetString("Confirm", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Are you sure you want to add new product(s)? This sales order will be voided and you will need to ask the chatbot via Messenger to add new products..
+        /// </summary>
+        public static string ConfirmAddProduct {
+            get {
+                return ResourceManager.GetString("ConfirmAddProduct", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Confirmation.
+        /// </summary>
+        public static string Confirmation {
+            get {
+                return ResourceManager.GetString("Confirmation", resourceCulture);
             }
         }
         
@@ -232,7 +313,7 @@ namespace Corprio.SocialWorker.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Are you sure to void this sales order?.
+        ///   Looks up a localized string similar to Are you sure you want to cancel this sales order?.
         /// </summary>
         public static string ConfirmVoidOrder {
             get {
@@ -421,6 +502,24 @@ namespace Corprio.SocialWorker.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Edit quantity.
+        /// </summary>
+        public static string EditQuantity {
+            get {
+                return ResourceManager.GetString("EditQuantity", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Select variant.
+        /// </summary>
+        public static string EditVariant {
+            get {
+                return ResourceManager.GetString("EditVariant", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to &lt;html&gt;&lt;body&gt;&lt;p&gt;Your customer has input an invalid email address &lt;b&gt;{0}&lt;/b&gt;&lt;/p&gt;&lt;p&gt;The order {1} confirmation email failed to be sent.&lt;/p&gt;&lt;/body&gt;&lt;html&gt;.
         /// </summary>
         public static string EmailNotSentMessage {
@@ -466,6 +565,15 @@ namespace Corprio.SocialWorker.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to We tried to restore this sales order to the chatbot conversing with you but failed. Please confirm if you wish to simply void this order..
+        /// </summary>
+        public static string ErrMsg_ChatbotNotFound {
+            get {
+                return ResourceManager.GetString("ErrMsg_ChatbotNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The customer could not be found..
         /// </summary>
         public static string ErrMsg_CustomerNotFound {
@@ -502,6 +610,15 @@ namespace Corprio.SocialWorker.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to {0} is out of stock..
+        /// </summary>
+        public static string ErrMsg_OutOfStock {
+            get {
+                return ResourceManager.GetString("ErrMsg_OutOfStock", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The product could not be found..
         /// </summary>
         public static string ErrMsg_ProductNotFound {
@@ -511,11 +628,38 @@ namespace Corprio.SocialWorker.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Quantity must be positive..
+        /// </summary>
+        public static string ErrMsg_QuantityNotPositive {
+            get {
+                return ResourceManager.GetString("ErrMsg_QuantityNotPositive", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The sales order could not be found..
         /// </summary>
         public static string ErrMsg_SalesOrderNotFound {
             get {
                 return ResourceManager.GetString("ErrMsg_SalesOrderNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The following attributes are not selected yet: {0}..
+        /// </summary>
+        public static string ErrMsg_UnselectedVariations {
+            get {
+                return ResourceManager.GetString("ErrMsg_UnselectedVariations", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The organization does not have a valid connection with any Facebook account..
+        /// </summary>
+        public static string ErrMsg_ValidMetaProfileNotFound {
+            get {
+                return ResourceManager.GetString("ErrMsg_ValidMetaProfileNotFound", resourceCulture);
             }
         }
         
@@ -538,7 +682,16 @@ namespace Corprio.SocialWorker.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to {0} is now connected with {1}..
+        ///   Looks up a localized string similar to Facebook account {0} is already connected with another organization. If you want to connect {1} with {0}, please visit {2}..
+        /// </summary>
+        public static string FB_AlreadyConnected {
+            get {
+                return ResourceManager.GetString("FB_AlreadyConnected", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Facebook account {0} is now connected with {1}..
         /// </summary>
         public static string FB_connected {
             get {
@@ -610,6 +763,24 @@ namespace Corprio.SocialWorker.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Footer.
+        /// </summary>
+        public static string Footer {
+            get {
+                return ResourceManager.GetString("Footer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The footer will be displayed below the shopping cart on checkout page..
+        /// </summary>
+        public static string Footer_Description {
+            get {
+                return ResourceManager.GetString("Footer_Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Free to Use.
         /// </summary>
         public static string Free_to_Use {
@@ -655,6 +826,33 @@ namespace Corprio.SocialWorker.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Free shipping on orders over {0}..
+        /// </summary>
+        public static string FreeShippingHint1 {
+            get {
+                return ResourceManager.GetString("FreeShippingHint1", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Buy {0} more to enjoy free shipping..
+        /// </summary>
+        public static string FreeShippingHint2 {
+            get {
+                return ResourceManager.GetString("FreeShippingHint2", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Achievement unlocked: free shipping..
+        /// </summary>
+        public static string FreeShippingQualified {
+            get {
+                return ResourceManager.GetString("FreeShippingQualified", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to You will not be charged for using this app forever. Join Corprio now to get started..
         /// </summary>
         public static string FreeToUseDescription {
@@ -691,7 +889,7 @@ namespace Corprio.SocialWorker.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Line 1 cannot be blank.
+        ///   Looks up a localized string similar to Line 1 cannot be blank..
         /// </summary>
         public static string InvalidFeedback_AddressLine1 {
             get {
@@ -700,11 +898,38 @@ namespace Corprio.SocialWorker.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Invalid country code.
+        ///   Looks up a localized string similar to Please input a valid country..
         /// </summary>
         public static string InvalidFeedback_CountryCode {
             get {
                 return ResourceManager.GetString("InvalidFeedback_CountryCode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Family name cannot be blank..
+        /// </summary>
+        public static string InvalidFeedback_FamilyName {
+            get {
+                return ResourceManager.GetString("InvalidFeedback_FamilyName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Given name cannot be blank..
+        /// </summary>
+        public static string InvalidFeedback_GivenName {
+            get {
+                return ResourceManager.GetString("InvalidFeedback_GivenName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Please provide a valid phone number..
+        /// </summary>
+        public static string InvalidFeedback_InvalidPhoneNumber {
+            get {
+                return ResourceManager.GetString("InvalidFeedback_InvalidPhoneNumber", resourceCulture);
             }
         }
         
@@ -727,7 +952,7 @@ namespace Corprio.SocialWorker.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Quantity must be a positive number.
+        ///   Looks up a localized string similar to Quantity must be a positive number..
         /// </summary>
         public static string InvalidFeedback_Quantity {
             get {
@@ -867,6 +1092,24 @@ namespace Corprio.SocialWorker.Resources {
         public static string ListPriceValue {
             get {
                 return ResourceManager.GetString("ListPriceValue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Continue with Facebook.
+        /// </summary>
+        public static string LoginFB {
+            get {
+                return ResourceManager.GetString("LoginFB", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Logout from Facebook.
+        /// </summary>
+        public static string LogoutFB {
+            get {
+                return ResourceManager.GetString("LogoutFB", resourceCulture);
             }
         }
         
@@ -1096,6 +1339,15 @@ namespace Corprio.SocialWorker.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Powered by {0}.
+        /// </summary>
+        public static string PoweredBy {
+            get {
+                return ResourceManager.GetString("PoweredBy", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Price.
         /// </summary>
         public static string Price {
@@ -1116,9 +1368,18 @@ namespace Corprio.SocialWorker.Resources {
         /// <summary>
         ///   Looks up a localized string similar to Proceed To Payment.
         /// </summary>
-        public static string ProceesToPayment {
+        public static string ProceedToPayment {
             get {
-                return ResourceManager.GetString("ProceesToPayment", resourceCulture);
+                return ResourceManager.GetString("ProceedToPayment", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Processing.
+        /// </summary>
+        public static string Processing {
+            get {
+                return ResourceManager.GetString("Processing", resourceCulture);
             }
         }
         
@@ -1258,6 +1519,15 @@ namespace Corprio.SocialWorker.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Receipient.
+        /// </summary>
+        public static string Receipient {
+            get {
+                return ResourceManager.GetString("Receipient", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Recent Invoices.
         /// </summary>
         public static string Recent_invoices {
@@ -1272,6 +1542,33 @@ namespace Corprio.SocialWorker.Resources {
         public static string Recent_Orders {
             get {
                 return ResourceManager.GetString("Recent Orders", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Reset Facebook Connection.
+        /// </summary>
+        public static string ReconnectFacebook {
+            get {
+                return ResourceManager.GetString("ReconnectFacebook", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Remaining stock of {0}: {1}..
+        /// </summary>
+        public static string RemainingStockMessage {
+            get {
+                return ResourceManager.GetString("RemainingStockMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Remaining Stock.
+        /// </summary>
+        public static string RemainingStockTitle {
+            get {
+                return ResourceManager.GetString("RemainingStockTitle", resourceCulture);
             }
         }
         
@@ -1591,6 +1888,15 @@ namespace Corprio.SocialWorker.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Size.
+        /// </summary>
+        public static string Size {
+            get {
+                return ResourceManager.GetString("Size", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Social Media Templates.
         /// </summary>
         public static string SocialMediaTemplate {
@@ -1753,6 +2059,15 @@ namespace Corprio.SocialWorker.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Product List Price.
+        /// </summary>
+        public static string Template_ProductListPrice {
+            get {
+                return ResourceManager.GetString("Template_ProductListPrice", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Product Name.
         /// </summary>
         public static string Template_ProductName {
@@ -1762,11 +2077,11 @@ namespace Corprio.SocialWorker.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Product Price.
+        ///   Looks up a localized string similar to Product Public Price.
         /// </summary>
-        public static string Template_ProductPrice {
+        public static string Template_ProductPublicPrice {
             get {
-                return ResourceManager.GetString("Template_ProductPrice", resourceCulture);
+                return ResourceManager.GetString("Template_ProductPublicPrice", resourceCulture);
             }
         }
         
@@ -1785,6 +2100,51 @@ namespace Corprio.SocialWorker.Resources {
         public static string TemplateSavedTitle {
             get {
                 return ResourceManager.GetString("TemplateSavedTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Message shown in thank you page.
+        /// </summary>
+        public static string ThankYouMessage {
+            get {
+                return ResourceManager.GetString("ThankYouMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This message is shown at the top of the thank you page..
+        /// </summary>
+        public static string ThankYouMessage_Description {
+            get {
+                return ResourceManager.GetString("ThankYouMessage_Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Thank you page.
+        /// </summary>
+        public static string ThankYouPage {
+            get {
+                return ResourceManager.GetString("ThankYouPage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Define the content that will be displayed to your customer when they finalize their order. This content will be included in the order confirmation email sent to the customer..
+        /// </summary>
+        public static string ThankYouPage_Desc {
+            get {
+                return ResourceManager.GetString("ThankYouPage_Desc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Choose a different variant.
+        /// </summary>
+        public static string Title_EditVariant {
+            get {
+                return ResourceManager.GetString("Title_EditVariant", resourceCulture);
             }
         }
         
@@ -1884,6 +2244,105 @@ namespace Corprio.SocialWorker.Resources {
         public static string WarehouseID_Description {
             get {
                 return ResourceManager.GetString("WarehouseID_Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You will not be able to publish products and/or catalogues of the company that is currently linked to Facebook..
+        /// </summary>
+        public static string Warning_consequence1 {
+            get {
+                return ResourceManager.GetString("Warning_consequence1", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The chatbot will not be able to handle private messages or comments on behalf of the company that is currently linked to Facebook..
+        /// </summary>
+        public static string Warning_consequence2 {
+            get {
+                return ResourceManager.GetString("Warning_consequence2", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Your configurations of social media templates, delivery methods, etc. will be reset to default..
+        /// </summary>
+        public static string Warning_consequence3 {
+            get {
+                return ResourceManager.GetString("Warning_consequence3", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You want to delete this product? This action cannot be undone..
+        /// </summary>
+        public static string Warning_DeleteProduct {
+            get {
+                return ResourceManager.GetString("Warning_DeleteProduct", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Are you sure? This action cannot be undone..
+        /// </summary>
+        public static string Warning_final {
+            get {
+                return ResourceManager.GetString("Warning_final", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to IMPORTANT.
+        /// </summary>
+        public static string Warning_header1 {
+            get {
+                return ResourceManager.GetString("Warning_header1", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Please carefully read the following text before proceeding..
+        /// </summary>
+        public static string Warning_header2 {
+            get {
+                return ResourceManager.GetString("Warning_header2", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to One.
+        /// </summary>
+        public static string Warning_num1 {
+            get {
+                return ResourceManager.GetString("Warning_num1", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to one.
+        /// </summary>
+        public static string Warning_num2 {
+            get {
+                return ResourceManager.GetString("Warning_num2", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to  Facebook account (including its Facebook pages and associated Instagram accounts) can only be connected with.
+        /// </summary>
+        public static string Warning_para1 {
+            get {
+                return ResourceManager.GetString("Warning_para1", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to  Corprio organization at a time. Resetting the connection has the following implications:.
+        /// </summary>
+        public static string Warning_para2 {
+            get {
+                return ResourceManager.GetString("Warning_para2", resourceCulture);
             }
         }
         

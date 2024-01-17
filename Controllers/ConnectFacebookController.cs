@@ -1,5 +1,4 @@
-﻿using Corprio.AspNetCore.Site.Controllers;
-using Corprio.CorprioAPIClient;
+﻿using Corprio.CorprioAPIClient;
 using Corprio.SocialWorker.Models;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
@@ -10,19 +9,9 @@ using System;
 using System.Collections.Generic;
 using Serilog;
 using Corprio.DataModel.Business;
-using System.Net.Http.Headers;
-using Corprio.AspNetCore.Site.Filters;
-using Corprio.DataModel;
-using Corprio.DataModel.Business.Products;
-using System.Dynamic;
-using Corprio.DataModel.Business.Products.ViewModel;
 using Microsoft.Extensions.Configuration;
-using Corprio.SocialWorker.Helpers;
 using Corprio.Core;
 using System.Linq;
-using Corprio.SocialWorker.Dictionaries;
-using Corprio.DataModel.Shared;
-using Corprio.Core.Exceptions;
 using Corprio.Core.Utility;
 using Microsoft.EntityFrameworkCore;
 
@@ -36,12 +25,7 @@ namespace Corprio.SocialWorker.Controllers
         {
             db = context;   
         }                
-        
-        public override IActionResult Index([FromRoute] Guid organizationID)
-        {
-            return base.Index(organizationID);
-        }
-        
+                        
         /// <summary>
         /// Get a long-lived user access token from Meta
         /// </summary>
@@ -82,47 +66,58 @@ namespace Corprio.SocialWorker.Controllers
         /// <param name="reAssignMetaProfile">True if the Facebook account can be reassigned from one organization to another</param>
         /// <returns>Status code</returns>
         /// <exception cref="Exception"></exception>
-        public async Task<IActionResult> RefreshAccessToken([FromServices] HttpClient httpClient, [FromServices] APIClient corprioClient, 
-            [FromRoute] Guid organizationID, string metaId, string token, bool reAssignMetaProfile)
+        public async Task<IActionResult> RefreshAccessToken([FromServices] HttpClient httpClient, [FromRoute] Guid organizationID, 
+            string metaId, string token, bool reAssignMetaProfile = false)
         {            
             if (string.IsNullOrWhiteSpace(token) || string.IsNullOrWhiteSpace(metaId))
                 return StatusCode(400, "Token and Meta entity ID cannot be blank. ");
             
             token = await GetLongLivedAccessToken(httpClient: httpClient, userAccessToken: token);
             if (string.IsNullOrWhiteSpace(token)) return StatusCode(500, Resources.SharedResource.ResourceManager.GetString("ErrMsg_FailedToGetToken"));
-
-            string responseString;  // response from the GET requests below will be assigned to this variable
-            MetaUser metaUser = db.MetaUsers.Include(x => x.Pages).FirstOrDefault(x => x.FacebookUserID == metaId);
+                        
+            MetaUser metaUser = db.MetaUsers.Include(x => x.Pages).FirstOrDefault(x => x.FacebookUserID == metaId && x.Dormant == false);
             bool newMetaUser = metaUser == null;
             if (newMetaUser)
-            {
-                OrganizationCoreInfo coreInfo = await corprioClient.OrganizationApi.GetCoreInfo(organizationID);
+            {                
                 metaUser = new MetaUser()
-                { 
+                {
                     ID = Guid.NewGuid(), 
-                    FacebookUserID = metaId, 
-                    KeywordForShoppingIntention = BabelFish.Vocab["DefaultKeyWordForShoppingIntention"][UtilityHelper.NICAM(coreInfo)],
+                    FacebookUserID = metaId,
                     OrganizationID = organizationID,
-                };                
+                };
             }
             else if (metaUser.OrganizationID != organizationID && !organizationID.Equals(Guid.Empty))
-            {
+            {                                                
                 if (!reAssignMetaProfile)
                 {                    
                     // note: the client-side must expect 409 = conflict of organization IDs
                     return StatusCode(409, "Conflict of organization ID.");
                 }
-                metaUser.OrganizationID = organizationID;
+
+                // note: instead of deleting the existing Meta profile, we put it to sleep
+                metaUser.Dormant = true;
+                db.MetaUsers.Update(metaUser);
+                await db.SaveChangesAsync();
+
+                // note: even if this organization used to have connection with this Facebook account
+                // (i.e., it has a dormant meta user profile), we create a new one for it
+                metaUser = new MetaUser()
+                {
+                    ID = Guid.NewGuid(),
+                    FacebookUserID = metaId,
+                    OrganizationID = organizationID,
+                };
+                newMetaUser = true;
             }
 
             metaUser.Token = token;
             if (newMetaUser)
             {
-                db.MetaUsers.Add(metaUser);                
+                db.MetaUsers.Add(metaUser);
             }
             else
             {
-                db.MetaUsers.Update(metaUser);                
+                db.MetaUsers.Update(metaUser);
             }
             try
             {
@@ -132,9 +127,10 @@ namespace Corprio.SocialWorker.Controllers
             {
                 Log.Error($"Failed to save Facebook user {metaUser.ID}. {ex.Message}");
                 throw;
-            }            
+            }
 
-            responseString = await GetQuery(httpClient: httpClient, userAccessToken: token, endPoint: $"{BaseUrl}/{metaId}/accounts");            
+            // the following query returns all pages on which the Facebook user has a role
+            string responseString = await GetQuery(httpClient: httpClient, userAccessToken: token, endPoint: $"{BaseUrl}/{metaId}/accounts");            
             MeAccountsPayload payload = JsonConvert.DeserializeObject<MeAccountsPayload>(responseString)!;
             if (payload?.Error != null)
             {
@@ -151,7 +147,8 @@ namespace Corprio.SocialWorker.Controllers
                 metaPage.Name = StringHelper.StringTruncate(page.Name, 300);
                 metaPage.Token = page.AccessToken;
 
-                // note: not every FB page is associated with an IG account
+                // the following query returns the IG account associated with the FB page
+                // (note: not every FB page is associated with an IG account)
                 responseString = await GetQuery(httpClient: httpClient, userAccessToken: page.AccessToken, endPoint: $"{BaseUrl}/{ApiVersion}/{page.Id}?fields=instagram_business_account");
                 FbPagePayload pagePayload = JsonConvert.DeserializeObject<FbPagePayload>(responseString)!;
                 if (pagePayload?.Error != null)

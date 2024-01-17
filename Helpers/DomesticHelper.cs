@@ -18,6 +18,7 @@ using Corprio.Core.Utility;
 using Corprio.DataModel.Shared;
 using Corprio.DataModel.Business.Sales.ViewModel;
 using Microsoft.Extensions.Configuration;
+using Corprio.DataModel.Business.Logistic;
 
 namespace Corprio.SocialWorker.Helpers
 {
@@ -30,6 +31,7 @@ namespace Corprio.SocialWorker.Helpers
         private readonly string PageName;
         private readonly DbFriendlyBot Shell;
         private readonly MetaBotStatus Bot;
+        private readonly ApplicationSetting AppSetting;
 
         // magic numbers
         private const int ChoiceLimit = 10;        
@@ -42,10 +44,11 @@ namespace Corprio.SocialWorker.Helpers
         /// <param name="organizationID">ID of the organization being represented by the chat bot</param>        
         /// <param name="botStatus">An object storing the bot's state</param>
         /// <param name="pageName">Name of the page being represented by the chat bot</param>
+        /// <param name="setting">Application setting</param>
         /// <param name="detectedLocales">List of locales detected by Wit.ai</param>
         /// <exception cref="ArgumentException"></exception>
-        public DomesticHelper(ApplicationDbContext context, IConfiguration configuration, APIClient client, Guid organizationID, DbFriendlyBot botStatus, string pageName,
-            List<DetectedLocale> detectedLocales = null)
+        public DomesticHelper(ApplicationDbContext context, IConfiguration configuration, APIClient client, Guid organizationID, DbFriendlyBot botStatus, 
+            string pageName, ApplicationSetting setting, List<DetectedLocale> detectedLocales = null)
         {
             if (string.IsNullOrWhiteSpace(pageName)) throw new ArgumentException("Page name cannot be blank.");
 
@@ -55,6 +58,7 @@ namespace Corprio.SocialWorker.Helpers
             OrgID = organizationID;
             PageName = pageName;
             Shell = botStatus;
+            AppSetting = setting;
             Bot = botStatus.ReadyToWork();
             Bot.Language = DetectLanguage(detectedLocales);
         }
@@ -351,7 +355,7 @@ namespace Corprio.SocialWorker.Helpers
                     return await SoftReboot();
                 }
 
-                basket.Price = price.Price.Value;
+                basket.Price = price.Price.Value ?? 0;
             }
 
             bool promotion = await CheckPromotion();
@@ -401,51 +405,44 @@ namespace Corprio.SocialWorker.Helpers
             {
                 Log.Error($"Failed to obtain core information for {OrgID}");
                 return null;
-            }
-
-            ApplicationSetting applicationSetting = db.Settings.FirstOrDefault(x => x.OrganizationID == OrgID);
-            if (applicationSetting?.WarehouseID == null)
-            {
-                Log.Error($"Failed to obtain application setting for {OrgID}");
-                return null;
             }            
+
+            // note 1: for billing, we do email, name and phone but not the address because we won't do that during checkout either
+            // note 2: for delivery, we do address, name and phone so that they MIGHT be the default value in checkout form
+            AddSalesOrderModel salesOrder = new()
+            {                
+                BillEmail = customer.BusinessPartner.PrimaryEmail,
+                BillName = customer.BusinessPartner.DisplayName,
+                BillPhoneNumbers = new List<Global.Geography.PhoneNumber>(),
+                CurrencyCode = coreInfo.CurrencyCode,
+                CustomerID = (Guid)Bot.BuyerCorprioID,                
+                DeliveryAddress_Line1 = customer.BusinessPartner.PrimaryAddress_Line1,
+                DeliveryAddress_Line2 = customer.BusinessPartner.PrimaryAddress_Line2,
+                DeliveryAddress_City = customer.BusinessPartner.PrimaryAddress_City,
+                DeliveryAddress_State = customer.BusinessPartner.PrimaryAddress_State,
+                DeliveryAddress_PostalCode = customer.BusinessPartner.PrimaryAddress_PostalCode,
+                DeliveryAddress_CountryAlphaCode = customer.BusinessPartner.PrimaryAddress_CountryAlphaCode,
+                DeliveryPhoneNumbers = new List<Global.Geography.PhoneNumber>(),
+                OrderDate = DateTimeOffset.Now,
+                WarehouseID = AppSetting.WarehouseID,
+            };
+            if (!string.IsNullOrWhiteSpace(customer.BusinessPartner.PrimaryMobilePhoneNumber_SubscriberNumber))
+            {
+                Global.Geography.PhoneNumber phoneNumber = new()
+                {
+                    NumberType = Global.PhoneNumberType.Mobile,
+                    CountryCallingCode = customer.BusinessPartner.PrimaryMobilePhoneNumber_CountryCallingCode,
+                    NationalDestinationCode = customer.BusinessPartner.PrimaryMobilePhoneNumber_NationalDestinationCode,
+                    SubscriberNumber = customer.BusinessPartner.PrimaryMobilePhoneNumber_SubscriberNumber
+                };
+                salesOrder.BillPhoneNumbers.Add(phoneNumber);
+                salesOrder.DeliveryPhoneNumbers.Add(phoneNumber);
+            }
 
             Guid orderId;
             try
             {
-                orderId = await Client.SalesOrderApi.Add(organizationID: OrgID, salesOrder: new AddSalesOrderModel
-                {
-                    OrderDate = DateTimeOffset.Now,
-                    CustomerID = (Guid)Bot.BuyerCorprioID,
-                    CurrencyCode = coreInfo.CurrencyCode,
-                    BillAddress_Name = customer.BusinessPartner.PrimaryAddress_Name,
-                    BillAddress_Line1 = customer.BusinessPartner.PrimaryAddress_Line1,
-                    BillAddress_Line2 = customer.BusinessPartner.PrimaryAddress_Line2,
-                    BillAddress_City = customer.BusinessPartner.PrimaryAddress_City,
-                    BillAddress_State = customer.BusinessPartner.PrimaryAddress_State,
-                    BillAddress_PostalCode = customer.BusinessPartner.PrimaryAddress_PostalCode,
-                    BillAddress_CountryAlphaCode = customer.BusinessPartner.PrimaryAddress_CountryAlphaCode,
-                    BillAddress_Latitude = customer.BusinessPartner.PrimaryAddress_Latitude,
-                    BillAddress_Longitude = customer.BusinessPartner.PrimaryAddress_Longitude,
-                    DeliveryAddress_Name = customer.BusinessPartner.PrimaryAddress_Name,
-                    DeliveryAddress_Line1 = customer.BusinessPartner.PrimaryAddress_Line1,
-                    DeliveryAddress_Line2 = customer.BusinessPartner.PrimaryAddress_Line2,
-                    DeliveryAddress_City = customer.BusinessPartner.PrimaryAddress_City,
-                    DeliveryAddress_State = customer.BusinessPartner.PrimaryAddress_State,
-                    DeliveryAddress_PostalCode = customer.BusinessPartner.PrimaryAddress_PostalCode,
-                    DeliveryAddress_CountryAlphaCode = customer.BusinessPartner.PrimaryAddress_CountryAlphaCode,
-                    DeliveryAddress_Latitude = customer.BusinessPartner.PrimaryAddress_Latitude,
-                    DeliveryAddress_Longitude = customer.BusinessPartner.PrimaryAddress_Longitude,
-                    BillPhoneNumbers = new List<Global.Geography.PhoneNumber> { new Global.Geography.PhoneNumber
-                    {
-                        NumberType = Global.PhoneNumberType.Mobile,
-                        CountryCallingCode = customer.BusinessPartner.PrimaryMobilePhoneNumber_CountryCallingCode,
-                        NationalDestinationCode = customer.BusinessPartner.PrimaryMobilePhoneNumber_NationalDestinationCode,
-                        SubscriberNumber = customer.BusinessPartner.PrimaryMobilePhoneNumber_SubscriberNumber
-                    } },
-                    BillEmail = customer.BusinessPartner.PrimaryEmail,
-                    WarehouseID = applicationSetting.WarehouseID,
-                });
+                orderId = await Client.SalesOrderApi.Add(organizationID: OrgID, salesOrder: salesOrder);
             }
             catch (ApiExecutionException ex)
             {
@@ -453,6 +450,7 @@ namespace Corprio.SocialWorker.Helpers
                 return null;
             }
 
+            // note: the basket quantity is NOT checked again against the latest stock level
             foreach (BotBasket basket in Bot.Cart)
             {
                 try
@@ -621,9 +619,33 @@ namespace Corprio.SocialWorker.Helpers
         /// <returns></returns>
         private async Task<string> AddProductToCart(Product product)
         {
-            Bot.Cart.Add(new BotBasket { ProductID = product.ID, Name = product.Name, UOMCode = product.ListPrice_UOMCode });
-            Bot.ProductMemory.Clear();
-            Bot.ThinkingOf = BotTopic.QuantityOpen;            
+            BotBasket basket = new() 
+            { 
+                DisallowOutOfStock = product.Nature == ProductNature.Inventory,
+                Name = product.Name,
+                ProductID = product.ID,
+                UOMCode = product.ListPrice_UOMCode 
+            };
+            if (basket.DisallowOutOfStock)
+            {                
+                List<StockTotalByProductWarehouse> stockLevels = await Client.StockApi.GetCurrentStocks(organizationID: OrgID, productID: product.ID, warehouseID: AppSetting.WarehouseID);
+                if (stockLevels.Any())
+                {
+                    decimal reservedStock = await Client.StockApi.GetReservedStock(organizationID: OrgID, productID: product.ID, warehouseID: AppSetting.WarehouseID);
+                    basket.ProductStockLevel = stockLevels.First().BaseQty - reservedStock;
+                }
+            }
+            Bot.ProductMemory.Clear();  // note: if the topic was ProductVariationMC, then the ProductMemory may contain something
+
+            if (basket.DisallowOutOfStock && basket.ProductStockLevel <=0)
+            {
+                Bot.ThinkingOf = BotTopic.ProductOpen;
+                await Save();
+                return $"{ThusSpokeBabel(key: "Err_OutOfStock", placeholders: new List<string>() { product.Name })}\n{await AskQuestion()}";
+            }
+            
+            Bot.Cart.Add(basket);
+            Bot.ThinkingOf = BotTopic.QuantityOpen;
             await Save();
             return await AskQuestion();
         }
@@ -717,7 +739,7 @@ namespace Corprio.SocialWorker.Helpers
             Product product = await Client.ProductApi.Get(organizationID: OrgID, id: productId);
             if (product == null) return await HandleProductNotFound();
 
-            if (!product.IsMasterProduct || (!product.Variations?.Any() ?? false))
+            if (!product.IsMasterProduct || !(product.Variations?.Any() ?? false))
                 return await AddProductToCart(product);
             
             Bot.ThinkingOf = BotTopic.ProductVariationMC;
@@ -758,7 +780,7 @@ namespace Corprio.SocialWorker.Helpers
             string OTP = rand.Next(1000000).ToString("D6");
             var message = new EmailMessage
             {
-                Subject = ThusSpokeBabel(key: "Email_subject", placeholders: new List<string>() { PageName  }),
+                Subject = ThusSpokeBabel(key: "Email_subject", placeholders: new List<string>() { PageName }),
                 Body = ThusSpokeBabel(key: "Email_body", placeholders: new List<string>() { OTP }),
                 ToEmails = new EmailAddress[] { new EmailAddress(Bot.BuyerEmail) }
             };
@@ -1110,9 +1132,10 @@ namespace Corprio.SocialWorker.Helpers
                     if (!decimal.TryParse(input, out decimal qty))
                         return $"{ThusSpokeBabel("Err_NotUnderstand")}\n{await AskQuestion()}";
 
-                    if (qty <= 0)
-                        return $"{ThusSpokeBabel("Err_NonPositiveInput")}\n{await AskQuestion()}";
-                    
+                    // note: for simplicity, we assume all products' UOMs are 'unit' and therefore expect the quantity to be an integer
+                    if (qty <= 0 || qty % 1 > 0)
+                        return $"{ThusSpokeBabel("Err_NonPositiveInteger")}\n{await AskQuestion()}";                    
+
                     BotBasket basket = Bot.Cart.FirstOrDefault(x => x.Quantity == 0);
                     if (basket == null)
                     {

@@ -3,6 +3,16 @@
     --img-md-width: 50px;
 }
 
+.user-message p {
+    margin-bottom: 0;
+}
+
+.overflow-hidden {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 .cart-image {
     width: var(--img-width);
 }
@@ -20,7 +30,69 @@
         font-size: calc(var(--img-width)*3/4);
     }
 
-@media screen and (max-width: 767px) {    
+/* override the theme's display and vertical-align for .dx-radiobutton and .dx-radio-value-container so that the radio buttons are at the top */
+#delivery-method .dx-radiobutton {
+    display: table;
+    cursor: pointer;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+    line-height: 16px;
+}
+
+#delivery-method .dx-radio-value-container {
+    display: table-cell;
+    padding-right: 10px;
+    vertical-align: top;
+    padding-left: 0;
+}
+
+.customer-info .dx-widget {
+    margin: 5px 5px 5px 0;
+}
+
+#recipient-section .dx-widget {
+    margin: 5px 5px 5px 0;
+}
+
+#delivery-method .delivery-method-info {
+    padding: 0.75rem 1.25rem;
+    box-shadow: 0px 0px 3px #d8d8d8;
+    border-radius: 0.25rem;
+}
+
+#delivery-method .dx-radiobutton-checked .delivery-method-info {
+    box-shadow: 0px 0px 3px #1f5dbd;
+}
+
+.dx-radiobutton.dx-state-hover .dx-radiobutton-icon::before {
+    border-color: #888888;
+}
+
+.table .dx-icon {
+    font-size: 12px;
+    width: auto;
+    height: auto;
+    line-height: normal;
+}
+
+@media screen and (max-width: 767px) {
+    .table, .order-ref {
+        font-size: 13px;
+    }
+
+        .table .dx-texteditor-container {
+            font-size: 13px;
+        }
+
+        .table .dx-icon {
+            font-size: 10px;
+            width: auto;
+            height: auto;
+            line-height: normal;
+        }
 
     .cart-image {
         width: var(--img-md-width);
@@ -33,4 +105,8 @@
         .empty-image i {
             font-size: calc(var(--img-md-width)*3/4);
         }
+
+    .user-message {
+        font-size: max(0.5rem, 10px);
+    }
 }

@@ -19,7 +19,11 @@ namespace Corprio.SocialWorker.Models
                 //new AppMenuItem {
                 //    ShowInBreadcrumb = false, Url = "/[organizationID]/CataloguePublication", Controller = "CataloguePublication",
                 //    ID = "CataloguePublication", Text = "PublishCatalogue", Icon="fa-regular fa-bag-shopping"
-                //},                
+                //},
+                new AppMenuItem {
+                    ShowInBreadcrumb = false, Url = "/[organizationID]/ReconnectFacebook", Controller = "ReconnectFacebook",
+                    ID = "ReconnectFacebook", Text = "ReconnectFacebook", Icon="fa-regular fa-unlink"
+                },
             }
         };
     }

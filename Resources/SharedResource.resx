@@ -118,7 +118,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="AppDescription" xml:space="preserve">
-    <value>Corprio Sales Master is a free application software for managing your sales transactions such as orders and invoices</value>
+    <value>Corprio Social Worker is a free application software for automating your product advertising and sales order handling</value>
   </data>
   <data name="BillSalesOrder" xml:space="preserve">
     <value>Bill sales order</value>
@@ -133,7 +133,7 @@
     <value>Are you sure to void this invoice?</value>
   </data>
   <data name="ConfirmVoidOrder" xml:space="preserve">
-    <value>Are you sure to void this sales order?</value>
+    <value>Are you sure you want to cancel this sales order?</value>
   </data>
   <data name="ConfirmVoidSalesReturn" xml:space="preserve">
     <value>Are you sure to void this sales return?</value>
@@ -313,7 +313,7 @@
     <value>Input sales order number, customer name, phone, product code or name to search</value>
   </data>
   <data name="AppSlogan" xml:space="preserve">
-    <value>Manage your sales &lt;br&gt; easily and accurately</value>
+    <value>Manage your Facebook presence &lt;br&gt; easily and accurately</value>
   </data>
   <data name="SearchReturnTips" xml:space="preserve">
     <value>Input sales return number. invoice number, customer name, phone, product code or name to search</value>
@@ -460,7 +460,7 @@
     <value>Connect Facebook</value>
   </data>
   <data name="FB_connected" xml:space="preserve">
-    <value>{0} is now connected with {1}.</value>
+    <value>Facebook account {0} is now connected with {1}.</value>
   </data>
   <data name="FB_Desc1" xml:space="preserve">
     <value>Log in to Facebook to connect</value>
@@ -597,8 +597,8 @@
   <data name="Template_ProductName" xml:space="preserve">
     <value>Product Name</value>
   </data>
-  <data name="Template_ProductPrice" xml:space="preserve">
-    <value>Product Price</value>
+  <data name="Template_ProductListPrice" xml:space="preserve">
+    <value>Product List Price</value>
   </data>
   <data name="Tooltip_Keyword" xml:space="preserve">
     <value>When someone replies to the post with the keyword, the chatbot will follow up with that person through private message.</value>
@@ -642,14 +642,14 @@
   <data name="ErrMsg_AppSettingNotFound" xml:space="preserve">
     <value>The relevant application setting could not be found.</value>
   </data>
+  <data name="AddNewProduct" xml:space="preserve">
+    <value>Add New Product</value>
+  </data>
   <data name="Advice_ConfirmAddress" xml:space="preserve">
     <value>Please confirm/provide your delivery Address.</value>
   </data>
   <data name="Advice_FollowPickupInstruction" xml:space="preserve">
     <value>Please follow the instructions below to pick up your purchase.</value>
-  </data>
-  <data name="Advice_GetFreeShipping" xml:space="preserve">
-    <value>Purchase {0} {1} to enjoy free delivery.</value>
   </data>
   <data name="Advice_NoDeliveryMethod" xml:space="preserve">
     <value>{0} did not specify a delivery method. Please contact {0} at {1}.</value>
@@ -660,8 +660,26 @@
   <data name="AppName" xml:space="preserve">
     <value>Corprio.SocialWorker</value>
   </data>
+  <data name="BillTo" xml:space="preserve">
+    <value>Bill to</value>
+  </data>
+  <data name="CancelOrder" xml:space="preserve">
+    <value>Cancel Order</value>
+  </data>
+  <data name="CannotEdit_PaymentProcessing" xml:space="preserve">
+    <value>The order cannot be updated because its payment is being processed.</value>
+  </data>
+  <data name="CannotEdit_VoidedOrPaid" xml:space="preserve">
+    <value>The order has been voided or paid and therefore cannot be edited.</value>
+  </data>
   <data name="Checkout" xml:space="preserve">
     <value>Checkout</value>
+  </data>
+  <data name="ConfirmAddProduct" xml:space="preserve">
+    <value>Are you sure you want to add new product(s)? This sales order will be voided and you will need to ask the chatbot via Messenger to add new products.</value>
+  </data>
+  <data name="Confirmation" xml:space="preserve">
+    <value>Confirmation</value>
   </data>
   <data name="ConfirmationEmailNotSent" xml:space="preserve">
     <value>The confirmation email for order {0} failed to be sent</value>
@@ -690,14 +708,32 @@
   <data name="FreeShipping" xml:space="preserve">
     <value>Free Shipping</value>
   </data>
+  <data name="FreeShippingHint1" xml:space="preserve">
+    <value>Free shipping on orders over {0}.</value>
+  </data>
+  <data name="FreeShippingHint2" xml:space="preserve">
+    <value>Buy {0} more to enjoy free shipping.</value>
+  </data>
+  <data name="FreeShippingQualified" xml:space="preserve">
+    <value>Achievement unlocked: free shipping.</value>
+  </data>
   <data name="InvalidFeedback_AddressLine1" xml:space="preserve">
-    <value>Line 1 cannot be blank</value>
+    <value>Line 1 cannot be blank.</value>
   </data>
   <data name="InvalidFeedback_CountryCode" xml:space="preserve">
-    <value>Invalid country code</value>
+    <value>Please input a valid country.</value>
+  </data>
+  <data name="InvalidFeedback_FamilyName" xml:space="preserve">
+    <value>Family name cannot be blank.</value>
+  </data>
+  <data name="InvalidFeedback_GivenName" xml:space="preserve">
+    <value>Given name cannot be blank.</value>
+  </data>
+  <data name="InvalidFeedback_InvalidPhoneNumber" xml:space="preserve">
+    <value>Please provide a valid phone number.</value>
   </data>
   <data name="InvalidFeedback_Quantity" xml:space="preserve">
-    <value>Quantity must be a positive number</value>
+    <value>Quantity must be a positive number.</value>
   </data>
   <data name="Options" xml:space="preserve">
     <value>Options</value>
@@ -708,14 +744,20 @@
   <data name="Price" xml:space="preserve">
     <value>Price</value>
   </data>
-  <data name="ProceesToPayment" xml:space="preserve">
+  <data name="ProceedToPayment" xml:space="preserve">
     <value>Proceed To Payment</value>
+  </data>
+  <data name="Processing" xml:space="preserve">
+    <value>Processing</value>
   </data>
   <data name="Product" xml:space="preserve">
     <value>Product</value>
   </data>
   <data name="ProductDesc" xml:space="preserve">
     <value>Description</value>
+  </data>
+  <data name="Receipient" xml:space="preserve">
+    <value>Receipient</value>
   </data>
   <data name="Shipping" xml:space="preserve">
     <value>Shipping</value>
@@ -728,5 +770,116 @@
   </data>
   <data name="YouReceivedNewOrder" xml:space="preserve">
     <value>You have received a new order</value>
+  </data>
+  <data name="CheckoutPage" xml:space="preserve">
+    <value>Checkout Page</value>
+  </data>
+  <data name="CheckoutPage_Desc" xml:space="preserve">
+    <value>Configure how the checkout page will appear to your customers.</value>
+  </data>
+  <data name="Colour" xml:space="preserve">
+    <value>Colour</value>
+  </data>
+  <data name="EditQuantity" xml:space="preserve">
+    <value>Edit quantity</value>
+  </data>
+  <data name="EditVariant" xml:space="preserve">
+    <value>Select variant</value>
+  </data>
+  <data name="ErrMsg_ChatbotNotFound" xml:space="preserve">
+    <value>We tried to restore this sales order to the chatbot conversing with you but failed. Please confirm if you wish to simply void this order.</value>
+  </data>
+  <data name="ErrMsg_OutOfStock" xml:space="preserve">
+    <value>{0} is out of stock.</value>
+  </data>
+  <data name="ErrMsg_QuantityNotPositive" xml:space="preserve">
+    <value>Quantity must be positive.</value>
+  </data>
+  <data name="ErrMsg_UnselectedVariations" xml:space="preserve">
+    <value>The following attributes are not selected yet: {0}.</value>
+  </data>
+  <data name="ErrMsg_ValidMetaProfileNotFound" xml:space="preserve">
+    <value>The organization does not have a valid connection with any Facebook account.</value>
+  </data>
+  <data name="FB_AlreadyConnected" xml:space="preserve">
+    <value>Facebook account {0} is already connected with another organization. If you want to connect {1} with {0}, please visit {2}.</value>
+  </data>
+  <data name="Footer" xml:space="preserve">
+    <value>Footer</value>
+  </data>
+  <data name="Footer_Description" xml:space="preserve">
+    <value>The footer will be displayed below the shopping cart on checkout page.</value>
+  </data>
+  <data name="LoginFB" xml:space="preserve">
+    <value>Continue with Facebook</value>
+  </data>
+  <data name="LogoutFB" xml:space="preserve">
+    <value>Logout from Facebook</value>
+  </data>
+  <data name="PoweredBy" xml:space="preserve">
+    <value>Powered by {0}</value>
+  </data>
+  <data name="ReconnectFacebook" xml:space="preserve">
+    <value>Reset Facebook Connection</value>
+  </data>
+  <data name="RemainingStockMessage" xml:space="preserve">
+    <value>Remaining stock of {0}: {1}.</value>
+  </data>
+  <data name="RemainingStockTitle" xml:space="preserve">
+    <value>Remaining Stock</value>
+  </data>
+  <data name="Size" xml:space="preserve">
+    <value>Size</value>
+  </data>
+  <data name="Template_ProductPublicPrice" xml:space="preserve">
+    <value>Product Public Price</value>
+  </data>
+  <data name="ThankYouMessage" xml:space="preserve">
+    <value>Message shown in thank you page</value>
+  </data>
+  <data name="ThankYouMessage_Description" xml:space="preserve">
+    <value>This message is shown at the top of the thank you page.</value>
+  </data>
+  <data name="ThankYouPage" xml:space="preserve">
+    <value>Thank you page</value>
+  </data>
+  <data name="ThankYouPage_Desc" xml:space="preserve">
+    <value>Define the content that will be displayed to your customer when they finalize their order. This content will be included in the order confirmation email sent to the customer.</value>
+  </data>
+  <data name="Title_EditVariant" xml:space="preserve">
+    <value>Choose a different variant</value>
+  </data>
+  <data name="Warning_consequence1" xml:space="preserve">
+    <value>You will not be able to publish products and/or catalogues of the company that is currently linked to Facebook.</value>
+  </data>
+  <data name="Warning_consequence2" xml:space="preserve">
+    <value>The chatbot will not be able to handle private messages or comments on behalf of the company that is currently linked to Facebook.</value>
+  </data>
+  <data name="Warning_consequence3" xml:space="preserve">
+    <value>Your configurations of social media templates, delivery methods, etc. will be reset to default.</value>
+  </data>
+  <data name="Warning_DeleteProduct" xml:space="preserve">
+    <value>You want to delete this product? This action cannot be undone.</value>
+  </data>
+  <data name="Warning_final" xml:space="preserve">
+    <value>Are you sure? This action cannot be undone.</value>
+  </data>
+  <data name="Warning_header1" xml:space="preserve">
+    <value>IMPORTANT</value>
+  </data>
+  <data name="Warning_header2" xml:space="preserve">
+    <value>Please carefully read the following text before proceeding.</value>
+  </data>
+  <data name="Warning_num1" xml:space="preserve">
+    <value>One</value>
+  </data>
+  <data name="Warning_num2" xml:space="preserve">
+    <value>one</value>
+  </data>
+  <data name="Warning_para1" xml:space="preserve">
+    <value> Facebook account (including its Facebook pages and associated Instagram accounts) can only be connected with</value>
+  </data>
+  <data name="Warning_para2" xml:space="preserve">
+    <value> Corprio organization at a time. Resetting the connection has the following implications:</value>
   </data>
 </root>

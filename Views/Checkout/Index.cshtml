@@ -20,28 +20,95 @@
 <script src="~/js/views/Checkout/Index.js" asp-append-version="true"></script>
 <script>
     const vdata = {
-        actions: {
+        actions: {            
             deleteSalesOrderLine: '@StringHelper.Encode(@Url.Action("DeleteSalesOrderLine", "Checkout", new { organizationID }))',
             editSalesOrderLine: '@StringHelper.Encode(@Url.Action("EditSalesOrderLine", "Checkout", new { organizationID }))',
             finalizeSalesOrder: '@StringHelper.Encode(@Url.Action("FinalizeSalesOrder", "Checkout", new { organizationID }))',
+            getProductVariations: '@StringHelper.Encode(@Url.Action("GetProductVariations", "Checkout", new { organizationID }))',
+            voidAndRecall: '@StringHelper.Encode(@Url.Action("VoidAndRecall", "Checkout", new { organizationID }))',
+            voidOrder: '@StringHelper.Encode(@Url.Action("VoidSalesOrder", "Checkout", new { organizationID }))',
         },
-        localizer: {
+        localizer: {            
+            addNewProduct: '@StringHelper.Encode(@localizer["AddNewProduct"])',
+            billTo: '@StringHelper.Encode(@localizer["BillTo"])',
+            cancel: '@StringHelper.Encode(@localizer["Cancel"])',
+            cancelOrder: '@StringHelper.Encode(@localizer["CancelOrder"])',
+            cannotEdit_PaymentProcessing: '@StringHelper.Encode(@localizer["CannotEdit_PaymentProcessing"])',
+            cannotEdit_VoidedOrPaid: '@StringHelper.Encode(@localizer["CannotEdit_VoidedOrPaid"])',
+            colour: '@StringHelper.Encode(@localizer["Colour"])',
+            confirm: '@StringHelper.Encode(@localizer["Confirm"])',
+            confirmation: '@StringHelper.Encode(@localizer["Confirmation"])',
+            confirmAddProduct: '@StringHelper.Encode(@localizer["ConfirmAddProduct"])',
+            confirmVoidOrder: '@StringHelper.Encode(@localizer["ConfirmVoidOrder"])',
+            delete: '@StringHelper.Encode(@localizer["Delete"])',
+            deliveryCharge: '@StringHelper.Encode(@localizer["DeliveryCharge"])',
+            deliveryMethod: '@StringHelper.Encode(@localizer["DeliveryMethod"])',
+            editQuantity: '@StringHelper.Encode(@localizer["EditQuantity"])',
+            editVariant: '@StringHelper.Encode(@localizer["EditVariant"])',
+            errMsgChatbotNotFound: '@StringHelper.Encode(@localizer["ErrMsg_ChatbotNotFound"])',
+            errMsgUnselectedVariations: '@StringHelper.Encode(@localizer["ErrMsg_UnselectedVariations"])',
+            familyName: '@encoder.Encode(globalLocalizer["Family Name"])',
+            givenName: '@encoder.Encode(globalLocalizer["Given Name"])',
+            freeShippingHint1: '@StringHelper.Encode(@localizer["FreeShippingHint1"])',
+            freeShippingHint2: '@StringHelper.Encode(@localizer["FreeShippingHint2"])',
+            freeShippingQualified: '@StringHelper.Encode(@localizer["FreeShippingQualified"])',
+            invalidFeedback_AddressLine1: '@StringHelper.Encode(@localizer["InvalidFeedback_AddressLine1"])',
+            invalidFeedback_CountryCode: '@StringHelper.Encode(@localizer["InvalidFeedback_CountryCode"])',
+            invalidFeedback_FamilyName: '@StringHelper.Encode(@localizer["InvalidFeedback_FamilyName"])',
+            invalidFeedback_GivenName: '@StringHelper.Encode(@localizer["InvalidFeedback_GivenName"])',
+            invalidFeedback_InvalidPhoneNumber: '@StringHelper.Encode(@localizer["InvalidFeedback_InvalidPhoneNumber"])',
+            noDeliveryMethod: '@StringHelper.Encode(@localizer["Advice_NoDeliveryMethod"])',
+            noPickupInstruction: '@StringHelper.Encode(@localizer["Advice_NoPickupInstruction"])',
+            proceedToPayment: '@StringHelper.Encode(@localizer["ProceedToPayment"])',
+            processing: '@StringHelper.Encode(@localizer["Processing"])',
+            quantity: '@StringHelper.Encode(@localizer["Qty"])',
+            receipient: '@StringHelper.Encode(@localizer["Receipient"])',
+            remainingStockMessage: '@StringHelper.Encode(@localizer["RemainingStockMessage"])',
+            remainingStockTitle: '@StringHelper.Encode(@localizer["RemainingStockTitle"])',
+            save: '@StringHelper.Encode(localizer["Save"])',
+            selfPickup: '@StringHelper.Encode(localizer["SelfPickUp"])',
+            size: '@StringHelper.Encode(@localizer["Size"])',
+            shipToCustomer: '@StringHelper.Encode(localizer["ShipToCustomer"])',
+            titleEditVariant: '@StringHelper.Encode(localizer["Title_EditVariant"])',
+            warningDeleteProduct: '@StringHelper.Encode(localizer["Warning_DeleteProduct"])',
         },
-        settings: {
-            allowSelfPickup: "@Model.AllowSelfPickUp",
-            appUrl: "@appUrl",
-            billedPersonFamilyName: "@Model.BillPerson.FamilyName",
-            billedPersonGivenName: "@Model.BillPerson.GivenName",
-            currencyCode: "@Model.CurrencyCode",
-            defaultCountryCode: "@Model.DefaultCountryCode",
-            deliveryChargeAmount: "@Model.DeliveryCharge",
-            freeShippingAmount: "@freeShippingAmount",
-            hasFreeShipping: "@hasFreeShippingPolicy",
-            organizationID: "@Model.OrganizationID",
-            paymentPortalUrl: "@paymentPortalUrl",
-            provideShipping: "@Model.ProvideDelivery",
-            salesOrderID: "@Model.SalesOrderID",
-            separator: "@CheckoutConstants.Separator",
+        model: {
+            allowSelfPickup: '@Model.AllowSelfPickUp',
+            billedPersonFamilyName: '@Model.BillPerson.FamilyName',
+            billedPersonGivenName: '@Model.BillPerson.GivenName',
+            billedPhoneCountryCallingCode: '@Model.BillContactPhone.CountryCallingCode',
+            billedPhoneNationalDestinationCode: '@Model.BillContactPhone.NationalDestinationCode',
+            billedPhoneSubscriberNumber: '@Model.BillContactPhone.SubscriberNumber',
+            chosenDeliveryMethod: '@Model.ChosenDeliveryMethod',
+            currencyCode: '@Model.CurrencyCode',
+            defaultCountryCode: '@Model.DefaultCountryCode',
+            deliveryChargeAmount: '@Model.DeliveryCharge',
+            deliveryAddress_Line1: '@Model.DeliveryAddress.Line1',
+            deliveryAddress_Line2: '@Model.DeliveryAddress.Line2',
+            deliveryAddress_City: '@Model.DeliveryAddress.City',
+            deliveryAddress_State: '@Model.DeliveryAddress.State',
+            deliveryAddress_PostalCode: '@Model.DeliveryAddress.PostalCode',
+            deliveryAddress_CountryAlphaCode: '@Model.DeliveryAddress.CountryAlphaCode',
+            deliveryContact_FamilyName: '@Model.DeliveryContact.FamilyName',
+            deliveryContact_GivenName: '@Model.DeliveryContact.GivenName',
+            deliveryPhoneCountryCallingCode: '@Model.DeliveryContactPhone.CountryCallingCode',
+            deliveryPhoneNationalDestinationCode: '@Model.DeliveryContactPhone.NationalDestinationCode',
+            deliveryPhoneSubscriberNumber: '@Model.DeliveryContactPhone.SubscriberNumber',
+            freeShippingAmount: '@freeShippingAmount',
+            hasFreeShipping: '@hasFreeShippingPolicy',
+            isOrderVoidOrPaid: '@Model.IsOrderVoidOrPaid',
+            isPaymentClicked: '@Model.IsPaymentClicked',
+            orderLineJsonString: '@Model.OrderLineJsonString',
+            organizationID: '@Model.OrganizationID',
+            organizationEmailAddress: '@Model.OrganizationEmailAddress',
+            organizationShortName: '@Model.OrganizationShortName',
+            provideShipping: '@Model.ProvideDelivery',
+            salesOrderID: '@Model.SalesOrderID',
+            selfPickUpInstruction: '@Model.SelfPickUpInstruction'
+        },
+        settings: {            
+            appUrl: '@appUrl',                                    
+            paymentPortalUrl: '@paymentPortalUrl',            
         },
     };
 </script>
@@ -50,27 +117,33 @@
         <h3>@localizer["Checkout"]</h3>
     </div>
 
-    <div>
+    <div>        
         <div id="reminderPopup"></div>
 
-        <div class="row mb-4">
-            <div class="col">
+        <section class="row mb-4">
+            <div class="col order-ref">
                 <div class="input-group mb-3 mr-2">
                     <label class="my-1 mr-2" for="document-date">@localizer["OrderDate"]</label>
                     <input type="text" id="document-date" class="text-right" value="@Model.OrderDate.ToString("d", new CultureInfo("zh-HK"))" disabled />
                 </div>
             </div>
 
-            <div class="col">
+            <div class="col order-ref">
                 <div class="input-group mb-3 mr-2">
                     <label class="my-1 mr-2" for="document-number">@localizer["DocumentNum"]</label>
                     <input type="text" id="document-number" class="text-right" value="@Model.DocumentNum" disabled />
                 </div>
             </div>
-        </div>
-        
-        <h4>@localizer["ShoppingCart"]</h4>
-        <div class="table-responsive">
+        </section>
+                
+        <section class="table-responsive">
+            <div class="d-flex justify-content-between mb-2">
+                <h5 class="">@localizer["ShoppingCart"]</h5>
+                @if (!Model.IsPaymentClicked && !Model.IsOrderVoidOrPaid)
+                {
+                    <div><button class="btn btn-info add-prd-btn"><i class="fas fa-plus mr-1"></i>@localizer["AddNewProduct"]</button></div>
+                }
+            </div>
             <table class="table lined-border">
                 <thead>
                     <tr>
@@ -80,50 +153,17 @@
                             <div class="flex-even">@localizer["ProductDesc"]</div>
                         </th>
                         <th scope="col">@localizer["Price"]</th>
-                        <th scope="col">@localizer["Qty"]</th>                        
+                        <th scope="col" class="dx-text-content-alignment-left d-flex">
+                            <div class="flex-even">@localizer["Qty"]</div>
+                            <div class="flex-even">@localizer["UnitOfMeasure"]</div>
+                        </th>
                     </tr>
                 </thead>
-                <tbody id="cart-items">
-                    @foreach (OrderLine line in Model.Lines)
-                    {
-                        <tr class="orderline-row">
-                            <td>
-                                <div>
-                                    @if (!string.IsNullOrEmpty(line.URL))
-                                    {
-                                        <img src="@line.URL" alt="@line.ProductName" class="cart-image img-cover square" />
-                                    }
-                                    else
-                                    {
-                                        <div class="empty-image rounded"><i class="fa-solid fa-image square"></i></div>
-                                    }
-                                </div>
-                                <div class="flex-even">
-                                    <input type="hidden" disabled value="@line.SalesOrderLineID" />
-                                    <button class="btn edit-line-btn" title="@localizer["Edit"]"><i class="fa-regular fa-pen-to-square"></i></button>
-                                    <button class="btn save-line-btn" title="@localizer["Save"]"><i class="fa-regular fa-floppy-disk"></i></button>
-                                    <button class="btn delete-line-btn" title="@localizer["Delete"]"><i class="fa-solid fa-trash"></i></button>
-                                </div>
-                            </td>
-                            <td class="text-left d-flex">
-                                <div class="flex-even mr-2">@line.ProductName</div>
-                                <div class="flex-even">@line.ProductDesc</div>
-                            </td>
-                            <td class="sales-order-line-price">
-                                @Model.CurrencyCode @line.NetUnitPrice.ToString("N2")
-                                <input type="hidden" class="price-true-value" disabled value="@line.NetUnitPrice" />
-                            </td>                            
-                            <td class="sales-order-line-qty">
-                                <input type="number" class="qty-face-value text-right pr-2" disabled value="@line.Quantity.ToString("N2")" />
-                                <input type="hidden" class="qty-true-value" disabled value="@line.Quantity" />
-                                <div class="invalid-feedback">@localizer["InvalidFeedback_Quantity"]</div>
-                            </td>                            
-                        </tr>
-                    }
-                </tbody>
+                <tbody id="cart-items"></tbody>
             </table>
-        </div>
-        <div class="mr-2">
+        </section>
+
+        <section class="mr-2 mb-3">
             <div class="mb-2">
                 <div class="d-flex justify-content-between">
                     <div>@localizer["Subtotal"]</div>
@@ -131,91 +171,29 @@
                 </div>
             </div>
             
-            <div id="delivery-charge-div" class="mb-2">
-                <div class="d-flex justify-content-between">
-                    <div>@localizer["DeliveryCharge"]</div>
-                    <div id="delivery-charge-amt"></div>
+            @if (!Model.IsPaymentClicked)
+            {
+                <div id="delivery-charge-div" class="mb-2">
+                    <div class="d-flex justify-content-between">
+                        <div>@localizer["DeliveryCharge"]</div>
+                        <div id="delivery-charge-amt"></div>
+                    </div>
                 </div>
-            </div>
-
-            <div id="free-shipping-div" class="mb-2">
-                <div class="d-flex justify-content-between">
-                    <div>@localizer["FreeShipping"]</div>
-                    <div id="free-shipping-amt" class="text-danger"></div>
-                </div>
-            </div>
-
+            }
+            
             <div class="border-top mb-2 pt-2">
                 <div class="d-flex justify-content-between">
                     <b>@localizer["TotalAmount"]</b>
                     <b id="order-total"></b>
                 </div>
             </div>                        
-        </div>        
-        <br />
+        </section>
+        
+        <div class="user-message">@Html.Raw(Model.Footer)</div>
 
-        <h4>@localizer["Buyer"]</h4>
-        <div id="bill-person" class="ml-4 mb-2"></div>
-
-        <h4>@localizer["DeliveryMethod"]</h4>                        
-        <input type="hidden" id="delivery-method-value" value="0" />
-        @if(!Model.AllowSelfPickUp && !Model.ProvideDelivery)
-        {
-            <div class="font-italic">@string.Format(localizer["Advice_NoDeliveryMethod"], Model.OrganizationShortName, Model.OrganizationEmailAddress)</div>
-        }
-        else
-        {            
-            @if (Model.AllowSelfPickUp)
-            {                
-                <div class="form-check">
-                    <input class="form-check-input" type="radio" name="radio-delivery-method" id="radio-self-pickup">
-                    <label class="form-check-label" for="radio-self-pickup">@localizer["SelfPickUp"]</label>
-                </div>
-                <div class="ml-4 mb-2">
-                    <h6>@localizer["Advice_FollowPickupInstruction"]</h6>
-                    @if (!string.IsNullOrWhiteSpace(Model.SelfPickUpInstruction))
-                    {
-                        <div class="mb-3">@Model.SelfPickUpInstruction</div>
-                    }
-                    else
-                    {
-                        <div class="font-italic">@string.Format(localizer["Advice_NoPickupInstruction"], Model.OrganizationShortName, Model.OrganizationEmailAddress)</div>
-                    }
-                </div>
-            }
-
-            @if (Model.ProvideDelivery)
-            {                
-                <div class="form-check">
-                    <input class="form-check-input" type="radio" name="radio-delivery-method" id="radio-shipping">
-                    <label class="form-check-label" for="radio-shipping">@localizer["Shipping"]</label>
-                </div>
-                <div class="ml-4 mb-2">
-                    <h6>@localizer["Advice_ConfirmAddress"]</h6>
-                    <div id="delivery-address" class="form-group" style="max-width:700px;">
-                        @Html.DevExtreme().TextBoxFor(m => m.DeliveryAddress_Line1).ID("Address_Line1").Placeholder("Line 1")
-                        @Html.DevExtreme().TextBoxFor(m => m.DeliveryAddress_Line2).ID("Address_Line2").Placeholder("Line 2")
-                        @Html.DevExtreme().TextBoxFor(m => m.DeliveryAddress_City).ID("Address_City").Placeholder("City")
-                        @Html.DevExtreme().TextBoxFor(m => m.DeliveryAddress_State).ID("Address_State").Placeholder("State")
-                        @Html.DevExtreme().TextBoxFor(m => m.DeliveryAddress_PostalCode).ID("Address_PostalCode").Placeholder("Postal Code")
-                        @(Html.DevExtreme().SelectBoxFor(m => m.DeliveryAddress_CountryAlphaCode).ID("Address_CountryAlphaCode")
-                            .DataSource(Options.CountrySelectionList).DisplayExpr("Value").ValueExpr("Key").Placeholder("Country Code")
-                            .SearchEnabled(true))
-                        <div id="address-feedback1" class="invalid-feedback">@localizer["InvalidFeedback_AddressLine1"]</div>
-                        <div id="address-feedback2" class="invalid-feedback">@localizer["InvalidFeedback_CountryCode"]</div>
-                    </div>
-                </div>
-            }
-        }
-        @if (Model.ProvideDelivery && hasFreeShippingPolicy)
-        {
-            <div class="d-flex justify-content-center mt-2 mb-2">
-                <b class="m-0 text-primary">@string.Format(localizer["Advice_GetFreeShipping"], Model.CurrencyCode, Model.FreeShippingAmount?.ToString("N2"))</b>
-            </div>            
-        }        
-        <div class="d-flex justify-content-center mt-2 mb-2">
-            <button id="confirm-address-btn" class="btn btn-info">@localizer["ProceesToPayment"]</button>
-        </div>                
+        <div id="load-panel"></div>
+        <div id="edit-popup"></div>
+        <form id="customer-info-form" autocomplete="on"></form>
     </div>
 </div>
 <vc:static-data model="@StaticDataRequestViewModel.All(true)" org-info="true" />

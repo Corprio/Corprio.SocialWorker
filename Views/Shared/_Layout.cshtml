@@ -9,6 +9,7 @@
 @inject Microsoft.AspNetCore.Hosting.IWebHostEnvironment env
 
 @{
+    string clientLibVersion = "2.6.6"; //version of npm package @corprio/aspnetcore-site
     string clientID = configuration["CorprioClientCredential:ClientID"];
     Corprio.AspNetCore.Site.Models.AppMenu menu = await userPreferenceService.GetAppMenu(clientID, Corprio.SocialWorker.Models.Menu.StandardMenu);
     Guid organizationID = Context.SelectedOrganizationID() ?? Guid.Empty;    
@@ -35,18 +36,18 @@
 
     <environment include="Development">
         <link href="~/node_modules/bootstrap/dist/css/bootstrap.css" rel="stylesheet" />
-        <link rel="stylesheet" href="~/node_modules/@("@")corprio/aspnetcore-site/dist/css/dx.material.corprio-scheme.min.css" />
-        <link rel="stylesheet" href="~/node_modules/@("@")corprio/aspnetcore-site/dist/css/corprio.css" />
-        <link rel="stylesheet" href="~/node_modules/@("@")corprio/aspnetcore-site/dist/css/corprio-app.css" />
+        <link rel="stylesheet" href="~/node_modules/@("@")corprio/aspnetcore-site/dist/css/dx.material.corprio-scheme.min.css?v=@clientLibVersion" />
+        <link rel="stylesheet" href="~/node_modules/@("@")corprio/aspnetcore-site/dist/css/corprio.css?v=@clientLibVersion" />
+        <link rel="stylesheet" href="~/node_modules/@("@")corprio/aspnetcore-site/dist/css/corprio-app.css?v=@clientLibVersion" />
         <link rel="stylesheet" href="~/css/site.css" />
     </environment>
     <environment exclude="Development">
         <link rel="stylesheet" href="https://ajax.aspnetcdn.com/ajax/bootstrap/4.6.0/css/bootstrap.min.css"
               asp-fallback-href="~/node_modules/bootstrap/dist/css/bootstrap.min.css"
               asp-fallback-test-class="sr-only" asp-fallback-test-property="position" asp-fallback-test-value="absolute" />
-        <link rel="stylesheet" href="~/node_modules/@("@")corprio/aspnetcore-site/dist/css/dx.material.corprio-scheme.min.css" asp-append-version="true" />
-        <link rel="stylesheet" href="~/node_modules/@("@")corprio/aspnetcore-site/dist/css/corprio.min.css" asp-append-version="true" />
-        <link rel="stylesheet" href="~/node_modules/@("@")corprio/aspnetcore-site/dist/css/corprio-app.min.css" asp-append-version="true" />
+        <link rel="stylesheet" href="~/node_modules/@("@")corprio/aspnetcore-site/dist/css/dx.material.corprio-scheme.min.css?v=@clientLibVersion" />
+        <link rel="stylesheet" href="~/node_modules/@("@")corprio/aspnetcore-site/dist/css/corprio.min.css?v=@clientLibVersion?v=@clientLibVersion" />
+        <link rel="stylesheet" href="~/node_modules/@("@")corprio/aspnetcore-site/dist/css/corprio-app.min.css?v=@clientLibVersion?v=@clientLibVersion" />
         <link rel="stylesheet" href="~/css/site.min.css" asp-append-version="true" />
     </environment>
 
@@ -67,12 +68,13 @@
         <script src="~/node_modules/jquery-ui-dist/jquery-ui.js"></script>
         <script src="~/node_modules/knockout/build/output/knockout-latest.js"></script>
         @* End: Required by XtraReport viewer *@
-        <script src="~/node_modules/devextreme-quill/dist/dx-quill.min.js"></script>
-        <script src="~/node_modules/devextreme/dist/js/dx.all.js"></script>
-        <script src="~/node_modules/devextreme-aspnet-data/js/dx.aspnet.data.js"></script>
-        <script src="~/node_modules/devextreme/dist/js/dx.aspnet.mvc.js"></script>
-        <script src="~/node_modules/@("@")corprio/aspnetcore-site/dist/js/corprio.bundle.js?v=2.5.26"></script>
-        <script src="~/node_modules/@("@")corprio/aspnetcore-site/@LanguageHelper.LoadMessagesJs()?v=2.5.26" type="module"></script>
+        <!-- DevExtreme Quill (required by the HtmlEditor UI component) -->
+        <script src="https://cdn3.devexpress.com/jslib/23.2.3/js/dx-quill.min.js"></script>
+        <script src="https://cdn3.devexpress.com/jslib/23.2.3/js/dx.all.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/devextreme-aspnet-data/3.0.0/dx.aspnet.data.min.js"></script>
+        <script src="https://cdn3.devexpress.com/jslib/23.2.3/js/dx.aspnet.mvc.js"></script>
+        <script src="~/node_modules/@("@")corprio/aspnetcore-site/dist/js/corprio.bundle.js?v=@clientLibVersion"></script>
+        <script src="~/node_modules/@("@")corprio/aspnetcore-site/@LanguageHelper.LoadMessagesJs()?v=@clientLibVersion" type="module"></script>
         <script src="~/js/site.js" asp-append-version="true"></script>        
         @RenderSection("ScriptsDev", required: false)
     </environment>
@@ -83,12 +85,12 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.5.1/knockout-latest.min.js"></script>
         <!-- DevExtreme Quill (required by the HtmlEditor UI component) -->
-        @*<script src="https://cdn3.devexpress.com/jslib/22.2.3/js/dx-quill.min.js"></script>*@
-        <script src="https://cdn3.devexpress.com/jslib/22.2.3/js/dx.all.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/devextreme-aspnet-data/2.8.2/dx.aspnet.data.min.js"></script>
-        <script src="https://cdn3.devexpress.com/jslib/22.2.3/js/dx.aspnet.mvc.js"></script>
-        <script src="~/node_modules/@("@")corprio/aspnetcore-site/dist/js/corprio.bundle.min.js?v=2.5.26"></script>
-        <script src="~/node_modules/@("@")corprio/aspnetcore-site/@LanguageHelper.LoadMessagesJs()?v=2.5.26" type="module"></script>
+        <script src="https://cdn3.devexpress.com/jslib/23.2.3/js/dx-quill.min.js"></script>
+        <script src="https://cdn3.devexpress.com/jslib/23.2.3/js/dx.all.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/devextreme-aspnet-data/3.0.0/dx.aspnet.data.min.js"></script>
+        <script src="https://cdn3.devexpress.com/jslib/23.2.3/js/dx.aspnet.mvc.js"></script>
+        <script src="~/node_modules/@("@")corprio/aspnetcore-site/dist/js/corprio.bundle.min.js?v=@clientLibVersion"></script>
+        <script src="~/node_modules/@("@")corprio/aspnetcore-site/@LanguageHelper.LoadMessagesJs()?v=@clientLibVersion" type="module"></script>
 
         <script src="~/js/site.min.js" asp-append-version="true"></script>
         @RenderSection("ScriptsPro", required: false)

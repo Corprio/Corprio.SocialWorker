@@ -18,6 +18,7 @@ using Corprio.SocialWorker.Dictionaries;
 using Corprio.DataModel.Shared;
 using System.Linq.Dynamic.Core;
 using Microsoft.EntityFrameworkCore;
+using Corprio.AspNetCore.Site.Services;
 
 namespace Corprio.SocialWorker.Controllers
 {
@@ -130,8 +131,16 @@ namespace Corprio.SocialWorker.Controllers
         /// <param name="corprioClient">Client for Api requests among Corprio projects</param>
         /// <param name="payload">Webhook payload</param>
         /// <returns>Status code</returns>
-        public async Task<IActionResult> HandleFeedWebhook(HttpClient httpClient, APIClient corprioClient, FeedWebhookPayload payload)
+        public async Task<IActionResult> HandleFeedWebhook(HttpClient httpClient, APIClient corprioClient, 
+            ApplicationSettingService applicationSettingService, FeedWebhookPayload payload)
         {
+            MetaPost post;
+            List<dynamic> existingProducts;
+            Guid productId;
+            DbFriendlyBot botStatus;
+            ApplicationSetting setting;
+            DomesticHelper bot;
+
             // note: it is possible for more than one entry/change to come in, as Meta aggregates up to 1,000 event notifications
             // see Frequency at https://developers.facebook.com/docs/graph-api/webhooks/getting-started
             foreach (var entry in payload.Entry)
@@ -143,23 +152,23 @@ namespace Corprio.SocialWorker.Controllers
                     //MetaPost post = new() { IsFbPost = false };
                     //MetaPage page = new() { Token = "EAAEcibYeGIUBOZCjbwHaILofgZAajzBlzX9PFbDZCpLKafFPQjmrmEaNVZAVskYLKGNvSd0g8BT4DgbQAeRFoHf26sscYNGzCpjz7sfyFHuBRk6c5zvechmGliH2NHLO4JOaccoANwAvEAoT7GiJiW7QqAo204J4i3fZCOA2yDaNZCsdHomAEfKBOlaZBSH" };
                     
-                    MetaPost post = db.MetaPosts
+                    post = db.MetaPosts
                         .Include(x => x.FacebookPage)
                         .ThenInclude(x => x.FacebookUser)
                         .ThenInclude(x => x.Bots)
-                        .FirstOrDefault(x => x.PostId == change.Value.PostId);
+                        .FirstOrDefault(x => x.PostId == change.Value.PostId && x.FacebookPage.FacebookUser.Dormant == false);
                     if (post?.FacebookPage?.FacebookUser?.OrganizationID == null)
                     {
                         Log.Error($"Failed to find post {change.Value.PostId} and its parent objects.");
                         continue;
-                    }
+                    }                    
 
                     // note 1: we use the keyword stored at the post level, NOT at the user level, because the keyword may be udpated after a post is made
                     // note 2: if the keyword is, for example, <a+>, then it was saved as &lt;a+&gt; in DB, while the user can input either <a+> or <A+>
                     if (post.KeywordForShoppingIntention?.ToUpper() != UtilityHelper.UncleanAndClean(change.Value.Message.Trim()).ToUpper()) 
                         continue;
 
-                    List<dynamic> existingProducts = await corprioClient.ProductApi.Query(
+                    existingProducts = await corprioClient.ProductApi.Query(
                         organizationID: post.FacebookPage.FacebookUser.OrganizationID,
                         selector: "new (ID)",
                         where: "EntityProperties.Any(Name==@0 && Value==@1)",
@@ -172,12 +181,13 @@ namespace Corprio.SocialWorker.Controllers
                         Log.Error($"Failed to find the product posted as {post.PostId}.");
                         continue;
                     }
-                    Guid productId = Guid.Parse(existingProducts[0].ID);
-
-                    DbFriendlyBot botStatus = await FindBot(facebookUser: post.FacebookPage.FacebookUser, interlocutorID: change.Value.From.Id);
-                    var bot = new DomesticHelper(context: db, configuration: configuration, client: corprioClient, 
+                    productId = Guid.Parse(existingProducts[0].ID);
+                    
+                    setting = await applicationSettingService.GetSetting<ApplicationSetting>(post.FacebookPage.FacebookUser.OrganizationID);
+                    botStatus = await FindBot(facebookUser: post.FacebookPage.FacebookUser, interlocutorID: change.Value.From.Id);
+                    bot = new DomesticHelper(context: db, configuration: configuration, client: corprioClient, 
                         organizationID: post.FacebookPage.FacebookUser.OrganizationID, 
-                        botStatus: botStatus, pageName: post.FacebookPage.Name);
+                        botStatus: botStatus, pageName: post.FacebookPage.Name, setting: setting);
                     string message;
                     try
                     {
@@ -218,8 +228,16 @@ namespace Corprio.SocialWorker.Controllers
         /// <param name="payload">Webhook payload</param>
         /// <returns>Status code</returns>
         /// <exception cref="Exception"></exception>
-        public async Task<IActionResult> HandleMessageWebhook(HttpClient httpClient, APIClient corprioClient, MessageWebhookPayload payload)
+        public async Task<IActionResult> HandleMessageWebhook(HttpClient httpClient, APIClient corprioClient, 
+            ApplicationSettingService applicationSettingService, MessageWebhookPayload payload)
         {
+            ApplicationSetting setting;
+            MetaPage page;
+            DbFriendlyBot botStatus;
+            DomesticHelper bot;
+            string response;
+            string endPoint;
+
             // note: it is possible for more than one entry/messaging to come in, as Meta aggregates up to 1,000 event notifications
             // see Frequency at https://developers.facebook.com/docs/graph-api/webhooks/getting-started
             foreach (var entry in payload.Entry)
@@ -233,20 +251,22 @@ namespace Corprio.SocialWorker.Controllers
                         continue;
                     }
                     
-                    MetaPage page = payload.Object == "instagram"
-                        ? db.MetaPages.Include(x => x.FacebookUser).ThenInclude(x => x.Bots).FirstOrDefault(x => x.InstagramID == messaging.Recipient.MetaID)
-                        : db.MetaPages.Include(x => x.FacebookUser).ThenInclude(x => x.Bots).FirstOrDefault(x => x.PageId == messaging.Recipient.MetaID);
+                    page = payload.Object == "instagram"
+                        ? db.MetaPages.Include(x => x.FacebookUser).ThenInclude(x => x.Bots).FirstOrDefault(x => x.InstagramID == messaging.Recipient.MetaID && x.FacebookUser.Dormant == false)
+                        : db.MetaPages.Include(x => x.FacebookUser).ThenInclude(x => x.Bots).FirstOrDefault(x => x.PageId == messaging.Recipient.MetaID && x.FacebookUser.Dormant == false);
                     if (page?.FacebookUser?.OrganizationID == null)
                     {
                         Log.Error($"Failed to find page based on recipient ID {messaging.Recipient.MetaID} and its associated objects.");
                         continue;
-                    }
+                    }                    
+
+                    setting = await applicationSettingService.GetSetting<ApplicationSetting>(page.FacebookUser.OrganizationID);
 
                     // assumption: senderId is the same regardless if (i) the sender made a comment on a post or (ii) sent a message via messenger
-                    DbFriendlyBot botStatus = await FindBot(facebookUser: page.FacebookUser, interlocutorID: messaging.Sender.MetaID);
-                    var bot = new DomesticHelper(context: db, configuration: configuration, client: corprioClient, organizationID: page.FacebookUser.OrganizationID, 
-                        botStatus: botStatus, detectedLocales: messaging.Message?.NLP?.DetectedLocales, pageName: page.Name);
-                    string response;
+                    botStatus = await FindBot(facebookUser: page.FacebookUser, interlocutorID: messaging.Sender.MetaID);
+                    bot = new DomesticHelper(context: db, configuration: configuration, client: corprioClient, organizationID: page.FacebookUser.OrganizationID, 
+                        botStatus: botStatus, detectedLocales: messaging.Message?.NLP?.DetectedLocales, pageName: page.Name, setting: setting);
+                    
                     try
                     {
                         response = await bot.ThinkBeforeSpeak(messaging.Message.Text);
@@ -259,7 +279,7 @@ namespace Corprio.SocialWorker.Controllers
                     // note: the bot must respond with something in 30 seconds (source: https://developers.facebook.com/docs/messenger-platform/policy/responsiveness)
                     if (string.IsNullOrWhiteSpace(response)) response = bot.ThusSpokeBabel("Err_DefaultMsg");
 
-                    string endPoint = payload.Object == "instagram" ? $"{BaseUrl}/{ApiVersion}/me/messages" : $"{BaseUrl}/{ApiVersion}/{messaging.Recipient.MetaID}/messages";
+                    endPoint = payload.Object == "instagram" ? $"{BaseUrl}/{ApiVersion}/me/messages" : $"{BaseUrl}/{ApiVersion}/{messaging.Recipient.MetaID}/messages";
                     await ApiActionHelper.SendMessage(
                         httpClient: httpClient,
                         accessToken: page.Token,
@@ -285,9 +305,11 @@ namespace Corprio.SocialWorker.Controllers
         /// <summary>
         /// Handle webhook notification sent via HTTP POST method
         /// </summary>
-        /// <returns>Status code</returns>
+        /// <param name="applicationSettingService">Application setting service</param>
+        /// <param name="httpClient">HTTP client for executing API query</param>
+        /// <returns></returns>
         [HttpPost("/webhook")]
-        public async Task<IActionResult> HandleWebhookPost([FromServices] HttpClient httpClient)
+        public async Task<IActionResult> HandleWebhookPost([FromServices] ApplicationSettingService applicationSettingService, [FromServices] HttpClient httpClient)
         {            
             string hash = Request.Headers.ContainsKey("x-hub-signature-256") ? Request.Headers["x-hub-signature-256"] : string.Empty;
             (bool verified, string requestString) = await HashCheck(request: Request, metaHash: hash);
@@ -302,14 +324,16 @@ namespace Corprio.SocialWorker.Controllers
             MessageWebhookPayload messageWebhookPayload = requestString == null ? null : JsonConvert.DeserializeObject<MessageWebhookPayload>(requestString)!;
             if (messageWebhookPayload?.Entry?.Any(x => x.Messaging?.Any(y => !string.IsNullOrWhiteSpace(y.Sender?.MetaID)) ?? false) ?? false)
             {                
-                return await HandleMessageWebhook(httpClient: httpClient, corprioClient: corprioClient, payload: messageWebhookPayload);
+                return await HandleMessageWebhook(httpClient: httpClient, corprioClient: corprioClient, 
+                    applicationSettingService: applicationSettingService, payload: messageWebhookPayload);
             }
 
             // if the payload includes "Changes", then presumably it is for webhook on feed
             FeedWebhookPayload feedWebhookPayload = requestString == null ? null : JsonConvert.DeserializeObject<FeedWebhookPayload>(requestString)!;
             if (feedWebhookPayload?.Entry?.Any(x => x.Changes?.Count > 0) ?? false)
             {
-                return await HandleFeedWebhook(httpClient: httpClient, corprioClient: corprioClient, payload: feedWebhookPayload);
+                return await HandleFeedWebhook(httpClient: httpClient, corprioClient: corprioClient,
+                    applicationSettingService: applicationSettingService, payload: feedWebhookPayload);
             }
 
             Log.Information($"Cannot recognize payload in webhook notification. Payload: {requestString}");
@@ -319,7 +343,7 @@ namespace Corprio.SocialWorker.Controllers
         /// <summary>
         /// Trigger the publication of a catalogue / product list
         /// </summary>
-        /// <param name="httpClient">HTTP client for executing API query</param>        
+        /// <param name="httpClient">HTTP client for executing API query</param>
         /// <param name="organizationID">Organization ID</param>
         /// <param name="productlistID">Entity ID of product list</param>        
         /// <returns>Status code</returns>        

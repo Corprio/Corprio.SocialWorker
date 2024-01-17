@@ -9,12 +9,17 @@ using Serilog;
 using Corprio.DataModel;
 using Corprio.CorprioAPIClient;
 using Corprio.Core.Exceptions;
+using Corprio.SocialWorker.Dictionaries;
+using Corprio.DataModel.Business;
+using System.Collections.Generic;
+using Corprio.AspNetCore.Site.Services;
 
 namespace Corprio.SocialWorker.Controllers
 {
     public class GetStartedController : AspNetCore.XtraReportSite.Controllers.BaseController
     {
         private readonly ApplicationDbContext db;
+        readonly ApplicationSettingService applicationSettingService;
         readonly APIClient corprioClient;
 
         /// <summary>
@@ -22,38 +27,13 @@ namespace Corprio.SocialWorker.Controllers
         /// </summary>
         /// <param name="context"></param>
         /// <param name="client">Client for Api requests among Corprio projects</param>
-        public GetStartedController(ApplicationDbContext context, APIClient client) : base()
+        public GetStartedController(ApplicationDbContext context, APIClient client, ApplicationSettingService appSettingService) : base()
         {
             db = context;
             corprioClient = client;
+            applicationSettingService = appSettingService;
         }
-        
-        /// <summary>
-        /// Save the application setting
-        /// </summary>
-        /// <param name="organizationID">Organization ID</param>
-        /// <param name="model">Application setting submitted from the client side</param>
-        /// <returns>Status code</returns>
-        public async Task<IActionResult> Save([FromRoute] Guid organizationID, [FromForm] ApplicationSetting model)
-        {
-            model.OrganizationID = organizationID;
-            ApplicationSetting setting = db.Settings.FirstOrDefault(x => x.OrganizationID == organizationID);
-            bool newSetting = setting == null;
-            Core.Utility.PropertyCopier.Copy(source: model, target: setting, ignoreNotUpdatable: false, copyKeyProperties: false, excludeProperties: null);
-
-            if (newSetting)
-            {
-                db.Settings.Add(setting);
-            }
-            else
-            {
-                db.Settings.Update(setting);
-            }
-            await db.SaveChangesAsync();
-
-            return StatusCode(200);
-        }
-        
+                
         /// <summary>
         /// Retrieve/initialize application setting and render the relevant view
         /// </summary>
@@ -61,14 +41,19 @@ namespace Corprio.SocialWorker.Controllers
         /// <returns>View</returns>
         public override IActionResult Index([FromRoute] Guid organizationID)
         {
-            ApplicationSetting applicationSetting = db.Settings.FirstOrDefault(x => x.OrganizationID == organizationID);
-            bool firstVisit = applicationSetting == null;  
+            ApplicationSetting applicationSetting = applicationSettingService.GetSetting<ApplicationSetting>(organizationID).ConfigureAwait(false).GetAwaiter().GetResult();            
+            bool firstVisit = string.IsNullOrWhiteSpace(applicationSetting?.KeywordForShoppingIntention);
             bool updated = false;  // if true, then the setting needs to be saved
-            applicationSetting ??= new()
+            if (firstVisit)
             {
-                ID = Guid.NewGuid(),
-                OrganizationID = organizationID,
-            };
+                OrganizationCoreInfo coreInfo = corprioClient.OrganizationApi.GetCoreInfo(organizationID).ConfigureAwait(false).GetAwaiter().GetResult();
+                applicationSetting = new()
+                {
+                    CataloguePostTemplate = string.Join(TemplateComponent.Separator, DefaultTemplate.DefaultTempalte_Catalogue),                    
+                    KeywordForShoppingIntention = BabelFish.Vocab["DefaultKeyWordForShoppingIntention"][UtilityHelper.NICAM(coreInfo)],                    
+                    ProductPostTemplate = string.Join(TemplateComponent.Separator, DefaultTemplate.DefaultTempalte_Product),
+                };
+            }                        
 
             if (string.IsNullOrWhiteSpace(applicationSetting.EmailToReceiveOrder))
             {
@@ -78,7 +63,7 @@ namespace Corprio.SocialWorker.Controllers
             
             if (applicationSetting.DeliveryChargeProductID == null)
             {
-                var productResult = corprioClient.ProductApi.Query(
+                List<dynamic> productResult = corprioClient.ProductApi.Query(
                     organizationID: organizationID,
                     selector: "new(ID)",
                     where: "Code=@0 and Disabled=false",
@@ -93,7 +78,7 @@ namespace Corprio.SocialWorker.Controllers
             
             if (applicationSetting.WarehouseID == null)
             {
-                var warehouseResult = corprioClient.WarehouseApi.Query(
+                List<dynamic> warehouseResult = corprioClient.WarehouseApi.Query(
                     organizationID: organizationID,
                     dynamicQuery: new DynamicQuery()
                     {
@@ -119,18 +104,30 @@ namespace Corprio.SocialWorker.Controllers
                 Log.Error($"Failed to test the latest SMTP setting of organization {organizationID}. {ex.Message}");
             }
 
-            if (firstVisit)
+            if (firstVisit || updated)
             {
-                db.Settings.Add(applicationSetting);
-                db.SaveChangesAsync().ConfigureAwait(false).GetAwaiter();
+                applicationSettingService.SaveSetting(organizationID: organizationID, setting: applicationSetting).ConfigureAwait(false).GetAwaiter(); ;
             }
-            else if (updated)
-            {
-                db.Settings.Update(applicationSetting);
-                db.SaveChangesAsync().ConfigureAwait(false).GetAwaiter();
-            }
-
+            
             return View(applicationSetting);
         }
+
+        /// <summary>
+        /// Save the application setting
+        /// </summary>
+        /// <param name="organizationID">Organization ID</param>
+        /// <param name="model">Application setting submitted from the client side</param>
+        /// <returns>Status code</returns>
+        public async Task<IActionResult> Save([FromRoute] Guid organizationID, [FromForm] ApplicationSetting model)
+        {
+            if (string.IsNullOrWhiteSpace(model.KeywordForShoppingIntention)) throw new Exception("Keyword cannot be blank.");
+
+            ApplicationSetting setting = await applicationSettingService.GetSetting<ApplicationSetting>(organizationID);            
+            Core.Utility.PropertyCopier.Copy(source: model, target: setting, ignoreNotUpdatable: false, copyKeyProperties: false, excludeProperties: null);
+            applicationSettingService.SaveSetting(organizationID: organizationID, setting: setting).ConfigureAwait(false).GetAwaiter(); ;            
+
+            return StatusCode(200);
+        }
+
     }
 }

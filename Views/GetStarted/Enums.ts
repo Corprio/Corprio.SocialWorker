@@ -1,6 +1,6 @@
 export enum MessageType {
-    CATALOGUE = 'catalogue',
-    PRODUCT = 'product'
+    CataloguePost = 'CataloguePost',
+    ProductPost = 'ProductPost'
 }
 
 export enum Selector {
@@ -22,6 +22,7 @@ export enum Selector {
     customTextInput_Catalogue = '#custom-input-catalogue',
     customTextInput_Product = '#custom-input-product',
     fbDialogue = '#fb-dialogue',
+    fbDialogue2 = '#fb-dialogue2',
     keywordInput_Product = '#keyword-input-product',
     loadIndicator_Top = '#load-indicator-top',
     loginButton = '#loginBtn',
@@ -30,6 +31,7 @@ export enum Selector {
     previewPanel_Product = '#preview-panel-product',
     restoreDefaultButton_Catalogue = '#restore-default-btn-catalogue',
     restoreDefaultButton_Product = '#restore-default-btn-product',
+    saveSettingButtons = '.save-setting-btn',
     saveTemplateButton_Catalogue = '#save-template-btn-catalogue',
-    saveTemplateButton_Product = '#save-template-btn-product',    
+    saveTemplateButton_Product = '#save-template-btn-product',
 }
