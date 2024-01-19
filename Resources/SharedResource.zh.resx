@@ -556,7 +556,7 @@
     <value>连接到您的Facebook 页面和 Instagram 帐户</value>
   </data>
   <data name="FB_not_connected" xml:space="preserve">
-    <value>直到您再次登录 Facebook，{0} 与任何 Facebook 帐户的连接将在 60 天后过期。</value>
+    <value>直到您再次登录 Facebook，{0} 与任何 Facebook 帐户的连接将在 60 天后失效。</value>
   </data>
   <data name="FreeShippingAmount" xml:space="preserve">
     <value>免运费金额</value>
@@ -780,11 +780,32 @@
   <data name="Colour" xml:space="preserve">
     <value>颜色</value>
   </data>
+  <data name="ContactPhone" xml:space="preserve">
+    <value>电话</value>
+  </data>
+  <data name="CustomerName" xml:space="preserve">
+    <value>顾客姓名</value>
+  </data>
+  <data name="DeliverTo" xml:space="preserve">
+    <value>送货地址</value>
+  </data>
+  <data name="DeliveryAddress" xml:space="preserve">
+    <value>地址</value>
+  </data>
+  <data name="Disconnect" xml:space="preserve">
+    <value>终止绑定</value>
+  </data>
+  <data name="DisconnectFacebook" xml:space="preserve">
+    <value>终止Facebook 绑定</value>
+  </data>
   <data name="EditQuantity" xml:space="preserve">
     <value>编辑数量</value>
   </data>
   <data name="EditVariant" xml:space="preserve">
     <value>更改选择</value>
+  </data>
+  <data name="Email" xml:space="preserve">
+    <value>电子邮件</value>
   </data>
   <data name="ErrMsg_ChatbotNotFound" xml:space="preserve">
     <value>我们尝试将此销售订单恢复到与您对话的聊天机器人，但失败。请确认您是否希望取消此订单。</value>
@@ -802,7 +823,10 @@
     <value>该公司没有与任何 Facebook 帐户建立有效连接。</value>
   </data>
   <data name="FB_AlreadyConnected" xml:space="preserve">
-    <value>Facebook 帐号 {0} 已与另一家公司连结。如果您希望将 {1} 与 {0} 连结，请造访 {2}。</value>
+    <value>Facebook 帐号 {0} 已与另一家公司连结。如果您希望将 {1} 与 {0} 连结，请造访</value>
+  </data>
+  <data name="FB_disconnected" xml:space="preserve">
+    <value>{0} 不再连接到任何 Facebook 帐户。</value>
   </data>
   <data name="Footer" xml:space="preserve">
     <value>预设页脚</value>
@@ -816,8 +840,23 @@
   <data name="LogoutFB" xml:space="preserve">
     <value>登出 Facebook</value>
   </data>
+  <data name="OrderDetails" xml:space="preserve">
+    <value>这是您的订单详情</value>
+  </data>
+  <data name="Period" xml:space="preserve">
+    <value>。</value>
+  </data>
   <data name="PoweredBy" xml:space="preserve">
     <value>由 {0} 提供支持</value>
+  </data>
+  <data name="Preview" xml:space="preserve">
+    <value>预览</value>
+  </data>
+  <data name="ProductCode" xml:space="preserve">
+    <value>产品代码</value>
+  </data>
+  <data name="Recipient" xml:space="preserve">
+    <value>收件人</value>
   </data>
   <data name="ReconnectFacebook" xml:space="preserve">
     <value>重置 Facebook 连接</value>
@@ -827,6 +866,9 @@
   </data>
   <data name="RemainingStockTitle" xml:space="preserve">
     <value>库存</value>
+  </data>
+  <data name="Remark" xml:space="preserve">
+    <value>备注</value>
   </data>
   <data name="Size" xml:space="preserve">
     <value>尺寸</value>
@@ -848,6 +890,48 @@
   </data>
   <data name="Title_EditVariant" xml:space="preserve">
     <value>更改选择</value>
+  </data>
+  <data name="Tour_CheckoutSection_Desc" xml:space="preserve">
+    <value>当您的客户选择结帐时，他们将被重定向到结帐页面以查看其购物车并提供个人信息。您可以在此设置要在结账页面向客户显示的信息。</value>
+  </data>
+  <data name="Tour_DelliverySection_Desc" xml:space="preserve">
+    <value>您在此设置的送货方式将在您的客户结帐时显示给他们选择。</value>
+  </data>
+  <data name="Tour_DisconnectFacebook_Desc" xml:space="preserve">
+    <value>终止您的公司和 Facebook 帐户之间的连接。</value>
+  </data>
+  <data name="Tour_FbSection_Desc" xml:space="preserve">
+    <value>将您的公司与 Facebook 连接，以便 {0} 可以代替您创建帖子并回复私人消息/评论。</value>
+  </data>
+  <data name="Tour_GetStarted_Desc" xml:space="preserve">
+    <value>在此完成一些简单的配置即让{0}投入服务。</value>
+  </data>
+  <data name="Tour_PaymentSection_Desc" xml:space="preserve">
+    <value>您在此设置的付款方式将在您的客户结账时提供给他们选择。</value>
+  </data>
+  <data name="Tour_ProductPublication_Desc" xml:space="preserve">
+    <value>将公司与 Facebook 帐户连接后，您可以在此将产品发布到 Facebook 专页和 Instagram 帐户。</value>
+  </data>
+  <data name="Tour_PublishButton_Desc" xml:space="preserve">
+    <value>选择一个产品并将其发布到您的 Facebook 专页和 Instagram 帐户。</value>
+  </data>
+  <data name="Tour_SaveButton_Desc" xml:space="preserve">
+    <value>完成设置后，请不要忘记按一下「储存」。</value>
+  </data>
+  <data name="Tour_SomSection_Desc" xml:space="preserve">
+    <value>将您的公司与 Facebook 帐户连接后，{0}的聊天机器人就可以处理客户发送到您的 Facebook 专页和 Instagram 帐户的信息。该聊天机器人将根据您在此处的设置创建销售订单。</value>
+  </data>
+  <data name="Tour_TemplateSection_Desc" xml:space="preserve">
+    <value>在此设置如何将您的商品/目录发布到您的社交媒体。</value>
+  </data>
+  <data name="Tour_ThankyouSection_Desc" xml:space="preserve">
+    <value>在此设置您希望在客户完成结帐后向其显示的感谢信息。</value>
+  </data>
+  <data name="Tour_Welcome_Desc" xml:space="preserve">
+    <value>欢迎来到{0}。</value>
+  </data>
+  <data name="Tour_Welcome_Title" xml:space="preserve">
+    <value>欢迎</value>
   </data>
   <data name="Warning_consequence1" xml:space="preserve">
     <value>您将无法发布目前与 Facebook 连结的公司的产品和/或目录。</value>
@@ -881,5 +965,8 @@
   </data>
   <data name="Warning_para2" xml:space="preserve">
     <value>公司连接。重置Facebook 帐号的连接将会导致以下后果：</value>
+  </data>
+  <data name="Warning_para3" xml:space="preserve">
+    <value>您即将终止 {0} 与 Facebook 帐户的连接。此操作无法撤消，并且会产生以下影响：</value>
   </data>
 </root>

@@ -31,6 +31,7 @@
     <None Remove="Views\Checkout\enums.ts" />
     <None Remove="Views\Checkout\Index.ts" />
     <None Remove="Views\Checkout\Interfaces.ts" />
+    <None Remove="Views\DisconnectFacebook\Index.ts" />
     <None Remove="Views\ReconnectFacebook\Index.ts" />
     <None Remove="Views\Home\Index.ts" />
     <None Remove="Views\GetStarted\Enums.ts" />
@@ -68,6 +69,7 @@
     <TypeScriptCompile Include="Views\Checkout\Index.ts" />
     <TypeScriptCompile Include="Views\Checkout\Enums.ts" />
     <TypeScriptCompile Include="Views\Checkout\Interfaces.ts" />
+    <TypeScriptCompile Include="Views\DisconnectFacebook\Index.ts" />
     <TypeScriptCompile Include="Views\ReconnectFacebook\Index.ts" />
     <TypeScriptCompile Include="Views\ConnectFacebook\Index.ts" />
     <TypeScriptCompile Include="Views\GetStarted\Interfaces.ts" />

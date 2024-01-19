@@ -16,6 +16,7 @@
     Guid organizationID = Context.SelectedOrganizationID() ?? Guid.Empty;
     OrganizationCoreInfo orgInfo = organizationID.Equals(Guid.Empty) ? null : await corprioApi.OrganizationApi.GetCoreInfo(organizationID: organizationID);
     bool authorizedToUpdate = orgInfo == null ? false : orgInfo.OwnerID == Context.User.GetUserID();  // true if the current user can update the application setting
+    string appBaseUrl = configuration["AppBaseUrl"];
 
     string defaultCatalogueMessage = BabelFish.Vocab["VisitCatalogue"][UtilityHelper.NICAM(orgInfo)];
     string sampleShortName = orgInfo == null ? orgInfo.ShortName : "MyCompany";
@@ -32,7 +33,7 @@
     // use vdata to pass parameters to TS
     const vdata = {
         actions: {
-            refreshAccessToken: '@StringHelper.Encode(@Url.Action("RefreshAccessToken", "ConnectFacebook", new { organizationID }))',            
+            refreshAccessToken: '@StringHelper.Encode(@Url.Action("RefreshAccessToken", "ConnectFacebook", new { organizationID }))',
             saveSetting: '@StringHelper.Encode(@Url.Action("GetStarted", "Save", new { organizationID }))',            
         },
         localizer: {
@@ -49,6 +50,7 @@
             msgMissingDeliveryChargeProductError: '@StringHelper.Encode(localizer["MsgMissingDeliveryChargeProductError"])',
             msgSettingSaved: '@StringHelper.Encode(localizer["MsgSettingSaved"])',
             newLine: '@StringHelper.Encode(localizer["Template_NewLine"])',
+            period: '@StringHelper.Encode(localizer["Period"])',
             productCode: '@StringHelper.Encode(localizer["Template_ProductCode"])',
             productDescription: '@StringHelper.Encode(localizer["Template_ProductDescription"])',
             productListPrice: '@StringHelper.Encode(localizer["Template_ProductListPrice"])',
@@ -65,35 +67,36 @@
             productTemplate: '@StringHelper.Encode(Model.ProductPostTemplate)',
         },
         sampleValues: {
-            catalogueURL: "@catalogueURL",
-            defaultCatalogueMessage: "@defaultCatalogueMessage",
-            defaultProductMessage: "@defaultProductMessage",
+            catalogueURL: '@catalogueURL',
+            defaultCatalogueMessage: '@defaultCatalogueMessage',
+            defaultProductMessage: '@defaultProductMessage',
         },
         settings: {
-            env: "@env",
-            metaApiID: "@metaApiID",
-            metaApiVersion: "@metaApiVersion",
-            organizationID: "@organizationID",
-            sendConfirmationEmail: "@Model.SendConfirmationEmail",
+            appBaseUrl: '@appBaseUrl',
+            env: '@env',
+            metaApiID: '@metaApiID',
+            metaApiVersion: '@metaApiVersion',
+            organizationID: '@organizationID',
+            sendConfirmationEmail: '@Model.SendConfirmationEmail',
             shortName: '@orgInfo?.ShortName',
         },
         templateComponents: {
-            catalogueCodeValue: "@TemplateComponent.CatalogueCode",
-            catalogueEndDateValue: "@TemplateComponent.CatalogueEndDate",
-            catalogueNameValue: "@TemplateComponent.CatalogueName",
-            catalogueStartDateValue: "@TemplateComponent.CatalogueStartDate",            
-            catalogueUrlValue: "@TemplateComponent.CatalogueUrl",
-            defaultMessageValue: "@TemplateComponent.DefaultMessage",
-            defaultTemplate_catalogue: "@defaultTemplate_catalogue",
-            defaultTemplate_product: "@defaultTemplate_product",            
-            newLineValue: "@TemplateComponent.LineBreak",            
-            productCodeValue: "@TemplateComponent.ProductCode",
-            productDescriptionValue: "@TemplateComponent.ProductDescription",
-            productListPriceValue: "@TemplateComponent.ProductListPrice",
-            productNameValue: "@TemplateComponent.ProductName",
-            productPublicPriceValue: "@TemplateComponent.ProductPublicPrice",
-            productReplyKeyword: "@TemplateComponent.Keyword",
-            separator: "@separator"
+            catalogueCodeValue: '@TemplateComponent.CatalogueCode',
+            catalogueEndDateValue: '@TemplateComponent.CatalogueEndDate',
+            catalogueNameValue: '@TemplateComponent.CatalogueName',
+            catalogueStartDateValue: '@TemplateComponent.CatalogueStartDate',            
+            catalogueUrlValue: '@TemplateComponent.CatalogueUrl',
+            defaultMessageValue: '@TemplateComponent.DefaultMessage',
+            defaultTemplate_catalogue: '@defaultTemplate_catalogue',
+            defaultTemplate_product: '@defaultTemplate_product',            
+            newLineValue: '@TemplateComponent.LineBreak',            
+            productCodeValue: '@TemplateComponent.ProductCode',
+            productDescriptionValue: '@TemplateComponent.ProductDescription',
+            productListPriceValue: '@TemplateComponent.ProductListPrice',
+            productNameValue: '@TemplateComponent.ProductName',
+            productPublicPriceValue: '@TemplateComponent.ProductPublicPrice',
+            productReplyKeyword: '@TemplateComponent.Keyword',
+            separator: '@separator'
         }        
     };
 </script>
@@ -261,7 +264,8 @@
                                 t.Add().Name(HtmlEditorImageUploadTab.Url);
                             }))
                             .Disabled(!authorizedToUpdate).Width("100%"))
-                    </div>                    
+                    </div>
+                    <button type="button" id="preview-checkout" class="btn btn-white mr-2 my-4"><i class="fas fa-save mr-2"></i>@localizer["Preview"]</button>
                 </section>
 
                 <section id="thankyou-section">
@@ -279,6 +283,7 @@
                             }
                             )).Disabled(!authorizedToUpdate).Width("100%"))
                     </div>
+                    <button type="button" id="preview-thank-you" class="btn btn-white mr-2 my-4"><i class="fas fa-save mr-2"></i>@localizer["Preview"]</button>
                 </section>
             </form>
             
@@ -316,14 +321,12 @@
                             </select>
                             <div class="input-group-append">
                                 <button id="component-btn-product" class="btn btn-outline-primary" type="button" data-toggle="tooltip" data-placement="right" title="@localizer["Tooltip_StandardMessageComponent"]">@globalLocalizer["Add"]</button>
-                            </div>
+                            </div>                             
                             <div class="invalid-feedback">@localizer["InvalidFeedback_NoKeyword"]</div>
                         </div>
 
                         <div class="input-group mb-3">
-                            <label class="my-1 mr-2" for="custom-input-product">
-                                @localizer["CustomText"]
-                            </label>
+                            <label class="my-1 mr-2" for="custom-input-product">@localizer["CustomText"]</label>
                             <input type="text" id="custom-input-product" class="form-control" placeholder="@localizer["CustomText"]" aria-label="Custom Text" aria-describedby="basic-addon2">
                             <div class="input-group-append">
                                 <button id="custom-btn-product" class="btn btn-outline-primary" type="button">@globalLocalizer["Add"]</button>
@@ -378,9 +381,7 @@
                             </div>
 
                             <div class="input-group mb-3">
-                                <label class="my-1 mr-2" for="custom-input-catalogue">
-                                    @localizer["CustomText"]
-                                </label>
+                                <label class="my-1 mr-2" for="custom-input-catalogue">@localizer["CustomText"]</label>
                                 <input type="text" id="custom-input-catalogue" class="form-control" placeholder="@localizer["CustomText"]" aria-label="Custom Text" aria-describedby="basic-addon2">
                                 <div class="input-group-append">
                                     <button id="custom-btn-catalogue" class="btn btn-outline-primary" type="button">@globalLocalizer["Add"]</button>

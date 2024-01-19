@@ -22,6 +22,9 @@ using Corprio.DataModel.Business.Logistic;
 
 namespace Corprio.SocialWorker.Helpers
 {
+    /// <summary>
+    /// All logic of the chat bot is in this class
+    /// </summary>
     public class DomesticHelper
     {
         private readonly ApplicationDbContext db;

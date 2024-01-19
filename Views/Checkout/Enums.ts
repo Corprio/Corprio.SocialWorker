@@ -6,10 +6,10 @@ export enum DeliveryOption {
 }
 
 
-export enum CorprioPhoneNumberType {
-    General,
-    Home,
-    Work,
-    Mobile,
-    Fax
-}
+//export enum CorprioPhoneNumberType {
+//    General,
+//    Home,
+//    Work,
+//    Mobile,
+//    Fax
+//}

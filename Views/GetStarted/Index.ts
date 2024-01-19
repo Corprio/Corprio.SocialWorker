@@ -21,6 +21,7 @@ declare const vdata: {
         msgMissingDeliveryChargeProductError: string;
         msgSettingSaved: string;
         newLine: string;
+        period: string;
         productCode: string;
         productDescription: string;
         productListPrice: string;
@@ -42,6 +43,7 @@ declare const vdata: {
         defaultProductMessage: string;
     };
     settings: {
+        appBaseUrl: string;
         env: string;
         metaApiID: string;
         metaApiVersion: string;
@@ -292,6 +294,11 @@ function validateKeyword(keyword: string): boolean {
     return true;
 }
 
+/**
+ * Turn the template created in GUI into string
+ * @param messageType-Publication of products or catalogues
+ * @returns
+ */
 function stringifyTemplate(messageType: MessageType): StringifiedTemplate {
     const result: StringifiedTemplate = {
         isValid: messageType === MessageType.CataloguePost,  // note: there is no validation for catalogue post template
@@ -588,18 +595,18 @@ function refreshAccessToken(metaId: string, accessToken: string) {
         url: vdata.actions.refreshAccessToken,
         data: {
             metaId: metaId,
-            token: accessToken,            
+            token: accessToken,
         },
         success: function () {
             console.log(`Token for ${metaId} is fed to backend successfully.`);
             initializeGlobalVariables();  // initialize global variables again because theoritically fbAsyncInit and its callbacks can all run before DOM is loaded            
             restoreKeyword();
             restoreTemplate(MessageType.ProductPost);
-            restoreTemplate(MessageType.CataloguePost);            
-            $(Selector.saveSettingButtons).removeAttr('disabled');
+            restoreTemplate(MessageType.CataloguePost);
+            $(Selector.saveSettingButtons).removeAttr('disabled');            
         },
         error: function (jqXHR, textStatus, errorThrown) {
-            $(Selector.saveSettingButtons).attr('disabled', 'disabled');
+            $(Selector.saveSettingButtons).attr('disabled', 'disabled');            
 
             // note: 409 means that another organization is connected with the Facebook account
             if (jqXHR.status !== 409) {
@@ -607,11 +614,14 @@ function refreshAccessToken(metaId: string, accessToken: string) {
                 return corprio.formatError(jqXHR, textStatus, errorThrown);                
             }
 
+            // query Facebook to obtain the Facebook user name
             FB.api('/me', { fields: 'name' }, function (response: facebook.User) {
                 const alert =
                     `<div class="alert alert-danger">` +
                         `<i class="fa-regular fa-circle-exclamation"></i>` +
-                        `&nbsp;${vdata.localizer.fbAlreadyConnected.replaceAll('{0}', response.name).replaceAll('{1}', vdata.settings.shortName).replaceAll('{2}', vdata.localizer.reconnectFacebook)}` +
+                        `&nbsp;${vdata.localizer.fbAlreadyConnected.replaceAll('{0}', response.name).replaceAll('{1}', vdata.settings.shortName)}&nbsp;` +
+                        `<u class="text-primary"><a href="${vdata.settings.appBaseUrl}/${vdata.settings.organizationID}/ReconnectFacebook">${vdata.localizer.reconnectFacebook}</a></u>` +
+                        `${vdata.localizer.period}` +
                     `</div>`
                 $(Selector.fbDialogue2).empty().append(alert);
                 return FB.logout(checkLoginState);
@@ -714,6 +724,9 @@ window.fbAsyncInit = function () {
     });
 };
 
+/**
+ * IIFE to make a reference to the SDK, if it does not already exist
+ */
 (function (element: Document, tagName: string, selector: string) {
     var js, fjs = element.getElementsByTagName(tagName)[0];
     if (element.getElementById(selector)) { return; }
@@ -723,13 +736,15 @@ window.fbAsyncInit = function () {
 }(document, 'script', 'facebook-jssdk')
 );
 
-// initialize global variables and restore the saved templates
+/**
+ * Entry point
+ */
 $(function () {
     // prevent 'Enter' from triggering form submission
     $(window).on('keydown', function (event) {
         if (event.key == 'Enter') {
             event.preventDefault();
-            return false;
+            return;
         }
     });
 
@@ -790,17 +805,20 @@ $(function () {
 
     });       
 
-    // template-related stuff
-    if (vdata.settings.env === "PRD") {
-        $(Selector.catalogueSetting).hide();
-    } else {
-        $(Selector.catalogueSetting).show();
-    }
-    
+    // template-related stuff    
+    $(Selector.catalogueSetting).toggle(vdata.settings.env !== "PRD");
     initializeGlobalVariables();    
     AssignEventListenersForTemplates(MessageType.CataloguePost);    
-    AssignEventListenersForTemplates(MessageType.ProductPost);
+    AssignEventListenersForTemplates(MessageType.ProductPost);    
     $(Selector.saveSettingButtons).on('click', saveSettings);
+
+    // miscellaneous
+    $('#preview-checkout').on('click', function () {
+        window.open(`/${vdata.settings.organizationID}/GetStarted/PreviewCheckout`, '_blank');
+    });
+    $('#preview-thank-you').on('click', function () {
+        window.open(`/${vdata.settings.organizationID}/GetStarted/PreviewThankYou`, '_blank');
+    });    
     
     corprio.page.initTour({ defaultTour: 'getstarted.index', autoStart: true, driverCssLoaded: true });
 });

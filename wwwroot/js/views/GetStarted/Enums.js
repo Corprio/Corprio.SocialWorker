@@ -50,6 +50,7 @@ var Selector;
     Selector["loadIndicator_Top"] = "#load-indicator-top";
     Selector["loginButton"] = "#loginBtn";
     Selector["logoutButton"] = "#logoutBtn";
+    Selector["previewButtons"] = ".preview-btn";
     Selector["previewPanel_Catalogue"] = "#preview-panel-catalogue";
     Selector["previewPanel_Product"] = "#preview-panel-product";
     Selector["restoreDefaultButton_Catalogue"] = "#restore-default-btn-catalogue";

@@ -51,6 +51,7 @@ var Selector;
     Selector["loadIndicator_Top"] = "#load-indicator-top";
     Selector["loginButton"] = "#loginBtn";
     Selector["logoutButton"] = "#logoutBtn";
+    Selector["previewButtons"] = ".preview-btn";
     Selector["previewPanel_Catalogue"] = "#preview-panel-catalogue";
     Selector["previewPanel_Product"] = "#preview-panel-product";
     Selector["restoreDefaultButton_Catalogue"] = "#restore-default-btn-catalogue";
@@ -323,6 +324,11 @@ function validateKeyword(keyword) {
     $(Enums_1.Selector.keywordInput_Product).removeClass('is-invalid');
     return true;
 }
+/**
+ * Turn the template created in GUI into string
+ * @param messageType-Publication of products or catalogues
+ * @returns
+ */
 function stringifyTemplate(messageType) {
     const result = {
         isValid: messageType === Enums_1.MessageType.CataloguePost,
@@ -625,10 +631,13 @@ function refreshAccessToken(metaId, accessToken) {
                 $(Enums_1.Selector.fbDialogue2).empty();
                 return corprio.formatError(jqXHR, textStatus, errorThrown);
             }
+            // query Facebook to obtain the Facebook user name
             FB.api('/me', { fields: 'name' }, function (response) {
                 const alert = `<div class="alert alert-danger">` +
                     `<i class="fa-regular fa-circle-exclamation"></i>` +
-                    `&nbsp;${vdata.localizer.fbAlreadyConnected.replaceAll('{0}', response.name).replaceAll('{1}', vdata.settings.shortName).replaceAll('{2}', vdata.localizer.reconnectFacebook)}` +
+                    `&nbsp;${vdata.localizer.fbAlreadyConnected.replaceAll('{0}', response.name).replaceAll('{1}', vdata.settings.shortName)}&nbsp;` +
+                    `<u class="text-primary"><a href="${vdata.settings.appBaseUrl}/${vdata.settings.organizationID}/ReconnectFacebook">${vdata.localizer.reconnectFacebook}</a></u>` +
+                    `${vdata.localizer.period}` +
                     `</div>`;
                 $(Enums_1.Selector.fbDialogue2).empty().append(alert);
                 return FB.logout(checkLoginState);
@@ -716,6 +725,9 @@ window.fbAsyncInit = function () {
         handleFbLoginStatusChange(response); // Returns the login status.
     });
 };
+/**
+ * IIFE to make a reference to the SDK, if it does not already exist
+ */
 (function (element, tagName, selector) {
     var js, fjs = element.getElementsByTagName(tagName)[0];
     if (element.getElementById(selector)) {
@@ -726,13 +738,15 @@ window.fbAsyncInit = function () {
     js.src = "https://connect.facebook.net/en_US/sdk.js";
     fjs.parentNode.insertBefore(js, fjs);
 }(document, 'script', 'facebook-jssdk'));
-// initialize global variables and restore the saved templates
+/**
+ * Entry point
+ */
 $(function () {
     // prevent 'Enter' from triggering form submission
     $(window).on('keydown', function (event) {
         if (event.key == 'Enter') {
             event.preventDefault();
-            return false;
+            return;
         }
     });
     // facebook-related stuff
@@ -783,17 +797,19 @@ $(function () {
         $(".sidebar-wrapper").addClass("hidden");
         $(".sidebar").removeClass("show");
     });
-    // template-related stuff
-    if (vdata.settings.env === "PRD") {
-        $(Enums_1.Selector.catalogueSetting).hide();
-    }
-    else {
-        $(Enums_1.Selector.catalogueSetting).show();
-    }
+    // template-related stuff    
+    $(Enums_1.Selector.catalogueSetting).toggle(vdata.settings.env !== "PRD");
     initializeGlobalVariables();
     AssignEventListenersForTemplates(Enums_1.MessageType.CataloguePost);
     AssignEventListenersForTemplates(Enums_1.MessageType.ProductPost);
     $(Enums_1.Selector.saveSettingButtons).on('click', saveSettings);
+    // miscellaneous
+    $('#preview-checkout').on('click', function () {
+        window.open(`/${vdata.settings.organizationID}/GetStarted/PreviewCheckout`, '_blank');
+    });
+    $('#preview-thank-you').on('click', function () {
+        window.open(`/${vdata.settings.organizationID}/GetStarted/PreviewThankYou`, '_blank');
+    });
     corprio.page.initTour({ defaultTour: 'getstarted.index', autoStart: true, driverCssLoaded: true });
 });
 

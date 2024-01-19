@@ -1,0 +1,36 @@
+﻿.max-1000 {
+    max-width: 1000px;
+    margin: auto;
+}
+
+.so-info th, .so-info td {
+    padding: 0.25rem;
+}
+
+.so-info .heading {
+    border-bottom: 1px solid grey;
+    text-transform: uppercase;
+    padding-top: 1.5rem;
+}
+
+.so-order th, .so-order td {
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+}
+
+.so-order img {
+    width: 48px;
+    height: 48px;
+}
+
+@@media screen and (max-width: 767px) {
+
+    .so-order {
+        font-size: 0.8rem;
+    }
+
+        .so-order th, .so-order td {
+            padding-left: 0.25rem;
+            padding-right: 0.25rem;
+        }
+}

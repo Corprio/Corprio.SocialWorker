@@ -1,3 +1,4 @@
+import { PhoneNumber } from '@corprio/aspnetcore-site/dist/js/coWidgets/coPhoneNumber';
 import { DeliveryOption } from './Enums';
 import { CheckoutDataModel, CheckoutOrderLine, ProductVariationInfo } from './Interfaces';
 
@@ -80,6 +81,7 @@ declare const vdata: {
         hasFreeShipping: string;
         isOrderVoidOrPaid: string;
         isPaymentClicked: string;
+        isPreview: string;
         orderLineJsonString: string;
         organizationEmailAddress: string;
         organizationID: string;
@@ -95,9 +97,9 @@ declare const vdata: {
 };
 
 // magic numbers
-const VALIDATION_GROUP = 'checkout';
-const DATASET_ATTRIBUTE = 'attribute';
-const DATASET_ORDERLINE = 'orderline';
+const VALIDATION_GROUP = 'checkout';  // name of validation group used in dxValidator
+const DATASET_ATTRIBUTE = 'attribute';  // name of data attribute about product variation's attribute
+const DATASET_ORDERLINE = 'orderline';  // name of data attribute about sales order line ID
 
 // global variables (state)
 let chosenDeliveryMethod: DeliveryOption = DeliveryOption.NoOption;
@@ -106,6 +108,7 @@ let provideShipping: boolean = false;
 let hasFreeShippingPolicy: boolean = false;
 let freeShippingAmount: number = 0;
 let isPaymentClicked: boolean = false;
+let isPreview: boolean = false;
 let isOrderVoidOrPaid: boolean = false;
 let totalQty: number = 0;
 let totalAmount: number = 0;
@@ -113,9 +116,11 @@ let actualDeliveryCharge: number = 0;
 const availableDeliveryMethods: DeliveryOption[] = [];
 let orderLines: CheckoutOrderLine[] = [];
 
-
+/**
+ * Handle deletion of a row from the shopping cart
+ */
 function deleteRow() {
-    if (isPaymentClicked) { return; }
+    if (isPaymentClicked || isPreview) { return; }
 
     // IMPORTANT: since we are using 'this', the following two lines must NOT be nested in another function
     const salesOrderLineID = $(this).data(DATASET_ORDERLINE);
@@ -143,6 +148,11 @@ function deleteRow() {
         });
 }
 
+/**
+ * Return a pop-up for user to edit product quantity
+ * @param line-Order line whose product's quantity is to be edited
+ * @returns-A template for editing product quantity
+ */
 function editQtyTemplate(line: CheckoutOrderLine) {
     const $content = $(`<div id="popup-${line.SalesOrderLineID}">`);
     $('<label class="flex-even">').html(vdata.localizer.quantity).appendTo($content);
@@ -174,7 +184,7 @@ function editQtyTemplate(line: CheckoutOrderLine) {
                 },
             }
         ],
-        readOnly: isPaymentClicked,
+        readOnly: isPaymentClicked || isPreview,
         onValueChanged: function (e) {
             let changedValue: number = e.value;
             if (changedValue < 0) {
@@ -209,11 +219,19 @@ function editQtyTemplate(line: CheckoutOrderLine) {
     return $content;
 }
 
+/**
+ * Hide the pop-up for editing product quantity or variations
+ */
 function hidePopup() {
     const $popup = $("#edit-popup").dxPopup("instance");
     $popup.hide();
 }
 
+/**
+ * Handle the product variation(s) selected by the user
+ * @param line-Order line whose product variations are selected
+ * @returns
+ */
 function determineProduct(line: CheckoutOrderLine) {
     if (!(line.ChildProductInfo?.length > 1)) { return hidePopup(); }
 
@@ -272,7 +290,11 @@ function determineProduct(line: CheckoutOrderLine) {
     return saveRow(line);
 }
 
-// note: a template function CANNOT be async
+/**
+ * Return a pop-up for user to select product variations
+ * @param line-Order line whose product variations are to be selected
+ * @returns-A template for select product variations
+ */
 function editVariantTemplate(line: CheckoutOrderLine) {    
     const $content = $(`<div id="popup-${line.SalesOrderLineID}">`);    
 
@@ -323,6 +345,11 @@ function editVariantTemplate(line: CheckoutOrderLine) {
     return $content;
 }
 
+/**
+ * Instruct the backend to update the product ID and/or quantity of a sales order line
+ * @param line-The sales order line to be updated
+ * @returns
+ */
 function saveRow(line: CheckoutOrderLine) {
     return $.post({
         url: vdata.actions.editSalesOrderLine,
@@ -356,6 +383,9 @@ function saveRow(line: CheckoutOrderLine) {
     }).fail(corprio.formatError);
 }
 
+/**
+ * Update the global variables for total quantiy and amount
+ */
 function recalculateTotals() {
     totalQty = orderLines.reduce(function (result, item) {
         result += item.Quantity;
@@ -368,6 +398,9 @@ function recalculateTotals() {
     }, 0);
 }
 
+/**
+ * Render the subtotal, delivery charge (if any) and total on screen
+ */
 function renderTotals() {
     $('#order-subtotal').text(StaticData.FormatCurrency(totalAmount, vdata.model.currencyCode));
     if (actualDeliveryCharge > 0) {
@@ -379,6 +412,10 @@ function renderTotals() {
     $('#order-total').text(StaticData.FormatCurrency(totalAmount + actualDeliveryCharge, vdata.model.currencyCode));    
 }
 
+/**
+ * Render the Bill-to section of checkout page
+ * @param defCallingCode-Default calling code, supposedly determined by the organization's country code
+ */
 function prepareBillToFields(defCallingCode: string) {
     const $billToFieldset = $('<fieldset id="bill-to-fieldset">').appendTo($('#customer-info-form'));
     $('<h5>').addClass('mt-3').text(vdata.localizer.billTo).appendTo($billToFieldset);
@@ -386,7 +423,7 @@ function prepareBillToFields(defCallingCode: string) {
     const $givenNameWidget = $('<div id="bill-person-given-name">')
         .dxTextBox({
             value: vdata.model.billedPersonGivenName,
-            disabled: isPaymentClicked,
+            disabled: isPaymentClicked || isPreview,
             maxLength: 100,
             label: vdata.localizer.givenName,
             labelMode: 'floating',
@@ -404,7 +441,7 @@ function prepareBillToFields(defCallingCode: string) {
     const $familyNameWidget = $('<div id="bill-person-family-name">')
         .dxTextBox({
             value: vdata.model.billedPersonFamilyName,
-            disabled: isPaymentClicked,
+            disabled: isPaymentClicked || isPreview,
             maxLength: 100,
             label: vdata.localizer.familyName,
             labelMode: 'floating',
@@ -421,26 +458,46 @@ function prepareBillToFields(defCallingCode: string) {
     
     $('<div>').addClass('d-flex mb-2').appendTo($billToFieldset).append($givenNameWidget, $familyNameWidget);
     
-    const $phoneWidget = $('<div id="bill-contact-phone">').appendTo($billToFieldset);
-    corprio.geography.addPhoneNumberTo(
-        $phoneWidget,
-        vdata.model.billedPhoneSubscriberNumber
+    const $billPhone = $('<div id="bill-contact-phone">').appendTo($billToFieldset);
+    corprio.coWidgets.useCoPhoneNumber();
+    $billPhone.coPhoneNumber({
+        name: 'contact-phone',
+        value: vdata.model.billedPhoneSubscriberNumber
             ? { NumberType: 3, CountryCallingCode: vdata.model.billedPhoneCountryCallingCode, NationalDestinationCode: vdata.model.billedPhoneNationalDestinationCode, SubscriberNumber: vdata.model.billedPhoneSubscriberNumber }
             : { NumberType: 3, CountryCallingCode: defCallingCode },
-        'contact-phone',
-        null,
-        function (phoneNumber) {
-            if (isPaymentClicked) { return; }
+        onValueChanged: function (e) {
+            if (isPaymentClicked || isPreview) { return; }
 
-            const $deliveryPhone = $('#delivery-phone-number');            
-            if ($deliveryPhone.length) {
-                corprio.geography.setPhoneNumber($deliveryPhone, phoneNumber);
+            const $deliveryPhone = $('#delivery-phone-number').coPhoneNumber('instance');
+            if ($deliveryPhone) {
+                $deliveryPhone.option('value', e.value);
             }
         },
-        true,
-        VALIDATION_GROUP
-    );    
-    $phoneWidget.find('.phone').dxValidator({
+        required: true,
+        validationGroup: VALIDATION_GROUP,
+    });
+
+    //corprio.geography.addPhoneNumberTo(
+    //    $billPhone,
+    //    vdata.model.billedPhoneSubscriberNumber
+    //        ? { NumberType: 3, CountryCallingCode: vdata.model.billedPhoneCountryCallingCode, NationalDestinationCode: vdata.model.billedPhoneNationalDestinationCode, SubscriberNumber: vdata.model.billedPhoneSubscriberNumber }
+    //        : { NumberType: 3, CountryCallingCode: defCallingCode },
+    //    'contact-phone',
+    //    null,
+    //    function (phoneNumber) {
+    //        if (isPaymentClicked || isPreview) { return; }
+
+    //        const $deliveryPhone = $('#delivery-phone-number');
+    //        if ($deliveryPhone.length) {                
+    //            setPhoneNumber($deliveryPhone, phoneNumber);
+    //            /*corprio.geography.setPhoneNumber($deliveryPhone, phoneNumber);*/                
+    //        }
+    //    },
+    //    true,
+    //    VALIDATION_GROUP
+    //);
+
+    $billPhone.find('.phone').dxValidator({
         validationGroup: VALIDATION_GROUP,
         validationRules: [{
             type: 'custom',
@@ -452,13 +509,19 @@ function prepareBillToFields(defCallingCode: string) {
             }
         }]
     });
-    if (isPaymentClicked) {
-        $phoneWidget.find('input').attr('disabled', 'disabled');
-        $phoneWidget.find('div[role="button"]').remove();
+    if (isPaymentClicked || isPreview) {
+        $billPhone.find('input').attr('disabled', 'disabled');
+        // also remove the flag and drop-down button from country code select box
+        $billPhone.find('.co-phonenumber-country-flag').remove();
+        $billPhone.find('div[role="button"]').remove();
     }
 }
 
-// stopped at here; this function worked. you can move on to do the email template/bot/settings
+/**
+ * Render shipping as a delivery method on the checkout page
+ * @param $shipToCustomerDiv-Container
+ * @returns-Updated container
+ */
 function renderShippingChoice($shipToCustomerDiv: JQuery<HTMLElement>) {
     $shipToCustomerDiv.empty();
     $shipToCustomerDiv.append(
@@ -480,6 +543,11 @@ function renderShippingChoice($shipToCustomerDiv: JQuery<HTMLElement>) {
     return $shipToCustomerDiv;
 }
 
+/**
+ * Render delivery method(s) on the checkout page
+ * @param defCallingCode-Default calling code, supposedly determined by the organization's country code
+ * @returns
+ */
 function prepareDeliveryMethodFields(defCallingCode: string) {
     const $deliveryMethodFieldset = $('<fieldset id="delivery-method-fieldset">').appendTo($('#customer-info-form'));
 
@@ -498,7 +566,7 @@ function prepareDeliveryMethodFields(defCallingCode: string) {
         $('<div id="delivery-method">').dxRadioGroup({
             // dependencies: the following two variables are assigned with adjustGlobalVariables()
             dataSource: availableDeliveryMethods,
-            disabled: isPaymentClicked,
+            disabled: isPaymentClicked || isPreview,
             value: chosenDeliveryMethod,
             itemTemplate: function (itemData, _, itemElement) {
                 if (itemData === DeliveryOption.SelfPickup) {
@@ -509,16 +577,14 @@ function prepareDeliveryMethodFields(defCallingCode: string) {
                             : vdata.localizer.noPickupInstruction.replaceAll('{0}', vdata.model.organizationShortName).replaceAll('{1}', vdata.model.organizationEmailAddress))
                     );
                 } else if (itemData === DeliveryOption.Shipping) {
-                    const $shipToCustomerDiv = renderShippingChoice($('<div id="shipping-choice">'));                    
-                    let $deliveryChargeContent = $('<div>').html(`${vdata.localizer.deliveryCharge}: ${StaticData.FormatCurrency(parseFloat(vdata.model.deliveryChargeAmount), vdata.model.currencyCode)}`);
-                    let $freeShippingHint = $('<div class="font-weight-bold">').html(vdata.localizer.freeShippingHint1.replaceAll('{0}', StaticData.FormatCurrency(freeShippingAmount, vdata.model.currencyCode)));
-                    itemElement.append(
-                        $shipToCustomerDiv,
-                        // note: free shipping hint is not shown if the customer has proceeded to payment, because the merchant may have adjusted the free shipping policy since then
-                        $('<div class="delivery-method-info my-2">').append(
-                            (hasFreeShippingPolicy && !isPaymentClicked) ? [$deliveryChargeContent, $freeShippingHint] : $deliveryChargeContent
-                        )
-                    );                    
+                    const $shipToCustomerDiv = renderShippingChoice($('<div id="shipping-choice">'));                                        
+                    const $deliveryChargeContent = $('<div>').html(`${vdata.localizer.deliveryCharge}: ${StaticData.FormatCurrency(parseFloat(vdata.model.deliveryChargeAmount), vdata.model.currencyCode)}`);
+                    const $freeShippingHint = $('<div class="font-weight-bold">').html(vdata.localizer.freeShippingHint1.replaceAll('{0}', StaticData.FormatCurrency(freeShippingAmount, vdata.model.currencyCode)));
+                    const $deliveryMethodInfoDiv = $('<div class="delivery-method-info my-2">').append(
+                        (hasFreeShippingPolicy) ? [$deliveryChargeContent, $freeShippingHint] : $deliveryChargeContent
+                    );
+                    // note: delivery charge is not shown if the customer has proceeded to payment, because the merchant may have adjusted the amount since then
+                    itemElement.append(isPaymentClicked ? $shipToCustomerDiv : [$shipToCustomerDiv, $deliveryMethodInfoDiv]);                    
                 }
             },
             onValueChanged: function (e) {
@@ -551,7 +617,7 @@ function prepareDeliveryMethodFields(defCallingCode: string) {
         $('<h5>').addClass('mt-3').text('Deliver To'),
         $('<div id="delivery-address-line1" class="mb-2">').dxTextBox({
             value: vdata.model.deliveryAddress_Line1,
-            disabled: isPaymentClicked,
+            disabled: isPaymentClicked || isPreview,
             maxLength: 250,
             label: corprio.globalization.getMessage('line1'),
             labelMode: 'floating',
@@ -566,7 +632,7 @@ function prepareDeliveryMethodFields(defCallingCode: string) {
         }),
         $('<div id="delivery-address-line2" class="mb-2">').dxTextBox({
             value: vdata.model.deliveryAddress_Line2,
-            disabled: isPaymentClicked,
+            disabled: isPaymentClicked || isPreview,
             maxLength: 250,
             label: corprio.globalization.getMessage('line2'),
             labelMode: 'floating',
@@ -574,7 +640,7 @@ function prepareDeliveryMethodFields(defCallingCode: string) {
         }),
         $('<div id="delivery-address-city" class="mb-2">').dxTextBox({
             value: vdata.model.deliveryAddress_City,
-            disabled: isPaymentClicked,
+            disabled: isPaymentClicked || isPreview,
             maxLength: 250,
             label: corprio.globalization.getMessage('City'),
             labelMode: 'floating',
@@ -582,7 +648,7 @@ function prepareDeliveryMethodFields(defCallingCode: string) {
         }),
         $('<div id="delivery-address-state" class="mb-2">').dxTextBox({
             value: vdata.model.deliveryAddress_State,
-            disabled: isPaymentClicked,
+            disabled: isPaymentClicked || isPreview,
             maxLength: 250,
             label: corprio.globalization.getMessage('State'),
             labelMode: 'floating',
@@ -590,7 +656,7 @@ function prepareDeliveryMethodFields(defCallingCode: string) {
         }),
         $('<div id="delivery-address-postal" class="mb-2">').dxTextBox({
             value: vdata.model.deliveryAddress_PostalCode,
-            disabled: isPaymentClicked,
+            disabled: isPaymentClicked || isPreview,
             maxLength: 20,
             label: corprio.globalization.getMessage('PostalCode'),
             labelMode: 'floating',
@@ -598,7 +664,7 @@ function prepareDeliveryMethodFields(defCallingCode: string) {
         }),
         $('<div id="delivery-address-country-code" class="mb-2">').dxSelectBox({
             value: vdata.model.defaultCountryCode,
-            disabled: isPaymentClicked,
+            disabled: isPaymentClicked || isPreview,
             dataSource: StaticData.CountryList,
             displayExpr: 'Value.GlobalizedName',
             valueExpr: 'Key',
@@ -622,8 +688,8 @@ function prepareDeliveryMethodFields(defCallingCode: string) {
     $('<h5>').addClass('mt-3').text(vdata.localizer.receipient).appendTo(recipientDiv);
     $('<div>').addClass('d-flex').appendTo(recipientDiv).append(
         $('<div id="delivery-contact-given-name">').dxTextBox({
-            value: (isPaymentClicked) ? vdata.model.deliveryContact_GivenName : String($('#bill-person-given-name').find('input').val()),
-            disabled: isPaymentClicked,
+            value: (isPaymentClicked || isPreview) ? vdata.model.deliveryContact_GivenName : String($('#bill-person-given-name').find('input').val()),
+            disabled: isPaymentClicked || isPreview,
             maxLength: 100,
             label: 'Given Name',
             labelMode: 'floating',
@@ -638,8 +704,8 @@ function prepareDeliveryMethodFields(defCallingCode: string) {
             }]
         }),
         $('<div id="delivery-contact-family-name">').dxTextBox({
-            value: (isPaymentClicked) ? vdata.model.deliveryContact_FamilyName : String($('#bill-person-family-name').find('input').val()),
-            disabled: isPaymentClicked,
+            value: (isPaymentClicked || isPreview) ? vdata.model.deliveryContact_FamilyName : String($('#bill-person-family-name').find('input').val()),
+            disabled: isPaymentClicked || isPreview,
             maxLength: 100,
             label: 'Family Name',
             labelMode: 'floating',
@@ -656,16 +722,27 @@ function prepareDeliveryMethodFields(defCallingCode: string) {
     );
     
     const $deliveryPhone = $('<div id="delivery-phone-number">').appendTo(recipientDiv);
-    corprio.geography.addPhoneNumberTo(
-        $deliveryPhone,
-        vdata.model.deliveryPhoneSubscriberNumber
+    corprio.coWidgets.useCoPhoneNumber();
+    $deliveryPhone.coPhoneNumber({
+        name: 'delivery-phone-number',
+        value: vdata.model.deliveryPhoneSubscriberNumber
             ? { NumberType: 3, CountryCallingCode: vdata.model.deliveryPhoneCountryCallingCode, NationalDestinationCode: vdata.model.deliveryPhoneNationalDestinationCode, SubscriberNumber: vdata.model.deliveryPhoneSubscriberNumber }
             : { NumberType: 3, CountryCallingCode: defCallingCode },
-        'delivery-phone-number',
-        null,
-        null,
-        false,
-        VALIDATION_GROUP);
+        required: false,
+        validationGroup: VALIDATION_GROUP
+    });
+
+    //corprio.geography.addPhoneNumberTo(
+    //    $deliveryPhone,
+    //    vdata.model.deliveryPhoneSubscriberNumber
+    //        ? { NumberType: 3, CountryCallingCode: vdata.model.deliveryPhoneCountryCallingCode, NationalDestinationCode: vdata.model.deliveryPhoneNationalDestinationCode, SubscriberNumber: vdata.model.deliveryPhoneSubscriberNumber }
+    //        : { NumberType: 3, CountryCallingCode: defCallingCode },
+    //    'delivery-phone-number',
+    //    null,
+    //    null,
+    //    false,
+    //    VALIDATION_GROUP);
+
     $deliveryPhone.find('.phone').dxValidator({
         validationGroup: VALIDATION_GROUP,
         validationRules: [{
@@ -675,13 +752,21 @@ function prepareDeliveryMethodFields(defCallingCode: string) {
             validationCallback: inputValidationForShipping
         }]
     });
-    if (isPaymentClicked) {
+    if (isPaymentClicked || isPreview) {
         $deliveryPhone.find('input').attr('disabled', 'disabled');
+        // also remove the flag and drop-down button from country code select box
+        $deliveryPhone.find('.co-phonenumber-country-flag').remove();        
         $deliveryPhone.find('div[role="button"]').remove();
     }
 }
 
+/**
+ * Handle the buyer's decision to add a product to the sales order
+ * @returns
+ */
 function handleAddProduct() {
+    if (isPaymentClicked || isPreview) { return; }
+
     DevExpress.ui.dialog
         .confirm(vdata.localizer.confirmAddProduct, vdata.localizer.confirmation)
         .done(function (dialogResult) {
@@ -722,7 +807,13 @@ function handleAddProduct() {
         });
 }
 
+/**
+ * Handle the buyer's decision to void the sales order
+ * @returns
+ */
 function handleVoidOrder() {
+    if (isOrderVoidOrPaid || isPreview) { return; }
+
     DevExpress.ui.dialog
         .confirm(vdata.localizer.confirmVoidOrder, vdata.localizer.confirmation)
         .done(function (dialogResult) {
@@ -737,6 +828,53 @@ function handleVoidOrder() {
         });
 }
 
+//function setPhoneNumber($phoneWidget: JQuery<HTMLElement>, oPhoneNumber: PhoneNumber) {
+//    if (!$phoneWidget) { return; }
+
+//    let $widget = $phoneWidget.find('.co-phone-type');
+//    if ($widget) {
+//        $widget.dxSelectBox('option', 'value', oPhoneNumber && oPhoneNumber.NumberType);
+//    }
+
+//    $widget = $phoneWidget.find('.co-select-country');
+//    if ($widget) {
+//        // note: to select a value in select box, we need to provide an alphabetical country code, while the country code in a phone number is numeric
+//        const codeCountryPair = StaticData.CountryList.find(x => x.Value.CountryCallingCode === oPhoneNumber.CountryCallingCode);
+//        if (codeCountryPair) {
+//            // note: the key in CountryList is an alphabetical country code
+//            $widget.dxSelectBox('option', 'value', codeCountryPair.Key);
+//        }
+//    }
+
+//    $widget = $phoneWidget.find('.co-phone-textbox');
+//    if ($widget) {
+//        $widget.dxTextBox('option', 'value', oPhoneNumber && oPhoneNumber.SubscriberNumber);
+//    }
+//};
+
+//function getPhoneNumber($element: JQuery<HTMLElement>): PhoneNumber {
+//    if ($element) {
+//        // note: the country code expected by the backend is numeric, while the value in select box is alphabetical
+//        let countryCallingCode = '';
+//        const alphabeticalCode = $element.find('.co-select-country').dxSelectBox('option', 'value');
+//        if (alphabeticalCode) {
+//            const country = StaticData.CountryList.find(x => x.Key === alphabeticalCode);
+//            countryCallingCode = country?.Value?.CountryCallingCode;
+//        }
+
+//        return {
+//            NumberType: $element.find('.co-phone-type').dxSelectBox('option', 'value'),
+//            CountryCallingCode: countryCallingCode,
+//            NationalDestinationCode: '',
+//            SubscriberNumber: $element.find('.co-phone-textbox').dxTextBox('option', 'value'),
+//        };
+//    }
+//    return { NumberType: 0, CountryCallingCode: '', NationalDestinationCode: '', SubscriberNumber: '' };
+//}
+
+/**
+ * Render the form to be filled in by buyer
+ */
 function prepareCustomerInfoForm() {        
     const $form = $('#customer-info-form').addClass('customer-info my-4');    
     const defCountryInfo = StaticData.CountryList.find(c => c.Key === vdata.model.defaultCountryCode);
@@ -764,6 +902,7 @@ function prepareCustomerInfoForm() {
 
     $form.on('submit', function (event: Event) {
         event.preventDefault();
+        if (isPaymentClicked || isPreview) { return; }
 
         let validationGroup = DevExpress.validationEngine.getGroupConfig(VALIDATION_GROUP);
         if (validationGroup) {
@@ -774,15 +913,18 @@ function prepareCustomerInfoForm() {
             }
         }
 
+        const $billPhone = $('#bill-contact-phone').coPhoneNumber('instance');
         const data: CheckoutDataModel = {
             BillPerson: {
                 FamilyName: $('#bill-person-family-name').dxTextBox('option', 'value'),
                 GivenName: $('#bill-person-given-name').dxTextBox('option', 'value')
             },
-            BillContactPhone: corprio.geography.getPhoneNumber($('#bill-contact-phone')),
+            BillContactPhone: $billPhone.option('value'),
+            /*BillContactPhone: getPhoneNumber($('#bill-contact-phone')),*/
+            /*BillContactPhone: corprio.geography.getPhoneNumber($('#bill-contact-phone')),*/            
             ChosenDeliveryMethod: chosenDeliveryMethod,
             SalesOrderID: vdata.model.salesOrderID,
-        };
+        };        
         if (chosenDeliveryMethod === DeliveryOption.Shipping) {            
             data.DeliveryAddress = {
                 Line1: $('#delivery-address-line1').dxTextBox('option', 'value'),
@@ -796,14 +938,25 @@ function prepareCustomerInfoForm() {
                 FamilyName: $('#delivery-contact-family-name').dxTextBox('option', 'value'),
                 GivenName: $('#delivery-contact-given-name').dxTextBox('option', 'value')
             };
-            data.DeliveryContactPhone = corprio.geography.getPhoneNumber($('#delivery-phone-number'));
-        }
+            const $deliveryPhone = $('#delivery-phone-number').coPhoneNumber('instance');
+            data.DeliveryContactPhone = $deliveryPhone.option('value');
+            /*data.DeliveryContactPhone = getPhoneNumber($('#delivery-phone-number'));*/
+            /*data.DeliveryContactPhone = corprio.geography.getPhoneNumber($('#delivery-phone-number'));*/
+        }        
         loadPanel.show();
+
+        let dataString: string;
+        try {
+            dataString = JSON.stringify(data);
+        } catch {
+            console.log('Failed to stringify data.');
+            dataString = '';
+        }
         $.ajax({
             url: vdata.actions.finalizeSalesOrder,
             type: 'POST',
             contentType: 'application/json;charset=utf-8',
-            data: JSON.stringify(data),
+            data: dataString,
             success: function () {
                 window.location.replace(`${vdata.settings.paymentPortalUrl}/T42/RecePayment/order/${vdata.model.salesOrderID}?successUrl=${vdata.settings.appUrl}/${vdata.model.organizationID}/thankyou&failUrl=${vdata.settings.appUrl}/${vdata.model.organizationID}/paymentfailed`);
             },
@@ -815,6 +968,11 @@ function prepareCustomerInfoForm() {
     });
 }
 
+/**
+ * Translate the enum for delivery option into culture-sensitive string
+ * @param deliveryOption
+ * @returns
+ */
 function translateDeliveryOption(deliveryOption: DeliveryOption) {
     switch (deliveryOption) {
         case DeliveryOption.SelfPickup:
@@ -824,6 +982,9 @@ function translateDeliveryOption(deliveryOption: DeliveryOption) {
     }
 }
 
+/**
+ * Update the global variable for delivery charge, having considered the total amount and free shipping policy
+ */
 function adjustDeliveryCharge() {
     // note: if the customer has already proceeded to payment, then any delivery charge would have been included in the order line
     if (isPaymentClicked || chosenDeliveryMethod !== DeliveryOption.Shipping) {
@@ -836,6 +997,9 @@ function adjustDeliveryCharge() {
     }
 }
 
+/**
+ * Update the global variables based on data provided by the backend
+ */
 function adjustGlobalVariables() {        
     try {
         // note: the JSON string provided by the backend has double quotation marks replaced with &quot;
@@ -847,6 +1011,7 @@ function adjustGlobalVariables() {
 
     allowSelfPickup = vdata.model.allowSelfPickup.toLowerCase() === 'true';
     provideShipping = vdata.model.provideShipping.toLowerCase() === 'true';
+    isPreview = vdata.model.isPreview.toLowerCase() === 'true';
     isOrderVoidOrPaid = vdata.model.isOrderVoidOrPaid.toLowerCase() === 'true';
 
     // if for some reason (e.g., the merchant has processed the order using SalesMaster) the order has been voided/paid
@@ -876,12 +1041,14 @@ function adjustGlobalVariables() {
         
     if (allowSelfPickup) {
         availableDeliveryMethods.push(DeliveryOption.SelfPickup);
+        // choose self pickup by default
         if (!isPaymentClicked) {
             chosenDeliveryMethod = DeliveryOption.SelfPickup;
         }
     }
     if (provideShipping) {
         availableDeliveryMethods.push(DeliveryOption.Shipping);
+        // choose delivery only if self pickup is not available
         if (!isPaymentClicked && !allowSelfPickup) {
             chosenDeliveryMethod = DeliveryOption.Shipping;
         }
@@ -893,6 +1060,9 @@ function adjustGlobalVariables() {
     adjustDeliveryCharge();
 }
 
+/**
+ * Render a reminder about whether the sales order can be edited
+ */
 function renderReminder() {
     const $reminder = $('#reminderPopup');
 
@@ -904,8 +1074,12 @@ function renderReminder() {
     } 
 }
 
+/**
+ * Handle the buyer's decision to re-select product variation(s) of a product
+ * @returns
+ */
 function editProduct() {
-    if (isPaymentClicked) { return; }
+    if (isPaymentClicked || isPreview) { return; }
 
     const salesOrderLineID: string = $(this).data(DATASET_ORDERLINE);
     const relevantOrderLine = orderLines.filter(x => x.SalesOrderLineID === salesOrderLineID);
@@ -925,8 +1099,12 @@ function editProduct() {
     $popup.show();
 }
 
+/**
+ * Handle the buyer's decision to update a product's quantity
+ * @returns
+ */
 function editQty() {
-    if (isPaymentClicked) { return; }
+    if (isPaymentClicked || isPreview) { return; }
 
     const salesOrderLineID: string = $(this).data(DATASET_ORDERLINE);
     const relevantOrderLine = orderLines.filter(x => x.SalesOrderLineID === salesOrderLineID);
@@ -946,6 +1124,10 @@ function editQty() {
     $popup.show();
 }
 
+/**
+ * Render the shopping cart on checkout page
+ * @returns
+ */
 function prepareCartTable() {
     if (!orderLines.length) { return; }
 
@@ -998,15 +1180,18 @@ function prepareCartTable() {
     }
 }
 
-$(function () {        
+/**
+ * Entry point
+ */
+$(function () {
     adjustGlobalVariables();
     prepareCartTable();
     recalculateTotals();
     renderReminder();
     prepareCustomerInfoForm();
     renderTotals();
-
+    
     if (!isPaymentClicked) {
         $('.add-prd-btn').on('click', handleAddProduct);
-    }
+    }    
 });

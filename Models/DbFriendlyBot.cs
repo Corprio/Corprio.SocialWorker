@@ -88,6 +88,10 @@ namespace Corprio.SocialWorker.Models
         /// </summary>
         public DateTimeOffset? OTP_ExpiryTime { get; set; }
 
+        /// <summary>
+        /// Turn a database-friendly bot into a bot with object properties
+        /// </summary>
+        /// <returns>A bot with object properties</returns>
         public MetaBotStatus ReadyToWork()
         {
             if (this == null) return null;
@@ -124,6 +128,11 @@ namespace Corprio.SocialWorker.Models
             return bot;
         }
 
+        /// <summary>
+        /// Copy properties from a bot with object properties to a database-friendly bot
+        /// </summary>
+        /// <param name="bot">A bot with object properties</param>
+        /// <returns>A database-friendly bot with updated properties</returns>
         public DbFriendlyBot ReadyToSave(MetaBotStatus bot)
         {
             if (bot == null) return this;

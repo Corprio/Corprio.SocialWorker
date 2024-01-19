@@ -4,7 +4,14 @@ using DevExtreme.AspNet.Mvc.Builders;
 namespace Corprio.SocialWorker
 {
     public static class Common
-    {        
+    {
+        public const string LogoImageKey = "Logo";
+
+        /// <summary>
+        /// Create a MS-Word-ribbon-like tool bar
+        /// </summary>
+        /// <param name="builder"></param>
+        /// <returns></returns>
         public static HtmlEditorToolbarBuilder StandardToolbar(this HtmlEditorToolbarBuilder builder)
         {
 

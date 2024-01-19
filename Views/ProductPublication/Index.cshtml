@@ -24,7 +24,7 @@
         .Columns(col =>
         {
             // reference: https://demos.devexpress.com/ASPNetCore/Demo/DataGrid/CommandColumnCustomization/
-            col.Add().Caption(localizer["Publish"]).Name("Publish").Type(GridCommandColumnType.Buttons).Width(52).ShowInColumnChooser(false)
+            col.Add().Caption(localizer["Publish"]).Name("Publish").Type(GridCommandColumnType.Buttons).Width(52).ShowInColumnChooser(false).CssClass("publish-btn")
             .Buttons(b => b.Add().Hint(localizer["PublishProductHint"]).Icon("upload").OnClick("PublishProduct"));
             col.AddFor(m => m.MasterProductCode).Visible(false).AllowEditing(false).CalculateSortValue("MasterProduct.Code");
             col.AddFor(m => m.Code).SortOrder(SortOrder.Asc);
@@ -169,6 +169,10 @@
     function filterTag(filterValue, selectedFilterOperation) {
         return ["EntityProperties.Any(Name==\"tag\" && Value==\"" + filterValue + "\")", "=", "true"];
     }
+
+    $(function() {
+        corprio.page.initTour({ defaultTour: 'productpublication.index', autoStart: true, driverCssLoaded: true });
+    })
 
 </script>
 @using (Html.DevExtreme().NamedTemplate("TagsEditTemplate"))

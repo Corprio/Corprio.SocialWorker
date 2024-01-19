@@ -21,8 +21,8 @@ namespace Corprio.SocialWorker.Models
                 //    ID = "CataloguePublication", Text = "PublishCatalogue", Icon="fa-regular fa-bag-shopping"
                 //},
                 new AppMenuItem {
-                    ShowInBreadcrumb = false, Url = "/[organizationID]/ReconnectFacebook", Controller = "ReconnectFacebook",
-                    ID = "ReconnectFacebook", Text = "ReconnectFacebook", Icon="fa-regular fa-unlink"
+                    ShowInBreadcrumb = false, Url = "/[organizationID]/DisconnectFacebook", Controller = "DisconnectFacebook",
+                    ID = "DisconnectFacebook", Text = "DisconnectFacebook", Icon="fa-regular fa-unlink"
                 },
             }
         };

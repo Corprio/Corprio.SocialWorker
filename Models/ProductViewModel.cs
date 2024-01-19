@@ -5,6 +5,9 @@ using System.Collections.Generic;
 
 namespace Corprio.SocialWorker.Models
 {
+    /// <summary>
+    /// Model of product for the views rendered by this App
+    /// </summary>
     public class ProductViewModel : Product
     {        
         /// <summary>
@@ -51,6 +54,11 @@ namespace Corprio.SocialWorker.Models
         public decimal? UnitPrice { get; set; }
 
         /// <summary>
+        /// Net unit price
+        /// </summary>
+        public decimal? NetPrice => UnitPrice.HasValue ? DataModel.Helper.NetPrice(UnitPrice.Value, DiscountType, DiscountValue) : (decimal?)null;
+
+        /// <summary>
         /// The property has its value directly retrieved from SalesOrder object
         /// </summary>
         public decimal NetUnitPrice { get; set; }
@@ -64,13 +72,7 @@ namespace Corprio.SocialWorker.Models
         /// <summary>
         /// UOM of price
         /// </summary>
-        public string UOMCode { get; set; }
-
-        /// <summary>
-        /// Decimals used by the UOM
-        /// </summary>
-        /// <remarks>Not used now. Assume selling whole unit</remarks>
-        public int SalesUOMDecimals { get; set; }
+        public string UOMCode { get; set; }        
 
         public string Image01UrlKey { get; set; }
         public string Image02UrlKey { get; set; }
@@ -88,12 +90,5 @@ namespace Corprio.SocialWorker.Models
         /// 
         public List<string> ImageUrls { get; set; } = new List<string>(new string[8]);
 
-
-        //for check inventory
-        public decimal? InventoryLevel { get; set; }        
-
-        public bool HasAllChildProducts { get; set; }
-
-        public List<List<object>> VariationsMatches { get; set; }
     }
 }

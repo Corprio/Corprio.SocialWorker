@@ -340,6 +340,24 @@ namespace Corprio.SocialWorker.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Phone.
+        /// </summary>
+        public static string ContactPhone {
+            get {
+                return ResourceManager.GetString("ContactPhone", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Customer name.
+        /// </summary>
+        public static string CustomerName {
+            get {
+                return ResourceManager.GetString("CustomerName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to CustomText.
         /// </summary>
         public static string CustomText {
@@ -399,6 +417,24 @@ namespace Corprio.SocialWorker.Resources {
         public static string Delete {
             get {
                 return ResourceManager.GetString("Delete", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Deliver to.
+        /// </summary>
+        public static string DeliverTo {
+            get {
+                return ResourceManager.GetString("DeliverTo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Address.
+        /// </summary>
+        public static string DeliveryAddress {
+            get {
+                return ResourceManager.GetString("DeliveryAddress", resourceCulture);
             }
         }
         
@@ -466,6 +502,24 @@ namespace Corprio.SocialWorker.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Disconnect.
+        /// </summary>
+        public static string Disconnect {
+            get {
+                return ResourceManager.GetString("Disconnect", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Disconnect Facebook.
+        /// </summary>
+        public static string DisconnectFacebook {
+            get {
+                return ResourceManager.GetString("DisconnectFacebook", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Discount %.
         /// </summary>
         public static string DiscountPercent {
@@ -516,6 +570,15 @@ namespace Corprio.SocialWorker.Resources {
         public static string EditVariant {
             get {
                 return ResourceManager.GetString("EditVariant", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Email.
+        /// </summary>
+        public static string Email {
+            get {
+                return ResourceManager.GetString("Email", resourceCulture);
             }
         }
         
@@ -682,7 +745,7 @@ namespace Corprio.SocialWorker.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Facebook account {0} is already connected with another organization. If you want to connect {1} with {0}, please visit {2}..
+        ///   Looks up a localized string similar to Facebook account {0} is already connected with another organization. If you want to connect {1} with {0}, please visit.
         /// </summary>
         public static string FB_AlreadyConnected {
             get {
@@ -714,6 +777,15 @@ namespace Corprio.SocialWorker.Resources {
         public static string FB_Desc2 {
             get {
                 return ResourceManager.GetString("FB_Desc2", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} is no longer connected to any Facebook account..
+        /// </summary>
+        public static string FB_disconnected {
+            get {
+                return ResourceManager.GetString("FB_disconnected", resourceCulture);
             }
         }
         
@@ -1231,6 +1303,15 @@ namespace Corprio.SocialWorker.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Here are your order details.
+        /// </summary>
+        public static string OrderDetails {
+            get {
+                return ResourceManager.GetString("OrderDetails", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The sales order has been voided already!  It cannot be voided again..
         /// </summary>
         public static string OrderHasBeenVoided {
@@ -1330,6 +1411,15 @@ namespace Corprio.SocialWorker.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to ..
+        /// </summary>
+        public static string Period {
+            get {
+                return ResourceManager.GetString("Period", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to (For example: BUY).
         /// </summary>
         public static string Placeholder_Keyword {
@@ -1344,6 +1434,15 @@ namespace Corprio.SocialWorker.Resources {
         public static string PoweredBy {
             get {
                 return ResourceManager.GetString("PoweredBy", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Preview.
+        /// </summary>
+        public static string Preview {
+            get {
+                return ResourceManager.GetString("Preview", resourceCulture);
             }
         }
         
@@ -1389,6 +1488,15 @@ namespace Corprio.SocialWorker.Resources {
         public static string Product {
             get {
                 return ResourceManager.GetString("Product", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Product code.
+        /// </summary>
+        public static string ProductCode {
+            get {
+                return ResourceManager.GetString("ProductCode", resourceCulture);
             }
         }
         
@@ -1546,6 +1654,15 @@ namespace Corprio.SocialWorker.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Recipient.
+        /// </summary>
+        public static string Recipient {
+            get {
+                return ResourceManager.GetString("Recipient", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Reset Facebook Connection.
         /// </summary>
         public static string ReconnectFacebook {
@@ -1569,6 +1686,15 @@ namespace Corprio.SocialWorker.Resources {
         public static string RemainingStockTitle {
             get {
                 return ResourceManager.GetString("RemainingStockTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Remark.
+        /// </summary>
+        public static string Remark {
+            get {
+                return ResourceManager.GetString("Remark", resourceCulture);
             }
         }
         
@@ -2185,6 +2311,132 @@ namespace Corprio.SocialWorker.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to When your customer elects to check out, they will be re-directed to a checkout page to review their shopping cart and provide personal information. You can define any message you want to show to your customer at the checkout page..
+        /// </summary>
+        public static string Tour_CheckoutSection_Desc {
+            get {
+                return ResourceManager.GetString("Tour_CheckoutSection_Desc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The delivery methods you set up here will be displayed to your customers when they check out..
+        /// </summary>
+        public static string Tour_DelliverySection_Desc {
+            get {
+                return ResourceManager.GetString("Tour_DelliverySection_Desc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Terminate the connection between your company and Facebook account..
+        /// </summary>
+        public static string Tour_DisconnectFacebook_Desc {
+            get {
+                return ResourceManager.GetString("Tour_DisconnectFacebook_Desc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Connect your company with Facebook so that {0} can create posts/stories and respond to private messages / comments on your behalf..
+        /// </summary>
+        public static string Tour_FbSection_Desc {
+            get {
+                return ResourceManager.GetString("Tour_FbSection_Desc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Complete some simple configurations here to start using {0}..
+        /// </summary>
+        public static string Tour_GetStarted_Desc {
+            get {
+                return ResourceManager.GetString("Tour_GetStarted_Desc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The payment methods you set up here will be made available to your customers when they check out..
+        /// </summary>
+        public static string Tour_PaymentSection_Desc {
+            get {
+                return ResourceManager.GetString("Tour_PaymentSection_Desc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Once you have connected your company with your Facebook account, you can publish products to your Facebook pages and Instagram accounts..
+        /// </summary>
+        public static string Tour_ProductPublication_Desc {
+            get {
+                return ResourceManager.GetString("Tour_ProductPublication_Desc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Select a product and publish it to your Facebook page(s) and Instagram account(s)..
+        /// </summary>
+        public static string Tour_PublishButton_Desc {
+            get {
+                return ResourceManager.GetString("Tour_PublishButton_Desc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Don&apos;t forget to click save when you done with configuring {0}..
+        /// </summary>
+        public static string Tour_SaveButton_Desc {
+            get {
+                return ResourceManager.GetString("Tour_SaveButton_Desc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Once you have connected your company with your Facebook account, a chatbot can handle messages your customers send to your Facebook pages and Instagram accounts. That chatbot will create sales orders according to your settings here..
+        /// </summary>
+        public static string Tour_SomSection_Desc {
+            get {
+                return ResourceManager.GetString("Tour_SomSection_Desc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Define how your products/catalogues will be posted to your social media..
+        /// </summary>
+        public static string Tour_TemplateSection_Desc {
+            get {
+                return ResourceManager.GetString("Tour_TemplateSection_Desc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Define the thank-you message that you want to display to your customer after they complete checkout..
+        /// </summary>
+        public static string Tour_ThankyouSection_Desc {
+            get {
+                return ResourceManager.GetString("Tour_ThankyouSection_Desc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Welcome to {0}..
+        /// </summary>
+        public static string Tour_Welcome_Desc {
+            get {
+                return ResourceManager.GetString("Tour_Welcome_Desc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Welcome.
+        /// </summary>
+        public static string Tour_Welcome_Title {
+            get {
+                return ResourceManager.GetString("Tour_Welcome_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Unapprove.
         /// </summary>
         public static string Unapprove {
@@ -2320,7 +2572,7 @@ namespace Corprio.SocialWorker.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to one.
+        ///   Looks up a localized string similar to  one.
         /// </summary>
         public static string Warning_num2 {
             get {
@@ -2343,6 +2595,15 @@ namespace Corprio.SocialWorker.Resources {
         public static string Warning_para2 {
             get {
                 return ResourceManager.GetString("Warning_para2", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You are about to disconnect {0} from your Facebook account. This action cannot be undone and has the following implications:.
+        /// </summary>
+        public static string Warning_para3 {
+            get {
+                return ResourceManager.GetString("Warning_para3", resourceCulture);
             }
         }
         

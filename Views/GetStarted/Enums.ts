@@ -27,6 +27,7 @@ export enum Selector {
     loadIndicator_Top = '#load-indicator-top',
     loginButton = '#loginBtn',
     logoutButton = '#logoutBtn',
+    previewButtons = '.preview-btn',
     previewPanel_Catalogue = '#preview-panel-catalogue',
     previewPanel_Product = '#preview-panel-product',
     restoreDefaultButton_Catalogue = '#restore-default-btn-catalogue',

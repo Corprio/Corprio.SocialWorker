@@ -1,9 +1,18 @@
 ﻿namespace Corprio.SocialWorker.Models
 {
+    /// <summary>
+    /// Sales orders' entity property that captures checkout related information
+    /// </summary>
     public class SalesOrderCheckoutState
     {
+        /// <summary>
+        /// True if the buyer has elected to proceed to payment in the checkout page.
+        /// </summary>
         public bool IsPaymentClicked { get; set; }
 
+        /// <summary>
+        /// Delivery method elected by the buyer.
+        /// </summary>
         public DeliveryOption ChosenDeliveryMethod { get; set; }
 
         /// <summary>

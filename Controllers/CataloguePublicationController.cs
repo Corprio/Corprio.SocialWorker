@@ -11,9 +11,7 @@ using Corprio.DataModel;
 using Corprio.DataModel.Business.Products;
 using Corprio.DataModel.Business.Products.ViewModel;
 using Microsoft.Extensions.Configuration;
-using Corprio.SocialWorker.Helpers;
 using System.Linq;
-using Corprio.SocialWorker.Dictionaries;
 using Microsoft.EntityFrameworkCore;
 using Corprio.AspNetCore.Site.Filters;
 using DevExtreme.AspNet.Mvc;
@@ -43,9 +41,9 @@ namespace Corprio.SocialWorker.Controllers
         /// <summary>
         /// Get catalogue records
         /// </summary>
-        /// <param name="corprioClient"></param>
-        /// <param name="loadDataOptions"></param>
-        /// <returns></returns>
+        /// <param name="corprioClient">Client for executing API requests among Corprio projects</param>
+        /// <param name="loadDataOptions">DataGrid datasource load options</param>
+        /// <returns>Paged records to be shown in DataGrid</returns>
         [OrganizationAuthorizationCheck(
            ActionEntityTypes = new EntityType[] { EntityType.ProductList },
            RequiredPermissions = new DataAction[] { DataAction.Read })]

@@ -2,6 +2,9 @@
 
 namespace Corprio.SocialWorker.Models
 {
+    /// <summary>
+    /// Natural languages that the bot can handle and speak
+    /// </summary>
     public enum BotLanguage
     {
         English,
@@ -9,6 +12,9 @@ namespace Corprio.SocialWorker.Models
         TraditionalChinese
     }
 
+    /// <summary>
+    /// Range of topics that the bot is supposed to handle
+    /// </summary>
     public enum BotTopic
     {
         Limbo,
@@ -24,22 +30,18 @@ namespace Corprio.SocialWorker.Models
         PromotionOpen
     }
 
+    /// <summary>
+    /// Meta products
+    /// </summary>
     public enum MetaProduct
     {        
         Facebook,        
         Instagram
-    }
-    
-    public enum MetaTokenType
-    {
-        [Description("APP")]
-        App,
-        [Description("USER")]
-        User,
-        [Description("PAGE")]
-        Page
-    }
+    }    
 
+    /// <summary>
+    /// Selected languages that can be detected by Meta NLP
+    /// </summary>
     public enum MetaLanguageModel
     {
         [Description("CHINESE")]
@@ -48,6 +50,9 @@ namespace Corprio.SocialWorker.Models
         English
     }
 
+    /// <summary>
+    /// Types of media items that can be published to Instagram
+    /// </summary>
     public enum IgMediaType
     {
         [Description("CAROUSEL")]

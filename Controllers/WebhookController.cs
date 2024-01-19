@@ -32,6 +32,12 @@ namespace Corprio.SocialWorker.Controllers
         private readonly string AppSecret;
         private readonly string BaseUrl;
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="httpClientFactory"></param>
+        /// <param name="configuration"></param>
         public WebhookController(ApplicationDbContext context, IHttpClientFactory httpClientFactory, IConfiguration configuration) : base()
         {
             db = context;
@@ -107,6 +113,12 @@ namespace Corprio.SocialWorker.Controllers
             return new Tuple<bool, string>((computedHash == metaHash), requestBody);
         }
         
+        /// <summary>
+        /// Find the bot that was chatting with the interlocutor; if none is found, a new bot is created
+        /// </summary>
+        /// <param name="facebookUser">Owner of the bot</param>
+        /// <param name="interlocutorID">Meta ID of the person chatting with the bot</param>
+        /// <returns>Bot</returns>
         public async Task<DbFriendlyBot> FindBot(MetaUser facebookUser, string interlocutorID)
         {
             DbFriendlyBot botStatus = facebookUser.Bots.FirstOrDefault(x => x.BuyerID == interlocutorID);
@@ -341,7 +353,7 @@ namespace Corprio.SocialWorker.Controllers
         }
         
         /// <summary>
-        /// Trigger the publication of a catalogue / product list
+        /// Trigger the publication of a catalogue / product list (WIP - this function is expected to cater API requests from other Apps)
         /// </summary>
         /// <param name="httpClient">HTTP client for executing API query</param>
         /// <param name="organizationID">Organization ID</param>
@@ -370,7 +382,7 @@ namespace Corprio.SocialWorker.Controllers
         }
 
         /// <summary>
-        /// Trigger the publication of a product
+        /// Trigger the publication of a product (WIP - this function is expected to cater API requests from other Apps)
         /// </summary>
         /// <param name="httpClient">HTTP client for executing API query</param>        
         /// <param name="organizationID">Organization ID</param>

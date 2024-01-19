@@ -19,7 +19,7 @@ var exports = __webpack_exports__;
   \*********************************/
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.CorprioPhoneNumberType = exports.DeliveryOption = void 0;
+exports.DeliveryOption = void 0;
 // IMPORTANT: the order of the following options must be in line with that defined on the server side
 var DeliveryOption;
 (function (DeliveryOption) {
@@ -27,14 +27,13 @@ var DeliveryOption;
     DeliveryOption[DeliveryOption["SelfPickup"] = 1] = "SelfPickup";
     DeliveryOption[DeliveryOption["Shipping"] = 2] = "Shipping";
 })(DeliveryOption || (exports.DeliveryOption = DeliveryOption = {}));
-var CorprioPhoneNumberType;
-(function (CorprioPhoneNumberType) {
-    CorprioPhoneNumberType[CorprioPhoneNumberType["General"] = 0] = "General";
-    CorprioPhoneNumberType[CorprioPhoneNumberType["Home"] = 1] = "Home";
-    CorprioPhoneNumberType[CorprioPhoneNumberType["Work"] = 2] = "Work";
-    CorprioPhoneNumberType[CorprioPhoneNumberType["Mobile"] = 3] = "Mobile";
-    CorprioPhoneNumberType[CorprioPhoneNumberType["Fax"] = 4] = "Fax";
-})(CorprioPhoneNumberType || (exports.CorprioPhoneNumberType = CorprioPhoneNumberType = {}));
+//export enum CorprioPhoneNumberType {
+//    General,
+//    Home,
+//    Work,
+//    Mobile,
+//    Fax
+//}
 
 })();
 

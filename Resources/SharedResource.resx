@@ -780,11 +780,32 @@
   <data name="Colour" xml:space="preserve">
     <value>Colour</value>
   </data>
+  <data name="ContactPhone" xml:space="preserve">
+    <value>Phone</value>
+  </data>
+  <data name="CustomerName" xml:space="preserve">
+    <value>Customer name</value>
+  </data>
+  <data name="DeliverTo" xml:space="preserve">
+    <value>Deliver to</value>
+  </data>
+  <data name="DeliveryAddress" xml:space="preserve">
+    <value>Address</value>
+  </data>
+  <data name="Disconnect" xml:space="preserve">
+    <value>Disconnect</value>
+  </data>
+  <data name="DisconnectFacebook" xml:space="preserve">
+    <value>Disconnect Facebook</value>
+  </data>
   <data name="EditQuantity" xml:space="preserve">
     <value>Edit quantity</value>
   </data>
   <data name="EditVariant" xml:space="preserve">
     <value>Select variant</value>
+  </data>
+  <data name="Email" xml:space="preserve">
+    <value>Email</value>
   </data>
   <data name="ErrMsg_ChatbotNotFound" xml:space="preserve">
     <value>We tried to restore this sales order to the chatbot conversing with you but failed. Please confirm if you wish to simply void this order.</value>
@@ -802,7 +823,10 @@
     <value>The organization does not have a valid connection with any Facebook account.</value>
   </data>
   <data name="FB_AlreadyConnected" xml:space="preserve">
-    <value>Facebook account {0} is already connected with another organization. If you want to connect {1} with {0}, please visit {2}.</value>
+    <value>Facebook account {0} is already connected with another organization. If you want to connect {1} with {0}, please visit</value>
+  </data>
+  <data name="FB_disconnected" xml:space="preserve">
+    <value>{0} is no longer connected to any Facebook account.</value>
   </data>
   <data name="Footer" xml:space="preserve">
     <value>Footer</value>
@@ -816,8 +840,23 @@
   <data name="LogoutFB" xml:space="preserve">
     <value>Logout from Facebook</value>
   </data>
+  <data name="OrderDetails" xml:space="preserve">
+    <value>Here are your order details</value>
+  </data>
+  <data name="Period" xml:space="preserve">
+    <value>.</value>
+  </data>
   <data name="PoweredBy" xml:space="preserve">
     <value>Powered by {0}</value>
+  </data>
+  <data name="Preview" xml:space="preserve">
+    <value>Preview</value>
+  </data>
+  <data name="ProductCode" xml:space="preserve">
+    <value>Product code</value>
+  </data>
+  <data name="Recipient" xml:space="preserve">
+    <value>Recipient</value>
   </data>
   <data name="ReconnectFacebook" xml:space="preserve">
     <value>Reset Facebook Connection</value>
@@ -827,6 +866,9 @@
   </data>
   <data name="RemainingStockTitle" xml:space="preserve">
     <value>Remaining Stock</value>
+  </data>
+  <data name="Remark" xml:space="preserve">
+    <value>Remark</value>
   </data>
   <data name="Size" xml:space="preserve">
     <value>Size</value>
@@ -848,6 +890,48 @@
   </data>
   <data name="Title_EditVariant" xml:space="preserve">
     <value>Choose a different variant</value>
+  </data>
+  <data name="Tour_CheckoutSection_Desc" xml:space="preserve">
+    <value>When your customer elects to check out, they will be re-directed to a checkout page to review their shopping cart and provide personal information. You can define any message you want to show to your customer at the checkout page.</value>
+  </data>
+  <data name="Tour_DelliverySection_Desc" xml:space="preserve">
+    <value>The delivery methods you set up here will be displayed to your customers when they check out.</value>
+  </data>
+  <data name="Tour_DisconnectFacebook_Desc" xml:space="preserve">
+    <value>Terminate the connection between your company and Facebook account.</value>
+  </data>
+  <data name="Tour_FbSection_Desc" xml:space="preserve">
+    <value>Connect your company with Facebook so that {0} can create posts/stories and respond to private messages / comments on your behalf.</value>
+  </data>
+  <data name="Tour_GetStarted_Desc" xml:space="preserve">
+    <value>Complete some simple configurations here to start using {0}.</value>
+  </data>
+  <data name="Tour_PaymentSection_Desc" xml:space="preserve">
+    <value>The payment methods you set up here will be made available to your customers when they check out.</value>
+  </data>
+  <data name="Tour_ProductPublication_Desc" xml:space="preserve">
+    <value>Once you have connected your company with your Facebook account, you can publish products to your Facebook pages and Instagram accounts.</value>
+  </data>
+  <data name="Tour_PublishButton_Desc" xml:space="preserve">
+    <value>Select a product and publish it to your Facebook page(s) and Instagram account(s).</value>
+  </data>
+  <data name="Tour_SaveButton_Desc" xml:space="preserve">
+    <value>Don't forget to click save when you done with configuring {0}.</value>
+  </data>
+  <data name="Tour_SomSection_Desc" xml:space="preserve">
+    <value>Once you have connected your company with your Facebook account, a chatbot can handle messages your customers send to your Facebook pages and Instagram accounts. That chatbot will create sales orders according to your settings here.</value>
+  </data>
+  <data name="Tour_TemplateSection_Desc" xml:space="preserve">
+    <value>Define how your products/catalogues will be posted to your social media.</value>
+  </data>
+  <data name="Tour_ThankyouSection_Desc" xml:space="preserve">
+    <value>Define the thank-you message that you want to display to your customer after they complete checkout.</value>
+  </data>
+  <data name="Tour_Welcome_Desc" xml:space="preserve">
+    <value>Welcome to {0}.</value>
+  </data>
+  <data name="Tour_Welcome_Title" xml:space="preserve">
+    <value>Welcome</value>
   </data>
   <data name="Warning_consequence1" xml:space="preserve">
     <value>You will not be able to publish products and/or catalogues of the company that is currently linked to Facebook.</value>
@@ -874,12 +958,15 @@
     <value>One</value>
   </data>
   <data name="Warning_num2" xml:space="preserve">
-    <value>one</value>
+    <value> one</value>
   </data>
   <data name="Warning_para1" xml:space="preserve">
     <value> Facebook account (including its Facebook pages and associated Instagram accounts) can only be connected with</value>
   </data>
   <data name="Warning_para2" xml:space="preserve">
     <value> Corprio organization at a time. Resetting the connection has the following implications:</value>
+  </data>
+  <data name="Warning_para3" xml:space="preserve">
+    <value>You are about to disconnect {0} from your Facebook account. This action cannot be undone and has the following implications:</value>
   </data>
 </root>

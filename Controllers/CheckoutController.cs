@@ -25,10 +25,7 @@ using Corprio.DataModel.Shared;
 using Newtonsoft.Json;
 using Corprio.DataModel.Business.Logistic;
 using Newtonsoft.Json.Linq;
-using DevExpress.XtraCharts.Native;
-using DevExpress.XtraCharts;
 using Corprio.AspNetCore.Site.Services;
-using Microsoft.EntityFrameworkCore;
 
 namespace Corprio.SocialWorker.Controllers
 {
@@ -42,7 +39,8 @@ namespace Corprio.SocialWorker.Controllers
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="context"></param>        
+        /// <param name="context"></param>
+        /// <param name="applicationSettingService"></param>
         public CheckoutController(ApplicationDbContext context, IConfiguration configuration, 
             ApplicationSettingService applicationSettingService) : base()
         {
@@ -82,7 +80,7 @@ namespace Corprio.SocialWorker.Controllers
             
             CheckoutViewModel checkoutView = new()
             {
-                AllowSelfPickUp = applicationSetting.SelfPickUp,                
+                AllowSelfPickUp = applicationSetting.SelfPickUp,
                 BillContactPhone = salesOrder.BillPhoneNumbers?.FirstOrDefault(x => !string.IsNullOrWhiteSpace(x.SubscriberNumber)) ?? customer.BusinessPartner.PrimaryMobilePhoneNumber(),
                 CurrencyCode = salesOrder.CurrencyCode,
                 DefaultCountryCode = coreInfo.CountryCode,
@@ -94,6 +92,7 @@ namespace Corprio.SocialWorker.Controllers
                 FreeShippingAmount = applicationSetting.FreeShippingAmount,
                 Footer = applicationSetting.Footer,
                 IsOrderVoidOrPaid = (salesOrder.IsVoided || (salesOrder.BilledStatus != null && salesOrder.BilledStatus.InvoicedQty > 0)),
+                IsPreview = false,
                 Language = string.IsNullOrWhiteSpace(ui) ? System.Threading.Thread.CurrentThread.CurrentCulture.Name : ui,
                 Lines = new List<OrderLine>(),
                 OrderDate = salesOrder.OrderDate,
@@ -105,6 +104,7 @@ namespace Corprio.SocialWorker.Controllers
                 SelfPickUpInstruction = applicationSetting.SelfPickUpInstruction,                
             };
 
+            // since the view may be rendered AFTER checkout, we try to restore the order with user's input stored in the sales order's EP
             salesOrder.EntityProperties ??= new List<EntityProperty>();
             EntityProperty checkoutEP = salesOrder.EntityProperties.FirstOrDefault(x => x.Name == EntityPropertyName);
             if (checkoutEP != null)
@@ -200,6 +200,15 @@ namespace Corprio.SocialWorker.Controllers
             return View(viewName: "Index", model: checkoutView);
         }
 
+        /// <summary>
+        /// Generate an order line that will be included in the checkout page
+        /// </summary>
+        /// <param name="corprioClient">Client for API requests among Corprio projects</param>
+        /// <param name="organizationID">Organization ID</param>
+        /// <param name="product">Product to be included in the order line</param>
+        /// <param name="line">Sales order line from which the order line is derived</param>
+        /// <param name="warehouseID">ID of the warehouse at which the stock level is checked</param>
+        /// <returns>An order line that will be included in the checkout page</returns>
         public async Task<OrderLine> PrepareOrderLine(APIClient corprioClient, Guid organizationID, Product product, 
             SalesOrderLine line, Guid warehouseID)
         {
@@ -298,6 +307,15 @@ namespace Corprio.SocialWorker.Controllers
             return orderLine;
         }
 
+        /// <summary>
+        /// Remove a sales order line
+        /// </summary>
+        /// <param name="httpClientFactory">HttpClientFactory for resolving the httpClient for client access</param>
+        /// <param name="organizationID">Organization ID</param>
+        /// <param name="salesOrderID">Sales order ID</param>
+        /// <param name="salesOrderLineID">Sales order line ID</param>
+        /// <returns>Status code</returns>
+        /// <exception cref="Exception"></exception>
         [AllowAnonymous]
         [OrganizationNeeded(false)]
         public async Task<IActionResult> DeleteSalesOrderLine([FromServices] IHttpClientFactory httpClientFactory, [FromRoute] Guid organizationID, 
@@ -321,8 +339,19 @@ namespace Corprio.SocialWorker.Controllers
                 throw new Exception($"The sales order line could not be deleted. Details: {ex.Message}");
             }
             return StatusCode(200);
-        }        
+        }
 
+        /// <summary>
+        /// Update a sales order line
+        /// </summary>
+        /// <param name="httpClientFactory">HttpClientFactory for resolving the httpClient for client access</param>
+        /// <param name="organizationID">Organization ID</param>
+        /// <param name="salesOrderID">Sales order ID</param>
+        /// <param name="salesOrderLineID">Sales order line ID</param>
+        /// <param name="productID">Product ID</param>
+        /// <param name="quantity">Quantity of product</param>
+        /// <returns>Status code</returns>
+        /// <exception cref="Exception"></exception>
         [AllowAnonymous]
         [OrganizationNeeded(false)]
         public async Task<OrderLine> EditSalesOrderLine([FromServices] IHttpClientFactory httpClientFactory, 
@@ -378,7 +407,7 @@ namespace Corprio.SocialWorker.Controllers
         }
 
         /// <summary>
-        /// Generate the body of the email about successful order
+        /// Generate the body of order confirmation email
         /// </summary>
         /// <param name="model">Data model</param>        
         /// <returns>Email body</returns>
@@ -469,6 +498,14 @@ namespace Corprio.SocialWorker.Controllers
             return message.LocalizeString(Resources.SharedResource.ResourceManager);
         }
 
+        /// <summary>
+        /// Send out order arrival email to the merchant AND order confirmation email to the customer
+        /// </summary>
+        /// <param name="corprio">Client for executing API requests among Corprio projects</param>
+        /// <param name="organizationID">Organization ID</param>
+        /// <param name="orderID">Sales order ID</param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
         private async Task SendEmailsAsync(APIClient corprio, Guid organizationID, Guid orderID)
         {
             OrderConfirmationDataModel model = await corprio.SalesOrderApi.GetResult<OrderConfirmationDataModel>(organizationID: organizationID,
@@ -540,6 +577,14 @@ namespace Corprio.SocialWorker.Controllers
             );
         }
 
+        /// <summary>
+        /// Void a sales order and add its order lines to the cart of the chat bot who created the order
+        /// </summary>
+        /// <param name="httpClientFactory">HttpClientFactory for resolving the httpClient for client access</param>
+        /// <param name="organizationID">Organization ID</param>
+        /// <param name="salesOrderID">Sales order ID</param>
+        /// <returns>Status code</returns>
+        /// <exception cref="Exception"></exception>
         [AllowAnonymous]
         [OrganizationNeeded(false)]
         public async Task<IActionResult> VoidAndRecall([FromServices] IHttpClientFactory httpClientFactory, [FromRoute] Guid organizationID, Guid salesOrderID)
@@ -589,6 +634,13 @@ namespace Corprio.SocialWorker.Controllers
             return StatusCode(200);
         }
 
+        /// <summary>
+        /// Void a sales order
+        /// </summary>
+        /// <param name="httpClientFactory">HttpClientFactory for resolving the httpClient for client access</param>
+        /// <param name="organizationID">Organization ID</param>
+        /// <param name="salesOrderID">Sales order ID</param>
+        /// <returns>Status code</returns>
         [AllowAnonymous]
         [OrganizationNeeded(false)]
         public async Task<IActionResult> VoidSalesOrder([FromServices] IHttpClientFactory httpClientFactory, [FromRoute] Guid organizationID, Guid salesOrderID)
@@ -599,11 +651,19 @@ namespace Corprio.SocialWorker.Controllers
             return StatusCode(200);
         }
 
+        /// <summary>
+        /// Triggered when the customer elects to proceed to payment
+        /// </summary>
+        /// <param name="httpClientFactory">HttpClientFactory for resolving the httpClient for client access</param>
+        /// <param name="organizationID">Organization ID</param>
+        /// <param name="data">Data submitted by the customer when they complete checkout</param>
+        /// <returns>Status code</returns>
+        /// <exception cref="Exception"></exception>
         [AllowAnonymous]
         [OrganizationNeeded(false)]
         public async Task<IActionResult> FinalizeSalesOrder([FromServices] IHttpClientFactory httpClientFactory, [FromRoute] Guid organizationID,
             [FromBody] CheckoutDataModel data)
-        {
+        {                                                
             if (data == null) throw new Exception("No data was provided.");
 
             ApplicationSetting applicationSetting = await applicationSettingService.GetSetting<ApplicationSetting>(organizationID);            
@@ -710,25 +770,10 @@ namespace Corprio.SocialWorker.Controllers
                 salesOrder.DeliveryAddress_CountryAlphaCode = data.DeliveryAddress.CountryAlphaCode;
                 
                 salesOrder.DeliveryPhoneNumbers ??= new List<PhoneNumber>();                
-                if (!salesOrder.BillPhoneNumbers.Any(x => x.Equals(data.DeliveryContactPhone)))
+                if (!salesOrder.DeliveryPhoneNumbers.Any(x => x.Equals(data.DeliveryContactPhone)))
                 {
                     salesOrder.DeliveryPhoneNumbers.Add(data.DeliveryContactPhone);
-                }                
-
-                // assumption: we include a line for delivery charge of $0 even when free shipping is provided
-                AddSalesOrderLineModel deliveryChargeOrderLine = new()
-                {
-                    ProductID = applicationSetting.DeliveryChargeProductID ?? throw new Exception("Delivery charge product ID is missing from application setting."),
-                    Qty = 1,
-                    SalesOrderID = data.SalesOrderID,
-                    UnitPrice = new Price
-                    {
-                        Value = (applicationSetting.FreeShippingAmount == null || applicationSetting.FreeShippingAmount > salesOrder.Lines.Sum(x => x.NetUnitPrice * x.Qty))
-                           ? applicationSetting.DeliveryCharge
-                           : 0,
-                    }
-                };
-                await corprioClient.SalesOrderApi.AddLine(organizationID: organizationID, line: deliveryChargeOrderLine);
+                }
 
                 // note: if AND only if the customer's primary address appears empty, then we update it with the delivery address as well
                 Customer customer = await corprioClient.CustomerApi.Get(organizationID: organizationID, id: salesOrder.CustomerID)
@@ -776,6 +821,29 @@ namespace Corprio.SocialWorker.Controllers
             {
                 throw new Exception($"The sales order could not be updated. Details: {ex.Message}");
             }
+            
+            // assumption: we include a line for delivery charge of $0 even when free shipping is provided
+            // note: the order line is added after the sales order's EP is updated, lest this new line is removed
+            AddSalesOrderLineModel deliveryChargeOrderLine = new()
+            {
+                ProductID = applicationSetting.DeliveryChargeProductID ?? throw new Exception("Delivery charge product ID is missing from application setting."),
+                Qty = 1,
+                SalesOrderID = data.SalesOrderID,
+                UnitPrice = new Price
+                {
+                    Value = (applicationSetting.FreeShippingAmount == null || applicationSetting.FreeShippingAmount > salesOrder.Lines.Sum(x => x.NetUnitPrice * x.Qty))
+                       ? applicationSetting.DeliveryCharge
+                       : 0,
+                }
+            };
+            try
+            {                
+                await corprioClient.SalesOrderApi.AddLine(organizationID: organizationID, line: deliveryChargeOrderLine);
+            }
+            catch (ApiExecutionException ex)
+            {
+                throw new Exception($"The sales order could not be updated. Details: {ex.Message}");
+            }
 
             var paymentMethods = await corprioClient.CustomerPaymentMethodApi.GetList(organizationID, loadDataOptions: new LoadDataOptions { PageSize = 1 });
             if (!paymentMethods.Any()) return StatusCode(412, "The merchant has not set up payment method.");
@@ -804,6 +872,82 @@ namespace Corprio.SocialWorker.Controllers
             }
 
             return StatusCode(200);
+        }
+
+        /// <summary>
+        /// Return a view to thank the customer once they complete payment
+        /// </summary>
+        /// <param name="httpClientFactory">HttpClientFactory for resolving the httpClient for client access</param>
+        /// <param name="organizationID">Organization ID</param>
+        /// <param name="trnID">Order ID</param>
+        /// <param name="trnType">Transaction type. Supported values are order or invoice</param>
+        /// <param name="amt">The received amount</param>
+        /// <param name="payID">Payment ID returned by the payment provider, if any</param>
+        /// <param name="payMeth">Name of the payment provider</param>
+        /// <returns>View</returns>
+        [AllowAnonymous]
+        [HttpPost("/{organizationID:guid}/thankyou")]
+        public async Task<IActionResult> ThankYou(
+            [FromServices] IHttpClientFactory httpClientFactory,
+            [FromRoute] Guid organizationID,
+            [FromForm] string payMeth,
+            [FromForm] string payID,
+            [FromForm] string trnType,
+            [FromForm] Guid trnID,
+            [FromForm] Guid paytrnid,
+            [FromForm] decimal amt,
+            [FromForm] string hash
+            )
+        {
+            //Cannot use ApiClient because this method is called by anonymous users
+            var httpClient = httpClientFactory.CreateClient("appClient"); //create httpClient for client access authorization only
+            APIClient corprio = new APIClient(httpClient);
+
+            OrderConfirmationDataModel model;
+
+            if (trnType == "order")
+            {
+                //validate hash
+                string calculatedHash = await corprio.OrganizationApi.GetHash(organizationID, new KeyValuePair<string, string>[] {
+                    new KeyValuePair<string, string>("paymeth", payMeth),
+                    new KeyValuePair<string, string>("payid", payID),
+                    new KeyValuePair<string, string>("trntype", trnType),
+                    new KeyValuePair<string, string>("trnid", trnID.ToString()),
+                    new KeyValuePair<string, string>("paytrnid", paytrnid.ToString()),
+                    new KeyValuePair<string, string>("amt", amt.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture))
+                });
+                if (calculatedHash != hash)
+                {
+                    //hash not match
+                    Log.Error($"Unsupported transaction type {trnType} is received");
+                    model = new OrderConfirmationDataModel { Message = "Invalid hash" };
+                }
+                else
+                {
+                    //get order record to show details to the customer
+                    model = await corprio.SalesOrderApi.GetResult<OrderConfirmationDataModel>(organizationID: organizationID,
+                        id: trnID,
+                        selector: $@"new(ID as SalesOrderID,OrderDate,DocumentNum,CurrencyCode,Amount,DeliveryAddress_Line1,DeliveryAddress_Line2,DeliveryAddress_City,DeliveryAddress_State,DeliveryAddress_PostalCode,DeliveryAddress_CountryAlphaCode,
+                            DeliveryContact_DisplayName,DeliveryPhoneNumbers,BillName,BillEmail,BillPhoneNumbers,Remark,
+                            Lines.OrderBy(SortOrder).Select(new (ProductID,Product.Code,Product.Name,Remark,Qty,UnitPrice,NetUnitPrice,UOMCode,Product.ListPrice_QtyDecimals as SalesUOMDecimals,DiscountType,DiscountValue,Product.Image01.UrlKey as Image01UrlKey)) as Products
+                            )");
+                    foreach (var p in model.Products)
+                    {
+                        p.ImageUrls[0] = corprio.ImageApi.Url(organizationID, p.Image01UrlKey, ImageSize.Normal);
+
+                    }
+                    
+                    ApplicationSetting settings = await applicationSettingService.GetSetting<ApplicationSetting>(organizationID);
+                    model.ThankYouMessage = settings?.ThankYouMessage;
+                    model.LogoImageUrl = await corprio.OrganizationApi.GetApplicationImageUrlByKey(organizationID, Common.LogoImageKey, ImageSize.Original);
+                }
+            }
+            else
+            {
+                Log.Error($"Unsupported transaction type {trnType} is received");
+                model = new OrderConfirmationDataModel { Message = "Invalid transaction type" };
+            }
+            return View(model);
         }
     }    
 }

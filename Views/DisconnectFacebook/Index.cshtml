@@ -1,0 +1,59 @@
+﻿@using Corprio.Core.Utility
+@inject Microsoft.Extensions.Configuration.IConfiguration configuration
+@inject Corprio.CorprioAPIClient.APIClient corprioApi
+@{
+    ViewData["Title"] = "DisconnectFacebook";
+    string metaApiID = configuration["MetaApiSetting:AppId"];
+    string metaApiVersion = configuration["MetaApiSetting:ApiVersion"];
+    Guid organizationID = Context.SelectedOrganizationID() ?? Guid.Empty;
+    string shortName = await corprioApi.OrganizationApi.GetShortName(organizationID);
+}
+
+<script src="~/js/views/DisconnectFacebook/Index.js" asp-append-version="true"></script>
+<script>
+    // use vdata to pass parameters to TS
+    const vdata = {
+        actions: {            
+            terminateConnection: '@StringHelper.Encode(@Url.Action("TerminateConnection", "DisconnectFacebook", new { organizationID }))',
+        },
+        localizer: {
+            cancel: '@StringHelper.Encode(@localizer["Cancel"])',
+            confirm: '@StringHelper.Encode(@localizer["Confirm"])',
+            confirmation: '@StringHelper.Encode(@localizer["Confirmation"])',
+            fbDisconnected: '@StringHelper.Encode(@localizer["FB_disconnected"])',
+            finalWarning: '@StringHelper.Encode(localizer["Warning_final"])',               
+        },
+        settings: {
+            metaApiID: "@metaApiID",
+            metaApiVersion: "@metaApiVersion",
+            shortName: "@shortName"
+        },
+    };
+</script>
+<script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js"></script>
+
+<div class="container-fluid mt-md-4 mt-5 d-flex justify-content-center" style="max-width: 770px;">
+    <div>        
+        <div id="reconnect-warning" style="display: block;">
+            <h3>@localizer["Warning_header1"]</h3>
+            <h5>@localizer["Warning_header2"]</h5>
+            <br />
+            <p>
+                @string.Format(localizer["Warning_para3"], shortName)
+            </p>
+            <ul class="fa-ul">
+                <li class="mb-2">
+                    <span class="fa-li"><i class="fas fa-circle-exclamation"></i></span>
+                    @localizer["Warning_consequence1"]
+                </li>
+                <li class="mb-2">
+                    <span class="fa-li"><i class="fas fa-circle-exclamation"></i></span>
+                    @localizer["Warning_consequence2"]
+                </li>
+            </ul>
+        </div>        
+        <button class="btn btn-primary mt-2" id="disconnectBtn">@localizer["Disconnect"]</button>
+
+        <div id="disconnect-dialogue" class="mt-3"></div>
+    </div>
+</div>

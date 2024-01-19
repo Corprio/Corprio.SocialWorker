@@ -8,8 +8,7 @@ namespace Corprio.SocialWorker.Controllers
     public class HomeController : HomeControllerBase
     {                        
         protected override IActionResult AuthenticatedLandingPage(APIClient corprio, Guid organizationID)
-        {
-            //return RedirectToAction("Index", "ConnectFacebook", new { organizationID });
+        {            
             return RedirectToAction("Index", "GetStarted", new { organizationID });
         }        
     }

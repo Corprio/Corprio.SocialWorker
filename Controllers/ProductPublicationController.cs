@@ -51,14 +51,13 @@ namespace Corprio.SocialWorker.Controllers
         /// <summary>
         /// Retrieve entity property values
         /// </summary>
-        /// <param name="corprio"></param>
-        /// <param name="organizationID"></param>
-        /// <param name="propertyName"></param>
-        /// <param name="loadOptions"></param>
+        /// <param name="corprio">Client for executing API requests among Corprio projects</param>
+        /// <param name="organizationID">Organization ID</param>
+        /// <param name="propertyName">Name of EP to be retrieved</param>        
         /// <returns></returns>
         [OrganizationNeeded(false)]
         [HttpGet("/ProductPublication/GetDistinctProductPropertyValues")]
-        public Task<IEnumerable<string>> GetDistinctProductPropertyValues([FromServices] APIClient corprio, Guid organizationID, string propertyName, LoadDataOptions loadOptions)
+        public Task<IEnumerable<string>> GetDistinctProductPropertyValues([FromServices] APIClient corprio, Guid organizationID, string propertyName)
         {
             return corprio.ProductApi.GetDistinctPropertyValues(organizationID: organizationID, propertyName: propertyName);
         }
@@ -68,7 +67,7 @@ namespace Corprio.SocialWorker.Controllers
         /// </summary>
         /// <param name="corprioClient">API client</param>
         /// <param name="loadOptions">DataGrid datasource load options</param>
-        /// <returns>Paged records for showing in DataGrid</returns>
+        /// <returns>Paged records to be shown in DataGrid</returns>
         [OrganizationAuthorizationCheck(
             ActionEntityTypes = new EntityType[] { EntityType.Product },
             RequiredPermissions = new DataAction[] { DataAction.Read })]

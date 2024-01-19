@@ -13,38 +13,180 @@ namespace Corprio.SocialWorker.Services
                 "getstarted.index" => new ProductTour
                 {
                     Steps = new[]
-                         {
-                             new DriveStep {
-                                 Popover = new Popover{
-                                     Title="Welcome",
-                                     Description = "Welcome"
-                                 }
-                             },
-                             new DriveStep {
-                                 Element = "#sidebar",
-                                 Popover = new Popover{
-                                     Description = "heading"
-                                 }
-                             },
-                             new DriveStep {
-                                 Element = "#template-section",
-                                 Popover = new Popover{
-                                     Description = "template"
-                                 }
-                             }
-                         }
+                    {
+                        new DriveStep {
+                            Popover = new Popover
+                            {
+                                Title = Resources.SharedResource.Tour_Welcome_Title,
+                                Description = string.Format(Resources.SharedResource.Tour_Welcome_Desc, Resources.SharedResource.AppName),
+                            }
+                        },
+                        new DriveStep {
+                            Element = "#menu-item-GetStarted-0-0",
+                            Popover = new Popover
+                            {
+                                Description = string.Format(Resources.SharedResource.Tour_GetStarted_Desc, Resources.SharedResource.AppName)
+                            }
+                        },
+                        new DriveStep {
+                            Element = "#menu-item-ProductPublication-0-1",
+                            Popover = new Popover
+                            {
+                                Description = Resources.SharedResource.Tour_ProductPublication_Desc,
+                            }
+                        },
+                        new DriveStep {
+                            Element = "#menu-item-DisconnectFacebook-0-2",
+                            Popover = new Popover
+                            {
+                                Description = Resources.SharedResource.Tour_DisconnectFacebook_Desc,
+                            }
+                        },
+                        new DriveStep {
+                            Element = "#fb-section",
+                            Popover = new Popover
+                            {
+                                Description = string.Format(Resources.SharedResource.Tour_FbSection_Desc, Resources.SharedResource.AppName),
+                            }
+                        },
+                        new DriveStep {
+                            Element = "#som-section",
+                            Popover = new Popover
+                            {
+                                Description = string.Format(Resources.SharedResource.Tour_SomSection_Desc, Resources.SharedResource.AppName)
+                            }
+                        },
+                        new DriveStep {
+                            Element = "#delivery-section",
+                            Popover = new Popover
+                            {
+                                Description = Resources.SharedResource.Tour_DelliverySection_Desc,
+                            }
+                        },
+                        new DriveStep {
+                            Element = "#payment-section",
+                            Popover = new Popover
+                            {
+                                Description = Resources.SharedResource.Tour_PaymentSection_Desc,
+                            }
+                        },
+                        new DriveStep {
+                            Element = "#checkout-section",
+                            Popover = new Popover
+                            {
+                                Description = Resources.SharedResource.Tour_CheckoutSection_Desc,
+                            }
+                        },
+                        new DriveStep {
+                            Element = "#thankyou-section",
+                            Popover = new Popover
+                            {
+                                Description = Resources.SharedResource.Tour_ThankyouSection_Desc,
+                            }
+                        },
+                        new DriveStep {
+                            Element = "#template-section",
+                            Popover = new Popover
+                            {
+                                Description = Resources.SharedResource.Tour_TemplateSection_Desc,
+                            }
+                        },
+                        new DriveStep {
+                            Element = ".save-setting-btn",
+                            Popover = new Popover
+                            {
+                                Description = string.Format(Resources.SharedResource.Tour_SaveButton_Desc, Resources.SharedResource.AppName),
+                            }
+                        },
+                    }
                 },
                 "productpublication.index" => new ProductTour
                 {
                     Steps = new[]
-                         {
-                             new DriveStep {
-                                 Popover = new Popover{
-                                     Title="Welcome",
-                                     Description = "Welcome"
-                                 }
-                             },                             
-                         }
+                    {                        
+                        new DriveStep {
+                            Element = "#menu-item-GetStarted-0-0",
+                            Popover = new Popover
+                            {
+                                Description = string.Format(Resources.SharedResource.Tour_GetStarted_Desc, Resources.SharedResource.AppName)
+                            }
+                        },
+                        new DriveStep {
+                            Element = "#menu-item-ProductPublication-0-1",
+                            Popover = new Popover
+                            {
+                                Description = Resources.SharedResource.Tour_ProductPublication_Desc,
+                            }
+                        },
+                        new DriveStep {
+                            Element = "#menu-item-DisconnectFacebook-0-2",
+                            Popover = new Popover
+                            {
+                                Description = Resources.SharedResource.Tour_DisconnectFacebook_Desc,
+                            }
+                        },
+                        new DriveStep {
+                            Element = ".publish-btn",
+                            Popover = new Popover
+                            {
+                                Description = "Select a product and publish it to your Facebook page(s) and Instagram account(s).",
+                            }
+                        },
+                    }
+                },
+                "disconnectfacebook.index" => new ProductTour
+                {
+                    Steps = new[]
+                    {
+                        new DriveStep {
+                            Element = "#menu-item-GetStarted-0-0",
+                            Popover = new Popover
+                            {
+                                Description = string.Format(Resources.SharedResource.Tour_GetStarted_Desc, Resources.SharedResource.AppName)
+                            }
+                        },
+                        new DriveStep {
+                            Element = "#menu-item-ProductPublication-0-1",
+                            Popover = new Popover
+                            {
+                                Description = Resources.SharedResource.Tour_ProductPublication_Desc,
+                            }
+                        },
+                        new DriveStep {
+                            Element = "#menu-item-DisconnectFacebook-0-2",
+                            Popover = new Popover
+                            {
+                                Description = Resources.SharedResource.Tour_DisconnectFacebook_Desc,
+                            }
+                        },
+                    }
+                },
+                "reconnectfacebook.index" => new ProductTour
+                {
+                    Steps = new[]
+                    {
+                        new DriveStep {
+                            Element = "#menu-item-GetStarted-0-0",
+                            Popover = new Popover
+                            {
+                                Description = string.Format(Resources.SharedResource.Tour_GetStarted_Desc, Resources.SharedResource.AppName)
+                            }
+                        },
+                        new DriveStep {
+                            Element = "#menu-item-ProductPublication-0-1",
+                            Popover = new Popover
+                            {
+                                Description = Resources.SharedResource.Tour_ProductPublication_Desc,
+                            }
+                        },
+                        new DriveStep {
+                            Element = "#menu-item-DisconnectFacebook-0-2",
+                            Popover = new Popover
+                            {
+                                Description = Resources.SharedResource.Tour_DisconnectFacebook_Desc,
+                            }
+                        },
+                    }
                 },
                 _ => null,
             };

@@ -1,4 +1,5 @@
-import { CorprioPhoneNumberType, DeliveryOption } from './Enums';
+import { PhoneNumber } from '@corprio/aspnetcore-site/dist/js/coWidgets/coPhoneNumber';
+import { DeliveryOption } from './Enums';
 
 export interface CorprioAddress {
     Line1: string,
@@ -14,21 +15,22 @@ export interface CorprioPerson {
     FamilyName: string,
 }
 
-export interface CorprioPhoneNumber {
-    NumberType: CorprioPhoneNumberType,
-    SubscriberNumber: string,
-    NationalDestinationCode: string,
-    CountryCallingCode: string,
-}
+//export interface CorprioPhoneNumber {
+//    NumberType: CorprioPhoneNumberType,
+//    SubscriberNumber: string,
+//    NationalDestinationCode: string,
+//    CountryCallingCode: string,
+//}
 
 // IMPORTANT: the properties of this interface must be in line with that defined on the server side
 export interface CheckoutDataModel {
     BillPerson: CorprioPerson,
-    BillContactPhone: CorprioPhoneNumber,
+    BillContactPhone: PhoneNumber,
     ChosenDeliveryMethod: DeliveryOption,
     DeliveryAddress?: CorprioAddress,
     DeliveryContact?: CorprioPerson,
-    DeliveryContactPhone?: CorprioPhoneNumber,
+    DeliveryContactPhone?: PhoneNumber,
+    Footer?: string,
     SalesOrderID: string,
 }
 

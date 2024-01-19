@@ -82,6 +82,9 @@ window.fbAsyncInit = function () {
         statusChangeCallback(response); // Returns the login status.
     });
 };
+/**
+ * IIFE to make a reference to the SDK, if it does not already exist
+ */
 (function (element, tagName, selector) {
     var js, fjs = element.getElementsByTagName(tagName)[0];
     if (element.getElementById(selector)) {
@@ -92,6 +95,9 @@ window.fbAsyncInit = function () {
     js.src = "https://connect.facebook.net/en_US/sdk.js";
     fjs.parentNode.insertBefore(js, fjs);
 }(document, 'script', 'facebook-jssdk'));
+/**
+ * Entry point
+ */
 $(function () {
     $('#loginBtn').on('click', function () {
         FB.login((response) => {
@@ -106,6 +112,7 @@ $(function () {
     $('#logoutBtn').on('click', function () {
         FB.logout(checkLoginState);
     });
+    corprio.page.initTour({ defaultTour: 'reconnectfacebook.index', autoStart: true, driverCssLoaded: true });
 });
 /**
  * Check the user's FB login status

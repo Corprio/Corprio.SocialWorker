@@ -12,6 +12,9 @@ using Corprio.SocialWorker.Helpers;
 
 namespace Corprio.SocialWorker.Models
 {
+    /// <summary>
+    /// Setting for this particular application
+    /// </summary>
     public class ApplicationSetting
     {
         /// <summary>
@@ -107,8 +110,18 @@ namespace Corprio.SocialWorker.Models
         [StringLength(10)]
         public string KeywordForShoppingIntention { get; set; }
 
+        /// <summary>
+        /// The template for posting products to social media
+        /// </summary>
         public string ProductPostTemplate { get; set; }
 
+        /// <summary>
+        /// Generate the post for publishing a product to social media
+        /// </summary>
+        /// <param name="product">The product to be published</param>
+        /// <param name="coreInfo">The organization's core information</param>
+        /// <param name="publicPrice">The product's price for walk-in customers</param>
+        /// <returns>The post to be made in social media</returns>
         public string ProductPostMessage(Product product, OrganizationCoreInfo coreInfo, PriceWithCurrency publicPrice)
         {
             if (product == null) return null;
@@ -128,8 +141,18 @@ namespace Corprio.SocialWorker.Models
             return UtilityHelper.UncleanAndClean(userInput: message, onceIsOK: true);
         }
 
+        /// <summary>
+        /// The template for posting catalogues to social media
+        /// </summary>
         public string CataloguePostTemplate { get; set; }
 
+        /// <summary>
+        /// Generate the post for publishing a catalogue to social media
+        /// </summary>
+        /// <param name="productList">The catalogue to be published</param>
+        /// <param name="coreInfo">The organization's core information</param>
+        /// <param name="goBuyClickUrl">The catalogue's URL</param>
+        /// <returns>The post to be made in social media</returns>
         public string CataloguePostMessage(ProductList productList, OrganizationCoreInfo coreInfo, string goBuyClickUrl)
         {
             if (productList == null) return null;
@@ -148,6 +171,9 @@ namespace Corprio.SocialWorker.Models
         }
     }
 
+    /// <summary>
+    /// Default template for publishing products and catalogues to social media
+    /// </summary>
     public class DefaultTemplate
     {
         public static readonly List<string> DefaultTempalte_Product = new()
@@ -171,6 +197,9 @@ namespace Corprio.SocialWorker.Models
         };
     }
 
+    /// <summary>
+    /// Definition of standard template component
+    /// </summary>
     public class TemplateComponent
     {
         public const string LineBreak = "%lineBreak%";

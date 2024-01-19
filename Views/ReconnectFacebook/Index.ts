@@ -38,6 +38,9 @@ window.fbAsyncInit = function () {
     });
 };
 
+/**
+ * IIFE to make a reference to the SDK, if it does not already exist
+ */
 (function (element: Document, tagName: string, selector: string) {
     var js, fjs = element.getElementsByTagName(tagName)[0];
     if (element.getElementById(selector)) { return; }
@@ -47,6 +50,9 @@ window.fbAsyncInit = function () {
 }(document, 'script', 'facebook-jssdk')
 );
 
+/**
+ * Entry point
+ */
 $(function () {    
     $('#loginBtn').on('click', function () {        
         FB.login((response: facebook.StatusResponse) => {
@@ -60,6 +66,8 @@ $(function () {
     $('#logoutBtn').on('click', function () {        
         FB.logout(checkLoginState);
     });
+
+    corprio.page.initTour({ defaultTour: 'reconnectfacebook.index', autoStart: true, driverCssLoaded: true });
 })
 
 /**
