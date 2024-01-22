@@ -28,9 +28,8 @@ namespace Corprio.SocialWorker
         public void ConfigureServices(IServiceCollection services)
         {            
             services.AddCommonAppServices(Configuration);
-            services.AddHttpClient();
-            services.AddDbContext<ApplicationDbContext>(options => options.UseSqlite(
-                Configuration.GetConnectionString("localDb")));
+            services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(
+                Configuration.GetConnectionString("ApplicationDB")));
 
             services.AddSingleton<GlobalListService>();
 
@@ -41,6 +40,7 @@ namespace Corprio.SocialWorker
             };
 
             //add HTTP client for accessing API without user login
+            services.AddHttpClient();
             services.AddClientAccessTokenHttpClient("webhookClient", "default", client => { client.ConfigureForCorprio(corprioApiSetting); });
             services.AddSingleton<IProductTourService, ProductTourService>();
         }

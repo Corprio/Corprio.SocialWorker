@@ -1,8 +1,11 @@
 using System;
 using System.IO;
 using Azure.Identity;
+using Corprio.SocialWorker.Models;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serilog;
 using Serilog.Events;
@@ -27,7 +30,25 @@ namespace Corprio.SocialWorker
             {
                 Log.Information("Starting Corprio SocialWorker Service ...");
 
-                CreateHostBuilder(args).Build().Run();
+                var host = CreateHostBuilder(args).Build();
+
+                //seed data
+                Log.Information("Going to seed data");
+                using var scope = host.Services.CreateScope();
+                var services = scope.ServiceProvider;
+                try
+                {
+                    Log.Information("Going to seed data");
+                    using ApplicationDbContext dataContext = services.GetService<ApplicationDbContext>();
+                    dataContext.Database.Migrate();
+                }
+                catch (Exception ex)
+                {
+                    Log.Error(ex, "Failure in seeding the local application database");
+                    throw;
+                }
+
+                host.Run();
                 Log.Information("Stopped cleanly");
                 return 0;
             }
