@@ -1186,6 +1186,15 @@ namespace Corprio.SocialWorker.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Modify setting.
+        /// </summary>
+        public static string ModifySMTP {
+            get {
+                return ResourceManager.GetString("ModifySMTP", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to More apps from Corprio....
         /// </summary>
         public static string More_apps_from_Corprio___ {
@@ -2379,6 +2388,15 @@ namespace Corprio.SocialWorker.Resources {
         public static string Tour_PublishButton_Desc {
             get {
                 return ResourceManager.GetString("Tour_PublishButton_Desc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to If you wish to have re-run site tour, simply click this button..
+        /// </summary>
+        public static string Tour_Rerun {
+            get {
+                return ResourceManager.GetString("Tour_Rerun", resourceCulture);
             }
         }
         

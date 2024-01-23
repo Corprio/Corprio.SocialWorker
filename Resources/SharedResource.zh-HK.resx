@@ -969,4 +969,10 @@
   <data name="Warning_para3" xml:space="preserve">
     <value>您即將終止 {0} 與 Facebook 帳號的連接。此操作無法撤消，並且會產生以下影響：</value>
   </data>
+  <data name="ModifySMTP" xml:space="preserve">
+    <value>變更設定</value>
+  </data>
+  <data name="Tour_Rerun" xml:space="preserve">
+    <value>如果您希望重溫這個應用導航，請單擊此按鈕。</value>
+  </data>
 </root>

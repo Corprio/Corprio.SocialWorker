@@ -2,10 +2,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Corprio.AspNetCore.Site.Extensions;
-using Corprio.AspNetCore.XtraReportSite;
-using Corprio.Core;
 using Microsoft.AspNetCore.Http;
 using Corprio.CorprioRestClient;
 using Corprio.SocialWorker.Models;
@@ -33,16 +30,15 @@ namespace Corprio.SocialWorker
                 Configuration.GetConnectionString("localDb")));
 
             services.AddSingleton<GlobalListService>();
+            services.AddSingleton<IProductTourService, ProductTourService>();
 
+            //add HTTP client for accessing API without user login
             CorprioApiSetting corprioApiSetting = new()
             {
                 ApiUrl = Configuration["CorprioApiSetting:ApiUrl"],
                 ApiVersion = Configuration["CorprioApiSetting:ApiVersion"]
-            };
-
-            //add HTTP client for accessing API without user login
-            services.AddClientAccessTokenHttpClient("webhookClient", "default", client => { client.ConfigureForCorprio(corprioApiSetting); });
-            services.AddSingleton<IProductTourService, ProductTourService>();
+            };            
+            services.AddClientAccessTokenHttpClient("webhookClient", "default", client => { client.ConfigureForCorprio(corprioApiSetting); });            
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

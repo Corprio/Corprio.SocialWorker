@@ -969,4 +969,10 @@
   <data name="Warning_para3" xml:space="preserve">
     <value>You are about to disconnect {0} from your Facebook account. This action cannot be undone and has the following implications:</value>
   </data>
+  <data name="ModifySMTP" xml:space="preserve">
+    <value>Modify setting</value>
+  </data>
+  <data name="Tour_Rerun" xml:space="preserve">
+    <value>If you wish to have re-run site tour, simply click this button.</value>
+  </data>
 </root>

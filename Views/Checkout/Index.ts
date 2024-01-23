@@ -1,4 +1,3 @@
-import { PhoneNumber } from '@corprio/aspnetcore-site/dist/js/coWidgets/coPhoneNumber';
 import { DeliveryOption } from './Enums';
 import { CheckoutDataModel, CheckoutOrderLine, ProductVariationInfo } from './Interfaces';
 

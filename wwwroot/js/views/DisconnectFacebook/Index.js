@@ -84,7 +84,6 @@ $(function () {
         });
         prompt.show();
     });
-    corprio.page.initTour({ defaultTour: 'disconnectfacebook.index', autoStart: true, driverCssLoaded: true });
 });
 
 })();
