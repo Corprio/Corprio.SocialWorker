@@ -3,6 +3,7 @@ using System;
 using Corprio.SocialWorker.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -15,76 +16,80 @@ namespace Corprio.SocialWorker.Migrations
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "7.0.14");
+            modelBuilder
+                .HasAnnotation("ProductVersion", "8.0.1")
+                .HasAnnotation("Relational:MaxIdentifierLength", 128);
+
+            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
             modelBuilder.Entity("Corprio.SocialWorker.Models.DbFriendlyBot", b =>
                 {
                     b.Property<Guid>("ID")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("ApplicationID")
                         .HasMaxLength(200)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<string>("AttributeValueMemoryString")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid?>("BuyerCorprioID")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("BuyerEmail")
                         .HasMaxLength(256)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(256)");
 
                     b.Property<string>("BuyerID")
                         .IsRequired()
                         .HasMaxLength(50)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("CartString")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTimeOffset>("CreateDate")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<string>("CreatedBy")
                         .HasMaxLength(200)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<Guid>("FacebookUserID")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("Language")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("int");
 
                     b.Property<DateTimeOffset>("LastUpdateDate")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<string>("LastUpdatedBy")
                         .HasMaxLength(200)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<string>("OTP_Code")
                         .HasMaxLength(6)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(6)");
 
                     b.Property<DateTimeOffset?>("OTP_ExpiryTime")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<string>("ProductMemoryString")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<byte[]>("RowVersion")
                         .IsConcurrencyToken()
                         .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("BLOB");
+                        .HasColumnType("rowversion");
 
                     b.Property<int>("ThinkingOf")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("int");
 
                     b.Property<string>("VariationMemoryString")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("ID");
 
@@ -97,51 +102,51 @@ namespace Corprio.SocialWorker.Migrations
                 {
                     b.Property<Guid>("ID")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("ApplicationID")
                         .HasMaxLength(200)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<DateTimeOffset>("CreateDate")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<string>("CreatedBy")
                         .HasMaxLength(200)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<Guid>("FacebookUserID")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("InstagramID")
                         .HasMaxLength(300)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(300)");
 
                     b.Property<DateTimeOffset>("LastUpdateDate")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<string>("LastUpdatedBy")
                         .HasMaxLength(200)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<string>("Name")
                         .HasMaxLength(300)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(300)");
 
                     b.Property<string>("PageId")
                         .IsRequired()
                         .HasMaxLength(50)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<byte[]>("RowVersion")
                         .IsConcurrencyToken()
                         .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("BLOB");
+                        .HasColumnType("rowversion");
 
                     b.Property<string>("Token")
                         .IsRequired()
                         .HasMaxLength(2000)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(2000)");
 
                     b.HasKey("ID");
 
@@ -154,46 +159,46 @@ namespace Corprio.SocialWorker.Migrations
                 {
                     b.Property<Guid>("ID")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("ApplicationID")
                         .HasMaxLength(200)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<DateTimeOffset>("CreateDate")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<string>("CreatedBy")
                         .HasMaxLength(200)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<Guid>("FacebookPageID")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("KeywordForShoppingIntention")
                         .IsRequired()
                         .HasMaxLength(10)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(10)");
 
                     b.Property<DateTimeOffset>("LastUpdateDate")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<string>("LastUpdatedBy")
                         .HasMaxLength(200)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<string>("PostId")
                         .IsRequired()
                         .HasMaxLength(50)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<int>("PostedWith")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("int");
 
                     b.Property<byte[]>("RowVersion")
                         .IsConcurrencyToken()
                         .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("BLOB");
+                        .HasColumnType("rowversion");
 
                     b.HasKey("ID");
 
@@ -206,46 +211,46 @@ namespace Corprio.SocialWorker.Migrations
                 {
                     b.Property<Guid>("ID")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("ApplicationID")
                         .HasMaxLength(200)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<DateTimeOffset>("CreateDate")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<string>("CreatedBy")
                         .HasMaxLength(200)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<bool>("Dormant")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("bit");
 
                     b.Property<string>("FacebookUserID")
                         .IsRequired()
                         .HasMaxLength(50)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<DateTimeOffset>("LastUpdateDate")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<string>("LastUpdatedBy")
                         .HasMaxLength(200)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<Guid>("OrganizationID")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<byte[]>("RowVersion")
                         .IsConcurrencyToken()
                         .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("BLOB");
+                        .HasColumnType("rowversion");
 
                     b.Property<string>("Token")
                         .IsRequired()
                         .HasMaxLength(2000)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(2000)");
 
                     b.HasKey("ID");
 

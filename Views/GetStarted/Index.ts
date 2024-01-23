@@ -820,5 +820,5 @@ $(function () {
         window.open(`/${vdata.settings.organizationID}/GetStarted/PreviewThankYou`, '_blank');
     });    
     
-    corprio.page.initTour({ defaultTour: 'getstarted.index', autoStart: true, driverCssLoaded: true });
+    corprio.page.initTour({ defaultTour: 'getstarted.index', autoStart: true, driverCssLoaded: false });
 });
