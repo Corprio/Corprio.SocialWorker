@@ -26,6 +26,8 @@ using Newtonsoft.Json;
 using Corprio.DataModel.Business.Logistic;
 using Newtonsoft.Json.Linq;
 using Corprio.AspNetCore.Site.Services;
+using PhoneNumbers;
+using DevExpress.ClipboardSource.SpreadsheetML;
 
 namespace Corprio.SocialWorker.Controllers
 {
@@ -67,16 +69,16 @@ namespace Corprio.SocialWorker.Controllers
             var corprioClient = new APIClient(httpClient);
 
             SalesOrder salesOrder = await corprioClient.SalesOrderApi.Get(organizationID: organizationID, id: salesOrderID);
-            if (salesOrder == null) return NotFound(Resources.SharedResource.ResourceManager.GetString("ErrMsg_SalesOrderNotFound"));
+            if (salesOrder == null) return NotFound(Resources.SharedResource.ErrMsg_SalesOrderNotFound);
 
             Customer customer = await corprioClient.CustomerApi.Get(organizationID: organizationID, id: salesOrder.CustomerID);
-            if (customer?.BusinessPartner == null) return NotFound(Resources.SharedResource.ResourceManager.GetString("ErrMsg_CustomerNotFound"));
+            if (customer?.BusinessPartner == null) return NotFound(Resources.SharedResource.ErrMsg_CustomerNotFound);
             
             ApplicationSetting applicationSetting = await applicationSettingService.GetSetting<ApplicationSetting>(organizationID);
-            if (applicationSetting == null) return NotFound(Resources.SharedResource.ResourceManager.GetString("ErrMsg_AppSettingNotFound"));
+            if (applicationSetting == null) return NotFound(Resources.SharedResource.ErrMsg_AppSettingNotFound);
 
             OrganizationCoreInfo coreInfo = await corprioClient.OrganizationApi.GetCoreInfo(organizationID);
-            if (coreInfo == null) return NotFound(Resources.SharedResource.ResourceManager.GetString("ErrMsg_OrganizationInfoNotFound"));
+            if (coreInfo == null) return NotFound(Resources.SharedResource.ErrMsg_OrganizationInfoNotFound);
             
             CheckoutViewModel checkoutView = new()
             {
@@ -191,7 +193,7 @@ namespace Corprio.SocialWorker.Controllers
             foreach (SalesOrderLine line in salesOrder.Lines)
             {
                 product = await corprioClient.ProductApi.Get(organizationID: organizationID, id: line.ProductID);
-                if (product == null) return NotFound(Resources.SharedResource.ResourceManager.GetString("ErrMsg_ProductNotFound"));
+                if (product == null) return NotFound(Resources.SharedResource.ErrMsg_ProductNotFound);
                 
                 checkoutView.Lines.Add(await PrepareOrderLine(corprioClient: corprioClient, organizationID: organizationID, product: product, line: line, warehouseID: (Guid)applicationSetting.WarehouseID));
             }
@@ -357,7 +359,7 @@ namespace Corprio.SocialWorker.Controllers
         public async Task<OrderLine> EditSalesOrderLine([FromServices] IHttpClientFactory httpClientFactory, 
             [FromRoute] Guid organizationID, Guid salesOrderID, Guid salesOrderLineID, Guid productID, decimal quantity)
         {
-            if (quantity <= 0) throw new Exception(Resources.SharedResource.ResourceManager.GetString("ErrMsg_QuantityNotPositive"));
+            if (quantity <= 0) throw new Exception(Resources.SharedResource.ErrMsg_QuantityNotPositive);
 
             HttpClient httpClient = httpClientFactory.CreateClient("appClient");
             var corprioClient = new APIClient(httpClient);
@@ -369,7 +371,7 @@ namespace Corprio.SocialWorker.Controllers
             SalesOrderLine salesOrderLine = salesOrder.Lines.FirstOrDefault(x => x.ID == salesOrderLineID) 
                 ?? throw new Exception("The sales order line ID is invalid");
             Product product = await corprioClient.ProductApi.Get(organizationID: organizationID, id: productID)
-                ?? throw new Exception(Resources.SharedResource.ResourceManager.GetString("ErrMsg_ProductNotFound"));
+                ?? throw new Exception(Resources.SharedResource.ErrMsg_ProductNotFound);
 
             PriceWithCurrency price = await corprioClient.SellingPriceApi.GetPriceForCustomer(
                 organizationID: organizationID,
@@ -400,7 +402,7 @@ namespace Corprio.SocialWorker.Controllers
             }
 
             ApplicationSetting settings = await applicationSettingService.GetSetting<ApplicationSetting>(organizationID)
-                ?? throw new Exception(Resources.SharedResource.ResourceManager.GetString("ErrMsg_AppSettingNotFound"));            
+                ?? throw new Exception(Resources.SharedResource.ErrMsg_AppSettingNotFound);            
 
             return await PrepareOrderLine(corprioClient: corprioClient, organizationID: organizationID, product: product, 
                 line: salesOrderLine, warehouseID: (Guid)settings.WarehouseID);
@@ -427,7 +429,7 @@ namespace Corprio.SocialWorker.Controllers
 
             //build string for bill phone numbers
             var billPhoneNumbers = new StringBuilder();
-            foreach (PhoneNumber phoneNumber in model.BillPhoneNumbers)
+            foreach (Global.Geography.PhoneNumber phoneNumber in model.BillPhoneNumbers)
             {
                 billPhoneNumbers.Append($"<div>{phoneNumber.E123PhoneNumber()}</div>");
             }
@@ -437,7 +439,7 @@ namespace Corprio.SocialWorker.Controllers
             if (!string.IsNullOrWhiteSpace(model.DeliveryAddress_CountryAlphaCode))
             {
                 StringBuilder deliveryPhoneNumbers = new StringBuilder();
-                foreach (PhoneNumber p in model.DeliveryPhoneNumbers)
+                foreach (Global.Geography.PhoneNumber p in model.DeliveryPhoneNumbers)
                 {
                     deliveryPhoneNumbers.Append($"<div>{p.E123PhoneNumber()}</div>");
                 }
@@ -482,7 +484,7 @@ namespace Corprio.SocialWorker.Controllers
                 { "logoImageUrl", model.LogoImageUrl },
                 { "thankYouMessage", model.ThankYouMessage },
                 { "paymentLink", model.PaymentLink },
-                { "paymentButtonText", Resources.SharedResource.ResourceManager.GetString("ProceedToPayment") },
+                { "paymentButtonText", Resources.SharedResource.ProceedToPayment },
                 { "documentNum", model.DocumentNum },
                 { "orderDate", model.OrderDate.ToString() },
                 { "billName", model.BillName },
@@ -520,7 +522,7 @@ namespace Corprio.SocialWorker.Controllers
             }
 
             ApplicationSetting applicationSetting = await applicationSettingService.GetSetting<ApplicationSetting>(organizationID)
-                ?? throw new Exception(Resources.SharedResource.ResourceManager.GetString("ErrMsg_AppSettingNotFound"));            
+                ?? throw new Exception(Resources.SharedResource.ErrMsg_AppSettingNotFound);            
             model.ThankYouMessage = applicationSetting.ThankYouMessage;
             OrganizationCoreInfo coreInfo = await corprio.OrganizationApi.GetCoreInfo(organizationID);            
             model.LogoImageUrl = coreInfo?.LogoImageUrl;
@@ -593,7 +595,7 @@ namespace Corprio.SocialWorker.Controllers
             var corprioClient = new APIClient(httpClient);
 
             SalesOrder salesOrder = await corprioClient.SalesOrderApi.Get(organizationID: organizationID, id: salesOrderID) 
-                ?? throw new Exception(Resources.SharedResource.ResourceManager.GetString("ErrMsg_SalesOrderNotFound"));
+                ?? throw new Exception(Resources.SharedResource.ErrMsg_SalesOrderNotFound);
 
             DbFriendlyBot bot = db.MetaBotStatuses.FirstOrDefault(x => x.BuyerCorprioID == salesOrder.CustomerID && x.FacebookUser.OrganizationID == organizationID && x.FacebookUser.Dormant == false); ;            
             if (bot == null)
@@ -604,7 +606,7 @@ namespace Corprio.SocialWorker.Controllers
             MetaBotStatus botStatus = bot.ReadyToWork();
 
             ApplicationSetting applicationSetting = await applicationSettingService.GetSetting<ApplicationSetting>(organizationID);            
-            if (applicationSetting == null) return NotFound(Resources.SharedResource.ResourceManager.GetString("ErrMsg_AppSettingNotFound"));
+            if (applicationSetting == null) return NotFound(Resources.SharedResource.ErrMsg_AppSettingNotFound);
 
             // note 1: the bot may already carry some items at the cart now but we don't clear the cart
             // note 2: there is no reason to update the topic that the bot is dealing with
@@ -614,7 +616,7 @@ namespace Corprio.SocialWorker.Controllers
                 if (line.ProductID == applicationSetting.DeliveryChargeProductID) continue;  // line representing delivery charge is excluded from the cart
 
                 product = await corprioClient.ProductApi.Get(organizationID: organizationID, id: line.ProductID) 
-                    ?? throw new Exception(Resources.SharedResource.ResourceManager.GetString("ErrMsg_ProductNotFound"));
+                    ?? throw new Exception(Resources.SharedResource.ErrMsg_ProductNotFound);
                 
                 botStatus.Cart.Add(new BotBasket 
                 { 
@@ -652,6 +654,28 @@ namespace Corprio.SocialWorker.Controllers
         }
 
         /// <summary>
+        /// Validate a phone number. 
+        /// If a subscriber number includes country calling code (e.g., +85285298765432 or +868613111111111), the function will call it invalid
+        /// </summary>
+        /// <param name="e164number">Phone number in E164 format</param>
+        /// <returns></returns>
+        public bool ValidatePhoneNumber(string e164number)
+        {
+            var phoneNumberUtil = PhoneNumberUtil.GetInstance();
+            PhoneNumbers.PhoneNumber billPhoneNumber;            
+            try
+            {
+                billPhoneNumber = phoneNumberUtil.Parse(e164number, null);
+            }
+            catch
+            {
+                return false;
+            }
+            var country = Lists.CountryList.FirstOrDefault(x => x.Value.CountryCallingCodes.Contains<string>(billPhoneNumber.CountryCode.ToString()));
+            return phoneNumberUtil.IsValidNumberForRegion(billPhoneNumber, country.Key);            
+        }
+
+        /// <summary>
         /// Triggered when the customer elects to proceed to payment
         /// </summary>
         /// <param name="httpClientFactory">HttpClientFactory for resolving the httpClient for client access</param>
@@ -665,19 +689,22 @@ namespace Corprio.SocialWorker.Controllers
             [FromBody] CheckoutDataModel data)
         {                                                
             if (data == null) throw new Exception("No data was provided.");
+            bool isValidPhoneNumber = ValidatePhoneNumber(data.BillContactPhone.E164PhoneNumber());
+            if (!isValidPhoneNumber) throw new Exception(Resources.SharedResource.ErrMsg_InvalidBillPhone);
 
             ApplicationSetting applicationSetting = await applicationSettingService.GetSetting<ApplicationSetting>(organizationID);            
-            if (applicationSetting == null) return NotFound(Resources.SharedResource.ResourceManager.GetString("ErrMsg_AppSettingNotFound"));
+            if (applicationSetting == null) return NotFound(Resources.SharedResource.ErrMsg_AppSettingNotFound);
 
             HttpClient httpClient = httpClientFactory.CreateClient("appClient");
             var corprioClient = new APIClient(httpClient);
 
-            SalesOrder salesOrder = await corprioClient.SalesOrderApi.Get(organizationID: organizationID, id: data.SalesOrderID)
-                ?? throw new Exception(Resources.SharedResource.ResourceManager.GetString("ErrMsg_SalesOrderNotFound"));
+            var paymentMethods = await corprioClient.CustomerPaymentMethodApi.GetList(organizationID, loadDataOptions: new LoadDataOptions { PageSize = 1 });
+            if (!paymentMethods.Any()) return StatusCode(412, Resources.SharedResource.ErrMsg_NoPaymentMethod);
+
+            SalesOrder salesOrder = await corprioClient.SalesOrderApi.Get(organizationID: organizationID, id: data.SalesOrderID);
+            if (salesOrder == null) return NotFound(Resources.SharedResource.ErrMsg_SalesOrderNotFound);
             if (salesOrder.IsVoided || (salesOrder.BilledStatus != null && salesOrder.BilledStatus.InvoicedQty > 0))
-            {
-                return StatusCode(400, "The sales order has been voided or paid and therefore cannot be edited.");
-            }
+                return StatusCode(400, Resources.SharedResource.CannotEdit_VoidedOrPaid);
 
             // this state is 'proper' in the sense that it is how it should look like if the customer has submitted the form for payment
             SalesOrderCheckoutState properCheckoutState = new()
@@ -703,7 +730,7 @@ namespace Corprio.SocialWorker.Controllers
                 }                
                 else if (checkoutStateInEP.IsPaymentClicked)
                 {
-                    return StatusCode(400, "A sales order cannot be edited while its payment is being processed.");
+                    return StatusCode(400, Resources.SharedResource.CannotEdit_PaymentProcessing);
                 }                
                 checkoutEP.Value = System.Text.Json.JsonSerializer.Serialize(properCheckoutState);                
             }
@@ -719,10 +746,10 @@ namespace Corprio.SocialWorker.Controllers
             decimal reservedStock;
             foreach (SalesOrderLine line in salesOrder.Lines)
             {
-                if (line.BaseQty <= 0) return StatusCode(400, Resources.SharedResource.ResourceManager.GetString("ErrMsg_QuantityNotPositive"));
+                if (line.BaseQty <= 0) return StatusCode(400, Resources.SharedResource.ErrMsg_QuantityNotPositive);
                 
                 product = await corprioClient.ProductApi.Get(organizationID: organizationID, id: line.ProductID);
-                if (product == null) return NotFound(Resources.SharedResource.ResourceManager.GetString("ErrMsg_ProductNotFound"));
+                if (product == null) return NotFound(Resources.SharedResource.ErrMsg_ProductNotFound);
                 
                 if (product.Nature != ProductNature.Inventory) continue;
 
@@ -740,7 +767,7 @@ namespace Corprio.SocialWorker.Controllers
             }
 
             salesOrder.BillName = data.BillPerson.FormatName(await corprioClient.OrganizationSettingApi.GetPersonNameFormat(organizationID));
-            salesOrder.BillPhoneNumbers ??= new List<PhoneNumber>();            
+            salesOrder.BillPhoneNumbers ??= new List<Global.Geography.PhoneNumber>();            
             if (!salesOrder.BillPhoneNumbers.Any(x => x.Equals(data.BillContactPhone)))
             {
                 salesOrder.BillPhoneNumbers.Add(data.BillContactPhone);
@@ -748,7 +775,7 @@ namespace Corprio.SocialWorker.Controllers
                         
             if (data.ChosenDeliveryMethod == DeliveryOption.SelfPickup && applicationSetting.SelfPickUp)
             {
-                salesOrder.DeliveryAddress_Line1 = Resources.SharedResource.ResourceManager.GetString("SelfPickUp");
+                salesOrder.DeliveryAddress_Line1 = Resources.SharedResource.SelfPickUp;
                 salesOrder.DeliveryAddress_Line2 = null;
                 salesOrder.DeliveryAddress_City = null;
                 salesOrder.DeliveryAddress_State = null;
@@ -757,8 +784,10 @@ namespace Corprio.SocialWorker.Controllers
             }
             else if (data.ChosenDeliveryMethod == DeliveryOption.Shipping && applicationSetting.ShipToCustomer)
             {
-                if (string.IsNullOrWhiteSpace(data.DeliveryAddress?.Line1)) throw new Exception("Delivery address cannot be blank.");                
-                if (string.IsNullOrWhiteSpace(data.DeliveryAddress.CountryAlphaCode) || data.DeliveryAddress.CountryAlphaCode.Length != 2) throw new Exception("Country code must consist of two letters.");
+                if (string.IsNullOrWhiteSpace(data.DeliveryAddress?.Line1)) throw new Exception(Resources.SharedResource.InvalidFeedback_AddressLine1);
+                if (string.IsNullOrWhiteSpace(data.DeliveryAddress.CountryAlphaCode) || data.DeliveryAddress.CountryAlphaCode.Length != 2) throw new Exception(Resources.SharedResource.InvalidFeedback_CountryCode);
+                isValidPhoneNumber = ValidatePhoneNumber(data.DeliveryContactPhone.E164PhoneNumber());
+                if (!isValidPhoneNumber) throw new Exception(Resources.SharedResource.ErrMsg_InvalidDeliveryPhone);
 
                 salesOrder.DeliveryContact_GivenName = data.DeliveryContact.GivenName;
                 salesOrder.DeliveryContact_FamilyName = data.DeliveryContact.FamilyName;
@@ -769,7 +798,7 @@ namespace Corprio.SocialWorker.Controllers
                 salesOrder.DeliveryAddress_PostalCode = data.DeliveryAddress.PostalCode;
                 salesOrder.DeliveryAddress_CountryAlphaCode = data.DeliveryAddress.CountryAlphaCode;
                 
-                salesOrder.DeliveryPhoneNumbers ??= new List<PhoneNumber>();                
+                salesOrder.DeliveryPhoneNumbers ??= new List<Global.Geography.PhoneNumber>();                
                 if (!salesOrder.DeliveryPhoneNumbers.Any(x => x.Equals(data.DeliveryContactPhone)))
                 {
                     salesOrder.DeliveryPhoneNumbers.Add(data.DeliveryContactPhone);
@@ -777,7 +806,7 @@ namespace Corprio.SocialWorker.Controllers
 
                 // note: if AND only if the customer's primary address appears empty, then we update it with the delivery address as well
                 Customer customer = await corprioClient.CustomerApi.Get(organizationID: organizationID, id: salesOrder.CustomerID)
-                    ?? throw new Exception("Customer of the sales order could not be found.");
+                    ?? throw new Exception(Resources.SharedResource.ErrMsg_CustomerNotFound);
 
                 if (string.IsNullOrWhiteSpace(customer.BusinessPartner.PrimaryAddress_Line1))
                 {
@@ -800,7 +829,7 @@ namespace Corprio.SocialWorker.Controllers
             }
             else if (!applicationSetting.SelfPickUp && !applicationSetting.ShipToCustomer)
             {
-                salesOrder.DeliveryAddress_Line1 = Resources.SharedResource.ResourceManager.GetString("DeliveryMethodTBD");
+                salesOrder.DeliveryAddress_Line1 = Resources.SharedResource.DeliveryMethodTBD;
                 salesOrder.DeliveryAddress_Line2 = null;
                 salesOrder.DeliveryAddress_City = null;
                 salesOrder.DeliveryAddress_State = null;
@@ -809,6 +838,7 @@ namespace Corprio.SocialWorker.Controllers
             }
             else
             {
+                // for instance, no shipping is offered by the merchant but the buyer has selected it
                 throw new Exception("Invalid delivery method was selected.");
             }
 
@@ -823,7 +853,7 @@ namespace Corprio.SocialWorker.Controllers
             }
             
             // assumption: we include a line for delivery charge of $0 even when free shipping is provided
-            // note: the order line is added after the sales order's EP is updated, lest this new line is removed
+            // note: the order line is added AFTER the sales order's EP is updated, lest this new line is removed
             AddSalesOrderLineModel deliveryChargeOrderLine = new()
             {
                 ProductID = applicationSetting.DeliveryChargeProductID ?? throw new Exception("Delivery charge product ID is missing from application setting."),
@@ -843,10 +873,7 @@ namespace Corprio.SocialWorker.Controllers
             catch (ApiExecutionException ex)
             {
                 throw new Exception($"The sales order could not be updated. Details: {ex.Message}");
-            }
-
-            var paymentMethods = await corprioClient.CustomerPaymentMethodApi.GetList(organizationID, loadDataOptions: new LoadDataOptions { PageSize = 1 });
-            if (!paymentMethods.Any()) return StatusCode(412, "The merchant has not set up payment method.");
+            }            
 
             bool isSmtpSet = false;
             try

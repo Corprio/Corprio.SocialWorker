@@ -43,6 +43,16 @@ namespace Corprio.SocialWorker.Models
         public BotTopic ThinkingOf { get; set; } = BotTopic.Limbo;
 
         /// <summary>
+        /// True if the customer claims to be new
+        /// </summary>
+        public bool? NewCustomer { get; set; }
+
+        /// <summary>
+        /// 'Remember' the product ID received via ReachOut()
+        /// </summary>
+        public Guid? PostedProductID { get; set; }
+
+        /// <summary>
         /// The product IDs and names that the bot 'remembers'.
         /// </summary>
         public string ProductMemoryString { get; set; }
@@ -100,30 +110,32 @@ namespace Corprio.SocialWorker.Models
             {
                 BuyerID = this.BuyerID,
                 FacebookUserID = this.FacebookUserID,
-                FacebookUser = this.FacebookUser,                
+                FacebookUser = this.FacebookUser,
                 Language = this.Language,
                 ThinkingOf = this.ThinkingOf,                
                 BuyerCorprioID = this.BuyerCorprioID,
                 BuyerEmail = this.BuyerEmail,
                 OTP_Code = this.OTP_Code,
                 OTP_ExpiryTime = this.OTP_ExpiryTime,
+                PostedProductID = this.PostedProductID,
+                NewCustomer = this.NewCustomer,
             };
 
             if (!string.IsNullOrWhiteSpace(this.ProductMemoryString))
-                bot.ProductMemory = JsonConvert.DeserializeObject<List<KeyValuePair<Guid, string>>>(this.ProductMemoryString)!;
-            bot.ProductMemory ??= new List<KeyValuePair<Guid, string>>();
+                bot.ProductMemory = JsonConvert.DeserializeObject<List<ProductSummary>>(this.ProductMemoryString)!;
+            bot.ProductMemory ??= [];
 
             if (!string.IsNullOrWhiteSpace(this.VariationMemoryString))
-                bot.VariationMemory = JsonConvert.DeserializeObject<List<KeyValuePair<string, List<string>>>>(this.VariationMemoryString)!;
-            bot.VariationMemory ??= new List<KeyValuePair<string, List<string>>>();
+                bot.VariationMemory = JsonConvert.DeserializeObject<List<KeyValuePair<string, List<VariationSummary>>>>(this.VariationMemoryString)!;
+            bot.VariationMemory ??= [];
 
             if (!string.IsNullOrWhiteSpace(this.AttributeValueMemoryString))
                 bot.AttributeValueMemory = JsonConvert.DeserializeObject<List<KeyValuePair<string, string>>>(this.AttributeValueMemoryString)!;
-            bot.AttributeValueMemory ??= new List<KeyValuePair<string, string>>();
+            bot.AttributeValueMemory ??= [];
 
             if (!string.IsNullOrWhiteSpace(this.CartString))
                 bot.Cart = JsonConvert.DeserializeObject<List<BotBasket>>(this.CartString)!;                                    
-            bot.Cart ??= new List<BotBasket>();
+            bot.Cart ??= [];
 
             return bot;
         }
@@ -141,6 +153,8 @@ namespace Corprio.SocialWorker.Models
             this.FacebookUser = bot.FacebookUser;
             this.Language = bot.Language;
             this.ThinkingOf = bot.ThinkingOf;
+            this.PostedProductID = bot.PostedProductID;
+            this.NewCustomer = bot.NewCustomer;
             this.ProductMemoryString = System.Text.Json.JsonSerializer.Serialize(bot.ProductMemory);
             this.VariationMemoryString = System.Text.Json.JsonSerializer.Serialize(bot.VariationMemory);
             this.AttributeValueMemoryString = System.Text.Json.JsonSerializer.Serialize(bot.AttributeValueMemory);

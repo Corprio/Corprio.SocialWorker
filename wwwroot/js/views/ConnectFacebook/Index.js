@@ -27,7 +27,6 @@ const permissions = ['email', 'public_profile', 'business_management', 'pages_ma
 /// <reference types="facebook-js-sdk" />
 // For the order of the following three code blocks, see: https://www.devils-heaven.com/facebook-javascript-sdk-login
 window.fbAsyncInit = function () {
-    console.log('fbAsyncInit is doing its things...');
     FB.init({
         appId: '312852768233605',
         cookie: true,

@@ -714,7 +714,6 @@ function getPages() {
 // (1) fbAsyncInit, (2) IIFE, then (3) whatever needs to run upon DOM being loaded
 // For reference, see: https://www.devils-heaven.com/facebook-javascript-sdk-login
 window.fbAsyncInit = function () {
-    console.log('fbAsyncInit is doing its things...');
     FB.init({
         appId: vdata.settings.metaApiID,
         cookie: true,
@@ -810,7 +809,7 @@ $(function () {
     $('#preview-thank-you').on('click', function () {
         window.open(`/${vdata.settings.organizationID}/GetStarted/PreviewThankYou`, '_blank');
     });
-    corprio.page.initTour({ defaultTour: 'getstarted.index', autoStart: true, driverCssLoaded: true });
+    corprio.page.initTour({ defaultTour: 'getstarted.index', autoStart: true, driverCssLoaded: true }); // must set driverCssLoaded to true    
 });
 
 })();

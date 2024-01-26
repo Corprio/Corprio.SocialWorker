@@ -5,9 +5,9 @@ using System;
 namespace Corprio.SocialWorker.Services
 {
     public class ProductTourService : IProductTourService
-    {
+    {                                        
         public ProductTour GetTour(string name, Guid? organizationID)
-        {
+        {                        
             return name switch
             {
                 "getstarted.index" => new ProductTour
@@ -103,7 +103,8 @@ namespace Corprio.SocialWorker.Services
                             Popover = new Popover
                             {
                                 Description = Resources.SharedResource.Tour_Rerun,
-                            }
+                                OnNextClick = "refocus",  // note: the call-back is defined in the relevant cshtml file
+                            },                            
                         },
                     }
                 },
@@ -112,13 +113,20 @@ namespace Corprio.SocialWorker.Services
                     Steps = new[]
                     {
                         new DriveStep {
-                            Element = ".publish-btn",
+                            Element = ".publish-col",
+                            Popover = new Popover
+                            {
+                                Description = Resources.SharedResource.Tour_PublishCol_Desc,
+                            },                            
+                        },
+                        new DriveStep {
+                            Element = ".dx-icon-upload, .dx-icon-exportselected",
                             Popover = new Popover
                             {
                                 Description = Resources.SharedResource.Tour_PublishButton_Desc,
-                            }
+                            },
                         },
-                    }
+                    },                    
                 },                
                 _ => null,
             };

@@ -27,8 +27,8 @@
             // reference: https://demos.devexpress.com/ASPNetCore/Demo/DataGrid/CommandColumnCustomization/
             col.Add().Caption(localizer["Publish"]).Name("Publish").Type(GridCommandColumnType.Buttons).Width(52).ShowInColumnChooser(false)
             .Buttons(b => b.Add().Hint(localizer["PublishCatalogueHint"]).Icon("upload").OnClick("PublishCatalogue"));
-            col.AddFor(m => m.Code);
-            col.AddFor(m => m.Name);
+            col.AddFor(m => m.Code).DataType(GridColumnDataType.String);
+            col.AddFor(m => m.Name).DataType(GridColumnDataType.String);
             col.AddShortDateTimeFor(m => m.StartDate, User.UserSettings()).SortOrder(SortOrder.Desc).DataType(GridColumnDataType.Date);
             col.AddShortDateTimeFor(m => m.EndDate, User.UserSettings()).DataType(GridColumnDataType.Date);
             col.AddFor(m => m.Remark);
@@ -42,7 +42,8 @@
             .Widget(w => w.Button().Text(globalLocalizer["Add New"]).Type(ButtonType.Default)
             .OnClick($"function(e){{ window.open(`{goBuyClickUrl}/{organizationID}/Catalogue/Add`, '_blank').focus() }}"));
         }))
-    )    
+    )
+    <div id="load-panel"></div>
 </div>
 <vc:static-data model="@StaticDataRequestViewModel.All(true)" org-info="true" />
 <script>

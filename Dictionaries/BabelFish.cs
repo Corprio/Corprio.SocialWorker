@@ -36,6 +36,12 @@ namespace Corprio.SocialWorker.Dictionaries
                 [BotLanguage.TraditionalChinese] = "您對以下商品有興趣嗎？如果是，請輸入商品名稱旁邊的數字。\n{0}",
                 [BotLanguage.SimplifiedChinese] = "您对以下商品有兴趣吗？如果是，请输入商品名称旁边的数字。\n{0}",
             },
+            ["AskNewCustomer"] = new Dictionary<BotLanguage, string>()
+            {
+                [BotLanguage.English] = "Hello. Is it your first time shopping at {0}? Please answer in YES or NO. ",
+                [BotLanguage.TraditionalChinese] = "您好。這是您第一次在{0}購物嗎？請以「是」或「否」回答。",
+                [BotLanguage.SimplifiedChinese] = "您好。这是您第一次在{0}购物吗？请以「是」或「否」回答。",
+            },
             ["AskOneProduct"] = new Dictionary<BotLanguage, string>()
             {
                 [BotLanguage.English] = "Do you want to buy {0}? Please answer in YES or NO. ",

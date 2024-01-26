@@ -4,6 +4,7 @@ using Corprio.SocialWorker.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Corprio.SocialWorker.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240124061949_AddMessageWebhooksTableToDb")]
+    partial class AddMessageWebhooksTableToDb
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -70,18 +73,12 @@ namespace Corprio.SocialWorker.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
-                    b.Property<bool?>("NewCustomer")
-                        .HasColumnType("bit");
-
                     b.Property<string>("OTP_Code")
                         .HasMaxLength(6)
                         .HasColumnType("nvarchar(6)");
 
                     b.Property<DateTimeOffset?>("OTP_ExpiryTime")
                         .HasColumnType("datetimeoffset");
-
-                    b.Property<Guid?>("PostedProductID")
-                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("ProductMemoryString")
                         .HasColumnType("nvarchar(max)");
@@ -104,54 +101,7 @@ namespace Corprio.SocialWorker.Migrations
                     b.ToTable("MetaBotStatuses");
                 });
 
-            modelBuilder.Entity("Corprio.SocialWorker.Models.FeedWebhook", b =>
-                {
-                    b.Property<Guid>("ID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("ApplicationID")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<DateTimeOffset>("CreateDate")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<string>("CreatedBy")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<double>("CreatedTime")
-                        .HasColumnType("float");
-
-                    b.Property<DateTimeOffset>("LastUpdateDate")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<string>("LastUpdatedBy")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<string>("PostID")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<byte[]>("RowVersion")
-                        .IsConcurrencyToken()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("rowversion");
-
-                    b.Property<string>("SenderID")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.HasKey("ID");
-
-                    b.ToTable("FeedWebhooks");
-                });
-
-            modelBuilder.Entity("Corprio.SocialWorker.Models.MessageWebhook", b =>
+            modelBuilder.Entity("Corprio.SocialWorker.Models.MessageWebhookModel", b =>
                 {
                     b.Property<Guid>("ID")
                         .ValueGeneratedOnAdd()

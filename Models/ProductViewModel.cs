@@ -89,6 +89,8 @@ namespace Corprio.SocialWorker.Models
         /// </summary>
         /// 
         public List<string> ImageUrls { get; set; } = new List<string>(new string[8]);
+        
+        public List<string> PostIDs { get; set; }
 
     }
 }

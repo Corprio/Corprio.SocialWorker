@@ -76,7 +76,7 @@ namespace Corprio.SocialWorker.Controllers
             var orgInfo = await corprioClient.OrganizationApi.GetCoreInfo(OrganizationID);
             PagedList<dynamic> list = await corprioClient.ProductApi.QueryPage(
                 organizationID: OrganizationID,
-                selector: "new (ID,Code,Name,EntityProperties.Where(Name=\"tag\").Select(Value) as Tags,"
+                selector: $"new (ID,Code,Name,EntityProperties.Where(Name=\"tag\").Select(Value) as Tags,EntityProperties.Where(Name=\"{BabelFish.ProductEpName}\").Select(Value) as PostIDs,"
                 + "Description,GlobalizedName,GlobalizedDescription,GlobalizedLongDescription,DefaultBarcode,Nature,ProductTypeID,ProductType.Name as ProductTypeName,"
                 + "BrandID,Brand.Name as BrandName,StockUOMCode,Model,GrossWeight,NetWeight,WeightUnit,Length,Width,Height,LengthUnit,Disabled,Image01ID,Image01ID=null?null:new(Image01.ID,Image01.UrlKey) as Image01,CreateDate,LastUpdateDate,ListPrice_Value," +
                 $"np(ListPrice_CurrencyCode, \"{orgInfo.CurrencyCode}\") as ListPrice_CurrencyCode," +

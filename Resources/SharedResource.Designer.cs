@@ -664,6 +664,33 @@ namespace Corprio.SocialWorker.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Please provide a valid phone number for billing..
+        /// </summary>
+        public static string ErrMsg_InvalidBillPhone {
+            get {
+                return ResourceManager.GetString("ErrMsg_InvalidBillPhone", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Please provide a valid phone number for delivery..
+        /// </summary>
+        public static string ErrMsg_InvalidDeliveryPhone {
+            get {
+                return ResourceManager.GetString("ErrMsg_InvalidDeliveryPhone", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The merchant has not set up payment method..
+        /// </summary>
+        public static string ErrMsg_NoPaymentMethod {
+            get {
+                return ResourceManager.GetString("ErrMsg_NoPaymentMethod", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The merchant&apos;s information could not be found..
         /// </summary>
         public static string ErrMsg_OrganizationInfoNotFound {
@@ -1609,11 +1636,20 @@ namespace Corprio.SocialWorker.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Publish a post to Facebook and Instagram.
+        ///   Looks up a localized string similar to Publish a post about this product to Facebook and Instagram.
         /// </summary>
         public static string PublishProductHint {
             get {
                 return ResourceManager.GetString("PublishProductHint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Publish a post about this product to Facebook and Instagram (Note: this product was published previously).
+        /// </summary>
+        public static string PublishProductHint2 {
+            get {
+                return ResourceManager.GetString("PublishProductHint2", resourceCulture);
             }
         }
         
@@ -2383,11 +2419,20 @@ namespace Corprio.SocialWorker.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Select a product and publish it to your Facebook page(s) and Instagram account(s)..
+        ///   Looks up a localized string similar to Once a product is published, the button&apos;s icon would change. You can use it as a reference to tell if you have published this product already..
         /// </summary>
         public static string Tour_PublishButton_Desc {
             get {
                 return ResourceManager.GetString("Tour_PublishButton_Desc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Select the product you would like to publish and click the corresponding icon in this column..
+        /// </summary>
+        public static string Tour_PublishCol_Desc {
+            get {
+                return ResourceManager.GetString("Tour_PublishCol_Desc", resourceCulture);
             }
         }
         

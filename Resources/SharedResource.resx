@@ -403,7 +403,7 @@
     <value>Do you want to publish this catalogue? A post will be made to your Facebook page(s) and Instagram account(s).</value>
   </data>
   <data name="PublishProductHint" xml:space="preserve">
-    <value>Publish a post to Facebook and Instagram</value>
+    <value>Publish a post about this product to Facebook and Instagram</value>
   </data>
   <data name="PublishProductPrompt" xml:space="preserve">
     <value>Do you want to publish this product? A post will be made to your Facebook page(s) and Instagram account(s).</value>
@@ -913,7 +913,7 @@
     <value>Once you have connected your company with your Facebook account, you can publish products to your Facebook pages and Instagram accounts.</value>
   </data>
   <data name="Tour_PublishButton_Desc" xml:space="preserve">
-    <value>Select a product and publish it to your Facebook page(s) and Instagram account(s).</value>
+    <value>Once a product is published, the button's icon would change. You can use it as a reference to tell if you have published this product already.</value>
   </data>
   <data name="Tour_SaveButton_Desc" xml:space="preserve">
     <value>Don't forget to click save when you done with configuring {0}.</value>
@@ -969,8 +969,23 @@
   <data name="Warning_para3" xml:space="preserve">
     <value>You are about to disconnect {0} from your Facebook account. This action cannot be undone and has the following implications:</value>
   </data>
+  <data name="ErrMsg_InvalidBillPhone" xml:space="preserve">
+    <value>Please provide a valid phone number for billing.</value>
+  </data>
+  <data name="ErrMsg_InvalidDeliveryPhone" xml:space="preserve">
+    <value>Please provide a valid phone number for delivery.</value>
+  </data>
+  <data name="ErrMsg_NoPaymentMethod" xml:space="preserve">
+    <value>The merchant has not set up payment method.</value>
+  </data>
   <data name="ModifySMTP" xml:space="preserve">
     <value>Modify setting</value>
+  </data>
+  <data name="PublishProductHint2" xml:space="preserve">
+    <value>Publish a post about this product to Facebook and Instagram (Note: this product was published previously)</value>
+  </data>
+  <data name="Tour_PublishCol_Desc" xml:space="preserve">
+    <value>Select the product you would like to publish and click the corresponding icon in this column.</value>
   </data>
   <data name="Tour_Rerun" xml:space="preserve">
     <value>If you wish to have re-run site tour, simply click this button.</value>
