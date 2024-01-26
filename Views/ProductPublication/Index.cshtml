@@ -8,7 +8,10 @@
     Guid organizationID = Context.SelectedOrganizationID() ?? Guid.Empty;
     ViewData["Title"] = @localizer["PublishProduct"];
     string masterProductUrl = configuration["ProductMasterUrl"];
+    string metaApiID = configuration["MetaApiSetting:AppId"];
+    string metaApiVersion = configuration["MetaApiSetting:ApiVersion"];
 }
+<script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js"></script>
 <div class="m-4">
     <div class="title-border-l">
         <h4>@localizer["PublishProduct"]</h4>
@@ -20,61 +23,73 @@
         .ElementAttr("class", "clickable-row")
         .NoDataText(localizer["noData"])
         // redirect to ProductMaster
-        .OnRowClick($"function(e){{ window.open(`{masterProductUrl}/{organizationID}/Product/Edit/productid`.replace('productid', e.key), '_blank').focus() }}")
+        @* .OnRowClick($"function(e){{ window.open(`{masterProductUrl}/{organizationID}/Product/Edit/productid`.replace('productid', e.key), '_blank').focus() }}") *@
         .Columns(col =>
         {
-            // reference: https://demos.devexpress.com/ASPNetCore/Demo/DataGrid/CommandColumnCustomization/
-            col.Add().Caption(localizer["Publish"]).Name("Publish").Type(GridCommandColumnType.Buttons).Width(52).ShowInColumnChooser(false).CssClass("publish-btn")
-            .Buttons(b => b.Add().Hint(localizer["PublishProductHint"]).Icon("upload").OnClick("PublishProduct"));
-            col.AddFor(m => m.MasterProductCode).Visible(false).AllowEditing(false).CalculateSortValue("MasterProduct.Code");
-            col.AddFor(m => m.Code).SortOrder(SortOrder.Asc);
-            col.AddFor(m => m.Name).SetCellValue("setNameValue");
-            col.AddFor(m => m.Description).Visible(false).SetCellValue("setDescriptionValue");
-            col.AddFor(m => m.GlobalizedName).GlobalText().Visible(false);
-            col.AddFor(m => m.GlobalizedDescription).GlobalText().Visible(false);
-            col.AddFor(m => m.GlobalizedLongDescription).GlobalHTML().Visible(false);
-            col.AddFor(m => m.DefaultBarcode).Visible(false);
-            col.AddFor(m => m.Nature).LookupEnum(typeof(ProductNature)).Visible(false);
-            col.AddFor(m => m.ProductTypeID).LookupProductType(organizationID)
+            // reference: https://demos.devexpress.com/ASPNetCore/Demo/DataGrid/CommandColumnCustomization/            
+            @* col.Add().Caption(localizer["Publish"]).Name("Publish").Type(GridCommandColumnType.Buttons).Width(52).ShowInColumnChooser(false)
+            .Buttons(b => b.Add().Hint(localizer["PublishProductHint"]).Icon("upload").OnClick("PublishProduct").CssClass("publish-btn")); *@
+            col.AddFor(m => m.PostIDs).DataType(GridColumnDataType.Object).Caption(localizer["Publish"]).Name("Publish").Width(52).ShowInColumnChooser(false)
+            .AllowFiltering(false).AllowSorting(false).CssClass("publish-col").CellTemplate(@<text>
+            <% if (data.PostIDs.length) { %>
+                @Html.DevExtreme().Button().Icon("exportselected").OnClick("function() { PublishProduct(data) }").Hint(localizer["PublishProductHint2"])
+            <% } else {%>
+                @Html.DevExtreme().Button().Icon("upload").OnClick("function() { PublishProduct(data) }").Hint(localizer["PublishProductHint"]).OnInitialized("function(e) { OnButtonInitialized(e, data) }")
+            <% } %>
+            </text>);
+            // the data type needs to be explicitly set to avoid loading the data twice (i.e., error W1005)
+            col.AddFor(m => m.MasterProductCode).DataType(GridColumnDataType.String).Visible(false).AllowEditing(false).CalculateSortValue("MasterProduct.Code");
+            col.AddFor(m => m.Code).DataType(GridColumnDataType.String).SortOrder(SortOrder.Asc);
+            col.AddFor(m => m.Name).DataType(GridColumnDataType.String).SetCellValue("setNameValue");
+            col.AddFor(m => m.Description).DataType(GridColumnDataType.String).Visible(false).SetCellValue("setDescriptionValue");
+            col.AddFor(m => m.GlobalizedName).DataType(GridColumnDataType.String).GlobalText().Visible(false);
+            col.AddFor(m => m.GlobalizedDescription).DataType(GridColumnDataType.String).GlobalText().Visible(false);
+            col.AddFor(m => m.GlobalizedLongDescription).DataType(GridColumnDataType.String).GlobalHTML().Visible(false);
+            col.AddFor(m => m.DefaultBarcode).DataType(GridColumnDataType.String).Visible(false);
+            col.AddFor(m => m.Nature).DataType(GridColumnDataType.Number).LookupEnum(typeof(ProductNature)).Visible(false);
+            col.AddFor(m => m.ProductTypeID).DataType(GridColumnDataType.String)
+            .LookupProductType(organizationID)
             .CalculateDisplayValue(nameof(ProductViewModel.ProductTypeName))
             .CalculateSortValue("ProductType.Name")
             .CellTemplate(new JS($"corprio.ui.launchAppCellTemplate('{organizationID}','ProductType','ProductTypeID')"));
-            col.AddFor(m => m.BrandID).LookupBrand(organizationID)
+            col.AddFor(m => m.BrandID).DataType(GridColumnDataType.String)
+            .LookupBrand(organizationID)
             .CalculateDisplayValue(nameof(ProductViewModel.BrandName))
             .CalculateSortValue("Brand.Name")
             .CellTemplate(new JS($"corprio.ui.launchAppCellTemplate('{organizationID}','Brand','BrandID')"));
-            col.AddFor(m => m.StockUOMCode).Caption(localizer["UnitOfMeasure"]).Visible(false);
-            col.AddFor(m => m.Model);
-            col.AddFor(m => m.ListPrice_CurrencyCode).Caption(localizer["ListPriceCurrency"]).Visible(false);
-            col.AddFor(m => m.ListPrice_Value).Caption(localizer["ListPriceValue"]).DataType(GridColumnDataType.Number).CalculateDisplayValue(new JS("displayListPrice")).CalculateSortValue("ListPrice_Value");
-            col.AddFor(m => m.GrossWeight).Visible(false);
-            col.AddFor(m => m.NetWeight).Visible(false);
-            col.AddFor(m => m.WeightUnit).Visible(false).Lookup(lookup =>
+            col.AddFor(m => m.StockUOMCode).DataType(GridColumnDataType.String).Caption(localizer["UnitOfMeasure"]).Visible(false);
+            col.AddFor(m => m.Model).DataType(GridColumnDataType.String);
+            col.AddFor(m => m.ListPrice_CurrencyCode).DataType(GridColumnDataType.String).Caption(localizer["ListPriceCurrency"]).Visible(false);
+            col.AddFor(m => m.ListPrice_Value).DataType(GridColumnDataType.Number).Caption(localizer["ListPriceValue"]).CalculateDisplayValue(new JS("displayListPrice")).CalculateSortValue("ListPrice_Value");
+            col.AddFor(m => m.GrossWeight).DataType(GridColumnDataType.Number).Visible(false);
+            col.AddFor(m => m.NetWeight).DataType(GridColumnDataType.Number).Visible(false);
+            col.AddFor(m => m.WeightUnit).DataType(GridColumnDataType.String).Visible(false).Lookup(lookup =>
                 lookup.DataSource(Corprio.Global.Measure.Lists.WeightUnitList()).DisplayExpr("Value").ValueExpr("Key").AllowClearing(true));
-            col.AddFor(m => m.Length).Visible(false);
-            col.AddFor(m => m.Width).Visible(false);
-            col.AddFor(m => m.Height).Visible(false);
-            col.AddFor(m => m.LengthUnit).Visible(false).Lookup(lookup =>
-            lookup.DataSource(Corprio.Global.Measure.Lists.LengthUnitList()).DisplayExpr("Value").ValueExpr("Key").AllowClearing(true));
-            col.AddFor(m => m.Image01).Visible(false).ImageColumn(uploadUrl: Url.Action("upload", "image"), cellDisplayTemplate: "imageCellDisplay", imageSpec: localizer["ProductImageSpec"]);
-            col.AddFor(m => m.Tags)
+            col.AddFor(m => m.Length).DataType(GridColumnDataType.Number).Visible(false);
+            col.AddFor(m => m.Width).DataType(GridColumnDataType.Number).Visible(false);
+            col.AddFor(m => m.Height).DataType(GridColumnDataType.Number).Visible(false);
+            col.AddFor(m => m.LengthUnit).DataType(GridColumnDataType.String).Visible(false).Lookup(lookup =>
+                lookup.DataSource(Corprio.Global.Measure.Lists.LengthUnitList()).DisplayExpr("Value").ValueExpr("Key").AllowClearing(true));
+            col.AddFor(m => m.Image01).DataType(GridColumnDataType.String).Visible(false)
+            .ImageColumn(uploadUrl: Url.Action("upload", "image"), cellDisplayTemplate: "imageCellDisplay", imageSpec: localizer["ProductImageSpec"]);
+            col.AddFor(m => m.Tags).DataType(GridColumnDataType.Object)
             .CalculateFilterExpression("filterTag")
             .FilterOperations(new GridFilterOperations[] { GridFilterOperations.Equal })
             .CellTemplate(new JS("TagsCellTemplate"))
             .EditCellTemplate(new TemplateName("TagsEditTemplate"))
             .AllowSorting(false);
-            col.AddFor(m => m.IsMasterProduct).Visible(false).CellTemplate(new JS(@$"corprio.ui.boolColumnCellTemplate('{Corprio.DataModel.Resources.Resource.IsMasterProduct}')"));
-            // the data type needs to be explicitly set to avoid loading the data twice (i.e., error W1005)
+            col.AddFor(m => m.IsMasterProduct).Visible(false).CellTemplate(new JS(@$"corprio.ui.boolColumnCellTemplate('{Corprio.DataModel.Resources.Resource.IsMasterProduct}')"));            
             col.AddFor(m => m.Disabled).DataType(GridColumnDataType.Boolean).FilterValue(false).Width(60).CellTemplate(new JS(@$"corprio.ui.boolColumnCellTemplate('{Corprio.DataModel.Resources.Resource.IsDisabled}')"));
-            col.AddShortDateTimeFor(m => m.CreateDate, User.UserSettings()).Visible(false).AllowEditing(false);
-            col.AddShortDateTimeFor(m => m.LastUpdateDate, User.UserSettings()).Visible(false).AllowEditing(false);
-        })        
+            col.AddShortDateTimeFor(m => m.CreateDate, User.UserSettings()).DataType(GridColumnDataType.Date).Visible(false).AllowEditing(false);
+            col.AddShortDateTimeFor(m => m.LastUpdateDate, User.UserSettings()).DataType(GridColumnDataType.Date).Visible(false).AllowEditing(false);
+        })
+        .OnCellClick("onCellClick")        
         .Toolbar(toolbar => toolbar.Items(items =>
         {
             // redirect to ProductMaster
             items.Add().Location(ToolbarItemLocation.Before).ShowText(ToolbarItemShowTextMode.Always)
             .Widget(w => w.Button().Text(globalLocalizer["Add New"]).Type(ButtonType.Default)
-            .OnClick($"function(e){{ window.open(`{masterProductUrl}/{organizationID}/Product/Add`, '_blank').focus() }}"));
+            .OnClick($"function(){{ window.open(`{masterProductUrl}/{organizationID}/Product/Add`, '_blank').focus() }}"));
             items.Add().Name(DataGridToolbarItem.ColumnChooserButton).Location(ToolbarItemLocation.After);
             items.Add().Name(DataGridToolbarItem.ExportButton).Location(ToolbarItemLocation.After);
         }))
@@ -97,7 +112,8 @@
     }
     
     function PublishProduct(e) {
-        console.log(e.row.data.ID);
+        console.log(e);
+        // console.log(e.row.data.ID);
         var prompt = DevExpress.ui.dialog.custom({
             title: "@encoder.Encode(localizer["PublishProduct"])",
             messageHtml: "<p>@encoder.Encode(localizer["PublishProductPrompt"])</p>",
@@ -108,17 +124,16 @@
                     $.ajax({
                         url: "@Url.Action("PublishProduct", new { organizationID })",
                         type: "POST",
-                        data: { productID: e.row.data.ID }
+                        data: { productID: e.ID }
+                        // data: { productID: e.row.data.ID }
                     }).done(function () {
                         var message = DevExpress.ui.dialog.custom({
                             title: "@encoder.Encode(localizer["PublicationCompletedTitle"])",
                             messageHtml: "<p>@localizer["ProductPublicationCompletedMessage"]</p>",
                         });
                         message.show();
-                    }).fail(corprio.formatError)
-                    .always(() => {                         
-                        loadPanel().hide();
-                    });
+                        $(`.icon-${e.ID}`).find('i').removeClass('dx-icon-upload').addClass('dx-icon-exportselected');
+                    }).fail(corprio.formatError).always(() => { loadPanel().hide(); });
                 },
                 type: "default",
             }, {
@@ -130,10 +145,11 @@
         prompt.show();
     }
 
-    function displayListPrice(rowData) {
-        if (rowData.ListPrice_Value === null || rowData.ListPrice_CurrencyCode == null)
-            return "";
-        else {
+    function displayListPrice(rowData) {        
+        // note: undefined == null is truthy
+        if (rowData.ListPrice_Value == null || rowData.ListPrice_CurrencyCode == null) {
+            return '';
+        } else {
             var dp = StaticData.CurrencyDecimals[rowData.ListPrice_CurrencyCode];
             if (dp === null) dp = 2;
             var numberFormat = new Intl.NumberFormat(corprio.getLang(), { style: 'currency', currency: rowData.ListPrice_CurrencyCode });
@@ -144,7 +160,7 @@
     function imageCellDisplay(cellElement, cellInfo) {
         if (cellInfo.value && cellInfo.value.UrlKey) cellElement.append($("<img>", { "src": '@corprio.ImageApi.UrlPrefix(organizationID, ImageSize.Thumbnail)' + cellInfo.value.UrlKey, "alt": cellInfo.data.Code }));
     }
-
+    
     function setNameValue(newData, value, currentRowData) {
         newData.Name = value;
         if (!currentRowData.ID) newData.GlobalizedName = corprio.globalText.init(value, langs); //initialize global name for new record
@@ -166,12 +182,53 @@
         });
         container.text(text);
     }
+    
     function filterTag(filterValue, selectedFilterOperation) {
         return ["EntityProperties.Any(Name==\"tag\" && Value==\"" + filterValue + "\")", "=", "true"];
+    }    
+    
+    // when a row is clicked, redirect to ProductMaster's edit page, unless it is the Publish button being clicked
+    function onCellClick(e) {                
+        if (e.rowType === "data" && e.column.name != "Publish") {
+            window.open('@masterProductUrl/@organizationID/Product/Edit/productid'.replace('productid', e.key), '_blank').focus()
+        }
     }
+    
+    // add a class to the publication button so that we can update its icon when needed
+    function OnButtonInitialized(e, data) {
+        e.element.addClass(`icon-${data.ID}`);
+    }    
+
+    // since this page may become the login landing page, it should trigger refresh access token whenever possible
+    window.fbAsyncInit = function () {
+        FB.init({ appId: '@metaApiID', cookie: true, xfbml: true, version: '@metaApiVersion' });        
+        FB.getLoginStatus(function (response) {   // Called after the JS SDK has been initialized.            
+            if (response?.status === 'connected') {
+                return $.ajax({
+                    type: 'POST',
+                    url: '/' + '@organizationID' + '/ConnectFacebook/RefreshAccessToken',
+                    data: { metaId: response.authResponse?.userID, token: response.authResponse?.accessToken },
+                    success: function () { console.log('Token refreshed'); },
+                    error: function () { console.log('Failed to refresh.'); }
+                });
+            }
+        });
+    };
+
+    /**
+     * IIFE to make a reference to the SDK, if it does not already exist
+     */
+    (function (element, tagName, selector) {
+        var js, fjs = element.getElementsByTagName(tagName)[0];
+        if (element.getElementById(selector)) { return; }
+        js = element.createElement(tagName); js.id = selector;
+        js.src = "https://connect.facebook.net/en_US/sdk.js";
+        fjs.parentNode.insertBefore(js, fjs);
+    }(document, 'script', 'facebook-jssdk')
+    );
 
     $(function() {
-        corprio.page.initTour({ defaultTour: 'productpublication.index', autoStart: true });
+        corprio.page.initTour({ defaultTour: 'productpublication.index', autoStart: true });        
     })
 
 </script>

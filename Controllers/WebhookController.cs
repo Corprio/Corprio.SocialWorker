@@ -112,14 +112,16 @@ namespace Corprio.SocialWorker.Controllers
 
             return new Tuple<bool, string>((computedHash == metaHash), requestBody);
         }
-        
+
         /// <summary>
         /// Find the bot that was chatting with the interlocutor; if none is found, a new bot is created
         /// </summary>
+        /// <param name="corprioClient">Client for executing API requests among Corprio projects</param>
+        /// <param name="organizationID">Organization ID</param>
         /// <param name="facebookUser">Owner of the bot</param>
         /// <param name="interlocutorID">Meta ID of the person chatting with the bot</param>
         /// <returns>Bot</returns>
-        public async Task<DbFriendlyBot> FindBot(MetaUser facebookUser, string interlocutorID)
+        public async Task<DbFriendlyBot> ReinventTheBot(APIClient corprioClient, Guid organizationID, MetaUser facebookUser, string interlocutorID)
         {
             DbFriendlyBot botStatus = facebookUser.Bots.FirstOrDefault(x => x.BuyerID == interlocutorID);
             if (botStatus == null)
@@ -128,12 +130,66 @@ namespace Corprio.SocialWorker.Controllers
                 {
                     ID = Guid.NewGuid(),
                     FacebookUserID = facebookUser.ID,
-                    BuyerID = interlocutorID
+                    BuyerID = interlocutorID,
+                    ThinkingOf = BotTopic.Limbo,
                 };
+
+                List<dynamic> existingCustomers = await corprioClient.CustomerApi.Query(
+                    organizationID: organizationID,
+                    selector: "new (ID)",
+                    where: "EntityProperties.Any(Name==@0 && Value==@1)",
+                    orderBy: "ID",
+                    whereArguments: new string[] { BabelFish.CustomerEpName, interlocutorID },
+                    skip: 0,
+                    take: 1);
+                if (existingCustomers.Count > 0)
+                {
+                    botStatus.BuyerCorprioID = Guid.Parse(existingCustomers[0].ID);
+                }
                 db.MetaBotStatuses.Add(botStatus);
                 await db.SaveChangesAsync();                
             }
             return botStatus;
+        }
+
+        /// <summary>
+        /// Used for testing before the App goes live
+        /// </summary>
+        /// <param name="httpClient"></param>
+        /// <param name="corprioClient"></param>
+        /// <param name="applicationSettingService"></param>
+        /// <returns></returns>
+        private async Task TestReachout(HttpClient httpClient, APIClient corprioClient,
+            ApplicationSettingService applicationSettingService)
+        {
+            // for testing only
+            Guid testOrgID = Guid.Parse("3c83fe2b-fe0a-420c-af24-e76fcf5bd7e7");
+            Guid testMetaUserID = Guid.Parse("20DF298D-665B-497A-9043-237043E1F6F5");
+            var testMetaUser = db.MetaUsers.Include(x => x.Pages).Include(x => x.Bots).FirstOrDefault(x => x.ID == testMetaUserID);
+            Guid testProductID = Guid.Parse("907D39F6-591D-4AFF-9D3A-C3CD4AF9E5C7");
+            string testMetaID = "24266381753005180";
+            var setting = await applicationSettingService.GetSetting<ApplicationSetting>(testOrgID);
+            var botStatus = await ReinventTheBot(corprioClient: corprioClient, organizationID: testOrgID,
+                facebookUser: testMetaUser, interlocutorID: testMetaID);
+            var bot = new DomesticHelper(context: db, configuration: configuration, client: corprioClient,
+                organizationID: testOrgID, botStatus: botStatus,
+                pageName: testMetaUser.Pages.First().Name, setting: setting);
+            string message;
+            try
+            {
+                message = await bot.ReachOut(testProductID);
+            }
+            catch (Exception ex)
+            {
+                Log.Error($"Failed to reach out to sell {testProductID}. {ex.Message}");
+                return;
+            }
+            await ApiActionHelper.SendMessage(
+                httpClient: httpClient,
+                accessToken: testMetaUser.Pages.First().Token,
+                endPoint: $"{BaseUrl}/{ApiVersion}/{testMetaUser.Pages.First().PageId}/messages",
+                message: message,
+                recipientId: testMetaID);
         }
 
         /// <summary>
@@ -155,15 +211,30 @@ namespace Corprio.SocialWorker.Controllers
 
             // note: it is possible for more than one entry/change to come in, as Meta aggregates up to 1,000 event notifications
             // see Frequency at https://developers.facebook.com/docs/graph-api/webhooks/getting-started
-            foreach (var entry in payload.Entry)
+            foreach (FeedWebhookEntry entry in payload.Entry)
             {
-                foreach (var change in entry.Changes)
+                foreach (FeedWebhookChange change in entry.Changes)
                 {
-                    //var bot = new DomesticHelper(client: corprioClient, organizationID: Guid.Parse("3C83FE2B-FE0A-420C-AF24-E76FCF5BD7E7"), botStatus: new MetaChatBot() { Id = "24286888740958239" }, pageName: "Yo-Yo");
-                    //Guid productId = Guid.Parse("AF112F6B-2ABC-431C-A16F-ED4487BFD71F");
-                    //MetaPost post = new() { IsFbPost = false };
-                    //MetaPage page = new() { Token = "EAAEcibYeGIUBOZCjbwHaILofgZAajzBlzX9PFbDZCpLKafFPQjmrmEaNVZAVskYLKGNvSd0g8BT4DgbQAeRFoHf26sscYNGzCpjz7sfyFHuBRk6c5zvechmGliH2NHLO4JOaccoANwAvEAoT7GiJiW7QqAo204J4i3fZCOA2yDaNZCsdHomAEfKBOlaZBSH" };
-                    
+                    //// for testing before the App goes live
+                    //await TestReachout(httpClient: httpClient, corprioClient: corprioClient, applicationSettingService: applicationSettingService);
+                    //continue;
+
+                    if (null != db.FeedWebhooks.FirstOrDefault(x => x.CreatedTime == change.Value.CreatedTime
+                        && x.SenderID == change.Value.From.Id && x.PostID == change.Value.PostId))
+                    {
+                        // do not process the same webhook more than once
+                        continue;
+                    }
+
+                    db.FeedWebhooks.Add(new FeedWebhook
+                    {
+                        ID = Guid.NewGuid(),
+                        CreatedTime = change.Value.CreatedTime,
+                        PostID = change.Value.PostId,
+                        SenderID = change.Value.From.Id,
+                    });
+                    await db.SaveChangesAsync();
+
                     post = db.MetaPosts
                         .Include(x => x.FacebookPage)
                         .ThenInclude(x => x.FacebookUser)
@@ -173,11 +244,11 @@ namespace Corprio.SocialWorker.Controllers
                     {
                         Log.Error($"Failed to find post {change.Value.PostId} and its parent objects.");
                         continue;
-                    }                    
+                    }
 
                     // note 1: we use the keyword stored at the post level, NOT at the user level, because the keyword may be udpated after a post is made
                     // note 2: if the keyword is, for example, <a+>, then it was saved as &lt;a+&gt; in DB, while the user can input either <a+> or <A+>
-                    if (post.KeywordForShoppingIntention?.ToUpper() != UtilityHelper.UncleanAndClean(change.Value.Message.Trim()).ToUpper()) 
+                    if (post.KeywordForShoppingIntention?.ToUpper() != UtilityHelper.UncleanAndClean(change.Value.Message.Trim()).ToUpper())
                         continue;
 
                     existingProducts = await corprioClient.ProductApi.Query(
@@ -187,18 +258,19 @@ namespace Corprio.SocialWorker.Controllers
                         orderBy: "ID",
                         whereArguments: new string[] { BabelFish.ProductEpName, post.PostId },
                         skip: 0,
-                        take: 1);                    
+                        take: 1);
                     if (existingProducts.Count == 0)
                     {
                         Log.Error($"Failed to find the product posted as {post.PostId}.");
                         continue;
                     }
                     productId = Guid.Parse(existingProducts[0].ID);
-                    
+
                     setting = await applicationSettingService.GetSetting<ApplicationSetting>(post.FacebookPage.FacebookUser.OrganizationID);
-                    botStatus = await FindBot(facebookUser: post.FacebookPage.FacebookUser, interlocutorID: change.Value.From.Id);
-                    bot = new DomesticHelper(context: db, configuration: configuration, client: corprioClient, 
-                        organizationID: post.FacebookPage.FacebookUser.OrganizationID, 
+                    botStatus = await ReinventTheBot(corprioClient: corprioClient, organizationID: post.FacebookPage.FacebookUser.OrganizationID,
+                        facebookUser: post.FacebookPage.FacebookUser, interlocutorID: change.Value.From.Id);
+                    bot = new DomesticHelper(context: db, configuration: configuration, client: corprioClient,
+                        organizationID: post.FacebookPage.FacebookUser.OrganizationID,
                         botStatus: botStatus, pageName: post.FacebookPage.Name, setting: setting);
                     string message;
                     try
@@ -211,15 +283,15 @@ namespace Corprio.SocialWorker.Controllers
                         continue;
                     }
 
-                    if (string.IsNullOrWhiteSpace (message))
+                    if (string.IsNullOrWhiteSpace(message))
                     {
                         Log.Error($"The bot failed to provide any message.");
                         continue;
                     }
 
-                    string endPoint = post.PostedWith == MetaProduct.Facebook 
-                        ? $"{BaseUrl}/{ApiVersion}/{change.Value.From.Id}/messages" 
-                        : $"{BaseUrl}/{ApiVersion}/me/messages";                    
+                    string endPoint = post.PostedWith == MetaProduct.Facebook
+                        ? $"{BaseUrl}/{ApiVersion}/{post.FacebookPage.PageId}/messages"
+                        : $"{BaseUrl}/{ApiVersion}/me/messages";
 
                     await ApiActionHelper.SendMessage(
                         httpClient: httpClient,
@@ -252,17 +324,33 @@ namespace Corprio.SocialWorker.Controllers
 
             // note: it is possible for more than one entry/messaging to come in, as Meta aggregates up to 1,000 event notifications
             // see Frequency at https://developers.facebook.com/docs/graph-api/webhooks/getting-started
-            foreach (var entry in payload.Entry)
+            foreach (MessageWebhookEntry entry in payload.Entry)
             {
-                foreach (var messaging in entry.Messaging)
+                foreach (MessageWebhookMessaging messaging in entry.Messaging)
                 {                    
-                    if (string.IsNullOrWhiteSpace(messaging.Recipient?.MetaID))
+                    if (string.IsNullOrWhiteSpace(messaging.Recipient?.MetaID) || string.IsNullOrWhiteSpace(messaging.Sender?.MetaID))
                     {
                         // note: we move on to the next message instead of throwing errors
-                        Log.Error($"Recipient ID for \"{messaging.Message?.Text}\" is blank.");
+                        Log.Error($"Recipient/sender ID for \"{messaging.Message?.Text}\" is blank.");
                         continue;
                     }
                     
+                    if (null != db.MessageWebhooks.FirstOrDefault(x => x.TimeStamp == messaging.Timestamp 
+                        && x.SenderID == messaging.Sender.MetaID && x.RecipientID == messaging.Recipient.MetaID))
+                    {                        
+                        // do not process the same webhook more than once
+                        continue;
+                    }
+
+                    db.MessageWebhooks.Add(new MessageWebhook
+                    {
+                        ID = Guid.NewGuid(),
+                        RecipientID = messaging.Recipient.MetaID,
+                        SenderID = messaging.Sender.MetaID,
+                        TimeStamp = messaging.Timestamp,
+                    });
+                    await db.SaveChangesAsync();
+
                     page = payload.Object == "instagram"
                         ? db.MetaPages.Include(x => x.FacebookUser).ThenInclude(x => x.Bots).FirstOrDefault(x => x.InstagramID == messaging.Recipient.MetaID && x.FacebookUser.Dormant == false)
                         : db.MetaPages.Include(x => x.FacebookUser).ThenInclude(x => x.Bots).FirstOrDefault(x => x.PageId == messaging.Recipient.MetaID && x.FacebookUser.Dormant == false);
@@ -275,7 +363,8 @@ namespace Corprio.SocialWorker.Controllers
                     setting = await applicationSettingService.GetSetting<ApplicationSetting>(page.FacebookUser.OrganizationID);
 
                     // assumption: senderId is the same regardless if (i) the sender made a comment on a post or (ii) sent a message via messenger
-                    botStatus = await FindBot(facebookUser: page.FacebookUser, interlocutorID: messaging.Sender.MetaID);
+                    botStatus = await ReinventTheBot(corprioClient: corprioClient, organizationID: page.FacebookUser.OrganizationID, 
+                        facebookUser: page.FacebookUser, interlocutorID: messaging.Sender.MetaID);
                     bot = new DomesticHelper(context: db, configuration: configuration, client: corprioClient, organizationID: page.FacebookUser.OrganizationID, 
                         botStatus: botStatus, detectedLocales: messaging.Message?.NLP?.DetectedLocales, pageName: page.Name, setting: setting);
                     

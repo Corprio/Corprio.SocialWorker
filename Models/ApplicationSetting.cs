@@ -169,6 +169,27 @@ namespace Corprio.SocialWorker.Models
                 .Replace(TemplateComponent.Separator, "");
             return UtilityHelper.UncleanAndClean(userInput: message, onceIsOK: true);
         }
+
+        public PromotionSetting Promotion {  get; set; } = new PromotionSetting();
+    }
+
+    public class PromotionSetting
+    {        
+        /// <summary>
+        /// Expiry time of the promotion. Null means the promotion will never expire.
+        /// </summary>
+        public DateTimeOffset? ExpiryTime { get; set; }
+
+        /// <summary>
+        /// Passcode that the customer is required to input in order to obtain a discount
+        /// </summary>
+        public string Passcode { get; set; }
+
+        /// <summary>
+        /// For instance, 15 means 15% off; null means no promotion is ongoing.
+        /// </summary>
+        [Range(0, 100)]
+        public decimal? PercentageOff { get; set; }
     }
 
     /// <summary>

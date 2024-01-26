@@ -486,7 +486,6 @@ function AssignEventListenersForTemplates(messageType: MessageType) {
     $(selectorMapping[messageType].blockPanel).on('dragover', function (event: Event) { handleDragOver(event) });
 }
 
-
 /**
  * React to change in the user's Facebook login status
  * @param response-Facebook's response to getLoginStatus()
@@ -710,8 +709,7 @@ function getPages() {
 // The order of the following three code blocks is extremely important. It has to be:
 // (1) fbAsyncInit, (2) IIFE, then (3) whatever needs to run upon DOM being loaded
 // For reference, see: https://www.devils-heaven.com/facebook-javascript-sdk-login
-window.fbAsyncInit = function () {
-    console.log('fbAsyncInit is doing its things...');
+window.fbAsyncInit = function () {    
     FB.init({
         appId: vdata.settings.metaApiID,
         cookie: true,  // Enable cookies to allow the server to access the session.
@@ -820,5 +818,5 @@ $(function () {
         window.open(`/${vdata.settings.organizationID}/GetStarted/PreviewThankYou`, '_blank');
     });    
     
-    corprio.page.initTour({ defaultTour: 'getstarted.index', autoStart: true, driverCssLoaded: false });
+    corprio.page.initTour({ defaultTour: 'getstarted.index', autoStart: true, driverCssLoaded: true }); // must set driverCssLoaded to true    
 });

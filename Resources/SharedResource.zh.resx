@@ -403,7 +403,7 @@
     <value>您想发布此商品目录吗？一则介绍它的贴文将会发布到您的 Facebook 专页和 Instagram 帐户。</value>
   </data>
   <data name="PublishProductHint" xml:space="preserve">
-    <value>发布商品到 Facebook 和 Instagram</value>
+    <value>在 Facebook 和 Instagram 上发布有关此产品的帖子</value>
   </data>
   <data name="PublishProductPrompt" xml:space="preserve">
     <value>您想发布此商品吗？一则介绍它的贴文将会发布到您的 Facebook 专页和 Instagram 帐户。</value>
@@ -913,7 +913,7 @@
     <value>将公司与 Facebook 帐户连接后，您可以在此将产品发布到 Facebook 专页和 Instagram 帐户。</value>
   </data>
   <data name="Tour_PublishButton_Desc" xml:space="preserve">
-    <value>选择一个产品并将其发布到您的 Facebook 专页和 Instagram 帐户。</value>
+    <value>产品发布后，其按钮的图标就会更新。您可以参考它来判断该产品是否曾经发布到社交媒体。</value>
   </data>
   <data name="Tour_SaveButton_Desc" xml:space="preserve">
     <value>完成设置后，请不要忘记按一下「储存」。</value>
@@ -968,5 +968,26 @@
   </data>
   <data name="Warning_para3" xml:space="preserve">
     <value>您即将终止 {0} 与 Facebook 帐户的连接。此操作无法撤消，并且会产生以下影响：</value>
+  </data>
+  <data name="ErrMsg_InvalidBillPhone" xml:space="preserve">
+    <value>请提供有效的买方电话号码。</value>
+  </data>
+  <data name="ErrMsg_InvalidDeliveryPhone" xml:space="preserve">
+    <value>请提供有效的送货电话号码。</value>
+  </data>
+  <data name="ErrMsg_NoPaymentMethod" xml:space="preserve">
+    <value>商户尚未设置支付方式。</value>
+  </data>
+  <data name="ModifySMTP" xml:space="preserve">
+    <value>变更设置</value>
+  </data>
+  <data name="PublishProductHint2" xml:space="preserve">
+    <value>在 Facebook 和 Instagram 上发布有关此产品的帖子（注：此产品之前已经发布）</value>
+  </data>
+  <data name="Tour_PublishCol_Desc" xml:space="preserve">
+    <value>选择您想要发布到 Facebook 和 Instagram的产品，然后单击此栏中相应的图标。</value>
+  </data>
+  <data name="Tour_Rerun" xml:space="preserve">
+    <value>如果您希望重温这个应用导航，请单击此按钮。</value>
   </data>
 </root>

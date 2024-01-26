@@ -30,6 +30,7 @@ namespace Corprio.SocialWorker.Controllers
         /// </summary>
         /// <param name="context"></param>
         /// <param name="client">Client for Api requests among Corprio projects</param>
+        /// <param name="appSettingService">Application setting service</param>
         public GetStartedController(ApplicationDbContext context, APIClient client, ApplicationSettingService appSettingService) : base()
         {
             db = context;
@@ -44,7 +45,7 @@ namespace Corprio.SocialWorker.Controllers
         /// <returns>View</returns>
         public override IActionResult Index([FromRoute] Guid organizationID)
         {
-            ApplicationSetting applicationSetting = applicationSettingService.GetSetting<ApplicationSetting>(organizationID).ConfigureAwait(false).GetAwaiter().GetResult();            
+            ApplicationSetting applicationSetting = applicationSettingService.GetSetting<ApplicationSetting>(organizationID).ConfigureAwait(false).GetAwaiter().GetResult();
             bool firstVisit = string.IsNullOrWhiteSpace(applicationSetting?.KeywordForShoppingIntention);
             bool updated = false;  // if true, then the setting needs to be saved
             if (firstVisit)

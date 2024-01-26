@@ -19,6 +19,7 @@ using Corprio.DataModel.Shared;
 using Corprio.DataModel.Business.Sales.ViewModel;
 using Microsoft.Extensions.Configuration;
 using Corprio.DataModel.Business.Logistic;
+using System.Net.Mail;
 
 namespace Corprio.SocialWorker.Helpers
 {
@@ -37,12 +38,14 @@ namespace Corprio.SocialWorker.Helpers
         private readonly ApplicationSetting AppSetting;
 
         // magic numbers
-        private const int ChoiceLimit = 10;        
+        private const int ChoiceLimit = 10;
         private const string KillCode = "!c";
 
         /// <summary>
         /// Constructor
         /// </summary>
+        /// <param name="context">Database connection</param>
+        /// <param name="configuration">Configuration</param>
         /// <param name="client">Client for Api requests among Corprio projects</param>
         /// <param name="organizationID">ID of the organization being represented by the chat bot</param>        
         /// <param name="botStatus">An object storing the bot's state</param>
@@ -50,8 +53,8 @@ namespace Corprio.SocialWorker.Helpers
         /// <param name="setting">Application setting</param>
         /// <param name="detectedLocales">List of locales detected by Wit.ai</param>
         /// <exception cref="ArgumentException"></exception>
-        public DomesticHelper(ApplicationDbContext context, IConfiguration configuration, APIClient client, Guid organizationID, DbFriendlyBot botStatus, 
-            string pageName, ApplicationSetting setting, List<DetectedLocale> detectedLocales = null)
+        public DomesticHelper(ApplicationDbContext context, IConfiguration configuration, APIClient client, Guid organizationID, 
+            DbFriendlyBot botStatus, string pageName, ApplicationSetting setting, List<DetectedLocale> detectedLocales = null)
         {
             if (string.IsNullOrWhiteSpace(pageName)) throw new ArgumentException("Page name cannot be blank.");
 
@@ -65,14 +68,17 @@ namespace Corprio.SocialWorker.Helpers
             Bot = botStatus.ReadyToWork();
             Bot.Language = DetectLanguage(detectedLocales);
         }
-
+        
         /// <summary>
         /// Save the bot's state into memory
         /// </summary>
         /// <returns></returns>
         private async Task Save()
-        {            
-            db.MetaBotStatuses.Update(Shell.ReadyToSave(Bot));            
+        {
+            // auto-correct any impossible state before saving
+            if (Bot.BuyerCorprioID != null) Bot.NewCustomer = false;
+            
+            db.MetaBotStatuses.Update(Shell.ReadyToSave(Bot));
             try
             {
                 await db.SaveChangesAsync();
@@ -137,7 +143,7 @@ namespace Corprio.SocialWorker.Helpers
         /// <returns>A string of product variations</returns>
         private async Task<string> ProductVariationChoiceString()
         {
-            KeyValuePair<string, List<string>> attributeValues = Bot.VariationMemory.FirstOrDefault(x => x.Value.Any());            
+            KeyValuePair<string, List<VariationSummary>> attributeValues = Bot.VariationMemory.FirstOrDefault(x => x.Value.Count > 0);
             if (attributeValues.Key == null)
             {
                 Log.Error("No product variation attribute has any values.");
@@ -147,7 +153,7 @@ namespace Corprio.SocialWorker.Helpers
             string choices = "";
             for (int i = 0; i < attributeValues.Value.Count; i++)
             {
-                choices += $"{i + 1} - {attributeValues.Value[i]}\n";
+                choices += $"{i + 1} - {attributeValues.Value[i].Name}\n";
             }
             choices += ThusSpokeBabel("Hint_Cancel");
             return choices;
@@ -163,68 +169,63 @@ namespace Corprio.SocialWorker.Helpers
             int limit = Math.Min(Bot.ProductMemory.Count, ChoiceLimit);
             for (int i = 0; i < limit; i++)
             {
-                choices += $"{i + 1} - {Bot.ProductMemory[i].Value}\n";
+                if (Bot.ProductMemory[i].ProductPriceValue.HasValue)
+                    choices += $"{i + 1} - {Bot.ProductMemory[i].ProductName}@{Bot.ProductMemory[i].ProductPriceCurrency}{Bot.ProductMemory[i].ProductPriceValue:F2} \n";
+                else
+                    choices += $"{i + 1} - {Bot.ProductMemory[i].ProductName} \n";
             }
             choices += ThusSpokeBabel("NoneOfTheAbove");
             if (Bot.ProductMemory.Count > ChoiceLimit)
             {                
-                choices += "\n" + ThusSpokeBabel(key: "TooManyResults", placeholders: new List<string>() { ChoiceLimit.ToString() });
+                choices += "\n" + ThusSpokeBabel(key: "TooManyResults", placeholders: [ChoiceLimit.ToString()]);
             }
             return choices;
         }
-
-        /// <summary>
-        /// Extract product name/code from a user input
-        /// </summary>
-        /// <param name="input">User input</param>
-        /// <returns>(1) True if the user input includes words that indicate buying intention, (2) words that presumably represent a product's name/code</returns>
-        private Tuple<bool, string> CheckBuyIntention(string input)
-        {
-            if (Bot.Language == BotLanguage.English) input = input.ToLower();
-            input = input.Replace("，", "").Replace("。", "").Replace("、", "")
-                .Replace(",", " ").Replace(".", " ")
-                .Replace("?", " ").Replace("!", " ");
-            input = Regex.Replace(input, @"\s+", " ");
-            var keywords = Bot.Language == BotLanguage.English 
-                ? new List<string>() { "buy ", "purchase ", "want ", "like " }
-                : new List<string>() { "買", "买", "要", "訂購", "订购" };
-            
-            foreach (string word in keywords)
-            {
-                int index = input.IndexOf(word);
-                if (index == -1) continue;
-                string wanted = input.Substring(index + word.Length, input.Length - index - word.Length).Trim();
-                return new Tuple<bool, string>(true, wanted);
-            }
-            return new Tuple<bool, string>(false, input);            
-        }
-
+        
         /// <summary>
         /// Convert query results into a list of key value pairs
         /// </summary>
         /// <param name="queryResults">List of dynamic objects resulting from database query</param>
         /// <returns>List of key value pairs</returns>
-        public List<KeyValuePair<Guid, string>> ReturnQueryResults(dynamic[] queryResults)
+        public async Task<List<ProductSummary>> ReturnQueryResults(dynamic[] queryResults)
         {
-            List<KeyValuePair<Guid, string>> searchResults = new();
+            var coreInfo = await Client.OrganizationApi.GetCoreInfo(OrgID);            
+
+            List<ProductSummary> searchResults = [];
             if (queryResults == null || queryResults.Length == 0) return searchResults;
 
+            Guid productId;            
+            var quantity = new Global.Measure.Quantity { Value = 1 };
+            PriceWithCurrency price;
             foreach (dynamic result in queryResults)
             {
-                Guid id = Guid.Empty;
-                string name = null;
-                foreach (var kvp in result)
+                productId = Guid.Parse(result.ID);
+                quantity.UOMCode = result.ListPrice_UOMCode;
+                if (Bot.BuyerCorprioID == null)
                 {
-                    if (kvp.Key == "ID")
-                        _ = Guid.TryParse(kvp.Value, out id);
-                    else
-                        name = kvp.Value;
+                    price = await Client.SellingPriceApi.GetPriceForCustomerPriceGroup(
+                        organizationID: OrgID, 
+                        productID: productId, 
+                        quantity: quantity,
+                        customerPriceGroupID: CustomerPriceGroup.PublicGroupID,
+                        currencyCode: coreInfo != null ? coreInfo.CurrencyCode : result.ListPrice_CurrencyCode);
                 }
-                
-                if (!id.Equals(Guid.Empty) && !string.IsNullOrWhiteSpace(name))
+                else
                 {
-                    searchResults.Add(new KeyValuePair<Guid, string>(id, name));
+                    price = await Client.SellingPriceApi.GetPriceForCustomer(
+                        organizationID: OrgID, 
+                        productID: productId, 
+                        quantity: quantity,
+                        customerID: (Guid)Bot.BuyerCorprioID,
+                        currencyCode: coreInfo != null ? coreInfo.CurrencyCode : result.ListPrice_CurrencyCode);
                 }                
+                searchResults.Add(new ProductSummary 
+                { 
+                    ProductID = productId, 
+                    ProductName = result.Name, 
+                    ProductPriceCurrency = price?.CurrencyCode, 
+                    ProductPriceValue = price?.Price?.Value 
+                });
             }
             return searchResults;
         }
@@ -235,19 +236,19 @@ namespace Corprio.SocialWorker.Helpers
         /// <param name="name">Key word provided by user for the search</param>
         /// <returns>List of query results</returns>
         /// <exception cref="ArgumentNullException"></exception>
-        private async Task<List<KeyValuePair<Guid, string>>> SearchProduct(string name)
+        private async Task<List<ProductSummary>> SearchProduct(string name)
         {
             if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullException("name");
             name = name.Trim();
             
             PagedList<dynamic> queryResults = await Client.ProductApi.QueryPage(organizationID: OrgID,
-                selector: "new (ID, Name)",
+                selector: "new (ID, Name, ListPrice_UOMCode, ListPrice_CurrencyCode)",
                 loadDataOptions: new LoadDataOptions
                 {
                     PageIndex = 0,
                     PageSize = 1,
                     RequireTotalCount = false,
-                    Sort = new SortingInfo[] { new SortingInfo { Selector = "Code", Desc = false } },
+                    Sort = [new SortingInfo { Selector = "Code", Desc = false }],
                     Filter = new List<object> { new object[] {
                         new string[] { "Code", "=", name },
                         "and", new string[] { "Disabled", "=", "False" }
@@ -255,11 +256,11 @@ namespace Corprio.SocialWorker.Helpers
                 });
             if (queryResults.Items.Length == 1)
             {
-                return ReturnQueryResults(queryResults.Items);
+                return await ReturnQueryResults(queryResults.Items);
             }
 
             queryResults = await Client.ProductApi.QueryPage(organizationID: OrgID,
-                selector: "new (ID, Name)",
+                selector: "new (ID, Name, ListPrice_UOMCode, ListPrice_CurrencyCode)",
                 loadDataOptions: new LoadDataOptions
                 {
                     PageIndex = 0,
@@ -273,7 +274,7 @@ namespace Corprio.SocialWorker.Helpers
                         "and", new string[] { "Disabled", "=", "False" }
                     } },
                 });
-            return ReturnQueryResults(queryResults.Items);
+            return await ReturnQueryResults(queryResults.Items);
         }        
 
         /// <summary>
@@ -283,9 +284,10 @@ namespace Corprio.SocialWorker.Helpers
         /// <returns>A language spoken by the bot</returns>
         public BotLanguage DetectLanguage(List<DetectedLocale> detectedLocales)
         {
+            detectedLocales ??= [];
             // note 1: when the user simply inputs a number, the detected locales may be an empty list
             // note 2: we should use whatever language the bot was using previously
-            if (!(detectedLocales?.Any() ?? false)) return Bot.Language;
+            if (detectedLocales.Count == 0) return Bot.Language;
 
             DetectedLocale locale = detectedLocales.Count == 1
                 ? detectedLocales[0]
@@ -293,32 +295,17 @@ namespace Corprio.SocialWorker.Helpers
             return locale.Locale == "zh_TW" 
                 ? BotLanguage.TraditionalChinese 
                 : (locale.Locale == "zh_CN" ? BotLanguage.SimplifiedChinese : BotLanguage.English);
-        }
+        }        
 
         /// <summary>
-        /// PLACEHOlDER
-        /// </summary>
-        /// <returns></returns>
-        private async Task<string> AskPromotionQuestion()
-        {
-            bool promotion = await CheckPromotion();
-            if (!promotion)
-            {
-                Log.Error("The bot was expecting an ongoing promotion but there was none.");
-            }
-
-            Log.Error("The bot does not know how to ask promotion question.");
-            return ThusSpokeBabel("Err_DefaultMsg");
-        }
-
-        /// <summary>
-        /// PLACEHOlDER
+        /// Check if a valid promotion is ongoing
         /// </summary>
         /// <returns>True if the organization is doing any promotion that may affect the selling price</returns>
-        private async Task<bool> CheckPromotion()
+        private bool CheckPromotion()
         {
-            // TODO - check if the organization is doing any promotion that may affect the selling price
             return false;
+            //return (AppSetting.Promotion?.PercentageOff != null && !string.IsNullOrWhiteSpace(AppSetting.Promotion.Passcode) &&
+            //    (AppSetting.Promotion.ExpiryTime == null || AppSetting.Promotion.ExpiryTime >= DateTimeOffset.Now));
         }
 
         /// <summary>
@@ -326,7 +313,7 @@ namespace Corprio.SocialWorker.Helpers
         /// </summary>
         /// <returns></returns>
         private async Task<string> Checkout()
-        {                        
+        {
             if (Bot.BuyerCorprioID == null)
             {
                 Log.Error("The bot was trying to process checkout but there was no valid customer ID.");
@@ -339,7 +326,7 @@ namespace Corprio.SocialWorker.Helpers
                 Log.Error($"Failed to obtain core information for {OrgID}");
                 return ThusSpokeBabel("Err_DefaultMsg");
             }
-
+            
             PriceWithCurrency price;
             foreach (BotBasket basket in Bot.Cart)
             {
@@ -360,9 +347,8 @@ namespace Corprio.SocialWorker.Helpers
 
                 basket.Price = price.Price.Value ?? 0;
             }
-
-            bool promotion = await CheckPromotion();
-            if (promotion)
+            
+            if (CheckPromotion())
             {
                 Bot.ThinkingOf = BotTopic.PromotionOpen;
                 await Save();
@@ -376,7 +362,7 @@ namespace Corprio.SocialWorker.Helpers
             Bot.Cart.Clear();
             Bot.ThinkingOf = BotTopic.Limbo;
             await Save();
-            return ThusSpokeBabel(key: "ThankYou", placeholders: new List<string>() { cartItemString, checkoutURL });
+            return ThusSpokeBabel(key: "ThankYou", placeholders: [cartItemString, checkoutURL]);
         }
         
         /// <summary>
@@ -408,7 +394,7 @@ namespace Corprio.SocialWorker.Helpers
             {
                 Log.Error($"Failed to obtain core information for {OrgID}");
                 return null;
-            }            
+            }
 
             // note 1: for billing, we do email, name and phone but not the address because we won't do that during checkout either
             // note 2: for delivery, we do address, name and phone so that they MIGHT be the default value in checkout form
@@ -506,18 +492,48 @@ namespace Corprio.SocialWorker.Helpers
         /// Update the bot's memory about attribute types and names
         /// </summary>
         /// <param name="attributeType">Attribute type of a product variation (e.g., size)</param>
-        /// <param name="name">Name of a product variation (e.g., XL)</param>
+        /// <param name="code">Code of a product variation (e.g., XL)</param>
         /// <returns></returns>
-        private async Task<string> UpdateAttributeValuesMemory(string attributeType, string name)
+        private async Task<string> UpdateAttributeValuesMemory(string attributeType, string code)
         {
-            Bot.AttributeValueMemory.Add(new KeyValuePair<string, string>(attributeType, name));
-            KeyValuePair<string, List<string>> attributeValues = Bot.VariationMemory.FirstOrDefault(x => x.Key == attributeType);
+            Bot.AttributeValueMemory.Add(new KeyValuePair<string, string>(attributeType, code));
+            KeyValuePair<string, List<VariationSummary>> attributeValues = Bot.VariationMemory.FirstOrDefault(x => x.Key == attributeType);
             if (attributeValues.Key == null)
             {
                 Log.Error($"{attributeType} could not be found in the bot's memory.");
                 return await SoftReboot();
             }
             attributeValues.Value.Clear();
+            await Save();
+            return await AskQuestion();
+        }
+
+        /// <summary>
+        /// Change topic based on the bot's latest status
+        /// </summary>
+        /// <returns></returns>
+        private async Task<string> Reorientation()
+        {
+            if (Bot.NewCustomer == null && Bot.BuyerCorprioID == null)
+            {
+                Bot.ThinkingOf = BotTopic.NewCustomerYN;
+                await Save();
+                return await AskQuestion();
+            }
+            
+            Bot.Cart ??= [];
+            if (Bot.Cart.Count == 0)
+            {                
+                Bot.ThinkingOf = BotTopic.ProductOpen;
+            }
+            else if (Bot.Cart.Any(x => x.Quantity == 0))
+            {
+                Bot.ThinkingOf = BotTopic.QuantityOpen;
+            }
+            else
+            {
+                Bot.ThinkingOf = BotTopic.CheckoutYN;
+            }
             await Save();
             return await AskQuestion();
         }
@@ -531,57 +547,53 @@ namespace Corprio.SocialWorker.Helpers
             switch (Bot.ThinkingOf)
             {
                 case BotTopic.Limbo:
-                    if (!(Bot.Cart?.Any() ?? false))
-                    {
-                        Bot.ThinkingOf = BotTopic.ProductOpen;
-                    }                                        
-                    else if (Bot.Cart.Any(x => x.Quantity == 0))
-                    {                        
-                        Bot.ThinkingOf = BotTopic.QuantityOpen;
-                    }
-                    else
-                    {                        
-                        Bot.ThinkingOf = BotTopic.CheckoutYN;
-                    }
-                    await Save();
-                    return await AskQuestion();
-                
+                    return await Reorientation();
+
+                case BotTopic.NewCustomerYN:                    
+                    string shortName = await Client.OrganizationApi.GetShortName(OrgID);                    
+                    return ThusSpokeBabel(key: "AskNewCustomer", placeholders: [shortName]);
+
                 case BotTopic.ProductOpen:
-                    if (!(Bot.ProductMemory?.Any() ?? false))
-                    {                        
+                    Bot.ProductMemory ??= [];
+                    if (Bot.ProductMemory.Count == 0)
+                    {
                         await Save();
                         return ThusSpokeBabel("AskProduct");
                     }
-
                     Bot.ThinkingOf = Bot.ProductMemory.Count == 1 ? BotTopic.ProductYN : BotTopic.ProductMC;
                     await Save();
                     return await AskQuestion();
 
-                case BotTopic.ProductYN:
-                    return ThusSpokeBabel(key: "AskOneProduct", placeholders: Bot.ProductMemory.Select(x => x.Value).ToList());
+                case BotTopic.ProductYN:                    
+                    ProductSummary product = Bot.ProductMemory[0];
+                    return ThusSpokeBabel(key: "AskOneProduct", 
+                        placeholders: product.ProductPriceValue.HasValue 
+                            ? [product.ProductName + "@" + product.ProductPriceCurrency + product.ProductPriceValue] 
+                            : [product.ProductName]);
 
                 case BotTopic.ProductMC:
-                    return ThusSpokeBabel(key: "AskMultiProducts", placeholders: new List<string>() { ProductChoiceString() });
+                    return ThusSpokeBabel(key: "AskMultiProducts", placeholders: [ProductChoiceString()]);
 
                 case BotTopic.ProductVariationMC:
-                    KeyValuePair<string, List<string>> attributeValues = Bot.VariationMemory.FirstOrDefault(x => x.Value.Any());                    
+                    KeyValuePair<string, List<VariationSummary>> attributeValues = Bot.VariationMemory.FirstOrDefault(x => x.Value.Count > 0);
                     if (attributeValues.Key == null)
                     {
-                        if (!(Bot.ProductMemory?.Any() ?? false))
+                        Bot.ProductMemory ??= [];
+                        if (Bot.ProductMemory.Count == 0)
                         {
                             Log.Error("The bot should remember one product when the topic is ProductVariation but it did not.");
                             return await SoftReboot();
                         }
-                        return await GetChildProduct(Bot.ProductMemory[0].Key);
+                        return await GetChildProduct(Bot.ProductMemory[0].ProductID);
                     }
 
                     if (attributeValues.Value.Count == 1)
                     {
-                        return await UpdateAttributeValuesMemory(attributeType: attributeValues.Key, name: attributeValues.Value[0]);
+                        return await UpdateAttributeValuesMemory(attributeType: attributeValues.Key, code: attributeValues.Value[0].Code);
                     }
 
                     string choices = await ProductVariationChoiceString();
-                    return ThusSpokeBabel(key: "AskProductVariation", placeholders: new List<string>() { attributeValues.Key, choices });
+                    return ThusSpokeBabel(key: "AskProductVariation", placeholders: [attributeValues.Key, choices]);
 
                 case BotTopic.QuantityOpen:
                     BotBasket basket = Bot.Cart.FirstOrDefault(x => x.Quantity == 0);
@@ -590,10 +602,11 @@ namespace Corprio.SocialWorker.Helpers
                         Log.Error("The bot was expecting one basket with zero quantity but found none.");
                         return await SoftReboot();
                     }
-                    return ThusSpokeBabel(key: "AskQty", placeholders: new List<string>() { basket.Name } );
+                    return ThusSpokeBabel(key: "AskQty", placeholders: [basket.Name] );
 
                 case BotTopic.CheckoutYN:
-                    if (!(Bot.Cart?.Any() ?? false))
+                    Bot.Cart ??= [];
+                    if (Bot.Cart.Count == 0)
                     {
                         Log.Error("The bot was going to prompt for checkout but the cart was empty.");
                         return await SoftReboot();
@@ -601,17 +614,23 @@ namespace Corprio.SocialWorker.Helpers
                     return ThusSpokeBabel("AskCheckout");
 
                 case BotTopic.ClearCartYN:
-                    return ThusSpokeBabel(key: "AskClearCart", placeholders: new List<string>() { CartItemString(showPrice: false) });
+                    return ThusSpokeBabel(key: "AskClearCart", placeholders: [CartItemString(showPrice: false)]);
 
                 case BotTopic.EmailOpen:
                     return ThusSpokeBabel("AskEmail");
-
-                // PLACEHOLDER
-                case BotTopic.PromotionOpen:
-                    return await AskPromotionQuestion();
+                
+                case BotTopic.PromotionOpen:                    
+                    if (!CheckPromotion())
+                    {
+                        Log.Error("The bot was expecting an ongoing promotion but there was none.");
+                        return await Checkout();
+                    }
+                    Log.Error("No promotion is implemented in the bot yet.");                    
+                    return ThusSpokeBabel("Err_DefaultMsg");
 
                 default:
-                    return ThusSpokeBabel("Err_DefaultMsg");
+                    Log.Error($"Unexpected topic: {Bot.ThinkingOf}");
+                    return await Reorientation();
             }
         }
 
@@ -631,8 +650,8 @@ namespace Corprio.SocialWorker.Helpers
             };
             if (basket.DisallowOutOfStock)
             {                
-                List<StockTotalByProductWarehouse> stockLevels = await Client.StockApi.GetCurrentStocks(organizationID: OrgID, productID: product.ID, warehouseID: AppSetting.WarehouseID);
-                if (stockLevels.Any())
+                List<StockTotalByProductWarehouse> stockLevels = await Client.StockApi.GetCurrentStocks(organizationID: OrgID, productID: product.ID, warehouseID: AppSetting.WarehouseID) ?? [];
+                if (stockLevels.Count > 0)
                 {
                     decimal reservedStock = await Client.StockApi.GetReservedStock(organizationID: OrgID, productID: product.ID, warehouseID: AppSetting.WarehouseID);
                     basket.ProductStockLevel = stockLevels.First().BaseQty - reservedStock;
@@ -644,10 +663,10 @@ namespace Corprio.SocialWorker.Helpers
             {
                 Bot.ThinkingOf = BotTopic.ProductOpen;
                 await Save();
-                return $"{ThusSpokeBabel(key: "Err_OutOfStock", placeholders: new List<string>() { product.Name })}\n{await AskQuestion()}";
-            }
-            
-            Bot.Cart.Add(basket);
+                return $"{ThusSpokeBabel(key: "Err_OutOfStock", placeholders: [product.Name])}\n{await AskQuestion()}";
+            }                        
+
+            Bot.Cart.Add(basket);            
             Bot.ThinkingOf = BotTopic.QuantityOpen;
             await Save();
             return await AskQuestion();
@@ -660,6 +679,7 @@ namespace Corprio.SocialWorker.Helpers
         private async Task<string> HandleProductNotFound()
         {
             Bot.ThinkingOf = BotTopic.Limbo;
+            Bot.PostedProductID = null;
             Bot.ProductMemory.Clear();
             Bot.VariationMemory.Clear();
             Bot.AttributeValueMemory.Clear();
@@ -688,9 +708,9 @@ namespace Corprio.SocialWorker.Helpers
                         await Save();
                         return await AskQuestion();
                     }
-                    return await SelectProduct(Bot.ProductMemory[answer - 1].Key);
+                    return await SelectProduct(Bot.ProductMemory[answer - 1].ProductID);
                 case BotTopic.ProductVariationMC:
-                    KeyValuePair<string, List<string>> attributeValues = Bot.VariationMemory.FirstOrDefault(x => x.Value.Any());
+                    KeyValuePair<string, List<VariationSummary>> attributeValues = Bot.VariationMemory.FirstOrDefault(x => x.Value.Count > 0);
                     if (attributeValues.Key == null)
                     {
                         Log.Error("The bot was expecting at least one attribute with values, but there was none.");
@@ -700,7 +720,7 @@ namespace Corprio.SocialWorker.Helpers
                     if (answer > attributeValues.Value.Count || answer < 1) 
                         return $"{ThusSpokeBabel("Err_NotUnderstand")}\n{await AskQuestion()}";                    
                     
-                    return await UpdateAttributeValuesMemory(attributeType: attributeValues.Key, name: attributeValues.Value[answer - 1]);
+                    return await UpdateAttributeValuesMemory(attributeType: attributeValues.Key, code: attributeValues.Value[answer - 1].Code);
 
                 default:
                     // if this scenario is triggered, the bot is really messed up, so we should reset even the customer and cart
@@ -718,6 +738,7 @@ namespace Corprio.SocialWorker.Helpers
         private async Task<string> SoftReboot(bool clearCustomer = false, bool clearCart = false)
         {
             Bot.ThinkingOf = BotTopic.Limbo;
+            Bot.PostedProductID = null;
             Bot.ProductMemory.Clear();
             Bot.VariationMemory.Clear();
             Bot.AttributeValueMemory.Clear();
@@ -742,23 +763,24 @@ namespace Corprio.SocialWorker.Helpers
             Product product = await Client.ProductApi.Get(organizationID: OrgID, id: productId);
             if (product == null) return await HandleProductNotFound();
 
-            if (!product.IsMasterProduct || !(product.Variations?.Any() ?? false))
-                return await AddProductToCart(product);
+            Bot.PostedProductID = null;
+            product.Variations ??= [];
+            if (!product.IsMasterProduct || product.Variations.Count == 0) return await AddProductToCart(product);
             
-            Bot.ThinkingOf = BotTopic.ProductVariationMC;
+            Bot.ThinkingOf = BotTopic.ProductVariationMC;            
             Bot.ProductMemory.Clear();
-            Bot.ProductMemory.Add(new KeyValuePair<Guid, string>(product.ID, product.Name)); // the bot needs to 'remember' the master product ID
+            Bot.ProductMemory.Add(new ProductSummary { ProductID = product.ID }); // the bot needs to 'remember' the master product ID
             Bot.VariationMemory.Clear();
             foreach (ProductVariation variation in product.Variations)
             {
-                var existingAttributeValues = Bot.VariationMemory.FirstOrDefault(x => x.Key == variation.AttributeType);
+                KeyValuePair<string, List<VariationSummary>> existingAttributeValues = Bot.VariationMemory.FirstOrDefault(x => x.Key == variation.AttributeType);
                 if (existingAttributeValues.Key == null)
                 {
-                    Bot.VariationMemory.Add(new KeyValuePair<string, List<string>>(variation.AttributeType, new List<string>() { variation.Name }));
+                    Bot.VariationMemory.Add(new KeyValuePair<string, List<VariationSummary>>(variation.AttributeType, [new VariationSummary { Code = variation.Code, Name = variation.Name }]));
                 }
                 else
                 {
-                    existingAttributeValues.Value.Add(variation.Name);
+                    existingAttributeValues.Value.Add(new VariationSummary { Code = variation.Code, Name = variation.Name });
                 }
             }
             await Save();
@@ -783,8 +805,8 @@ namespace Corprio.SocialWorker.Helpers
             string OTP = rand.Next(1000000).ToString("D6");
             var message = new EmailMessage
             {
-                Subject = ThusSpokeBabel(key: "Email_subject", placeholders: new List<string>() { PageName }),
-                Body = ThusSpokeBabel(key: "Email_body", placeholders: new List<string>() { OTP }),
+                Subject = ThusSpokeBabel(key: "Email_subject", placeholders: [PageName]),
+                Body = ThusSpokeBabel(key: "Email_body", placeholders: [OTP]),
                 ToEmails = new EmailAddress[] { new EmailAddress(Bot.BuyerEmail) }
             };
             try
@@ -811,7 +833,7 @@ namespace Corprio.SocialWorker.Helpers
         /// Get a customer ID based on an email address
         /// </summary>
         /// <param name="emailAddress">Email address that supposedly belongs to a customer in Corprio</param>
-        /// <returns></returns>
+        /// <returns>(1) True if the customer is an existing customer, (2) customer ID</returns>
         private async Task<Tuple<bool, Guid>> GetCustomerIdByEmail(string emailAddress)
         {
             Guid customerId = Guid.Empty;
@@ -824,7 +846,7 @@ namespace Corprio.SocialWorker.Helpers
                 whereArguments: new string[] { emailAddress },
                 skip: 0,
                 take: 1);
-            if (existingCustomers.Any()) 
+            if (existingCustomers.Count > 0) 
             {
                 customerId = Guid.Parse(existingCustomers[0].ID);
                 return new Tuple<bool, Guid>(true, customerId);
@@ -844,7 +866,7 @@ namespace Corprio.SocialWorker.Helpers
                             PrimaryEmail = emailAddress                        
                         },
                         Source = "Facebook/Instagram",
-                        EntityProperties = new List<EntityProperty>() { new EntityProperty() { Name = BabelFish.CustomerEpName, Value = Bot.BuyerID } }
+                        EntityProperties = [new EntityProperty() { Name = BabelFish.CustomerEpName, Value = Bot.BuyerID }],
                     });
             }
             catch (ApiExecutionException ex)
@@ -866,30 +888,47 @@ namespace Corprio.SocialWorker.Helpers
             if (!isValid) return ThusSpokeBabel("Err_InvalidEmail");
 
             // note: we don't care if this email address - and, by extension, the customer ID - is connected to another FB/IG ID,
-            // because we allow one customer to be associated with more than one social media account
-            Bot.BuyerEmail = emailAddress;
+            // because we allow one customer to be associated with more than one social media account            
             (bool isExistingCustomer, Guid customerId) = await GetCustomerIdByEmail(emailAddress);
-            if (isExistingCustomer)
-            {
-                await Save();
-                return await SendOTP();
-            }
 
             if (customerId.Equals(Guid.Empty))
             {
-                Log.Error($"Failed to retrieve/create a customer ID for email {Bot.BuyerEmail}");
+                Log.Error($"Failed to retrieve/create a customer ID for email {emailAddress}");
                 return await SoftReboot(clearCustomer: true);
             }
 
+            Bot.BuyerEmail = emailAddress;
+            if (isExistingCustomer)
+            {
+                // note: it is possible that the NewCustomer flag is true even though the provided email address belongs to an existing customer;
+                // we don't raise an error here because the customer may have forgotten if they've shopped with this merchant before
+                Bot.BuyerCorprioID = null;
+                await Save();
+                return await SendOTP();
+            }            
+
             Bot.BuyerCorprioID = customerId;
+            if (Bot.PostedProductID != null)
+            {
+                await Save();
+                return await SelectProduct((Guid)Bot.PostedProductID);
+            }
+
+            if (Bot.Cart.Count == 0)
+            {
+                Bot.ThinkingOf = BotTopic.ProductOpen;
+                await Save();
+                return await AskQuestion();
+            }
+
             await Save();
-            return await Checkout();            
+            return await Checkout();
         }
         
         /// <summary>
         /// Update a customer's entity properties with a Facebook user ID
         /// </summary>
-        /// <returns></returns>
+        /// <returns>True if the update is completed</returns>
         private async Task<bool> UpdateCustomerEp()
         {
             if (Bot.BuyerCorprioID == null)
@@ -921,32 +960,6 @@ namespace Corprio.SocialWorker.Helpers
         }
 
         /// <summary>
-        /// Look for the customer ID of the person conversing with the bot
-        /// </summary>
-        /// <returns></returns>
-        private async Task<string> ConfirmCustomer()
-        {                                    
-            List<dynamic> existingCustomers = await Client.CustomerApi.Query(
-                organizationID: OrgID,
-                selector: "new (ID)",
-                where: "EntityProperties.Any(Name==@0 && Value==@1)",
-                orderBy: "ID",
-                whereArguments: new string[] { BabelFish.CustomerEpName, Bot.BuyerID },
-                skip: 0,
-                take: 1);            
-            if (!existingCustomers.Any()) 
-            {
-                Bot.ThinkingOf = BotTopic.EmailOpen;
-                await Save();
-                return await AskQuestion();
-            }
-
-            Bot.BuyerCorprioID = Guid.Parse(existingCustomers[0].ID);
-            await Save();
-            return await Checkout();
-        }
-
-        /// <summary>
         /// Handle answer to a yes or no question
         /// </summary>
         /// <param name="yes">True if the answer is interpreted as a yes</param>
@@ -955,14 +968,25 @@ namespace Corprio.SocialWorker.Helpers
         {                        
             switch (Bot.ThinkingOf)
             {
+                case BotTopic.NewCustomerYN:
+                    Bot.NewCustomer = yes;
+                    if (yes)
+                    {                        
+                        return Bot.PostedProductID != null ? await SelectProduct((Guid)Bot.PostedProductID) : await Reorientation();
+                    }
+                    Bot.ThinkingOf = BotTopic.EmailOpen;
+                    await Save();
+                    return await AskQuestion();
+
                 case BotTopic.ProductYN:
-                    if (!(Bot.ProductMemory?.Any() ?? false))
+                    Bot.ProductMemory ??= [];
+                    if (Bot.ProductMemory.Count == 0)
                     {
                         Log.Error($"The bot did not have any product in memory when handling topic {Bot.ThinkingOf}");
                         return await SoftReboot();
                     }
                     
-                    if (yes) return await SelectProduct(Bot.ProductMemory[0].Key);
+                    if (yes) return await SelectProduct(Bot.ProductMemory[0].ProductID);
 
                     Bot.ProductMemory.Clear();
                     Bot.ThinkingOf = BotTopic.ProductOpen;
@@ -970,10 +994,17 @@ namespace Corprio.SocialWorker.Helpers
                     return await AskQuestion();
 
                 case BotTopic.CheckoutYN:
-                    if (yes) return Bot.BuyerCorprioID == null ? await ConfirmCustomer() : await Checkout();
+                    if (!yes)
+                    {
+                        Bot.ThinkingOf = BotTopic.ProductOpen;
+                        await Save();
+                        return await AskQuestion();
+                    }
 
-                    Bot.ThinkingOf = BotTopic.ProductOpen;
-                    await Save();
+                    if (Bot.BuyerCorprioID != null) return await Checkout();
+
+                    Bot.ThinkingOf = BotTopic.EmailOpen;
+                    await Save(); 
                     return await AskQuestion();
 
                 case BotTopic.ClearCartYN:
@@ -981,6 +1012,7 @@ namespace Corprio.SocialWorker.Helpers
                     Bot.VariationMemory.Clear();
                     Bot.AttributeValueMemory.Clear();
 
+                    Bot.Cart ??= [];
                     if (yes)
                     {
                         Bot.Cart.Clear();                        
@@ -989,9 +1021,9 @@ namespace Corprio.SocialWorker.Helpers
                         return $"{ThusSpokeBabel("EmptyCart")}\n{await AskQuestion()}";
                     }
 
-                    Bot.ThinkingOf = (Bot.Cart?.Any(x => x.Quantity == 0) ?? false) 
+                    Bot.ThinkingOf = Bot.Cart.Any(x => x.Quantity == 0)
                         ? BotTopic.QuantityOpen 
-                        : ((Bot.Cart?.Any() ?? false) ? BotTopic.CheckoutYN : BotTopic.ProductOpen);
+                        : Bot.Cart.Count > 0 ? BotTopic.CheckoutYN : BotTopic.ProductOpen;
 
                     await Save();
                     return await AskQuestion();
@@ -1010,10 +1042,10 @@ namespace Corprio.SocialWorker.Helpers
         private async Task<string> HandleCancel()
         {            
             switch (Bot.ThinkingOf)
-            {
+            {                
                 case BotTopic.ProductOpen:
                     Bot.ProductMemory.Clear();
-                    break;
+                    return await Reorientation();
 
                 case BotTopic.ProductYN:
                     Bot.ProductMemory.Clear();
@@ -1035,15 +1067,49 @@ namespace Corprio.SocialWorker.Helpers
 
                 case BotTopic.QuantityOpen:
                 case BotTopic.CheckoutYN:
-                case BotTopic.EmailOpen:
                     Bot.ThinkingOf = BotTopic.ClearCartYN;
+                    break;
+
+                case BotTopic.ClearCartYN:
+                    return await Reorientation();
+
+                case BotTopic.EmailOpen:
+                    if (Bot.BuyerCorprioID != null)
+                    {
+                        Log.Error($"The topic was {Bot.ThinkingOf} when the bot already had the customer ID.");
+                        return await Reorientation();                        
+                    }
+                    
+                    if (Bot.NewCustomer == true)
+                    {
+                        Bot.ThinkingOf = Bot.Cart.Count > 0 ? BotTopic.ClearCartYN : BotTopic.Limbo;
+                    }
+                    else
+                    {
+                        Bot.NewCustomer = null; // reset to null to let the customer answer again
+                        Bot.ThinkingOf = BotTopic.NewCustomerYN;
+                    }                    
                     break;
 
                 case BotTopic.EmailConfirmationOpen:
                     Bot.BuyerEmail = null;
                     Bot.OTP_Code = null;
                     Bot.OTP_ExpiryTime = null;
-                    Bot.ThinkingOf = BotTopic.ClearCartYN;
+                    if (Bot.BuyerCorprioID != null)
+                    {
+                        Log.Error($"The topic was {Bot.ThinkingOf} when the bot already had the customer ID.");
+                        return await Reorientation();
+                    }
+                    
+                    if (Bot.NewCustomer == true)
+                    {                        
+                        Bot.ThinkingOf = Bot.Cart.Count > 0 ? BotTopic.ClearCartYN : BotTopic.Limbo;
+                    }
+                    else
+                    {
+                        Bot.NewCustomer = null; // reset to null even if it was false, becaues the email confirmation process was not completed
+                        Bot.ThinkingOf = BotTopic.NewCustomerYN;
+                    }                    
                     break;
 
                 default:
@@ -1073,16 +1139,27 @@ namespace Corprio.SocialWorker.Helpers
         /// <returns></returns>
         public async Task<string> ReachOut(Guid productId)
         {            
-            Bot.ThinkingOf = BotTopic.ProductOpen;
             Bot.ProductMemory.Clear();
             Bot.VariationMemory.Clear();
-            Bot.AttributeValueMemory.Clear();            
-            Bot.BuyerEmail = null;
-            Bot.OTP_Code = null;
-            Bot.OTP_ExpiryTime = null;
-            Bot.Cart.Clear();            
+            Bot.AttributeValueMemory.Clear();
+            Bot.Cart = Bot.Cart.Where(x => x.Quantity > 0).ToList();            
+            // note: when the bot was created, the controller should have already checked if the buyer's meta Id matches any customer            
+            if (Bot.BuyerCorprioID != null || Bot.NewCustomer == true)
+            {
+                Bot.ThinkingOf = BotTopic.ProductOpen;
+            }
+            else
+            {                                
+                // NewCustomer is reset to null (from false) because apparently the email confirmation process was not completed
+                Bot.NewCustomer = null;
+                Bot.ThinkingOf = BotTopic.NewCustomerYN;
+                Bot.PostedProductID = productId;
+                Bot.BuyerEmail = null;
+                Bot.OTP_Code = null;
+                Bot.OTP_ExpiryTime = null;
+            }            
             await Save();
-            return await SelectProduct(productId);
+            return Bot.ThinkingOf == BotTopic.ProductOpen ? await SelectProduct(productId) : await AskQuestion();
         }
 
         /// <summary>
@@ -1095,28 +1172,29 @@ namespace Corprio.SocialWorker.Helpers
             if (string.IsNullOrWhiteSpace(input)) return null;
 
             input = input.Trim();
-            if (input.ToLower() == KillCode) return await HandleCancel();
+            if (input.Equals(KillCode, StringComparison.CurrentCultureIgnoreCase)) return await HandleCancel();
             
             switch (Bot.ThinkingOf)
             {
-                case BotTopic.Limbo:
+                case BotTopic.Limbo:                    
                 case BotTopic.ProductOpen:
-                    (bool buyIntention, string wanted) = CheckBuyIntention(input);
-                    Bot.ProductMemory = await SearchProduct(buyIntention ? wanted : input);                    
-                    
-                    // try to search again because it is possible that the product code/name includes words that otherwise indicate buying intention
-                    if (buyIntention && !(Bot.ProductMemory?.Any() ?? false)) 
-                        Bot.ProductMemory = await SearchProduct(input);
+                    if (Bot.NewCustomer == null && Bot.BuyerCorprioID == null)
+                    {
+                        Bot.ThinkingOf = BotTopic.NewCustomerYN;
+                        await Save();
+                        return await AskQuestion();
+                    }
+                    Bot.ProductMemory = await SearchProduct(input) ?? [];
 
-                    if (Bot.ProductMemory?.Any() ?? false)
+                    if (Bot.ProductMemory.Count > 0)
                     {
                         Bot.ThinkingOf = Bot.ProductMemory.Count == 1 ? BotTopic.ProductYN : BotTopic.ProductMC;
                         await Save();
                         return await AskQuestion();
-                    }                    
+                    }
+                    return ThusSpokeBabel(key: "CannotFindProduct", placeholders: [input]);
 
-                    return ThusSpokeBabel(key: "CannotFindProduct", new List<string>() { input });
-
+                case BotTopic.NewCustomerYN:
                 case BotTopic.ProductYN:
                 case BotTopic.CheckoutYN:
                 case BotTopic.ClearCartYN:
@@ -1156,15 +1234,21 @@ namespace Corprio.SocialWorker.Helpers
                     
                     Bot.ThinkingOf = BotTopic.CheckoutYN;                    
                     await Save();
-                    return $"{ThusSpokeBabel(key: "CartUpdated", placeholders: new List<string>() { basket.Quantity.ToString("F0"), basket.Name })}\n{await AskQuestion()}";
+                    return $"{ThusSpokeBabel(key: "CartUpdated", placeholders: [basket.Quantity.ToString("F0"), basket.Name])}\n{await AskQuestion()}";
 
                 case BotTopic.EmailOpen:
                     return await ConfirmEmail(input);
 
-                case BotTopic.EmailConfirmationOpen:
+                case BotTopic.EmailConfirmationOpen:                    
                     if (string.IsNullOrWhiteSpace(Bot.OTP_Code))
                     {
                         Log.Error("The bot did not have an OTP in the memory for email validation.");
+                        return await SoftReboot(clearCustomer: true);
+                    }
+
+                    if (string.IsNullOrWhiteSpace(Bot.BuyerEmail))
+                    {
+                        Log.Error("The bot did not have the customer's email but was doing email confirmation.");
                         return await SoftReboot(clearCustomer: true);
                     }
                     
@@ -1172,18 +1256,31 @@ namespace Corprio.SocialWorker.Helpers
                         return $"{ThusSpokeBabel("Err_InvalidOTP")}\n{await SendOTP()}";
 
                     Bot.OTP_Code = null;
+                    Bot.OTP_ExpiryTime = null;
                     (_, Guid customerId) = await GetCustomerIdByEmail(Bot.BuyerEmail);
                     if (customerId == Guid.Empty)
                     {
                         Log.Error($"Failed to retrieve/create a customer ID for email {Bot.BuyerEmail}");
                         return await SoftReboot(clearCustomer: true);
                     }
-
-                    Bot.BuyerCorprioID = customerId;
+                    Bot.BuyerCorprioID = customerId;                    
                     await Save();
                     await UpdateCustomerEp();  // we proceed even if the EP update fails
+
+                    if (Bot.PostedProductID != null)
+                    {                        
+                        return await SelectProduct((Guid)Bot.PostedProductID);
+                    }
+
+                    if (Bot.Cart.Count == 0)
+                    {
+                        Bot.ThinkingOf = BotTopic.ProductOpen;
+                        await Save();
+                        return await AskQuestion();
+                    }
+
                     return await Checkout();
-                    
+
                 case BotTopic.PromotionOpen:
                     // PLACEHOlDER
                     return await HandlePromotion(input);

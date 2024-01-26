@@ -303,9 +303,6 @@ function editVariantTemplate(line) {
                 labelMode: 'floating',
                 displayExpr: 'Name',
                 valueExpr: 'Code',
-                onValueChanged: function (e) {
-                    console.log(e.value);
-                },
             });
         }
     }
@@ -440,24 +437,6 @@ function prepareBillToFields(defCallingCode) {
         required: true,
         validationGroup: VALIDATION_GROUP,
     });
-    //corprio.geography.addPhoneNumberTo(
-    //    $billPhone,
-    //    vdata.model.billedPhoneSubscriberNumber
-    //        ? { NumberType: 3, CountryCallingCode: vdata.model.billedPhoneCountryCallingCode, NationalDestinationCode: vdata.model.billedPhoneNationalDestinationCode, SubscriberNumber: vdata.model.billedPhoneSubscriberNumber }
-    //        : { NumberType: 3, CountryCallingCode: defCallingCode },
-    //    'contact-phone',
-    //    null,
-    //    function (phoneNumber) {
-    //        if (isPaymentClicked || isPreview) { return; }
-    //        const $deliveryPhone = $('#delivery-phone-number');
-    //        if ($deliveryPhone.length) {                
-    //            setPhoneNumber($deliveryPhone, phoneNumber);
-    //            /*corprio.geography.setPhoneNumber($deliveryPhone, phoneNumber);*/                
-    //        }
-    //    },
-    //    true,
-    //    VALIDATION_GROUP
-    //);
     $billPhone.find('.phone').dxValidator({
         validationGroup: VALIDATION_GROUP,
         validationRules: [{
@@ -515,7 +494,7 @@ function prepareDeliveryMethodFields(defCallingCode) {
     if (chosenDeliveryMethod === Enums_1.DeliveryOption.NoOption) {
         return;
     }
-    $deliveryMethodFieldset.append($('<h5 class="mt-3">').text(`${vdata.localizer.deliveryMethod}`), $('<div id="delivery-method">').dxRadioGroup({
+    $deliveryMethodFieldset.append($('<h5 class="mt-3">').text(vdata.localizer.deliveryMethod), $('<div id="delivery-method">').dxRadioGroup({
         // dependencies: the following two variables are assigned with adjustGlobalVariables()
         dataSource: availableDeliveryMethods,
         disabled: isPaymentClicked || isPreview,
@@ -559,7 +538,7 @@ function prepareDeliveryMethodFields(defCallingCode) {
     }
     const $deliverToDiv = $('<div id="deliver-to-section">').appendTo($deliveryMethodFieldset);
     $deliverToDiv.toggle(chosenDeliveryMethod === Enums_1.DeliveryOption.Shipping);
-    $deliverToDiv.append($('<h5>').addClass('mt-3').text('Deliver To'), $('<div id="delivery-address-line1" class="mb-2">').dxTextBox({
+    $deliverToDiv.append($('<h5>').addClass('mt-3').text(vdata.localizer.deliverTo), $('<div id="delivery-address-line1" class="mb-2">').dxTextBox({
         value: vdata.model.deliveryAddress_Line1,
         disabled: isPaymentClicked || isPreview,
         maxLength: 250,
@@ -627,7 +606,7 @@ function prepareDeliveryMethodFields(defCallingCode) {
         value: (isPaymentClicked || isPreview) ? vdata.model.deliveryContact_GivenName : String($('#bill-person-given-name').find('input').val()),
         disabled: isPaymentClicked || isPreview,
         maxLength: 100,
-        label: 'Given Name',
+        label: vdata.localizer.givenName,
         labelMode: 'floating',
         inputAttr: { autocomplete: 'given-name', name: 'delivery-contact-given-name-input', id: 'delivery-contact-given-name-input' },
     }).dxValidator({
@@ -642,7 +621,7 @@ function prepareDeliveryMethodFields(defCallingCode) {
         value: (isPaymentClicked || isPreview) ? vdata.model.deliveryContact_FamilyName : String($('#bill-person-family-name').find('input').val()),
         disabled: isPaymentClicked || isPreview,
         maxLength: 100,
-        label: 'Family Name',
+        label: vdata.localizer.familyName,
         labelMode: 'floating',
         inputAttr: { autocomplete: 'family-name', name: 'delivery-contact-family-name-input', id: 'delivery-contact-family-name-input' },
     }).dxValidator({
@@ -664,16 +643,6 @@ function prepareDeliveryMethodFields(defCallingCode) {
         required: false,
         validationGroup: VALIDATION_GROUP
     });
-    //corprio.geography.addPhoneNumberTo(
-    //    $deliveryPhone,
-    //    vdata.model.deliveryPhoneSubscriberNumber
-    //        ? { NumberType: 3, CountryCallingCode: vdata.model.deliveryPhoneCountryCallingCode, NationalDestinationCode: vdata.model.deliveryPhoneNationalDestinationCode, SubscriberNumber: vdata.model.deliveryPhoneSubscriberNumber }
-    //        : { NumberType: 3, CountryCallingCode: defCallingCode },
-    //    'delivery-phone-number',
-    //    null,
-    //    null,
-    //    false,
-    //    VALIDATION_GROUP);
     $deliveryPhone.find('.phone').dxValidator({
         validationGroup: VALIDATION_GROUP,
         validationRules: [{
@@ -750,44 +719,6 @@ function handleVoidOrder() {
         }
     });
 }
-//function setPhoneNumber($phoneWidget: JQuery<HTMLElement>, oPhoneNumber: PhoneNumber) {
-//    if (!$phoneWidget) { return; }
-//    let $widget = $phoneWidget.find('.co-phone-type');
-//    if ($widget) {
-//        $widget.dxSelectBox('option', 'value', oPhoneNumber && oPhoneNumber.NumberType);
-//    }
-//    $widget = $phoneWidget.find('.co-select-country');
-//    if ($widget) {
-//        // note: to select a value in select box, we need to provide an alphabetical country code, while the country code in a phone number is numeric
-//        const codeCountryPair = StaticData.CountryList.find(x => x.Value.CountryCallingCode === oPhoneNumber.CountryCallingCode);
-//        if (codeCountryPair) {
-//            // note: the key in CountryList is an alphabetical country code
-//            $widget.dxSelectBox('option', 'value', codeCountryPair.Key);
-//        }
-//    }
-//    $widget = $phoneWidget.find('.co-phone-textbox');
-//    if ($widget) {
-//        $widget.dxTextBox('option', 'value', oPhoneNumber && oPhoneNumber.SubscriberNumber);
-//    }
-//};
-//function getPhoneNumber($element: JQuery<HTMLElement>): PhoneNumber {
-//    if ($element) {
-//        // note: the country code expected by the backend is numeric, while the value in select box is alphabetical
-//        let countryCallingCode = '';
-//        const alphabeticalCode = $element.find('.co-select-country').dxSelectBox('option', 'value');
-//        if (alphabeticalCode) {
-//            const country = StaticData.CountryList.find(x => x.Key === alphabeticalCode);
-//            countryCallingCode = country?.Value?.CountryCallingCode;
-//        }
-//        return {
-//            NumberType: $element.find('.co-phone-type').dxSelectBox('option', 'value'),
-//            CountryCallingCode: countryCallingCode,
-//            NationalDestinationCode: '',
-//            SubscriberNumber: $element.find('.co-phone-textbox').dxTextBox('option', 'value'),
-//        };
-//    }
-//    return { NumberType: 0, CountryCallingCode: '', NationalDestinationCode: '', SubscriberNumber: '' };
-//}
 /**
  * Render the form to be filled in by buyer
  */
@@ -833,8 +764,6 @@ function prepareCustomerInfoForm() {
                 GivenName: $('#bill-person-given-name').dxTextBox('option', 'value')
             },
             BillContactPhone: $billPhone.option('value'),
-            /*BillContactPhone: getPhoneNumber($('#bill-contact-phone')),*/
-            /*BillContactPhone: corprio.geography.getPhoneNumber($('#bill-contact-phone')),*/
             ChosenDeliveryMethod: chosenDeliveryMethod,
             SalesOrderID: vdata.model.salesOrderID,
         };
@@ -853,8 +782,6 @@ function prepareCustomerInfoForm() {
             };
             const $deliveryPhone = $('#delivery-phone-number').coPhoneNumber('instance');
             data.DeliveryContactPhone = $deliveryPhone.option('value');
-            /*data.DeliveryContactPhone = getPhoneNumber($('#delivery-phone-number'));*/
-            /*data.DeliveryContactPhone = corprio.geography.getPhoneNumber($('#delivery-phone-number'));*/
         }
         loadPanel.show();
         let dataString;
@@ -871,7 +798,7 @@ function prepareCustomerInfoForm() {
             contentType: 'application/json;charset=utf-8',
             data: dataString,
             success: function () {
-                window.location.replace(`${vdata.settings.paymentPortalUrl}/T42/RecePayment/order/${vdata.model.salesOrderID}?successUrl=${vdata.settings.appUrl}/${vdata.model.organizationID}/thankyou&failUrl=${vdata.settings.appUrl}/${vdata.model.organizationID}/paymentfailed`);
+                window.location.replace(`${vdata.settings.paymentPortalUrl}/${vdata.model.organizationShortName}/RecePayment/order/${vdata.model.salesOrderID}?successUrl=${vdata.settings.appUrl}/${vdata.model.organizationID}/thankyou&failUrl=${vdata.settings.appUrl}/${vdata.model.organizationID}/paymentfailed`);
             },
             complete: function () {
                 loadPanel.hide();

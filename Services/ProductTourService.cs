@@ -5,9 +5,9 @@ using System;
 namespace Corprio.SocialWorker.Services
 {
     public class ProductTourService : IProductTourService
-    {
+    {                                        
         public ProductTour GetTour(string name, Guid? organizationID)
-        {
+        {                        
             return name switch
             {
                 "getstarted.index" => new ProductTour
@@ -98,96 +98,36 @@ namespace Corprio.SocialWorker.Services
                                 Description = string.Format(Resources.SharedResource.Tour_SaveButton_Desc, Resources.SharedResource.AppName),
                             }
                         },
+                        new DriveStep {
+                            Element = ".tourButton",
+                            Popover = new Popover
+                            {
+                                Description = Resources.SharedResource.Tour_Rerun,
+                                OnNextClick = "refocus",  // note: the call-back is defined in the relevant cshtml file
+                            },                            
+                        },
                     }
                 },
                 "productpublication.index" => new ProductTour
                 {
                     Steps = new[]
-                    {                        
-                        new DriveStep {
-                            Element = "#menu-item-GetStarted-0-0",
-                            Popover = new Popover
-                            {
-                                Description = string.Format(Resources.SharedResource.Tour_GetStarted_Desc, Resources.SharedResource.AppName)
-                            }
-                        },
-                        new DriveStep {
-                            Element = "#menu-item-ProductPublication-0-1",
-                            Popover = new Popover
-                            {
-                                Description = Resources.SharedResource.Tour_ProductPublication_Desc,
-                            }
-                        },
-                        new DriveStep {
-                            Element = "#menu-item-DisconnectFacebook-0-2",
-                            Popover = new Popover
-                            {
-                                Description = Resources.SharedResource.Tour_DisconnectFacebook_Desc,
-                            }
-                        },
-                        new DriveStep {
-                            Element = ".publish-btn",
-                            Popover = new Popover
-                            {
-                                Description = "Select a product and publish it to your Facebook page(s) and Instagram account(s).",
-                            }
-                        },
-                    }
-                },
-                "disconnectfacebook.index" => new ProductTour
-                {
-                    Steps = new[]
                     {
                         new DriveStep {
-                            Element = "#menu-item-GetStarted-0-0",
+                            Element = ".publish-col",
                             Popover = new Popover
                             {
-                                Description = string.Format(Resources.SharedResource.Tour_GetStarted_Desc, Resources.SharedResource.AppName)
-                            }
+                                Description = Resources.SharedResource.Tour_PublishCol_Desc,
+                            },                            
                         },
                         new DriveStep {
-                            Element = "#menu-item-ProductPublication-0-1",
+                            Element = ".dx-icon-upload, .dx-icon-exportselected",
                             Popover = new Popover
                             {
-                                Description = Resources.SharedResource.Tour_ProductPublication_Desc,
-                            }
+                                Description = Resources.SharedResource.Tour_PublishButton_Desc,
+                            },
                         },
-                        new DriveStep {
-                            Element = "#menu-item-DisconnectFacebook-0-2",
-                            Popover = new Popover
-                            {
-                                Description = Resources.SharedResource.Tour_DisconnectFacebook_Desc,
-                            }
-                        },
-                    }
-                },
-                "reconnectfacebook.index" => new ProductTour
-                {
-                    Steps = new[]
-                    {
-                        new DriveStep {
-                            Element = "#menu-item-GetStarted-0-0",
-                            Popover = new Popover
-                            {
-                                Description = string.Format(Resources.SharedResource.Tour_GetStarted_Desc, Resources.SharedResource.AppName)
-                            }
-                        },
-                        new DriveStep {
-                            Element = "#menu-item-ProductPublication-0-1",
-                            Popover = new Popover
-                            {
-                                Description = Resources.SharedResource.Tour_ProductPublication_Desc,
-                            }
-                        },
-                        new DriveStep {
-                            Element = "#menu-item-DisconnectFacebook-0-2",
-                            Popover = new Popover
-                            {
-                                Description = Resources.SharedResource.Tour_DisconnectFacebook_Desc,
-                            }
-                        },
-                    }
-                },
+                    },                    
+                },                
                 _ => null,
             };
         }

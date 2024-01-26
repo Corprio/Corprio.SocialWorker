@@ -65,9 +65,7 @@ $(function () {
 
     $('#logoutBtn').on('click', function () {        
         FB.logout(checkLoginState);
-    });
-
-    corprio.page.initTour({ defaultTour: 'reconnectfacebook.index', autoStart: true, driverCssLoaded: true });
+    });    
 })
 
 /**

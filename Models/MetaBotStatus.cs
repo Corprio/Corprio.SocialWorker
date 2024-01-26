@@ -15,13 +15,13 @@ namespace Corprio.SocialWorker.Models
         /// <summary>
         /// The product IDs and names that the bot 'remembers'.
         /// </summary>
-        public List<KeyValuePair<Guid, string>> ProductMemory { get; set; }
+        public List<ProductSummary> ProductMemory { get; set; }
 
         /// <summary>
-        /// The product variations that the bot 'remembers', in the format of { attribute : { value, value } }. 
+        /// The product variations that the bot 'remembers', in the format of { Attribute : { { Code, Name }, { Code, Name } } }. 
         /// They represent choices that the bot WILL offer to the user.
         /// </summary>
-        public List<KeyValuePair<string, List<string>>> VariationMemory { get; set; }
+        public List<KeyValuePair<string, List<VariationSummary>>> VariationMemory { get; set; }
         
         /// <summary>
         /// The attribute-value pairs that the bot 'remembers. 
@@ -34,6 +34,30 @@ namespace Corprio.SocialWorker.Models
         /// </summary>
         public List<BotBasket> Cart { get; set; }
     }    
+
+    public class ProductSummary
+    {        
+        public Guid ProductID { get; set; }
+
+        public string ProductName { get; set; }
+
+        public string ProductPriceCurrency { get; set; }
+
+        public decimal? ProductPriceValue { get; set; }
+    }
+
+    public class VariationSummary
+    {
+        /// <summary>
+        /// E.g. L
+        /// </summary>
+        public string Code { get; set; }
+
+        /// <summary>
+        /// E.g. Large
+        /// </summary>
+        public string Name { get; set; }        
+    }
 
     /// <summary>
     /// A basket in the shopping cart. Each basket captures the price, quantity, etc. of 1 product.

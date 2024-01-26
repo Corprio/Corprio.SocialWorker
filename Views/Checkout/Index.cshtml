@@ -41,6 +41,7 @@
             confirmAddProduct: '@StringHelper.Encode(@localizer["ConfirmAddProduct"])',
             confirmVoidOrder: '@StringHelper.Encode(@localizer["ConfirmVoidOrder"])',
             delete: '@StringHelper.Encode(@localizer["Delete"])',
+            deliverTo: '@StringHelper.Encode(@localizer["DeliverTo"])',
             deliveryCharge: '@StringHelper.Encode(@localizer["DeliveryCharge"])',
             deliveryMethod: '@StringHelper.Encode(@localizer["DeliveryMethod"])',
             editQuantity: '@StringHelper.Encode(@localizer["EditQuantity"])',
@@ -114,87 +115,89 @@
     };
 </script>
 <div class="m-4">
-    <div class="title-border-l">
-        <h3>@localizer["Checkout"]</h3>
-    </div>
+    <div class="checkout-container">
+        <div class="title-border-l">
+            <h3>@localizer["Checkout"]</h3>
+        </div>
 
-    <div>        
-        <div id="reminderPopup"></div>
+        <div>
+            <div id="reminderPopup"></div>
 
-        <section class="row mb-4">
-            <div class="col order-ref">
-                <div class="input-group mb-3 mr-2">
-                    <label class="my-1 mr-2" for="document-date">@localizer["OrderDate"]</label>
-                    <input type="text" id="document-date" class="text-right" value="@Model.OrderDate.ToString("d", new CultureInfo("zh-HK"))" disabled />
-                </div>
-            </div>
-
-            <div class="col order-ref">
-                <div class="input-group mb-3 mr-2">
-                    <label class="my-1 mr-2" for="document-number">@localizer["DocumentNum"]</label>
-                    <input type="text" id="document-number" class="text-right" value="@Model.DocumentNum" disabled />
-                </div>
-            </div>
-        </section>
-                
-        <section class="table-responsive">
-            <div class="d-flex justify-content-between mb-2">
-                <h5 class="">@localizer["ShoppingCart"]</h5>
-                @if (!Model.IsPaymentClicked && !Model.IsOrderVoidOrPaid)
-                {
-                    <div><button class="btn btn-info add-prd-btn"><i class="fas fa-plus mr-1"></i>@localizer["AddNewProduct"]</button></div>
-                }
-            </div>
-            <table class="table lined-border">
-                <thead>
-                    <tr>
-                        <th scope="col">@localizer["Product"]</th>                        
-                        <th scope="col" class="dx-text-content-alignment-left d-flex">
-                            <div class="flex-even">@localizer["ProductName"]</div>
-                            <div class="flex-even">@localizer["ProductDesc"]</div>
-                        </th>
-                        <th scope="col">@localizer["Price"]</th>
-                        <th scope="col" class="dx-text-content-alignment-left d-flex">
-                            <div class="flex-even">@localizer["Qty"]</div>
-                            <div class="flex-even">@localizer["UnitOfMeasure"]</div>
-                        </th>
-                    </tr>
-                </thead>
-                <tbody id="cart-items"></tbody>
-            </table>
-        </section>
-
-        <section class="mr-2 mb-3">
-            <div class="mb-2">
-                <div class="d-flex justify-content-between">
-                    <div>@localizer["Subtotal"]</div>
-                    <div id="order-subtotal"></div>
-                </div>
-            </div>
-            
-            @if (!Model.IsPaymentClicked)
-            {
-                <div id="delivery-charge-div" class="mb-2">
-                    <div class="d-flex justify-content-between">
-                        <div>@localizer["DeliveryCharge"]</div>
-                        <div id="delivery-charge-amt"></div>
+            <section class="row mb-4">
+                <div class="col order-ref">
+                    <div class="input-group mb-3 mr-2">
+                        <label class="my-1 mr-2" for="document-date">@localizer["OrderDate"]</label>
+                        <input type="text" id="document-date" class="text-right" value="@Model.OrderDate.ToString("d", new CultureInfo("zh-HK"))" disabled />
                     </div>
                 </div>
-            }
-            
-            <div class="border-top mb-2 pt-2">
-                <div class="d-flex justify-content-between">
-                    <b>@localizer["TotalAmount"]</b>
-                    <b id="order-total"></b>
-                </div>
-            </div>                        
-        </section>
-        
-        <div class="user-message">@Html.Raw(Model.Footer)</div>
 
-        <div id="load-panel"></div>
-        <div id="edit-popup"></div>
-        <form id="customer-info-form" autocomplete="on"></form>
-    </div>
+                <div class="col order-ref">
+                    <div class="input-group mb-3 mr-2">
+                        <label class="my-1 mr-2" for="document-number">@localizer["DocumentNum"]</label>
+                        <input type="text" id="document-number" class="text-right" value="@Model.DocumentNum" disabled />
+                    </div>
+                </div>
+            </section>
+
+            <section class="table-responsive">
+                <div class="d-flex justify-content-between mb-2">
+                    <h5 class="">@localizer["ShoppingCart"]</h5>
+                    @if (!Model.IsPaymentClicked && !Model.IsOrderVoidOrPaid)
+                    {
+                        <div><button class="btn btn-info add-prd-btn"><i class="fas fa-plus mr-1"></i>@localizer["AddNewProduct"]</button></div>
+                    }
+                </div>
+                <table class="table lined-border">
+                    <thead>
+                        <tr>
+                            <th scope="col">@localizer["Product"]</th>
+                            <th scope="col" class="dx-text-content-alignment-left d-flex">
+                                <div class="flex-even">@localizer["ProductName"]</div>
+                                <div class="flex-even">@localizer["ProductDesc"]</div>
+                            </th>
+                            <th scope="col">@localizer["Price"]</th>
+                            <th scope="col" class="dx-text-content-alignment-left d-flex">
+                                <div class="flex-even">@localizer["Qty"]</div>
+                                <div class="flex-even">@localizer["UnitOfMeasure"]</div>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody id="cart-items"></tbody>
+                </table>
+            </section>
+
+            <section class="mr-2 mb-3">
+                <div class="mb-2">
+                    <div class="d-flex justify-content-between">
+                        <div>@localizer["Subtotal"]</div>
+                        <div id="order-subtotal"></div>
+                    </div>
+                </div>
+
+                @if (!Model.IsPaymentClicked)
+                {
+                    <div id="delivery-charge-div" class="mb-2">
+                        <div class="d-flex justify-content-between">
+                            <div>@localizer["DeliveryCharge"]</div>
+                            <div id="delivery-charge-amt"></div>
+                        </div>
+                    </div>
+                }
+
+                <div class="border-top mb-2 pt-2">
+                    <div class="d-flex justify-content-between">
+                        <b>@localizer["TotalAmount"]</b>
+                        <b id="order-total"></b>
+                    </div>
+                </div>
+            </section>
+
+            <div class="user-message">@Html.Raw(Model.Footer)</div>
+
+            <div id="load-panel"></div>
+            <div id="edit-popup"></div>
+            <form id="customer-info-form" autocomplete="on"></form>
+        </div>
+    </div>    
 </div>
 <vc:static-data model="@StaticDataRequestViewModel.All(true)" org-info="true" />

@@ -13,8 +13,7 @@ const permissions: string[] = ['email', 'public_profile', 'business_management',
 /// <reference types="facebook-js-sdk" />
 
 // For the order of the following three code blocks, see: https://www.devils-heaven.com/facebook-javascript-sdk-login
-window.fbAsyncInit = function () {
-    console.log('fbAsyncInit is doing its things...');       
+window.fbAsyncInit = function () {    
     FB.init({
         appId: '312852768233605',
         cookie: true,                     // Enable cookies to allow the server to access the session.

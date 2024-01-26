@@ -15,6 +15,9 @@ namespace Corprio.SocialWorker.Models
 
     public class MessageWebhookEntry
     {
+        /// <summary>
+        /// Do not treat this ID as a unique identifier of webhook, as it can simply be the Facebook page's ID
+        /// </summary>
         [JsonProperty("id")]
         public string WebhookEntryID { get; set; }
 

@@ -18,6 +18,7 @@ namespace Corprio.SocialWorker.Models
     public enum BotTopic
     {
         Limbo,
+        NewCustomerYN,
         ProductOpen,
         ProductYN,
         ProductMC,
