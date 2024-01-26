@@ -20,7 +20,22 @@ The Social Worker Application must be registered in [Corprio Portal](https://por
 |Brand|Read|
 |Stock without Cost|Read|
 |Customer|Read, Add New, Update|
+|Customer Payment Method|Read|
+|Organization Setting|Read|
 
 **Sending email**: Required
 
 **Application type**: Automated
+
+## Set up webhook for development
+The application uses webhook to respond facebook for messages inputted by customers in messengers.  In development, developers can use ngrok to redirect the facebook requests to localhost.
+1. Sign up at [ngrok](https://ngrok.com/)
+1. Download and install the ngrok agent in the developer machine
+1. 
+1. Connect the ngrok agent to your account
+1. Create a static domain in ngrok (optional step)
+1. Redirect web requests to localhost by running the command
+```
+ngrok http --domain=pleasant-definitely-macaw.ngrok-free.app https://localhost:44330 --host-header="localhost:44330"
+```
+![ngrok in action](resources/images/ngrok_in_action.png)
