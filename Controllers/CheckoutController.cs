@@ -671,8 +671,10 @@ namespace Corprio.SocialWorker.Controllers
             {
                 return false;
             }
-            var country = Lists.CountryList.FirstOrDefault(x => x.Value.CountryCallingCodes.Contains<string>(billPhoneNumber.CountryCode.ToString()));
-            return phoneNumberUtil.IsValidNumberForRegion(billPhoneNumber, country.Key);            
+            string parsedCountryCode = billPhoneNumber.CountryCode.ToString();            
+            // note: the same country calling code may be shared by multiple countries
+            var countries = Lists.CountryList.Where(x => x.Value.CountryCallingCodes.Contains<string>(parsedCountryCode)).ToList();
+            return countries.Any(x => phoneNumberUtil.IsValidNumberForRegion(billPhoneNumber, x.Key));            
         }
 
         /// <summary>
