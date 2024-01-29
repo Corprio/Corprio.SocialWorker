@@ -50,13 +50,20 @@ namespace Corprio.SocialWorker.Controllers
             bool updated = false;  // if true, then the setting needs to be saved
             if (firstVisit)
             {
-                OrganizationCoreInfo coreInfo = corprioClient.OrganizationApi.GetCoreInfo(organizationID).ConfigureAwait(false).GetAwaiter().GetResult();
-                applicationSetting = new()
+                try
                 {
-                    CataloguePostTemplate = string.Join(TemplateComponent.Separator, DefaultTemplate.DefaultTempalte_Catalogue),                    
-                    KeywordForShoppingIntention = BabelFish.Vocab["DefaultKeyWordForShoppingIntention"][UtilityHelper.NICAM(coreInfo)],                    
-                    ProductPostTemplate = string.Join(TemplateComponent.Separator, DefaultTemplate.DefaultTempalte_Product),
-                };
+                    OrganizationCoreInfo coreInfo = corprioClient.OrganizationApi.GetCoreInfo(organizationID).ConfigureAwait(false).GetAwaiter().GetResult();
+                    applicationSetting = new()
+                    {
+                        CataloguePostTemplate = string.Join(TemplateComponent.Separator, DefaultTemplate.DefaultTempalte_Catalogue),
+                        KeywordForShoppingIntention = BabelFish.Vocab["DefaultKeyWordForShoppingIntention"][UtilityHelper.NICAM(coreInfo)],
+                        ProductPostTemplate = string.Join(TemplateComponent.Separator, DefaultTemplate.DefaultTempalte_Product),
+                    };
+                }
+                catch (Core.Exceptions.ApplicationSubscriptionException)
+                {
+                    return RedirectToAction("subscribe", "home", new { organizationID });
+                }
             }                        
 
             if (string.IsNullOrWhiteSpace(applicationSetting.EmailToReceiveOrder))

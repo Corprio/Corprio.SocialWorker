@@ -331,7 +331,7 @@ function validateKeyword(keyword) {
  */
 function stringifyTemplate(messageType) {
     const result = {
-        isValid: messageType === Enums_1.MessageType.CataloguePost,
+        isValid: messageType === Enums_1.MessageType.CataloguePost, // note: there is no validation for catalogue post template
         keyword: '',
         templateString: ''
     };
@@ -716,8 +716,8 @@ function getPages() {
 window.fbAsyncInit = function () {
     FB.init({
         appId: vdata.settings.metaApiID,
-        cookie: true,
-        xfbml: true,
+        cookie: true, // Enable cookies to allow the server to access the session.
+        xfbml: true, // Parse social plugins on this webpage.
         version: vdata.settings.metaApiVersion
     });
     FB.getLoginStatus(function (response) {
