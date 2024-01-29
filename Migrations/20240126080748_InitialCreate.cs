@@ -12,6 +12,46 @@ namespace Corprio.SocialWorker.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
+                name: "FeedWebhooks",
+                columns: table => new
+                {
+                    ID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    PostID = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    SenderID = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    CreatedTime = table.Column<double>(type: "float", nullable: false),
+                    CreateDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
+                    LastUpdateDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
+                    CreatedBy = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
+                    LastUpdatedBy = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
+                    ApplicationID = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
+                    RowVersion = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_FeedWebhooks", x => x.ID);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "MessageWebhooks",
+                columns: table => new
+                {
+                    ID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    RecipientID = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    SenderID = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    TimeStamp = table.Column<double>(type: "float", nullable: false),
+                    CreateDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
+                    LastUpdateDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
+                    CreatedBy = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
+                    LastUpdatedBy = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
+                    ApplicationID = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
+                    RowVersion = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_MessageWebhooks", x => x.ID);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "MetaUsers",
                 columns: table => new
                 {
@@ -41,6 +81,8 @@ namespace Corprio.SocialWorker.Migrations
                     FacebookUserID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Language = table.Column<int>(type: "int", nullable: false),
                     ThinkingOf = table.Column<int>(type: "int", nullable: false),
+                    NewCustomer = table.Column<bool>(type: "bit", nullable: true),
+                    PostedProductID = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     ProductMemoryString = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     VariationMemoryString = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     AttributeValueMemoryString = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -141,6 +183,12 @@ namespace Corprio.SocialWorker.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "FeedWebhooks");
+
+            migrationBuilder.DropTable(
+                name: "MessageWebhooks");
+
             migrationBuilder.DropTable(
                 name: "MetaBotStatuses");
 

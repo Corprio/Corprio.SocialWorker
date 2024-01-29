@@ -17,15 +17,15 @@
     <Configurations>Debug;Release;Sandbox</Configurations>
     <Authors>Corprio</Authors>
     <Company>Popular IT</Company>
-    <Copyright>Copyright 2023 Popular IT</Copyright>
-    <PackageTags>corprio social worker</PackageTags>
+    <Copyright>Copyright 2024 Popular IT</Copyright>
+    <PackageTags>corprio socialmediamarketer</PackageTags>
     <Description>A web application for handling sales inquiry and for automating product/catalogue publication to Facebook and Instagram</Description>
 	<JavaScriptTestRoot>Tests\</JavaScriptTestRoot>
 	<JavaScriptTestFramework>Jest</JavaScriptTestFramework>
 	<GenerateProgramFile>false</GenerateProgramFile>
 	<UserSecretsId>7173AE0C-B16C-40C5-B589-E46477EED957</UserSecretsId>
 	<TypeScriptCompileBlocked>true</TypeScriptCompileBlocked>
-	<Title>Corprio Social Worker Application</Title>	
+	<Title>Corprio Social Media Marketer Application</Title>	
   </PropertyGroup>
 
   <ItemGroup>

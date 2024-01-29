@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Corprio.SocialWorker.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240124081116_AddFeedWebhooksTableToDb")]
-    partial class AddFeedWebhooksTableToDb
+    [Migration("20240126080748_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -73,12 +73,18 @@ namespace Corprio.SocialWorker.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
+                    b.Property<bool?>("NewCustomer")
+                        .HasColumnType("bit");
+
                     b.Property<string>("OTP_Code")
                         .HasMaxLength(6)
                         .HasColumnType("nvarchar(6)");
 
                     b.Property<DateTimeOffset?>("OTP_ExpiryTime")
                         .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid?>("PostedProductID")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("ProductMemoryString")
                         .HasColumnType("nvarchar(max)");
