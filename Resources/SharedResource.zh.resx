@@ -406,7 +406,7 @@
     <value>在 Facebook 和 Instagram 上发布有关此产品的帖子</value>
   </data>
   <data name="PublishProductPrompt" xml:space="preserve">
-    <value>您想发布此商品吗？一则介绍它的贴文将会发布到您的 Facebook 专页和 Instagram 帐户。</value>
+    <value>以下的帖子将会发布到您的 Facebook 专页和 Instagram 帐户。请检查帖子的内容并确保其中包含关键字「{0}」。聊天机器人会自动联系以 「{0}」 回复这帖子的顾客。</value>
   </data>
   <data name="UnitOfMeasure" xml:space="preserve">
     <value>单位</value>
@@ -658,7 +658,7 @@
     <value>{0} 未指定任何指令。请发送电子邮件至 {1} 与 {0} 联系。</value>
   </data>
   <data name="AppName" xml:space="preserve">
-    <value>Corprio.SocialWorker</value>
+    <value>Corprio.SocialMediaWorker</value>
   </data>
   <data name="BillTo" xml:space="preserve">
     <value>买方</value>
@@ -694,7 +694,7 @@
     <value>由于商家未指定送货方式，建议顾客通过电子邮件联系商家。</value>
   </data>
   <data name="DocumentNum" xml:space="preserve">
-    <value>文件号码</value>
+    <value>订单号码</value>
   </data>
   <data name="Edit" xml:space="preserve">
     <value>更改</value>
@@ -969,11 +969,20 @@
   <data name="Warning_para3" xml:space="preserve">
     <value>您即将终止 {0} 与 Facebook 帐户的连接。此操作无法撤消，并且会产生以下影响：</value>
   </data>
+  <data name="ErrMsg_BlankPostMsg" xml:space="preserve">
+    <value>帖子不能留白。</value>
+  </data>
   <data name="ErrMsg_InvalidBillPhone" xml:space="preserve">
     <value>请提供有效的买方电话号码。</value>
   </data>
   <data name="ErrMsg_InvalidDeliveryPhone" xml:space="preserve">
     <value>请提供有效的送货电话号码。</value>
+  </data>
+  <data name="ErrMsg_InvalidOrgID" xml:space="preserve">
+    <value>公司 ID 无效。</value>
+  </data>
+  <data name="ErrMsg_InvalidProductID" xml:space="preserve">
+    <value>產品 ID 无效。</value>
   </data>
   <data name="ErrMsg_NoPaymentMethod" xml:space="preserve">
     <value>商户尚未设置支付方式。</value>

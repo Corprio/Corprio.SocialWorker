@@ -90,7 +90,7 @@ namespace Corprio.SocialWorker.Helpers
         }
 
         /// <summary>
-        /// Generate a message in a language that is most relevant to the detected locale
+        /// Generate a message in the language that is most relevant to the detected locale
         /// </summary>
         /// <param name="key">Key for looking up the right phrases in the dictionary</param>
         /// <param name="placeholders">List of strings to be interpolated</param>
@@ -155,7 +155,7 @@ namespace Corprio.SocialWorker.Helpers
             {
                 choices += $"{i + 1} - {attributeValues.Value[i].Name}\n";
             }
-            choices += ThusSpokeBabel("Hint_Cancel");
+            choices += ThusSpokeBabel(key: "Hint_Cancel", placeholders: [KillCode]);
             return choices;
         }
 
@@ -371,7 +371,8 @@ namespace Corprio.SocialWorker.Helpers
         /// <returns>URL to the created sales order</returns>
         private async Task<string> CreateSalesOrder()
         {
-            if (!(Bot.Cart?.Any() ?? false))
+            Bot.Cart ??= [];
+            if (Bot.Cart.Count == 0)
             {
                 Log.Error("The bot was trying to create a sales order but the cart was empty.");
                 return null;
@@ -466,7 +467,7 @@ namespace Corprio.SocialWorker.Helpers
                 }
             }
 
-            return $"{configuration["AppBaseUrl"]}/{OrgID}/checkout/{orderId}";
+            return $"{configuration["AppBaseUrl"]}/{coreInfo.ShortName}/checkout/{orderId}";
         }
 
         /// <summary>
@@ -822,11 +823,11 @@ namespace Corprio.SocialWorker.Helpers
                 return $"{ThusSpokeBabel("Err_UndeliveredOTP")}";
             }
 
-            Bot.ThinkingOf = BotTopic.EmailConfirmationOpen;            
+            Bot.ThinkingOf = BotTopic.EmailConfirmationOpen;
             Bot.OTP_Code = OTP;
             Bot.OTP_ExpiryTime = DateTimeOffset.UtcNow.AddDays(1);
             await Save();
-            return ThusSpokeBabel("CodeSent");
+            return ThusSpokeBabel(key: "CodeSent", placeholders: [Bot.BuyerEmail, KillCode]);
         }
 
         /// <summary>
@@ -900,7 +901,7 @@ namespace Corprio.SocialWorker.Helpers
             Bot.BuyerEmail = emailAddress;
             if (isExistingCustomer)
             {
-                // note: it is possible that the NewCustomer flag is true even though the provided email address belongs to an existing customer;
+                // note: it is possible that the NewCustomer flag is true even if the provided email address belongs to an existing customer;
                 // we don't raise an error here because the customer may have forgotten if they've shopped with this merchant before
                 Bot.BuyerCorprioID = null;
                 await Save();

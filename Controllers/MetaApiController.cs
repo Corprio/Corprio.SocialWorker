@@ -32,8 +32,8 @@ namespace Corprio.SocialWorker.Controllers
             this.configuration = configuration;
             AppId = configuration["MetaApiSetting:AppId"];
             ApiVersion = configuration["MetaApiSetting:ApiVersion"];
-            BaseUrl = configuration["MetaApiSetting:BaseUrl"];            
-            AppSecret = "b8956ab840c1d15a8bb0bee5551a6ccb"; // Put this in a vault!!!
+            BaseUrl = configuration["MetaApiSetting:BaseUrl"];
+            AppSecret = configuration["MetaApiSetting:AppSecret"];
             GoBuyClickUrl = configuration["GoBuyClickUrl"];
         }                
         

@@ -331,7 +331,7 @@ function validateKeyword(keyword) {
  */
 function stringifyTemplate(messageType) {
     const result = {
-        isValid: messageType === Enums_1.MessageType.CataloguePost, // note: there is no validation for catalogue post template
+        isValid: messageType === Enums_1.MessageType.CataloguePost,
         keyword: '',
         templateString: ''
     };
@@ -548,7 +548,7 @@ function handleFbLoginStatusChange(response) {
 /**
  * Validate and submit the setting to backend for saving
  */
-function saveSettings() {
+function saveSettings(previewCheckout, previewThankyou) {
     let validationResult = DevExpress.validationEngine.validateGroup();
     if (!validationResult.isValid) {
         return;
@@ -588,7 +588,15 @@ function saveSettings() {
         cache: false,
         contentType: false,
         processData: false,
-        success: function (result) {
+        success: function () {
+            if (previewCheckout) {
+                window.open(`/${vdata.settings.organizationID}/GetStarted/PreviewCheckout`, '_blank');
+                return;
+            }
+            if (previewThankyou) {
+                window.open(`/${vdata.settings.organizationID}/GetStarted/PreviewThankYou`, '_blank');
+                return;
+            }
             DevExpress.ui.notify(vdata.localizer.msgSettingSaved, 'success');
         },
         error: corprio.formatError
@@ -716,8 +724,8 @@ function getPages() {
 window.fbAsyncInit = function () {
     FB.init({
         appId: vdata.settings.metaApiID,
-        cookie: true, // Enable cookies to allow the server to access the session.
-        xfbml: true, // Parse social plugins on this webpage.
+        cookie: true,
+        xfbml: true,
         version: vdata.settings.metaApiVersion
     });
     FB.getLoginStatus(function (response) {
@@ -801,14 +809,10 @@ $(function () {
     initializeGlobalVariables();
     AssignEventListenersForTemplates(Enums_1.MessageType.CataloguePost);
     AssignEventListenersForTemplates(Enums_1.MessageType.ProductPost);
-    $(Enums_1.Selector.saveSettingButtons).on('click', saveSettings);
+    $(Enums_1.Selector.saveSettingButtons).on('click', function () { saveSettings(false, false); });
     // miscellaneous
-    $('#preview-checkout').on('click', function () {
-        window.open(`/${vdata.settings.organizationID}/GetStarted/PreviewCheckout`, '_blank');
-    });
-    $('#preview-thank-you').on('click', function () {
-        window.open(`/${vdata.settings.organizationID}/GetStarted/PreviewThankYou`, '_blank');
-    });
+    $('#preview-checkout').on('click', function () { saveSettings(true, false); });
+    $('#preview-thank-you').on('click', function () { saveSettings(false, true); });
     corprio.page.initTour({ defaultTour: 'getstarted.index', autoStart: true, driverCssLoaded: true }); // must set driverCssLoaded to true    
 });
 

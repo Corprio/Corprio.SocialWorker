@@ -406,7 +406,7 @@
     <value>Publish a post about this product to Facebook and Instagram</value>
   </data>
   <data name="PublishProductPrompt" xml:space="preserve">
-    <value>Do you want to publish this product? A post will be made to your Facebook page(s) and Instagram account(s).</value>
+    <value>The following post will be made to your Facebook page(s) and Instagram account(s). Please review and ensure that the keyword '{0}' is included. The chatbot will automatically reach out to anyone replying to your post with {0}.</value>
   </data>
   <data name="UnitOfMeasure" xml:space="preserve">
     <value>Unit Of Measure</value>
@@ -658,7 +658,7 @@
     <value>{0} did not specify any instruction. Please contact {0} at {1}.</value>
   </data>
   <data name="AppName" xml:space="preserve">
-    <value>Corprio.SocialWorker</value>
+    <value>Corprio.SocialMediaWorker</value>
   </data>
   <data name="BillTo" xml:space="preserve">
     <value>Bill to</value>
@@ -694,7 +694,7 @@
     <value>Since delivery method was not configured, the customer was advised to contact the merchant via email.</value>
   </data>
   <data name="DocumentNum" xml:space="preserve">
-    <value>Document no.</value>
+    <value>Order number</value>
   </data>
   <data name="Edit" xml:space="preserve">
     <value>Edit</value>
@@ -969,11 +969,20 @@
   <data name="Warning_para3" xml:space="preserve">
     <value>You are about to disconnect {0} from your Facebook account. This action cannot be undone and has the following implications:</value>
   </data>
+  <data name="ErrMsg_BlankPostMsg" xml:space="preserve">
+    <value>Content of the post cannot be blank.</value>
+  </data>
   <data name="ErrMsg_InvalidBillPhone" xml:space="preserve">
     <value>Please provide a valid phone number for billing.</value>
   </data>
   <data name="ErrMsg_InvalidDeliveryPhone" xml:space="preserve">
     <value>Please provide a valid phone number for delivery.</value>
+  </data>
+  <data name="ErrMsg_InvalidOrgID" xml:space="preserve">
+    <value>Invalid organization ID.</value>
+  </data>
+  <data name="ErrMsg_InvalidProductID" xml:space="preserve">
+    <value>Invalid product ID.</value>
   </data>
   <data name="ErrMsg_NoPaymentMethod" xml:space="preserve">
     <value>The merchant has not set up payment method.</value>

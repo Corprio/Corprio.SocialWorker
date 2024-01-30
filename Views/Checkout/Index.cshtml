@@ -8,7 +8,7 @@
 @model CheckoutViewModel
 @{
     Layout = "_PublicLayout";
-    Guid organizationID = Context.SelectedOrganizationID() ?? Guid.Empty;    
+    Guid organizationID = Model.OrganizationID;    
     string appUrl = configuration["AppBaseUrl"];
     string paymentPortalUrl = configuration["PaymentAppUrl"];
     
@@ -101,7 +101,7 @@
             isPaymentClicked: '@Model.IsPaymentClicked',
             isPreview: '@Model.IsPreview',
             orderLineJsonString: '@Model.OrderLineJsonString',
-            organizationID: '@Model.OrganizationID',
+            organizationID: '@organizationID',
             organizationEmailAddress: '@Model.OrganizationEmailAddress',
             organizationShortName: '@Model.OrganizationShortName',
             provideShipping: '@Model.ProvideDelivery',
@@ -117,28 +117,26 @@
 <div class="m-4">
     <div class="checkout-container">
         <div class="title-border-l">
-            <h3>@localizer["Checkout"]</h3>
+            <h2>@Model.OrganizationShortName</h2>
         </div>
-
+        
+        <div class="d-flex justify-content-between mb-4">
+            <h4>@localizer["Checkout"]</h4>
+            <div class="d-flex flex-column">
+                <div class="order-ref d-flex justify-content-between">
+                    <div class="my-1 mr-2"><b>@localizer["OrderDate"]:</b></div>
+                    <div class="my-1 mr-2">@Model.OrderDate.ToString("d", new CultureInfo(Model.Language))</div>
+                </div>
+                <div class="order-ref d-flex justify-content-between">
+                    <div class="my-1 mr-2"><b>@localizer["DocumentNum"]:</b></div>
+                    <div class="my-1 mr-2">@Model.DocumentNum</div>
+                </div>
+            </div>
+        </div>
+                
         <div>
             <div id="reminderPopup"></div>
-
-            <section class="row mb-4">
-                <div class="col order-ref">
-                    <div class="input-group mb-3 mr-2">
-                        <label class="my-1 mr-2" for="document-date">@localizer["OrderDate"]</label>
-                        <input type="text" id="document-date" class="text-right" value="@Model.OrderDate.ToString("d", new CultureInfo("zh-HK"))" disabled />
-                    </div>
-                </div>
-
-                <div class="col order-ref">
-                    <div class="input-group mb-3 mr-2">
-                        <label class="my-1 mr-2" for="document-number">@localizer["DocumentNum"]</label>
-                        <input type="text" id="document-number" class="text-right" value="@Model.DocumentNum" disabled />
-                    </div>
-                </div>
-            </section>
-
+            
             <section class="table-responsive">
                 <div class="d-flex justify-content-between mb-2">
                     <h5 class="">@localizer["ShoppingCart"]</h5>

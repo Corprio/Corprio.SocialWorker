@@ -27,15 +27,23 @@ namespace Corprio.SocialWorker.Controllers
 {
     public class ProductPublicationController : MetaApiController
     {
-        private readonly ApplicationDbContext db;        
+        private readonly ApplicationDbContext db;
+        private readonly APIClient corprioClient;
+        private readonly HttpClient httpClient;
+        private readonly ApplicationSettingService applicationSettingService;
 
         /// <summary>
         /// Constructor
         /// </summary>
+        /// <param name="context"></param>
         /// <param name="configuration"></param>
-        public ProductPublicationController(ApplicationDbContext context, IConfiguration configuration) : base(configuration)
+        public ProductPublicationController(ApplicationDbContext context, APIClient corprioClient, HttpClient httpClient, 
+            ApplicationSettingService applicationSettingService, IConfiguration configuration) : base(configuration)
         {
             db = context;
+            this.corprioClient = corprioClient;
+            this.httpClient = httpClient;
+            this.applicationSettingService = applicationSettingService;
         }
 
         /// <summary>
@@ -50,28 +58,26 @@ namespace Corprio.SocialWorker.Controllers
 
         /// <summary>
         /// Retrieve entity property values
-        /// </summary>
-        /// <param name="corprio">Client for executing API requests among Corprio projects</param>
+        /// </summary>        
         /// <param name="organizationID">Organization ID</param>
         /// <param name="propertyName">Name of EP to be retrieved</param>        
         /// <returns></returns>
         [OrganizationNeeded(false)]
         [HttpGet("/ProductPublication/GetDistinctProductPropertyValues")]
-        public Task<IEnumerable<string>> GetDistinctProductPropertyValues([FromServices] APIClient corprio, Guid organizationID, string propertyName)
+        public Task<IEnumerable<string>> GetDistinctProductPropertyValues(Guid organizationID, string propertyName)
         {
-            return corprio.ProductApi.GetDistinctPropertyValues(organizationID: organizationID, propertyName: propertyName);
+            return corprioClient.ProductApi.GetDistinctPropertyValues(organizationID: organizationID, propertyName: propertyName);
         }
 
         /// <summary>
         /// Return a page of records
-        /// </summary>
-        /// <param name="corprioClient">API client</param>
+        /// </summary>        
         /// <param name="loadOptions">DataGrid datasource load options</param>
         /// <returns>Paged records to be shown in DataGrid</returns>
         [OrganizationAuthorizationCheck(
             ActionEntityTypes = new EntityType[] { EntityType.Product },
             RequiredPermissions = new DataAction[] { DataAction.Read })]
-        public async Task<IActionResult> GetPage([FromServices] APIClient corprioClient, DataSourceLoadOptions loadOptions)
+        public async Task<IActionResult> GetPage(DataSourceLoadOptions loadOptions)
         {
             var orgInfo = await corprioClient.OrganizationApi.GetCoreInfo(OrganizationID);
             PagedList<dynamic> list = await corprioClient.ProductApi.QueryPage(
@@ -87,38 +93,16 @@ namespace Corprio.SocialWorker.Controllers
             return Json(pagedList.ToLoadResult());
         }
 
-        /// <summary>
-        /// Publish a product to social media
-        /// </summary>
-        /// <param name="httpClient">HTTP client for executing API query</param>
-        /// <param name="corprioClient">Client for Api requests among Corprio projects</param>
-        /// <param name="applicationSettingService">Application setting service</param>
-        /// <param name="organizationID">Organization ID</param>
-        /// <param name="productID">ID of the product to be published</param>
-        /// <returns>Status code</returns>
-        /// <exception cref="Exception"></exception>
         [HttpPost]
-        public async Task<IActionResult> PublishProduct([FromServices] HttpClient httpClient, [FromServices] APIClient corprioClient,
-            [FromServices] ApplicationSettingService applicationSettingService, [FromRoute] Guid organizationID, Guid productID)
+        public async Task<PostTemplateSummary> PreviewProductPost([FromRoute] Guid organizationID, Guid productID)
         {
-            if (productID.Equals(Guid.Empty)) throw new Exception("Product ID is invalid.");
-            List<string> errorMessages = new();
-            MetaUser metaUser = db.MetaUsers.Include(x => x.Pages).FirstOrDefault(x => x.OrganizationID == organizationID && x.Dormant == false)
-                ?? throw new Exception(Resources.SharedResource.ResourceManager.GetString("ErrMsg_ValidMetaProfileNotFound"));
-
-            if (metaUser.Pages.Count == 0)
-            {
-                errorMessages.Add($"{organizationID} has no pages to publish product {productID}.");
-                Log.Information(errorMessages.Last());
-                return StatusCode(400, errorMessages);
-            }
-
+            if (productID.Equals(Guid.Empty)) throw new Exception(Resources.SharedResource.ErrMsg_InvalidProductID);
             Product product = await corprioClient.ProductApi.Get(organizationID: organizationID, id: productID)
-                ?? throw new Exception($"Product {productID} cannot be found.");
+                ?? throw new Exception(Resources.SharedResource.ErrMsg_ProductNotFound);
             OrganizationCoreInfo coreInfo = await corprioClient.OrganizationApi.GetCoreInfo(organizationID)
-                ?? throw new Exception($"Failed to get core information of organization {organizationID}.");
+                ?? throw new Exception(Resources.SharedResource.ErrMsg_OrganizationInfoNotFound);
             ApplicationSetting applicationSetting = await applicationSettingService.GetSetting<ApplicationSetting>(organizationID)
-                ?? throw new Exception($"Failed to retrieve application setting of organization {organizationID}.");            
+                ?? throw new Exception(Resources.SharedResource.ErrMsg_AppSettingNotFound);
             PriceWithCurrency price = null;
             if (applicationSetting.ProductPostTemplate?.Contains(TemplateComponent.ProductPublicPrice) ?? false)
             {
@@ -129,11 +113,48 @@ namespace Corprio.SocialWorker.Controllers
                     quantity: new Quantity { UOMCode = product.ListPrice_UOMCode, Value = 1 },
                     currencyCode: coreInfo.CurrencyCode);
             }
-            string message = applicationSetting.ProductPostMessage(product: product, coreInfo: coreInfo, publicPrice: price);
+
+            PostTemplateSummary summary = new() { 
+                Keyword = applicationSetting.KeywordForShoppingIntention,
+                Preview = applicationSetting.ProductPostMessage(product: product, coreInfo: coreInfo, publicPrice: price), 
+            };
+            return summary;            
+        }
+
+        /// <summary>
+        /// Publish a product to social media
+        /// </summary>        
+        /// <param name="organizationID">Organization ID</param>
+        /// <param name="productID">ID of the product to be published</param>
+        /// <param name="message">Text to be included in the post</param>
+        /// <returns>Status code</returns>
+        /// <exception cref="Exception"></exception>
+        [HttpPost]
+        public async Task<IActionResult> PublishProduct([FromRoute] Guid organizationID, Guid productID, string message)
+        {
+            if (productID.Equals(Guid.Empty)) throw new Exception(Resources.SharedResource.ErrMsg_InvalidProductID);
+            if (string.IsNullOrWhiteSpace(message)) throw new Exception(Resources.SharedResource.ErrMsg_BlankPostMsg);
+            message = UtilityHelper.UncleanAndClean(userInput: message, onceIsOK: true);
+            List<string> errorMessages = [];
+            MetaUser metaUser = db.MetaUsers.Include(x => x.Pages).FirstOrDefault(x => x.OrganizationID == organizationID && x.Dormant == false)
+                ?? throw new Exception(Resources.SharedResource.ErrMsg_ValidMetaProfileNotFound);
+
+            if (metaUser.Pages.Count == 0)
+            {
+                errorMessages.Add($"{organizationID} has no Facebook pages to publish product {productID}.");
+                Log.Information(errorMessages.Last());
+                return StatusCode(400, errorMessages);
+            }
+
+            Product product = await corprioClient.ProductApi.Get(organizationID: organizationID, id: productID)
+                ?? throw new Exception(Resources.SharedResource.ErrMsg_ProductNotFound);
+            ApplicationSetting applicationSetting = await applicationSettingService.GetSetting<ApplicationSetting>(organizationID)
+                ?? throw new Exception(Resources.SharedResource.ErrMsg_AppSettingNotFound);
 
             // we need to use a set because child products may share the same image(s) with their parent or peers
             HashSet<Guid> imageIds = UtilityHelper.ReturnImageUrls(product);
-            if (product.IsMasterProduct && (product.Variations?.Any() ?? false))
+            product.Variations ??= [];
+            if (product.IsMasterProduct && product.Variations.Count > 0)
             {
                 PagedList<Product> childProducts;
                 int pageNum = 0;
@@ -147,7 +168,7 @@ namespace Corprio.SocialWorker.Controllers
                         {
                             PageIndex = pageNum,
                             RequireTotalCount = false,
-                            Sort = new SortingInfo[] { new SortingInfo { Desc = false, Selector = "ID" } }
+                            Sort = [new SortingInfo { Desc = false, Selector = "ID" }]
                         });
                     pageNum++;
 
@@ -159,7 +180,7 @@ namespace Corprio.SocialWorker.Controllers
                 while (childProducts?.HasNextPage ?? false);
             }
 
-            List<string> imageUrls = new();
+            List<string> imageUrls = [];
             string imageUrlKey, imageUrl;
             foreach (Guid imageId in imageIds)
             {
@@ -175,12 +196,12 @@ namespace Corprio.SocialWorker.Controllers
 
             string postId;
             MetaPost post;
-            product.EntityProperties ??= new List<EntityProperty>();
+            product.EntityProperties ??= [];
             bool success = true;
             foreach (MetaPage page in metaUser.Pages)
             {                
                 // note: if there are no images to begin with, we simply don't attempt to post anything to IG
-                if (!string.IsNullOrWhiteSpace(page.InstagramID) && imageUrls.Any())
+                if (!string.IsNullOrWhiteSpace(page.InstagramID) && imageUrls.Count > 0)
                 {
                     postId = await MakeIgCarouselPost(httpClient: httpClient, accessToken: page.Token, igUserId: page.InstagramID,
                         mediaUrls: imageUrls, message: message);

@@ -124,7 +124,7 @@ namespace Corprio.SocialWorker.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Corprio.SocialWorker.
+        ///   Looks up a localized string similar to Corprio.SocialMediaWorker.
         /// </summary>
         public static string AppName {
             get {
@@ -538,7 +538,7 @@ namespace Corprio.SocialWorker.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Document no..
+        ///   Looks up a localized string similar to Order number.
         /// </summary>
         public static string DocumentNum {
             get {
@@ -628,6 +628,15 @@ namespace Corprio.SocialWorker.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Content of the post cannot be blank..
+        /// </summary>
+        public static string ErrMsg_BlankPostMsg {
+            get {
+                return ResourceManager.GetString("ErrMsg_BlankPostMsg", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to We tried to restore this sales order to the chatbot conversing with you but failed. Please confirm if you wish to simply void this order..
         /// </summary>
         public static string ErrMsg_ChatbotNotFound {
@@ -678,6 +687,24 @@ namespace Corprio.SocialWorker.Resources {
         public static string ErrMsg_InvalidDeliveryPhone {
             get {
                 return ResourceManager.GetString("ErrMsg_InvalidDeliveryPhone", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid organization ID..
+        /// </summary>
+        public static string ErrMsg_InvalidOrgID {
+            get {
+                return ResourceManager.GetString("ErrMsg_InvalidOrgID", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid product ID..
+        /// </summary>
+        public static string ErrMsg_InvalidProductID {
+            get {
+                return ResourceManager.GetString("ErrMsg_InvalidProductID", resourceCulture);
             }
         }
         
@@ -1654,7 +1681,7 @@ namespace Corprio.SocialWorker.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Do you want to publish this product? A post will be made to your Facebook page(s) and Instagram account(s)..
+        ///   Looks up a localized string similar to The following post will be made to your Facebook page(s) and Instagram account(s). Please review and ensure that the keyword &apos;{0}&apos; is included. The chatbot will automatically reach out to anyone replying to your post with {0}..
         /// </summary>
         public static string PublishProductPrompt {
             get {

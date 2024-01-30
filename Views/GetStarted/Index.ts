@@ -528,7 +528,7 @@ function handleFbLoginStatusChange(response: facebook.StatusResponse) {
 /**
  * Validate and submit the setting to backend for saving 
  */
-function saveSettings() {
+function saveSettings(previewCheckout: boolean, previewThankyou: boolean) {
     let validationResult = DevExpress.validationEngine.validateGroup();
     if (!validationResult.isValid) { return; }
     
@@ -566,7 +566,15 @@ function saveSettings() {
         cache: false,
         contentType: false,
         processData: false,
-        success: function (result) {
+        success: function () {
+            if (previewCheckout) {
+                window.open(`/${vdata.settings.organizationID}/GetStarted/PreviewCheckout`, '_blank');
+                return;
+            }
+            if (previewThankyou) {
+                window.open(`/${vdata.settings.organizationID}/GetStarted/PreviewThankYou`, '_blank');
+                return;
+            }
             DevExpress.ui.notify(vdata.localizer.msgSettingSaved, 'success');
         },
         error: corprio.formatError
@@ -808,15 +816,11 @@ $(function () {
     initializeGlobalVariables();    
     AssignEventListenersForTemplates(MessageType.CataloguePost);    
     AssignEventListenersForTemplates(MessageType.ProductPost);    
-    $(Selector.saveSettingButtons).on('click', saveSettings);
+    $(Selector.saveSettingButtons).on('click', function () { saveSettings(false, false) });
 
     // miscellaneous
-    $('#preview-checkout').on('click', function () {
-        window.open(`/${vdata.settings.organizationID}/GetStarted/PreviewCheckout`, '_blank');
-    });
-    $('#preview-thank-you').on('click', function () {
-        window.open(`/${vdata.settings.organizationID}/GetStarted/PreviewThankYou`, '_blank');
-    });    
+    $('#preview-checkout').on('click', function () { saveSettings(true, false) });
+    $('#preview-thank-you').on('click', function () { saveSettings(false, true) });
     
     corprio.page.initTour({ defaultTour: 'getstarted.index', autoStart: true, driverCssLoaded: true }); // must set driverCssLoaded to true    
 });

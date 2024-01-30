@@ -42,6 +42,7 @@ namespace Corprio.SocialWorker.Controllers
         /// Constructor
         /// </summary>
         /// <param name="context"></param>
+        /// <param name="configuration"></param>
         /// <param name="applicationSettingService"></param>
         public CheckoutController(ApplicationDbContext context, IConfiguration configuration, 
             ApplicationSettingService applicationSettingService) : base()
@@ -55,18 +56,25 @@ namespace Corprio.SocialWorker.Controllers
         /// Returns a view for customers to perform checkout
         /// </summary>
         /// <param name="httpClientFactory">HttpClientFactory for resolving the httpClient for client access</param>
-        /// <param name="organizationID">Organization ID</param>
+        /// <param name="orgID">Organization ID or short name</param>
         /// <param name="salesOrderID">Sales order ID</param>
         /// <param name="ui">Culture name for user interface in the format of languagecode2-country/regioncode2</param>
         /// <returns>View</returns>
         [AllowAnonymous]
         [OrganizationNeeded(false)]
-        [HttpGet("/{organizationID:guid}/checkout/{salesOrderID:guid}")]
+        [HttpGet("/{orgID}/checkout/{salesOrderID:guid}")]
         public async Task<IActionResult> Checkout([FromServices] IHttpClientFactory httpClientFactory,
-            [FromRoute] Guid organizationID, [FromRoute] Guid salesOrderID, [FromQuery] string ui)
+            [FromRoute] string orgID, [FromRoute] Guid salesOrderID, [FromQuery] string ui)
         {
+            // cannot use ApiClient because this method is called by anonymous users
             HttpClient httpClient = httpClientFactory.CreateClient("appClient");
             var corprioClient = new APIClient(httpClient);
+            
+            if (!Guid.TryParse(orgID, out Guid organizationID))
+            {
+                organizationID = await corprioClient.OrganizationApi.GetOrganizationID(orgID);
+            }
+            if (organizationID == Guid.Empty) return StatusCode(400, Resources.SharedResource.ErrMsg_InvalidOrgID);
 
             SalesOrder salesOrder = await corprioClient.SalesOrderApi.Get(organizationID: organizationID, id: salesOrderID);
             if (salesOrder == null) return NotFound(Resources.SharedResource.ErrMsg_SalesOrderNotFound);

@@ -46,7 +46,7 @@ namespace Corprio.SocialWorker.Controllers
             
             ApiVersion = configuration["MetaApiSetting:ApiVersion"];
             BaseUrl = configuration["MetaApiSetting:BaseUrl"];
-            AppSecret = "b8956ab840c1d15a8bb0bee5551a6ccb"; // Put this in a vault!!!
+            AppSecret = configuration["MetaApiSetting:AppSecret"];
         }
 
         /// <summary>

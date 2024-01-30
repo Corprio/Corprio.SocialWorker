@@ -121,8 +121,9 @@ namespace Corprio.SocialWorker.Models
         /// <param name="product">The product to be published</param>
         /// <param name="coreInfo">The organization's core information</param>
         /// <param name="publicPrice">The product's price for walk-in customers</param>
+        /// <param name="adhocEdit">Adhoc edits made to the post message</param>
         /// <returns>The post to be made in social media</returns>
-        public string ProductPostMessage(Product product, OrganizationCoreInfo coreInfo, PriceWithCurrency publicPrice)
+        public string ProductPostMessage(Product product, OrganizationCoreInfo coreInfo, PriceWithCurrency publicPrice, AdhocEditOptions adhocEdit = null)
         {
             if (product == null) return null;
             string message = !string.IsNullOrWhiteSpace(ProductPostTemplate)
@@ -137,7 +138,17 @@ namespace Corprio.SocialWorker.Models
                 .Replace(TemplateComponent.ProductDescription, product.Description)
                 .Replace(TemplateComponent.ProductListPrice, $"{product.ListPrice_CurrencyCode}{product.ListPrice_Value:F2}")
                 .Replace(TemplateComponent.ProductPublicPrice, $"{publicPrice?.CurrencyCode}{publicPrice?.Price?.Value?.ToString("F2")}")
-                .Replace(TemplateComponent.Separator, "");
+                .Replace(TemplateComponent.Separator, "");            
+            if (adhocEdit == null) return UtilityHelper.UncleanAndClean(userInput: message, onceIsOK: false);
+
+            if (!string.IsNullOrWhiteSpace(adhocEdit.AdhocMsgTop))
+            {
+                message = adhocEdit.AdhocMsgTop + (adhocEdit.AdhocNewlineTop ? "\n\n" : "\n") + message;                
+            }
+            if (!string.IsNullOrWhiteSpace(adhocEdit.AdhocMsgBottom))
+            {
+                message += (adhocEdit.AdhocNewlineBottom ? "\n\n" : "\n") + adhocEdit.AdhocMsgBottom;
+            }
             return UtilityHelper.UncleanAndClean(userInput: message, onceIsOK: true);
         }
 
@@ -222,7 +233,7 @@ namespace Corprio.SocialWorker.Models
     /// Definition of standard template component
     /// </summary>
     public class TemplateComponent
-    {
+    {        
         public const string LineBreak = "%lineBreak%";
         public const string Separator = "%;sep;%";
         public const string DefaultMessage = "%defaultMessage%";
@@ -238,5 +249,29 @@ namespace Corprio.SocialWorker.Models
         public const string ProductListPrice = "%productListPrice%";
         public const string ProductPublicPrice = "%productPublicPrice%";
         public const string Keyword = "%keyWord%";
+    }
+
+    /// <summary>
+    /// Options for customising a post
+    /// </summary>
+    public class AdhocEditOptions
+    {
+        public string AdhocMsgTop { get; set; }
+
+        public bool AdhocNewlineTop { get; set; }
+
+        public string AdhocMsgBottom { get; set; }
+
+        public bool AdhocNewlineBottom { get; set; }
+    }
+
+    /// <summary>
+    /// Feedback to frontend, summarising the post template
+    /// </summary>
+    public class PostTemplateSummary
+    {
+        public string Keyword { get; set; }
+
+        public string Preview { get; set; }        
     }
 }

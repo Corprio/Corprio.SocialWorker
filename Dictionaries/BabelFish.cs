@@ -80,9 +80,9 @@ namespace Corprio.SocialWorker.Dictionaries
             },            
             ["CodeSent"] = new Dictionary<BotLanguage, string>()
             {
-                [BotLanguage.English] = "A confirmation code has been sent to your email address. Please input the code to complete the transaction. ",
-                [BotLanguage.TraditionalChinese] = "確認碼已發送至您的電子郵件信箱。請輸入確認碼以繼續交易。",
-                [BotLanguage.SimplifiedChinese] = "确认码已发送至您的电子邮件信箱。请输入确认码以继续交易。",
+                [BotLanguage.English] = "A six-digit one-time password (OTP) has been sent to email {0}. Please input the OTP in 24 hours. If you wish to use another email address for receiving the OTP, please input {1}.",
+                [BotLanguage.TraditionalChinese] = "一個六位數字的一次性密碼已傳送至電子郵件地址 {0}。請在 24 小時內輸入該一次性密碼。如果您想使用其他電子郵件地址接收一次性密碼，請輸入 {1}。",
+                [BotLanguage.SimplifiedChinese] = "一个六位数字的一次性密码已传送至电子邮件地址 {0}。请在 24 小时内输入该一次性密码。如果您想使用其他电子邮件地址接收一次性密码，请输入 {1}。",
             },
             ["DefaultKeyWordForShoppingIntention"] = new Dictionary<BotLanguage, string>()
             {
@@ -164,9 +164,9 @@ namespace Corprio.SocialWorker.Dictionaries
             },
             ["Hint_Cancel"] = new Dictionary<BotLanguage, string>()
             {
-                [BotLanguage.English] = "(Note: You can input '!c' to cancel the current operation.) ",
-                [BotLanguage.TraditionalChinese] = "（提示：輸入「!c」可以取消目前操作。）",
-                [BotLanguage.SimplifiedChinese] = "（提示：输入「!c」可以取消目前操作。）",
+                [BotLanguage.English] = "(Note: You can input '{0}' to cancel the current operation.) ",
+                [BotLanguage.TraditionalChinese] = "（提示：輸入「{0}」可以取消目前操作。）",
+                [BotLanguage.SimplifiedChinese] = "（提示：输入「{0}」可以取消目前操作。）",
             },
             ["Hint_GenByBot"] = new Dictionary<BotLanguage, string>()
             {
