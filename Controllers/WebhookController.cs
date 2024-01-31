@@ -356,7 +356,8 @@ namespace Corprio.SocialWorker.Controllers
                         : db.MetaPages.Include(x => x.FacebookUser).ThenInclude(x => x.Bots).FirstOrDefault(x => x.PageId == messaging.Recipient.MetaID && x.FacebookUser.Dormant == false);
                     if (page?.FacebookUser?.OrganizationID == null)
                     {
-                        Log.Error($"Failed to find page based on recipient ID {messaging.Recipient.MetaID} and its associated objects.");
+                        Log.Error($"Failed to find page, and its associated objects, based on recipient ID {messaging.Recipient.MetaID}.");
+                        Log.Information($"SenderID: {messaging.Sender.MetaID}; ReceipientID: {messaging.Recipient.MetaID}; Message: {messaging.Message.Text}");
                         continue;
                     }                    
 
@@ -420,11 +421,13 @@ namespace Corprio.SocialWorker.Controllers
                 return StatusCode(200);
             }
             APIClient corprioClient = new(httpClientFactory.CreateClient("webhookClient"));
+            Log.Information($"Webhook content: {requestString}");
 
             // if the payload includes "Messaging" and one of its element has sender, then presumably it is for webhook on messages
             MessageWebhookPayload messageWebhookPayload = requestString == null ? null : JsonConvert.DeserializeObject<MessageWebhookPayload>(requestString)!;
             if (messageWebhookPayload?.Entry?.Any(x => x.Messaging?.Any(y => !string.IsNullOrWhiteSpace(y.Sender?.MetaID)) ?? false) ?? false)
-            {                
+            {
+                Log.Information("The webhook appears to be a message webhook.");
                 return await HandleMessageWebhook(httpClient: httpClient, corprioClient: corprioClient, 
                     applicationSettingService: applicationSettingService, payload: messageWebhookPayload);
             }
@@ -433,6 +436,7 @@ namespace Corprio.SocialWorker.Controllers
             FeedWebhookPayload feedWebhookPayload = requestString == null ? null : JsonConvert.DeserializeObject<FeedWebhookPayload>(requestString)!;
             if (feedWebhookPayload?.Entry?.Any(x => x.Changes?.Count > 0) ?? false)
             {
+                Log.Information("The webhook appears to be a feed webhook.");
                 return await HandleFeedWebhook(httpClient: httpClient, corprioClient: corprioClient,
                     applicationSettingService: applicationSettingService, payload: feedWebhookPayload);
             }
