@@ -615,6 +615,10 @@ function refreshAccessToken(metaId: string, accessToken: string) {
         error: function (jqXHR, textStatus, errorThrown) {
             $(Selector.saveSettingButtons).attr('disabled', 'disabled');            
 
+            if (jqXHR.status === 500) {
+                return FB.logout(checkLoginState);
+            }
+
             // note: 409 means that another organization is connected with the Facebook account
             if (jqXHR.status !== 409) {
                 $(Selector.fbDialogue2).empty();                

@@ -480,7 +480,7 @@ function prepareBillToFields(defCallingCode: string) {
             message: vdata.localizer.invalidFeedback_InvalidPhoneNumber,
             validationCallback: function (input) {
                 if (input.value == null || input.value == "" || input.value == undefined) return false;
-                return true;
+                return true;                
             }
         }]
     });

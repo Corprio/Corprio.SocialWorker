@@ -135,7 +135,7 @@ function editQtyTemplate(line) {
     $('<label class="flex-even">').html(vdata.localizer.quantity).appendTo($content);
     const $qtyDiv = $('<div class="flex-even mb-4">').appendTo($content);
     const $numBox = $qtyDiv.dxNumberBox({
-        width: String(Math.trunc(line.Quantity)).length * 8 + 92, // note: the quantity is orginally a decimal
+        width: String(Math.trunc(line.Quantity)).length * 8 + 92,
         value: Math.trunc(line.Quantity),
         max: line.DisallowOutOfStock ? Math.max(0, line.ProductStockLevel) : undefined,
         min: 0,
