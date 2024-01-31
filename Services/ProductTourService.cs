@@ -6,7 +6,7 @@ namespace Corprio.SocialWorker.Services
 {
     public class ProductTourService : IProductTourService
     {                                        
-        public ProductTour GetTour(string name, Guid? organizationID)
+        public ProductTour GetTour(string name, Guid? organizationID, bool isWideScreen)
         {                        
             return name switch
             {
