@@ -221,20 +221,20 @@ namespace Corprio.SocialWorker.Controllers
                     //await TestReachout(httpClient: httpClient, corprioClient: corprioClient, applicationSettingService: applicationSettingService);
                     //continue;
 
-                    // limitation: we can only process comment on a feed (i.e., we can't process comment on another comment)
+                    // assumption: we only process comment on a feed and ignore comment on another comment
                     if (change.Value.Media.MediaProductType != "FEED") continue;
 
-                    if (null != db.FeedWebhooks.FirstOrDefault(x => x.SenderID == change.Value.From.Id && x.PostID == change.Value.Media.Id))
+                    if (null != db.CommentWebhooks.FirstOrDefault(x => x.MediaItemID == change.Value.Media.Id && x.WebhookChangeID == change.Value.WebhookChangeID))
                     {
-                        // do not process the same webhook more than once
+                        Log.Information($"Ignoring duplicated webhook change {change.Value.WebhookChangeID} on media item {change.Value.Media.Id}.");
                         continue;
                     }
-
-                    db.FeedWebhooks.Add(new FeedWebhook
+                                        
+                    db.CommentWebhooks.Add(new CommentWebhook
                     {
                         ID = Guid.NewGuid(),                        
-                        PostID = change.Value.Media.Id,
-                        SenderID = change.Value.From.Id,
+                        MediaItemID = change.Value.Media.Id,
+                        WebhookChangeID = change.Value.WebhookChangeID,
                     });
                     await db.SaveChangesAsync();
 
@@ -337,8 +337,8 @@ namespace Corprio.SocialWorker.Controllers
 
                     if (null != db.FeedWebhooks.FirstOrDefault(x => x.CreatedTime == change.Value.CreatedTime
                         && x.SenderID == change.Value.From.Id && x.PostID == change.Value.PostId))
-                    {
-                        // do not process the same webhook more than once
+                    {                        
+                        Log.Information($"Ignoring duplicated webhook from {change.Value.From.Id} on post {change.Value.PostId} at {change.Value.CreatedTime}.");
                         continue;
                     }
 
@@ -444,18 +444,40 @@ namespace Corprio.SocialWorker.Controllers
             foreach (MessageWebhookEntry entry in payload.Entry)
             {
                 foreach (MessageWebhookMessaging messaging in entry.Messaging)
-                {                    
+                {
+                    if (string.IsNullOrWhiteSpace(messaging.Message?.Text))
+                    {
+                        // note: we move on to the next message instead of throwing errors
+                        Log.Error("The message's text is blank.");
+                        continue;
+                    }
+                    
+                    foreach (KeyValuePair<BotLanguage, string> phrase in BabelFish.Vocab["ChatbotSays"])
+                    {
+                        if (messaging.Message.Text.StartsWith(phrase.Value))
+                        {
+                            Log.Information($"Ignoring bot-generated message from {messaging.Recipient?.MetaID} to {messaging.Sender?.MetaID}");
+                            continue;
+                        }
+                    }
+
                     if (string.IsNullOrWhiteSpace(messaging.Recipient?.MetaID) || string.IsNullOrWhiteSpace(messaging.Sender?.MetaID))
                     {
                         // note: we move on to the next message instead of throwing errors
                         Log.Error($"Recipient/sender ID for \"{messaging.Message?.Text}\" is blank.");
                         continue;
+                    }                                        
+
+                    if (messaging.Message?.IsEcho == true || messaging.Sender.MetaID == entry.WebhookEntryID)
+                    {
+                        Log.Information($"Ignoring echo message from {messaging.Sender.MetaID}.");
+                        continue;
                     }
-                    
+
                     if (null != db.MessageWebhooks.FirstOrDefault(x => x.TimeStamp == messaging.Timestamp 
                         && x.SenderID == messaging.Sender.MetaID && x.RecipientID == messaging.Recipient.MetaID))
                     {                        
-                        // do not process the same webhook more than once
+                        Log.Information($"Ignoring duplicated webhook from {messaging.Sender.MetaID} to {messaging.Recipient.MetaID} at {messaging.Timestamp}.");
                         continue;
                     }
 
@@ -500,6 +522,7 @@ namespace Corprio.SocialWorker.Controllers
                     }
                     // note: the bot must respond with something in 30 seconds (source: https://developers.facebook.com/docs/messenger-platform/policy/responsiveness)
                     if (string.IsNullOrWhiteSpace(response)) response = bot.ThusSpokeBabel("Err_DefaultMsg");
+                    response = bot.ThusSpokeBabel("ChatbotSays") + response;
 
                     endPoint = payload.Object == "instagram" ? $"{BaseUrl}/{ApiVersion}/me/messages" : $"{BaseUrl}/{ApiVersion}/{messaging.Recipient.MetaID}/messages";
                     await ApiActionHelper.SendMessage(

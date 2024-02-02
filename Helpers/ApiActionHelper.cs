@@ -38,9 +38,10 @@ namespace Corprio.SocialWorker.Helpers
             {
                 if (!string.IsNullOrWhiteSpace(link)) queryParams.link = link;
 
-                if (photoIds?.Any() ?? false)
+                photoIds ??= [];
+                if (photoIds.Count > 0)
                 {
-                    List<object> media = new();
+                    List<object> media = [];
                     foreach (string photoId in photoIds)
                     {
                         media.Add(new { media_fbid = photoId });

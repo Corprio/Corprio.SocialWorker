@@ -18,7 +18,7 @@ namespace Corprio.SocialWorker.Models
         public DbSet<MetaPost> MetaPosts { get; set; }
         public DbSet<MessageWebhook> MessageWebhooks { get; set; }
         public DbSet<FeedWebhook> FeedWebhooks { get; set; }
-
+        public DbSet<CommentWebhook> CommentWebhooks { get; set; }
 
         //// https://devblogs.microsoft.com/dotnet/announcing-ef7-release-candidate-2/
         //// Note: didn't use Json column to store the bot statuses because it does not support collection of primitive types

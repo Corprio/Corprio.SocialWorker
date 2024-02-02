@@ -78,6 +78,12 @@ namespace Corprio.SocialWorker.Dictionaries
                 [BotLanguage.TraditionalChinese] = "{0}件{1}已加入到您的購物車。",
                 [BotLanguage.SimplifiedChinese] = "{0}件{1}已加入到您的购物车。",
             },            
+            ["ChatbotSays"] = new Dictionary<BotLanguage, string>()
+            {
+                [BotLanguage.English] = "Chatbot: ",
+                [BotLanguage.TraditionalChinese] = "機器人：",
+                [BotLanguage.SimplifiedChinese] = "机器人：",
+            },
             ["CodeSent"] = new Dictionary<BotLanguage, string>()
             {
                 [BotLanguage.English] = "A {0}-digit confirmation code has been sent to email {1}. Please input the code in {2} minutes. If you wish to use another email address for receiving the confirmation code, please input '{3}'.",

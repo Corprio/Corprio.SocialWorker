@@ -62,6 +62,12 @@ namespace Corprio.SocialWorker.Models
         public string Text { get; set; }
 
         /// <summary>
+        /// True if the webhook is an echo, i.e., repeating an OUTBOUND message
+        /// </summary>
+        [JsonProperty("is_echo")]
+        public bool? IsEcho { get; set; }
+
+        /// <summary>
         /// NLP-related properties provided by Wit.ai, which are available only if NLP has been turned on for the page
         /// </summary>
         [JsonProperty("nlp")]

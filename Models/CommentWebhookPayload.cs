@@ -15,8 +15,11 @@ namespace Corprio.SocialWorker.Models
 
     public class CommentWebhookEntry
     {
+        /// <summary>
+        /// Do not treat this ID as a unique identifier of webhook, as it can simply be the Facebook page's ID
+        /// </summary>
         [JsonProperty("id")]
-        public string Id { get; set; }
+        public string WebhookEntryID { get; set; }
 
         [JsonProperty("time")]
         public double Time { get; set; }
@@ -39,7 +42,7 @@ namespace Corprio.SocialWorker.Models
     public class CommentWebhookChangeValue
     {
         [JsonProperty("id")]
-        public string Id { get; set; }
+        public string WebhookChangeID { get; set; }
 
         [JsonProperty("parent_id")]
         public string ParentId { get; set; }
