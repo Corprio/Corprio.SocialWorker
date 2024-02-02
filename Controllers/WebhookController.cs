@@ -151,48 +151,7 @@ namespace Corprio.SocialWorker.Controllers
             }
             return botStatus;
         }
-
-        /// <summary>
-        /// Used for testing before the App goes live
-        /// </summary>
-        /// <param name="httpClient"></param>
-        /// <param name="corprioClient"></param>
-        /// <param name="applicationSettingService"></param>
-        /// <returns></returns>
-        private async Task TestReachout(HttpClient httpClient, APIClient corprioClient,
-            ApplicationSettingService applicationSettingService)
-        {
-            // for testing only
-            Guid testOrgID = Guid.Parse("3c83fe2b-fe0a-420c-af24-e76fcf5bd7e7");
-            Guid testMetaUserID = Guid.Parse("78144E5F-4596-435A-BB33-85F79767881D");
-            var testMetaUser = db.MetaUsers.Include(x => x.Pages).Include(x => x.Bots).FirstOrDefault(x => x.ID == testMetaUserID);
-            Guid testProductID = Guid.Parse("907D39F6-591D-4AFF-9D3A-C3CD4AF9E5C7");
-            //string testMetaID = "24266381753005180"; // this one is on FB
-            string testMetaID = "24286888740958239"; // this one is on IG
-            var setting = await applicationSettingService.GetSetting<ApplicationSetting>(testOrgID);
-            var botStatus = await ReinventTheBot(corprioClient: corprioClient, organizationID: testOrgID,
-                facebookUser: testMetaUser, interlocutorID: testMetaID);
-            var bot = new DomesticHelper(context: db, configuration: configuration, client: corprioClient,
-                organizationID: testOrgID, botStatus: botStatus,
-                pageName: testMetaUser.Pages.First().Name, setting: setting);
-            string message;
-            try
-            {
-                message = await bot.ReachOut(testProductID);
-            }
-            catch (Exception ex)
-            {
-                Log.Error($"Failed to reach out to sell {testProductID}. {ex.Message}");
-                return;
-            }
-            await ApiActionHelper.SendMessage(
-                httpClient: httpClient,
-                accessToken: testMetaUser.Pages.First().Token,
-                endPoint: $"{BaseUrl}/{ApiVersion}/{testMetaUser.Pages.First().PageId}/messages",
-                message: message,
-                recipientId: testMetaID);
-        }
-
+        
         /// <summary>
         /// Respond to webhook triggered by comments on IG media items
         /// </summary>
@@ -216,11 +175,7 @@ namespace Corprio.SocialWorker.Controllers
             foreach (CommentWebhookEntry entry in payload.Entry)
             {
                 foreach (CommentWebhookChange change in entry.Changes)
-                {
-                    //// for testing before the App goes live
-                    //await TestReachout(httpClient: httpClient, corprioClient: corprioClient, applicationSettingService: applicationSettingService);
-                    //continue;
-
+                {                    
                     // assumption: we only process comment on a feed and ignore comment on another comment
                     if (change.Value.Media.MediaProductType != "FEED") continue;
 
@@ -250,8 +205,8 @@ namespace Corprio.SocialWorker.Controllers
                     }
 
                     // note 1: we use the keyword stored at the post level, NOT at the user level, because the keyword may be udpated after a post is made
-                    // note 2: if the keyword is, for example, <a+>, then it was saved as &lt;a+&gt; in DB, while the user can input either <a+> or <A+>
-                    if (post.KeywordForShoppingIntention?.ToUpper() != UtilityHelper.UncleanAndClean(change.Value.Text.Trim()).ToUpper())
+                    // note 2: if the keyword is, for example, <a+>, then it was saved as &lt;a+&gt; in DB, while the user can input either <a+> or <A+>                    
+                    if (!string.Equals(post.KeywordForShoppingIntention, UtilityHelper.UncleanAndClean(change.Value.Text.Trim()), StringComparison.OrdinalIgnoreCase))
                         continue;
 
                     existingProducts = await corprioClient.ProductApi.Query(
@@ -291,6 +246,7 @@ namespace Corprio.SocialWorker.Controllers
                         Log.Error($"The bot failed to provide any message.");
                         continue;
                     }
+                    message = bot.ThusSpokeBabel("ChatbotSays") + message;
 
                     string endPoint = post.PostedWith == MetaProduct.Facebook
                         ? $"{BaseUrl}/{ApiVersion}/{post.FacebookPage.PageId}/messages"
@@ -330,11 +286,7 @@ namespace Corprio.SocialWorker.Controllers
             foreach (FeedWebhookEntry entry in payload.Entry)
             {
                 foreach (FeedWebhookChange change in entry.Changes)
-                {
-                    //// for testing before the App goes live
-                    //await TestReachout(httpClient: httpClient, corprioClient: corprioClient, applicationSettingService: applicationSettingService);
-                    //continue;
-
+                {                    
                     if (null != db.FeedWebhooks.FirstOrDefault(x => x.CreatedTime == change.Value.CreatedTime
                         && x.SenderID == change.Value.From.Id && x.PostID == change.Value.PostId))
                     {                        
@@ -363,8 +315,8 @@ namespace Corprio.SocialWorker.Controllers
                     }                    
 
                     // note 1: we use the keyword stored at the post level, NOT at the user level, because the keyword may be udpated after a post is made
-                    // note 2: if the keyword is, for example, <a+>, then it was saved as &lt;a+&gt; in DB, while the user can input either <a+> or <A+>
-                    if (post.KeywordForShoppingIntention?.ToUpper() != UtilityHelper.UncleanAndClean(change.Value.Message.Trim()).ToUpper())
+                    // note 2: if the keyword is, for example, <a+>, then it was saved as &lt;a+&gt; in DB, while the user can input either <a+> or <A+>                    
+                    if (!string.Equals(post.KeywordForShoppingIntention, UtilityHelper.UncleanAndClean(change.Value.Message.Trim()), StringComparison.OrdinalIgnoreCase)) 
                         continue;
 
                     existingProducts = await corprioClient.ProductApi.Query(
@@ -388,6 +340,7 @@ namespace Corprio.SocialWorker.Controllers
                     bot = new DomesticHelper(context: db, configuration: configuration, client: corprioClient,
                         organizationID: post.FacebookPage.FacebookUser.OrganizationID,
                         botStatus: botStatus, pageName: post.FacebookPage.Name, setting: setting);
+                    
                     string message;
                     try
                     {
@@ -398,12 +351,12 @@ namespace Corprio.SocialWorker.Controllers
                         Log.Error($"Failed to reach out to sell {productId}. {ex.Message}");
                         continue;
                     }
-
                     if (string.IsNullOrWhiteSpace(message))
                     {
                         Log.Error($"The bot failed to provide any message.");
                         continue;
                     }
+                    message = bot.ThusSpokeBabel("ChatbotSays") + message;
 
                     string endPoint = post.PostedWith == MetaProduct.Facebook
                         ? $"{BaseUrl}/{ApiVersion}/{post.FacebookPage.PageId}/messages"
@@ -452,14 +405,11 @@ namespace Corprio.SocialWorker.Controllers
                         continue;
                     }
                     
-                    foreach (KeyValuePair<BotLanguage, string> phrase in BabelFish.Vocab["ChatbotSays"])
+                    if (BabelFish.Vocab["ChatbotSays"].Any(x => messaging.Message.Text.StartsWith(x.Value)))
                     {
-                        if (messaging.Message.Text.StartsWith(phrase.Value))
-                        {
-                            Log.Information($"Ignoring bot-generated message from {messaging.Recipient?.MetaID} to {messaging.Sender?.MetaID}");
-                            continue;
-                        }
-                    }
+                        Log.Information($"Ignoring bot-generated message from {messaging.Recipient?.MetaID} to {messaging.Sender?.MetaID}");
+                        continue;
+                    }                    
 
                     if (string.IsNullOrWhiteSpace(messaging.Recipient?.MetaID) || string.IsNullOrWhiteSpace(messaging.Sender?.MetaID))
                     {

@@ -135,7 +135,7 @@ function editQtyTemplate(line) {
     $('<label class="flex-even">').html(vdata.localizer.quantity).appendTo($content);
     const $qtyDiv = $('<div class="flex-even mb-4">').appendTo($content);
     const $numBox = $qtyDiv.dxNumberBox({
-        width: String(Math.trunc(line.Quantity)).length * 8 + 92, // note: the quantity is orginally a decimal
+        width: String(Math.trunc(line.Quantity)).length * 8 + 108,
         value: Math.trunc(line.Quantity),
         max: line.DisallowOutOfStock ? Math.max(0, line.ProductStockLevel) : undefined,
         min: 0,
@@ -178,7 +178,7 @@ function editQtyTemplate(line) {
                 return;
             }
             line.Quantity = changedValue;
-            $qtyDiv.css('width', String(changedValue).length * 8 + 92); // re-adjust the width if necessary            
+            $qtyDiv.css('width', String(changedValue).length * 8 + 108); // re-adjust the width if necessary            
         },
         onInput: function (e) {
             const value = +$(e.event.target).val();

@@ -1182,7 +1182,7 @@ namespace Corprio.SocialWorker.Helpers
             if (string.IsNullOrWhiteSpace(input)) return null;
 
             input = input.Trim();
-            if (input.Equals(KillCode, StringComparison.CurrentCultureIgnoreCase)) return await HandleCancel();
+            if (input.Equals(KillCode, StringComparison.OrdinalIgnoreCase)) return await HandleCancel();
             
             switch (Bot.ThinkingOf)
             {
