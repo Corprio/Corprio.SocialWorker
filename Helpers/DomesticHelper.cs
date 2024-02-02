@@ -20,6 +20,7 @@ using Corprio.DataModel.Business.Sales.ViewModel;
 using Microsoft.Extensions.Configuration;
 using Corprio.DataModel.Business.Logistic;
 using System.Net.Mail;
+using System.ServiceModel.Channels;
 
 namespace Corprio.SocialWorker.Helpers
 {
@@ -40,6 +41,10 @@ namespace Corprio.SocialWorker.Helpers
         // magic numbers
         private const int ChoiceLimit = 10;
         private const string KillCode = "!c";
+        private const int OTP_MaxFailedAttempts = 3;
+        private const int OTP_Length = 6;
+        private const int OTP_SecondsToExpire = 120;
+        private const string OTP_Characters = "0123456789";
 
         /// <summary>
         /// Constructor
@@ -746,8 +751,7 @@ namespace Corprio.SocialWorker.Helpers
             if (clearCustomer)
             {
                 Bot.BuyerEmail = null;
-                Bot.OTP_Code = null;
-                Bot.OTP_ExpiryTime = null;                
+                Bot.OtpSessionID = null;
             }
             if (clearCart) Bot.Cart.Clear();
             await Save();
@@ -801,20 +805,28 @@ namespace Corprio.SocialWorker.Helpers
                 await Save();
                 return await AskQuestion();
             }
-            
-            var rand = new Random();
-            string OTP = rand.Next(1000000).ToString("D6");
-            var message = new EmailMessage
-            {
-                Subject = ThusSpokeBabel(key: "Email_subject", placeholders: [PageName]),
-                Body = ThusSpokeBabel(key: "Email_body", placeholders: [OTP]),
-                ToEmails = new EmailAddress[] { new EmailAddress(Bot.BuyerEmail) }
-            };
+
+            Guid sessionID;
             try
             {
-                await Client.OrganizationApi.SendEmail(organizationID: OrgID, emailMessage: message);
+                sessionID = await Client.OTPApi.RequestOTP(
+                    organizationID: OrgID, 
+                    otpRequest: new OTPRequest 
+                    { 
+                        Method = "email",
+                        Identifier = Bot.BuyerEmail,
+                        Options = new OTPOptions
+                        {
+                            MaxFailedAttempts = OTP_MaxFailedAttempts,
+                            TimeoutPeriod = OTP_SecondsToExpire,
+                            OTPLength = OTP_Length,
+                            PasswordCharacters = OTP_Characters,
+                            EmailSubject = ThusSpokeBabel(key: "Email_subject", placeholders: [PageName]),
+                            Message = ThusSpokeBabel("Email_body"),
+                        }
+                    });
             }
-            catch (Exception ex)
+            catch (ApiExecutionException ex)
             {
                 Log.Error($"Failed to send OTP to {Bot.BuyerEmail}. {ex.Message}");
                 Bot.ThinkingOf = BotTopic.EmailOpen;
@@ -822,12 +834,11 @@ namespace Corprio.SocialWorker.Helpers
                 await Save();
                 return $"{ThusSpokeBabel("Err_UndeliveredOTP")}";
             }
-
+            
             Bot.ThinkingOf = BotTopic.EmailConfirmationOpen;
-            Bot.OTP_Code = OTP;
-            Bot.OTP_ExpiryTime = DateTimeOffset.UtcNow.AddDays(1);
+            Bot.OtpSessionID = sessionID;            
             await Save();
-            return ThusSpokeBabel(key: "CodeSent", placeholders: [Bot.BuyerEmail, KillCode]);
+            return ThusSpokeBabel(key: "CodeSent", placeholders: [OTP_Length.ToString(), Bot.BuyerEmail, (OTP_SecondsToExpire/60).ToString(), KillCode]);
         }
 
         /// <summary>
@@ -1094,8 +1105,7 @@ namespace Corprio.SocialWorker.Helpers
 
                 case BotTopic.EmailConfirmationOpen:
                     Bot.BuyerEmail = null;
-                    Bot.OTP_Code = null;
-                    Bot.OTP_ExpiryTime = null;
+                    Bot.OtpSessionID = null;
                     if (Bot.BuyerCorprioID != null)
                     {
                         Log.Error($"The topic was {Bot.ThinkingOf} when the bot already had the customer ID.");
@@ -1156,8 +1166,7 @@ namespace Corprio.SocialWorker.Helpers
                 Bot.ThinkingOf = BotTopic.NewCustomerYN;
                 Bot.PostedProductID = productId;
                 Bot.BuyerEmail = null;
-                Bot.OTP_Code = null;
-                Bot.OTP_ExpiryTime = null;
+                Bot.OtpSessionID = null;
             }            
             await Save();
             return Bot.ThinkingOf == BotTopic.ProductOpen ? await SelectProduct(productId) : await AskQuestion();
@@ -1241,9 +1250,9 @@ namespace Corprio.SocialWorker.Helpers
                     return await ConfirmEmail(input);
 
                 case BotTopic.EmailConfirmationOpen:                    
-                    if (string.IsNullOrWhiteSpace(Bot.OTP_Code))
+                    if (Bot.OtpSessionID == null)
                     {
-                        Log.Error("The bot did not have an OTP in the memory for email validation.");
+                        Log.Error("The bot did not have an OTP session ID in the memory for email validation.");
                         return await SoftReboot(clearCustomer: true);
                     }
 
@@ -1252,12 +1261,19 @@ namespace Corprio.SocialWorker.Helpers
                         Log.Error("The bot did not have the customer's email but was doing email confirmation.");
                         return await SoftReboot(clearCustomer: true);
                     }
-                    
-                    if (input != Bot.OTP_Code || DateTimeOffset.Now > Bot.OTP_ExpiryTime)
-                        return $"{ThusSpokeBabel("Err_InvalidOTP")}\n{await SendOTP()}";
 
-                    Bot.OTP_Code = null;
-                    Bot.OTP_ExpiryTime = null;
+                    OTPValidationResult validationResult = await Client.OTPApi.ValidateOTP(organizationID: OrgID, sessionID: (Guid)Bot.OtpSessionID, otp: input);
+                    if (!validationResult.IsValid)
+                    {
+                        return validationResult.ErrorCode switch
+                        {
+                            ErrorCode.DataExpired => $"{ThusSpokeBabel("Err_OTP_Expired")}\n{await SendOTP()}",
+                            ErrorCode.InvalidData => ThusSpokeBabel("Err_OTP_Invalid"),
+                            ErrorCode.TooManyFailedAttempts => $"{ThusSpokeBabel("Err_OTP_MaxFailedAttempts")}\n{await SendOTP()}",
+                            _ => $"{ThusSpokeBabel("Err_OTP_Invalid")}\n{await SendOTP()}",
+                        };
+                    }
+                    Bot.OtpSessionID = null;
                     (_, Guid customerId) = await GetCustomerIdByEmail(Bot.BuyerEmail);
                     if (customerId == Guid.Empty)
                     {

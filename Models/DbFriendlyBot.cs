@@ -88,15 +88,9 @@ namespace Corprio.SocialWorker.Models
         public string BuyerEmail { get; set; }
 
         /// <summary>
-        /// Confirmation code that the user is required to input.
+        /// Session ID of one-time password
         /// </summary>
-        [StringLength(6)]
-        public string OTP_Code { get; set; }
-
-        /// <summary>
-        /// Expiry time of the confirmation code.
-        /// </summary>
-        public DateTimeOffset? OTP_ExpiryTime { get; set; }
+        public Guid? OtpSessionID { get; set; }        
 
         /// <summary>
         /// Turn a database-friendly bot into a bot with object properties
@@ -115,8 +109,7 @@ namespace Corprio.SocialWorker.Models
                 ThinkingOf = this.ThinkingOf,                
                 BuyerCorprioID = this.BuyerCorprioID,
                 BuyerEmail = this.BuyerEmail,
-                OTP_Code = this.OTP_Code,
-                OTP_ExpiryTime = this.OTP_ExpiryTime,
+                OtpSessionID = this.OtpSessionID,                
                 PostedProductID = this.PostedProductID,
                 NewCustomer = this.NewCustomer,
             };
@@ -161,8 +154,7 @@ namespace Corprio.SocialWorker.Models
             this.CartString = System.Text.Json.JsonSerializer.Serialize(bot.Cart);            
             this.BuyerCorprioID = bot.BuyerCorprioID;
             this.BuyerEmail = bot.BuyerEmail;
-            this.OTP_Code = bot.OTP_Code;
-            this.OTP_ExpiryTime = bot.OTP_ExpiryTime;
+            this.OtpSessionID = bot.OtpSessionID;
             return this;
         }
     }        

@@ -331,7 +331,7 @@ function validateKeyword(keyword) {
  */
 function stringifyTemplate(messageType) {
     const result = {
-        isValid: messageType === Enums_1.MessageType.CataloguePost, // note: there is no validation for catalogue post template
+        isValid: messageType === Enums_1.MessageType.CataloguePost,
         keyword: '',
         templateString: ''
     };
@@ -691,7 +691,7 @@ function addPageSubscriptions(page_id, page_access_token) {
             'feed',
             // webhook for pages: https://developers.facebook.com/docs/graph-api/webhooks/getting-started/webhooks-for-pages/
             'messages',
-            // any other webhook event: https://developers.facebook.com/docs/messenger-platform/webhook/#events
+            // any other webhook events: https://developers.facebook.com/docs/messenger-platform/webhook/#events                
         ],
         access_token: page_access_token,
     }, function (response) {
@@ -727,8 +727,8 @@ function getPages() {
 window.fbAsyncInit = function () {
     FB.init({
         appId: vdata.settings.metaApiID,
-        cookie: true, // Enable cookies to allow the server to access the session.
-        xfbml: true, // Parse social plugins on this webpage.
+        cookie: true,
+        xfbml: true,
         version: vdata.settings.metaApiVersion
     });
     FB.getLoginStatus(function (response) {

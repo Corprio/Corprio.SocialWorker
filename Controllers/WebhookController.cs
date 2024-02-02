@@ -164,10 +164,11 @@ namespace Corprio.SocialWorker.Controllers
         {
             // for testing only
             Guid testOrgID = Guid.Parse("3c83fe2b-fe0a-420c-af24-e76fcf5bd7e7");
-            Guid testMetaUserID = Guid.Parse("20DF298D-665B-497A-9043-237043E1F6F5");
+            Guid testMetaUserID = Guid.Parse("78144E5F-4596-435A-BB33-85F79767881D");
             var testMetaUser = db.MetaUsers.Include(x => x.Pages).Include(x => x.Bots).FirstOrDefault(x => x.ID == testMetaUserID);
             Guid testProductID = Guid.Parse("907D39F6-591D-4AFF-9D3A-C3CD4AF9E5C7");
-            string testMetaID = "24266381753005180";
+            //string testMetaID = "24266381753005180"; // this one is on FB
+            string testMetaID = "24286888740958239"; // this one is on IG
             var setting = await applicationSettingService.GetSetting<ApplicationSetting>(testOrgID);
             var botStatus = await ReinventTheBot(corprioClient: corprioClient, organizationID: testOrgID,
                 facebookUser: testMetaUser, interlocutorID: testMetaID);
@@ -193,10 +194,125 @@ namespace Corprio.SocialWorker.Controllers
         }
 
         /// <summary>
+        /// Respond to webhook triggered by comments on IG media items
+        /// </summary>
+        /// <param name="httpClient">HTTP client for executing API query</param>
+        /// <param name="corprioClient">Client for Api requests among Corprio projects</param>
+        /// <param name="applicationSettingService">Application setting service</param>
+        /// <param name="payload">Webhook payload</param>
+        /// <returns>Status code</returns>
+        public async Task<IActionResult> HandleCommentWebhook(HttpClient httpClient, APIClient corprioClient,
+            ApplicationSettingService applicationSettingService, CommentWebhookPayload payload)
+        {
+            MetaPost post;
+            List<dynamic> existingProducts;
+            Guid productId;
+            DbFriendlyBot botStatus;
+            ApplicationSetting setting;
+            DomesticHelper bot;
+
+            // note: it is possible for more than one entry/change to come in, as Meta aggregates up to 1,000 event notifications
+            // see Frequency at https://developers.facebook.com/docs/graph-api/webhooks/getting-started
+            foreach (CommentWebhookEntry entry in payload.Entry)
+            {
+                foreach (CommentWebhookChange change in entry.Changes)
+                {
+                    //// for testing before the App goes live
+                    //await TestReachout(httpClient: httpClient, corprioClient: corprioClient, applicationSettingService: applicationSettingService);
+                    //continue;
+
+                    // limitation: we can only process comment on a feed (i.e., we can't process comment on another comment)
+                    if (change.Value.Media.MediaProductType != "FEED") continue;
+
+                    if (null != db.FeedWebhooks.FirstOrDefault(x => x.SenderID == change.Value.From.Id && x.PostID == change.Value.Media.Id))
+                    {
+                        // do not process the same webhook more than once
+                        continue;
+                    }
+
+                    db.FeedWebhooks.Add(new FeedWebhook
+                    {
+                        ID = Guid.NewGuid(),                        
+                        PostID = change.Value.Media.Id,
+                        SenderID = change.Value.From.Id,
+                    });
+                    await db.SaveChangesAsync();
+
+                    post = db.MetaPosts
+                        .Include(x => x.FacebookPage)
+                        .ThenInclude(x => x.FacebookUser)
+                        .ThenInclude(x => x.Bots)
+                        .FirstOrDefault(x => x.PostId == change.Value.Media.Id && x.FacebookPage.FacebookUser.Dormant == false);
+                    if (post?.FacebookPage?.FacebookUser?.OrganizationID == null)
+                    {
+                        Log.Error($"Failed to find media item {change.Value.Media.Id} and its parent objects.");
+                        continue;
+                    }
+
+                    // note 1: we use the keyword stored at the post level, NOT at the user level, because the keyword may be udpated after a post is made
+                    // note 2: if the keyword is, for example, <a+>, then it was saved as &lt;a+&gt; in DB, while the user can input either <a+> or <A+>
+                    if (post.KeywordForShoppingIntention?.ToUpper() != UtilityHelper.UncleanAndClean(change.Value.Text.Trim()).ToUpper())
+                        continue;
+
+                    existingProducts = await corprioClient.ProductApi.Query(
+                        organizationID: post.FacebookPage.FacebookUser.OrganizationID,
+                        selector: "new (ID)",
+                        where: "EntityProperties.Any(Name==@0 && Value==@1)",
+                        orderBy: "ID",
+                        whereArguments: new string[] { BabelFish.ProductEpName, post.PostId },
+                        skip: 0,
+                        take: 1);
+                    if (existingProducts.Count == 0)
+                    {
+                        Log.Error($"Failed to find the product posted as post {post.PostId}.");
+                        continue;
+                    }
+                    productId = Guid.Parse(existingProducts[0].ID);
+
+                    setting = await applicationSettingService.GetSetting<ApplicationSetting>(post.FacebookPage.FacebookUser.OrganizationID);
+                    botStatus = await ReinventTheBot(corprioClient: corprioClient, organizationID: post.FacebookPage.FacebookUser.OrganizationID,
+                        facebookUser: post.FacebookPage.FacebookUser, interlocutorID: change.Value.From.Id);
+                    bot = new DomesticHelper(context: db, configuration: configuration, client: corprioClient,
+                        organizationID: post.FacebookPage.FacebookUser.OrganizationID,
+                        botStatus: botStatus, pageName: post.FacebookPage.Name, setting: setting);
+                    string message;
+                    try
+                    {
+                        message = await bot.ReachOut(productId);
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.Error($"Failed to reach out to sell {productId}. {ex.Message}");
+                        continue;
+                    }
+
+                    if (string.IsNullOrWhiteSpace(message))
+                    {
+                        Log.Error($"The bot failed to provide any message.");
+                        continue;
+                    }
+
+                    string endPoint = post.PostedWith == MetaProduct.Facebook
+                        ? $"{BaseUrl}/{ApiVersion}/{post.FacebookPage.PageId}/messages"
+                        : $"{BaseUrl}/{ApiVersion}/me/messages";
+
+                    await ApiActionHelper.SendMessage(
+                        httpClient: httpClient,
+                        accessToken: post.FacebookPage.Token,
+                        endPoint: endPoint,
+                        message: message,
+                        recipientId: change.Value.From.Id);
+                }
+            }
+            return StatusCode(200);
+        }
+
+        /// <summary>
         /// Respond to webhook triggered by feeds
         /// </summary>
         /// <param name="httpClient">HTTP client for executing API query</param>
         /// <param name="corprioClient">Client for Api requests among Corprio projects</param>
+        /// <param name="applicationSettingService">Application setting service</param>
         /// <param name="payload">Webhook payload</param>
         /// <returns>Status code</returns>
         public async Task<IActionResult> HandleFeedWebhook(HttpClient httpClient, APIClient corprioClient, 
@@ -244,7 +360,7 @@ namespace Corprio.SocialWorker.Controllers
                     {
                         Log.Error($"Failed to find post {change.Value.PostId} and its parent objects.");
                         continue;
-                    }
+                    }                    
 
                     // note 1: we use the keyword stored at the post level, NOT at the user level, because the keyword may be udpated after a post is made
                     // note 2: if the keyword is, for example, <a+>, then it was saved as &lt;a+&gt; in DB, while the user can input either <a+> or <A+>
@@ -309,6 +425,7 @@ namespace Corprio.SocialWorker.Controllers
         /// </summary>
         /// <param name="httpClient">HTTP client for executing API query</param>
         /// <param name="corprioClient">Client for Api requests among Corprio projects</param>
+        /// <param name="applicationSettingService">Application setting service</param>
         /// <param name="payload">Webhook payload</param>
         /// <returns>Status code</returns>
         /// <exception cref="Exception"></exception>
@@ -356,10 +473,13 @@ namespace Corprio.SocialWorker.Controllers
                         : db.MetaPages.Include(x => x.FacebookUser).ThenInclude(x => x.Bots).FirstOrDefault(x => x.PageId == messaging.Recipient.MetaID && x.FacebookUser.Dormant == false);
                     if (page?.FacebookUser?.OrganizationID == null)
                     {
+                        // apparently Facebook may send multiple notifications for the same message,
+                        // each of which uses a different sender ID and receipient ID to represent the same sender and receipient
                         Log.Error($"Failed to find page, and its associated objects, based on recipient ID {messaging.Recipient.MetaID}.");
                         Log.Information($"SenderID: {messaging.Sender.MetaID}; ReceipientID: {messaging.Recipient.MetaID}; Message: {messaging.Message.Text}");
-                        continue;
-                    }                    
+                        continue;                                                
+                    }
+                    Log.Information($"Found relevant page with senderID: {messaging.Sender.MetaID}, receipientID: {messaging.Recipient.MetaID}; message: {messaging.Message.Text}");
 
                     setting = await applicationSettingService.GetSetting<ApplicationSetting>(page.FacebookUser.OrganizationID);
 
@@ -432,16 +552,25 @@ namespace Corprio.SocialWorker.Controllers
                     applicationSettingService: applicationSettingService, payload: messageWebhookPayload);
             }
 
-            // if the payload includes "Changes", then presumably it is for webhook on feed
+            // if the payload includes "Changes" and field is "feed", then presumably it is for webhook on feed
             FeedWebhookPayload feedWebhookPayload = requestString == null ? null : JsonConvert.DeserializeObject<FeedWebhookPayload>(requestString)!;
-            if (feedWebhookPayload?.Entry?.Any(x => x.Changes?.Count > 0) ?? false)
+            if (feedWebhookPayload?.Entry?.Any(x => x.Changes.Any(y => y.Field == "feed")) ?? false)
             {
                 Log.Information("The webhook appears to be a feed webhook.");
                 return await HandleFeedWebhook(httpClient: httpClient, corprioClient: corprioClient,
                     applicationSettingService: applicationSettingService, payload: feedWebhookPayload);
             }
 
-            Log.Information($"Cannot recognize payload in webhook notification. Payload: {requestString}");
+            // if the payload includes "Changes" and field is "comment", then presumably it is for webhook on comment
+            CommentWebhookPayload commentWebhookPayload = requestString == null ? null : JsonConvert.DeserializeObject<CommentWebhookPayload>(requestString)!;
+            if (commentWebhookPayload?.Entry?.Any(x => x.Changes.Any(y => y.Field == "comments")) ?? false)
+            {
+                Log.Information("The webhook appears to be a comment webhook.");
+                return await HandleCommentWebhook(httpClient: httpClient, corprioClient: corprioClient,
+                    applicationSettingService: applicationSettingService, payload: commentWebhookPayload);
+            }
+
+            Log.Information("Cannot recognize payload in webhook notification.");
             return StatusCode(200);
         }
         

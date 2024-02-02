@@ -80,9 +80,9 @@ namespace Corprio.SocialWorker.Dictionaries
             },            
             ["CodeSent"] = new Dictionary<BotLanguage, string>()
             {
-                [BotLanguage.English] = "A six-digit one-time password (OTP) has been sent to email {0}. Please input the OTP in 24 hours. If you wish to use another email address for receiving the OTP, please input {1}.",
-                [BotLanguage.TraditionalChinese] = "一個六位數字的一次性密碼已傳送至電子郵件地址 {0}。請在 24 小時內輸入該一次性密碼。如果您想使用其他電子郵件地址接收一次性密碼，請輸入 {1}。",
-                [BotLanguage.SimplifiedChinese] = "一个六位数字的一次性密码已传送至电子邮件地址 {0}。请在 24 小时内输入该一次性密码。如果您想使用其他电子邮件地址接收一次性密码，请输入 {1}。",
+                [BotLanguage.English] = "A {0}-digit confirmation code has been sent to email {1}. Please input the code in {2} minutes. If you wish to use another email address for receiving the confirmation code, please input '{3}'.",
+                [BotLanguage.TraditionalChinese] = "一個{0}位數字的確認碼已傳送至電子郵件地址 {1}。請在{2}分鐘內輸入該確認碼。如果您想使用其他電子郵件地址接收確認碼，請輸入「{3}」。",
+                [BotLanguage.SimplifiedChinese] = "一个{0}位数字的确认码已传送至电子邮件地址 {1}。请在{2}分钟内输入该确认码。如果您想使用其他电子邮件地址接收确认码，请输入「{3}」。",
             },
             ["DefaultKeyWordForShoppingIntention"] = new Dictionary<BotLanguage, string>()
             {
@@ -92,9 +92,9 @@ namespace Corprio.SocialWorker.Dictionaries
             },
             ["Email_body"] = new Dictionary<BotLanguage, string>()
             {
-                [BotLanguage.English] = "{0} is your confirmation code. ",
-                [BotLanguage.TraditionalChinese] = "{0}是您的確認碼。",
-                [BotLanguage.SimplifiedChinese] = "{0}是您的确认码。",
+                [BotLanguage.English] = "${OTP} is your confirmation code. ",
+                [BotLanguage.TraditionalChinese] = "${OTP}是您的確認碼。",
+                [BotLanguage.SimplifiedChinese] = "${OTP}是您的确认码。",
             },
             ["Email_subject"] = new Dictionary<BotLanguage, string>()
             {
@@ -120,11 +120,23 @@ namespace Corprio.SocialWorker.Dictionaries
                 [BotLanguage.TraditionalChinese] = "電子郵件地址無效。請再次輸入。",
                 [BotLanguage.SimplifiedChinese] = "电子邮件地址无效。请再次输入。",
             },
-            ["Err_InvalidOTP"] = new Dictionary<BotLanguage, string>()
+            ["Err_OTP_Expired"] = new Dictionary<BotLanguage, string>()
             {
-                [BotLanguage.English] = "The confirmation code is invalid or expired. ",
-                [BotLanguage.TraditionalChinese] = "確認碼無效或已過期。",
-                [BotLanguage.SimplifiedChinese] = "确认码无效或已过期。",
+                [BotLanguage.English] = "The confirmation code has expired. ",
+                [BotLanguage.TraditionalChinese] = "確認碼已過期。",
+                [BotLanguage.SimplifiedChinese] = "确认码已过期。",
+            },
+            ["Err_OTP_Invalid"] = new Dictionary<BotLanguage, string>()
+            {
+                [BotLanguage.English] = "The confirmation code is invalid. ",
+                [BotLanguage.TraditionalChinese] = "確認碼無效。",
+                [BotLanguage.SimplifiedChinese] = "确认码无效。",
+            },
+            ["Err_OTP_MaxFailedAttempts"] = new Dictionary<BotLanguage, string>()
+            {
+                [BotLanguage.English] = "You have reached the maximum number of attempts; the confirmation code is now invalid. ",
+                [BotLanguage.TraditionalChinese] = "您已達到嘗試次數的上限；確認碼現已無效。",
+                [BotLanguage.SimplifiedChinese] = "您已达到尝试次数的上限；确认码现已无效。",
             },
             ["Err_NonPositiveInput"] = new Dictionary<BotLanguage, string>()
             {

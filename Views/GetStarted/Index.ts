@@ -685,7 +685,7 @@ function addPageSubscriptions(page_id: string, page_access_token: string) {
                 'feed',
                 // webhook for pages: https://developers.facebook.com/docs/graph-api/webhooks/getting-started/webhooks-for-pages/
                 'messages',
-                // any other webhook event: https://developers.facebook.com/docs/messenger-platform/webhook/#events
+                // any other webhook events: https://developers.facebook.com/docs/messenger-platform/webhook/#events                
             ],
             access_token: page_access_token,
         },
