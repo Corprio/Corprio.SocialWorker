@@ -22,6 +22,7 @@ The Social Media Marketer Application must be registered in [Corprio Portal](htt
 |Customer|Read, Add New, Update|
 |Customer Payment Method|Read|
 |Company Settings|Read|
+|One Time Password|Read, Add New|
 
 **Sending email**: Required
 
@@ -39,3 +40,6 @@ The application uses webhook to respond facebook for messages inputted by custom
 ngrok http --domain=pleasant-definitely-macaw.ngrok-free.app https://localhost:44330 --host-header="localhost:44330"
 ```
 ![ngrok in action](resources/images/ngrok_in_action.png)
+
+## To connect IG account from FB page
+Follow the instructions in [https://www.facebook.com/business/help/connect-instagram-to-page](https://www.facebook.com/business/help/connect-instagram-to-page).
