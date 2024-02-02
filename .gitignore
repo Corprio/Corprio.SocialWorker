@@ -344,3 +344,5 @@ healthchecksdb
 /wwwroot/css/site.min.css
 /wwwroot/js/views/GetStarted/Index.js.map
 /wwwroot/js/views/GetStarted/Index.js
+/wwwroot/js/views/Checkout/Index.js
+/wwwroot/js/views/Checkout/Index.js.map
