@@ -343,3 +343,4 @@ healthchecksdb
 /wwwroot/js/viewer.part.bundle.min.js
 /wwwroot/css/site.min.css
 /wwwroot/js/views/GetStarted/Index.js.map
+/wwwroot/js/views/GetStarted/Index.js
