@@ -70,8 +70,13 @@ namespace Corprio.SocialWorker.Helpers
             PageName = pageName;
             Shell = botStatus;
             AppSetting = setting;
-            Bot = botStatus.ReadyToWork();
-            Bot.Language = DetectLanguage(detectedLocales);
+            Bot = botStatus.ReadyToWork();            
+            BotLanguage detectedLanguage = DetectLanguage(detectedLocales);
+            if (Bot.Language != detectedLanguage)
+            {
+                Bot.Language = detectedLanguage;
+                Save().ConfigureAwait(false).GetAwaiter().GetResult();
+            }
         }
         
         /// <summary>
@@ -179,10 +184,10 @@ namespace Corprio.SocialWorker.Helpers
                 else
                     choices += $"{i + 1} - {Bot.ProductMemory[i].ProductName} \n";
             }
-            choices += ThusSpokeBabel("NoneOfTheAbove");
+            choices += ThusSpokeBabel("NoneOfTheAbove") + "\n";
             if (Bot.ProductMemory.Count > ChoiceLimit)
             {                
-                choices += "\n" + ThusSpokeBabel(key: "TooManyResults", placeholders: [ChoiceLimit.ToString()]);
+                choices += ThusSpokeBabel(key: "TooManyResults", placeholders: [ChoiceLimit.ToString()]) + "\n";
             }
             return choices;
         }

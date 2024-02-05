@@ -761,7 +761,7 @@ $(function () {
     // facebook-related stuff
     $(Selector.loginButton).on('click', function () {
         console.log('Logging into Facebook...');
-        FB.login((response: facebook.StatusResponse) => {
+        FB.login((response: facebook.StatusResponse) => {            
             if (response.authResponse) {
                 //user just authorized your app                
                 checkLoginState();

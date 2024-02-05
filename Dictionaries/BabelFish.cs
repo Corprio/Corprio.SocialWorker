@@ -8,21 +8,22 @@ namespace Corprio.SocialWorker.Dictionaries
     {
         public const string ProductEpName = "MetaPostId";
         public const string CustomerEpName = "MetaSenderId";
-        public const string CustomDataKeyForMetaUser = "MetaUser";        
+        public const string CustomDataKeyForMetaUser = "MetaUser";
+        public const string RobotEmoji = "🤖";
 
         public static readonly Dictionary<string, Dictionary<BotLanguage, string>> Vocab = new()
         {            
             ["AskCheckout"] = new Dictionary<BotLanguage, string>()
             {
-                [BotLanguage.English] = "Do you want to checkout now? ",
-                [BotLanguage.TraditionalChinese] = "您希望現在結帳嗎？",
-                [BotLanguage.SimplifiedChinese] = "您希望现在结帐吗？",
+                [BotLanguage.English] = "Do you want to checkout now? Please answer in YES or NO. ",
+                [BotLanguage.TraditionalChinese] = "您希望現在結帳嗎？請以「是」或「否」回答。",
+                [BotLanguage.SimplifiedChinese] = "您希望现在结帐吗？请以「是」或「否」回答。",
             },
             ["AskClearCart"] = new Dictionary<BotLanguage, string>()
             {
-                [BotLanguage.English] = "Do you want to empty your cart? ",
-                [BotLanguage.TraditionalChinese] = "您想清空您的購物車嗎？",
-                [BotLanguage.SimplifiedChinese] = "您想清空您的购物车吗？",
+                [BotLanguage.English] = "Do you want to empty your cart? Please answer in YES or NO. ",
+                [BotLanguage.TraditionalChinese] = "您想清空您的購物車嗎？請以「是」或「否」回答。",
+                [BotLanguage.SimplifiedChinese] = "您想清空您的购物车吗？请以「是」或「否」回答。",
             },
             ["AskEmail"] = new Dictionary<BotLanguage, string>()
             {
@@ -80,9 +81,9 @@ namespace Corprio.SocialWorker.Dictionaries
             },            
             ["ChatbotSays"] = new Dictionary<BotLanguage, string>()
             {
-                [BotLanguage.English] = "Chatbot: ",
-                [BotLanguage.TraditionalChinese] = "機器人：",
-                [BotLanguage.SimplifiedChinese] = "机器人：",
+                [BotLanguage.English] = "\n(by 🤖 assistant)",
+                [BotLanguage.TraditionalChinese] = "\n(🤖如此說)",
+                [BotLanguage.SimplifiedChinese] = "\n(🤖如此说)",
             },
             ["CodeSent"] = new Dictionary<BotLanguage, string>()
             {
@@ -232,7 +233,9 @@ namespace Corprio.SocialWorker.Dictionaries
 
         public static readonly Dictionary<string, int> YesNo = new()
         {
-            ["是"] = 1,            
+            ["是"] = 1,
+            ["對"] = 1,
+            ["对"] = 1,
             ["yes"] = 1,
             ["y"] = 1,
             ["yup"] = 1,
@@ -241,6 +244,10 @@ namespace Corprio.SocialWorker.Dictionaries
             ["sure"] = 1,            
             ["oui"] = 1,
             ["不是"] = 2,
+            ["不"] = 2,
+            ["不對"] = 2,
+            ["不对"] = 2,
+            ["否"] = 2,
             ["no"] = 2,
             ["n"] = 2,
             ["nope"] = 2,

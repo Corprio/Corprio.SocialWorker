@@ -19,6 +19,7 @@ using Corprio.DataModel.Shared;
 using System.Linq.Dynamic.Core;
 using Microsoft.EntityFrameworkCore;
 using Corprio.AspNetCore.Site.Services;
+using System.ServiceModel.Channels;
 
 namespace Corprio.SocialWorker.Controllers
 {
@@ -175,9 +176,15 @@ namespace Corprio.SocialWorker.Controllers
             foreach (CommentWebhookEntry entry in payload.Entry)
             {
                 foreach (CommentWebhookChange change in entry.Changes)
-                {                    
+                {
                     // assumption: we only process comment on a feed and ignore comment on another comment
-                    if (change.Value.Media.MediaProductType != "FEED") continue;
+                    if (change?.Value?.Media?.MediaProductType != "FEED") continue;
+                    
+                    if (string.IsNullOrWhiteSpace(change.Value?.Text))
+                    {                        
+                        Log.Information("Ignoring comment change with no message (e.g., LIKE).");
+                        continue;
+                    }
 
                     if (null != db.CommentWebhooks.FirstOrDefault(x => x.MediaItemID == change.Value.Media.Id && x.WebhookChangeID == change.Value.WebhookChangeID))
                     {
@@ -246,7 +253,7 @@ namespace Corprio.SocialWorker.Controllers
                         Log.Error($"The bot failed to provide any message.");
                         continue;
                     }
-                    message = bot.ThusSpokeBabel("ChatbotSays") + message;
+                    message += BabelFish.RobotEmoji;
 
                     string endPoint = post.PostedWith == MetaProduct.Facebook
                         ? $"{BaseUrl}/{ApiVersion}/{post.FacebookPage.PageId}/messages"
@@ -287,6 +294,12 @@ namespace Corprio.SocialWorker.Controllers
             {
                 foreach (FeedWebhookChange change in entry.Changes)
                 {                    
+                    if (string.IsNullOrWhiteSpace(change.Value?.Message))
+                    {
+                        Log.Information("Ignoring feed change with no message (e.g., LIKE).");
+                        continue;
+                    }
+                    
                     if (null != db.FeedWebhooks.FirstOrDefault(x => x.CreatedTime == change.Value.CreatedTime
                         && x.SenderID == change.Value.From.Id && x.PostID == change.Value.PostId))
                     {                        
@@ -312,7 +325,7 @@ namespace Corprio.SocialWorker.Controllers
                     {
                         Log.Error($"Failed to find post {change.Value.PostId} and its parent objects.");
                         continue;
-                    }                    
+                    }
 
                     // note 1: we use the keyword stored at the post level, NOT at the user level, because the keyword may be udpated after a post is made
                     // note 2: if the keyword is, for example, <a+>, then it was saved as &lt;a+&gt; in DB, while the user can input either <a+> or <A+>                    
@@ -356,7 +369,7 @@ namespace Corprio.SocialWorker.Controllers
                         Log.Error($"The bot failed to provide any message.");
                         continue;
                     }
-                    message = bot.ThusSpokeBabel("ChatbotSays") + message;
+                    message += BabelFish.RobotEmoji;
 
                     string endPoint = post.PostedWith == MetaProduct.Facebook
                         ? $"{BaseUrl}/{ApiVersion}/{post.FacebookPage.PageId}/messages"
@@ -400,12 +413,11 @@ namespace Corprio.SocialWorker.Controllers
                 {
                     if (string.IsNullOrWhiteSpace(messaging.Message?.Text))
                     {
-                        // note: we move on to the next message instead of throwing errors
-                        Log.Error("The message's text is blank.");
+                        Log.Information("Ignoring message that does not contain text (e.g., thumb-up).");
                         continue;
                     }
                     
-                    if (BabelFish.Vocab["ChatbotSays"].Any(x => messaging.Message.Text.StartsWith(x.Value)))
+                    if (messaging.Message.Text.EndsWith(BabelFish.RobotEmoji))
                     {
                         Log.Information($"Ignoring bot-generated message from {messaging.Recipient?.MetaID} to {messaging.Sender?.MetaID}");
                         continue;
@@ -472,7 +484,7 @@ namespace Corprio.SocialWorker.Controllers
                     }
                     // note: the bot must respond with something in 30 seconds (source: https://developers.facebook.com/docs/messenger-platform/policy/responsiveness)
                     if (string.IsNullOrWhiteSpace(response)) response = bot.ThusSpokeBabel("Err_DefaultMsg");
-                    response = bot.ThusSpokeBabel("ChatbotSays") + response;
+                    response += BabelFish.RobotEmoji;
 
                     endPoint = payload.Object == "instagram" ? $"{BaseUrl}/{ApiVersion}/me/messages" : $"{BaseUrl}/{ApiVersion}/{messaging.Recipient.MetaID}/messages";
                     await ApiActionHelper.SendMessage(
@@ -506,7 +518,7 @@ namespace Corprio.SocialWorker.Controllers
         [HttpPost("/webhook")]
         public async Task<IActionResult> HandleWebhookPost([FromServices] ApplicationSettingService applicationSettingService, [FromServices] HttpClient httpClient)
         {            
-            string hash = Request.Headers.ContainsKey("x-hub-signature-256") ? Request.Headers["x-hub-signature-256"] : string.Empty;
+            string hash = Request.Headers.ContainsKey("x-hub-signature-256") ? Request.Headers["x-hub-signature-256"] : string.Empty;            
             (bool verified, string requestString) = await HashCheck(request: Request, metaHash: hash);
             if (!verified)
             {
@@ -543,7 +555,7 @@ namespace Corprio.SocialWorker.Controllers
                     applicationSettingService: applicationSettingService, payload: commentWebhookPayload);
             }
 
-            Log.Information("Cannot recognize payload in webhook notification.");
+            Log.Information("Cannot recognize the payload in webhook notification.");
             return StatusCode(200);
         }
         
