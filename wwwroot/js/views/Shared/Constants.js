@@ -18,10 +18,13 @@ var exports = __webpack_exports__;
   !*** ./Views/Shared/Constants.ts ***!
   \***********************************/
 
+// 'business_management' is required for viewing pages managed by the user
+//export const PERMISSIONS: string[] = ['email', 'public_profile', 'business_management', 'pages_manage_metadata',
+//    'pages_messaging', 'pages_manage_posts', 'pages_manage_engagement', 'instagram_basic', 'instagram_content_publish',
+//    'instagram_manage_comments', 'instagram_manage_messages'];
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.PERMISSIONS = void 0;
-// 'business_management' is required for viewing pages managed by the user
-exports.PERMISSIONS = ['email', 'public_profile', 'business_management', 'pages_manage_metadata',
+exports.PERMISSIONS = ['public_profile', 'pages_show_list', 'pages_manage_metadata',
     'pages_messaging', 'pages_manage_posts', 'pages_manage_engagement', 'instagram_basic', 'instagram_content_publish',
     'instagram_manage_comments', 'instagram_manage_messages'];
 
