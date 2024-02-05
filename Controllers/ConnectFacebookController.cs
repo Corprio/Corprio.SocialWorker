@@ -176,6 +176,16 @@ namespace Corprio.SocialWorker.Controllers
                 }                
             }
             
+            // the user may have opted out some pages previously they granted us permissions, which should be deleted
+            foreach (MetaPage page in metaUser.Pages)
+            {
+                if (!fbPages.Any(x => x.Id == page.PageId))
+                {
+                    db.MetaPages.Remove(page);
+                    await db.SaveChangesAsync();
+                }
+            }
+
             return StatusCode(200);
         }
     }
