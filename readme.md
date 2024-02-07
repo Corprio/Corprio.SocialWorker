@@ -12,7 +12,7 @@ The Social Media Marketer Application must be registered in [Corprio Portal](htt
 
 |Entity Type|Permissions|
 |-----------|----------|
-|Sales Order|Read, Add New, Update, Approve|
+|Sales Order|Read, Add New, Update, Approve, Void|
 |Selling Price|Read|
 |Warehouse|Read|
 |Product|Read, Update|
