@@ -346,3 +346,6 @@ healthchecksdb
 /wwwroot/js/views/GetStarted/Index.js
 /wwwroot/js/views/Checkout/Index.js
 /wwwroot/js/views/Checkout/Index.js.map
+/wwwroot/js/views/Shared/Constants.js
+/wwwroot/js/views/ReconnectFacebook/Index.js
+/wwwroot/js/views/ReconnectFacebook/Index.js.map
