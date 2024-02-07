@@ -93,6 +93,16 @@ namespace Corprio.SocialWorker.Models
         public Guid? OtpSessionID { get; set; }        
 
         /// <summary>
+        /// When true, the bot does not read or respond to webhook payload
+        /// </summary>
+        public bool IsMuted { get; set; }
+
+        /// <summary>
+        /// Facebook/Instagram username of the customer, obtained from comment/feed webhook payload
+        /// </summary>
+        public string MetaUserName { get; set; }
+
+        /// <summary>
         /// Turn a database-friendly bot into a bot with object properties
         /// </summary>
         /// <returns>A bot with object properties</returns>
@@ -112,6 +122,8 @@ namespace Corprio.SocialWorker.Models
                 OtpSessionID = this.OtpSessionID,                
                 PostedProductID = this.PostedProductID,
                 NewCustomer = this.NewCustomer,
+                IsMuted = this.IsMuted,
+                MetaUserName = this.MetaUserName,
             };
 
             if (!string.IsNullOrWhiteSpace(this.ProductMemoryString))
@@ -155,6 +167,8 @@ namespace Corprio.SocialWorker.Models
             this.BuyerCorprioID = bot.BuyerCorprioID;
             this.BuyerEmail = bot.BuyerEmail;
             this.OtpSessionID = bot.OtpSessionID;
+            this.IsMuted = bot.IsMuted;
+            this.MetaUserName = bot.MetaUserName;
             return this;
         }
     }        

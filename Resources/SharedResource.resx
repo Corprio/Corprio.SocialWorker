@@ -987,6 +987,12 @@
   <data name="ErrMsg_NoPaymentMethod" xml:space="preserve">
     <value>The merchant has not set up payment method.</value>
   </data>
+  <data name="HumanEscalation_EmailBody" xml:space="preserve">
+    <value>&lt;html&gt;&lt;body&gt;&lt;p&gt;A customer on &lt;b&gt;{0} Messenger&lt;/b&gt; would like to communicate with a human rather than a chatbot. Please refer to below for the customer's particulars and reach out to them accordingly.&lt;/p&gt;&lt;ul&gt;&lt;li&gt;{0} user name: {1}&lt;/li&gt;&lt;li&gt;{0} user ID: {2}&lt;/li&gt;&lt;li&gt;Email address: &lt;u&gt;{3}&lt;/u&gt;&lt;/li&gt;&lt;li&gt;Shopping at: &lt;b&gt;{4}&lt;/b&gt; ({0})&lt;/li&gt;&lt;/ul&gt;&lt;/body&gt;&lt;/html&gt;</value>
+  </data>
+  <data name="HumanEscalation_EmailSubject" xml:space="preserve">
+    <value>A {0} customer on {1} Messenger would like to contact you</value>
+  </data>
   <data name="ModifySMTP" xml:space="preserve">
     <value>Modify setting</value>
   </data>
@@ -998,5 +1004,8 @@
   </data>
   <data name="Tour_Rerun" xml:space="preserve">
     <value>If you wish to have re-run site tour, simply click this button.</value>
+  </data>
+  <data name="Unknown_Italic" xml:space="preserve">
+    <value>&lt;i&gt;Unknown&lt;/i&gt;</value>
   </data>
 </root>

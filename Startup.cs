@@ -9,6 +9,7 @@ using Corprio.SocialWorker.Models;
 using Microsoft.EntityFrameworkCore;
 using Corprio.AspNetCore.Site.Services;
 using Corprio.SocialWorker.Services;
+using Corprio.Core;
 
 namespace Corprio.SocialWorker
 {
@@ -30,6 +31,9 @@ namespace Corprio.SocialWorker
 
             services.AddSingleton<GlobalListService>();
             services.AddSingleton<IProductTourService, ProductTourService>();
+            services.AddSingleton<IEmailSender, AsyncEmailSender>();
+            services.AddSingleton<EmailHelper>();
+            services.Configure<SmtpHostSetting>(Configuration.GetSection(nameof(SmtpHostSetting)));
 
             //add HTTP client for accessing API without user login
             CorprioApiSetting corprioApiSetting = new()

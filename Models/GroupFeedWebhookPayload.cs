@@ -33,7 +33,7 @@ namespace Corprio.SocialWorker.Models
         public OneLinePayload Recipient { get; set; }
 
         [JsonProperty("from")]
-        public WebhookFrom From { get; set; }
+        public FbWebhookFrom From { get; set; }
 
         [JsonProperty("group_id")]
         public string GroupId { get; set; }

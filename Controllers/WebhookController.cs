@@ -20,6 +20,8 @@ using System.Linq.Dynamic.Core;
 using Microsoft.EntityFrameworkCore;
 using Corprio.AspNetCore.Site.Services;
 using System.ServiceModel.Channels;
+using Corprio.DataModel.Business;
+using Corprio.Core;
 
 namespace Corprio.SocialWorker.Controllers
 {
@@ -28,22 +30,25 @@ namespace Corprio.SocialWorker.Controllers
         private readonly ApplicationDbContext db;
         readonly IHttpClientFactory httpClientFactory;
         readonly IConfiguration configuration;
+        readonly EmailHelper emailHelper;
         
         private readonly string ApiVersion;
         private readonly string AppSecret;
         private readonly string BaseUrl;
-
+        
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="context"></param>
         /// <param name="httpClientFactory"></param>
         /// <param name="configuration"></param>
-        public WebhookController(ApplicationDbContext context, IHttpClientFactory httpClientFactory, IConfiguration configuration) : base()
+        public WebhookController(ApplicationDbContext context, IHttpClientFactory httpClientFactory, 
+            IConfiguration configuration, EmailHelper emailHelper) : base()
         {
             db = context;
             this.httpClientFactory = httpClientFactory;
             this.configuration = configuration;
+            this.emailHelper = emailHelper;
             
             ApiVersion = configuration["MetaApiSetting:ApiVersion"];
             BaseUrl = configuration["MetaApiSetting:BaseUrl"];
@@ -121,8 +126,11 @@ namespace Corprio.SocialWorker.Controllers
         /// <param name="organizationID">Organization ID</param>
         /// <param name="facebookUser">Owner of the bot</param>
         /// <param name="interlocutorID">Meta ID of the person chatting with the bot</param>
+        /// <param name="metaUsername">Meta username of the person chatting with the bot</param>
+        /// <param name="unMute">If true, unmute the bot so that it reads and responds to webhook payload</param>
         /// <returns>Bot</returns>
-        public async Task<DbFriendlyBot> ReinventTheBot(APIClient corprioClient, Guid organizationID, MetaUser facebookUser, string interlocutorID)
+        public async Task<DbFriendlyBot> ReinventTheBot(APIClient corprioClient, Guid organizationID, MetaUser facebookUser, 
+            string interlocutorID, string metaUsername = null, bool unMute = false)
         {
             DbFriendlyBot botStatus = facebookUser.Bots.FirstOrDefault(x => x.BuyerID == interlocutorID);
             if (botStatus == null)
@@ -133,6 +141,7 @@ namespace Corprio.SocialWorker.Controllers
                     FacebookUserID = facebookUser.ID,
                     BuyerID = interlocutorID,
                     ThinkingOf = BotTopic.Limbo,
+                    MetaUserName = metaUsername
                 };
 
                 List<dynamic> existingCustomers = await corprioClient.CustomerApi.Query(
@@ -150,6 +159,28 @@ namespace Corprio.SocialWorker.Controllers
                 db.MetaBotStatuses.Add(botStatus);
                 await db.SaveChangesAsync();                
             }
+            else
+            {
+                bool updated = false;
+                if (unMute && botStatus.IsMuted)
+                {
+                    updated = true;
+                    botStatus.IsMuted = false;
+                }
+
+                if (!string.IsNullOrEmpty(metaUsername) && metaUsername != botStatus.MetaUserName)
+                {
+                    updated = true;
+                    botStatus.MetaUserName = metaUsername;
+                }
+
+                if (updated)
+                {
+                    db.MetaBotStatuses.Update(botStatus);
+                    await db.SaveChangesAsync();
+                }                
+            }
+            
             return botStatus;
         }
         
@@ -177,12 +208,15 @@ namespace Corprio.SocialWorker.Controllers
             {
                 foreach (CommentWebhookChange change in entry.Changes)
                 {
-                    // assumption: we only process comment on a feed and ignore comment on another comment
-                    if (change?.Value?.Media?.MediaProductType != "FEED") continue;
-                    
-                    if (string.IsNullOrWhiteSpace(change.Value?.Text))
+                    if (entry.WebhookEntryID == change.Value?.From?.Id)
+                    {
+                        Log.Information("Ignoring comment changes triggered by the IG business account itself.");
+                        continue;
+                    }
+                                                                                
+                    if (string.IsNullOrWhiteSpace(change.Value?.Text) || change.Value?.Media?.MediaProductType != "FEED")
                     {                        
-                        Log.Information("Ignoring comment change with no message (e.g., LIKE).");
+                        Log.Information("Ignoring comment changes that contain no text (e.g., LIKE) or are NOT on feed level (e.g., comment on another comment.");
                         continue;
                     }
 
@@ -232,8 +266,13 @@ namespace Corprio.SocialWorker.Controllers
                     productId = Guid.Parse(existingProducts[0].ID);
 
                     setting = await applicationSettingService.GetSetting<ApplicationSetting>(post.FacebookPage.FacebookUser.OrganizationID);
-                    botStatus = await ReinventTheBot(corprioClient: corprioClient, organizationID: post.FacebookPage.FacebookUser.OrganizationID,
-                        facebookUser: post.FacebookPage.FacebookUser, interlocutorID: change.Value.From.Id);
+                    botStatus = await ReinventTheBot(
+                        corprioClient: corprioClient, 
+                        organizationID: post.FacebookPage.FacebookUser.OrganizationID,
+                        facebookUser: post.FacebookPage.FacebookUser, 
+                        interlocutorID: change.Value.From.Id, 
+                        metaUsername: change.Value.From.Username,
+                        unMute: true);
                     bot = new DomesticHelper(context: db, configuration: configuration, client: corprioClient,
                         organizationID: post.FacebookPage.FacebookUser.OrganizationID,
                         botStatus: botStatus, pageName: post.FacebookPage.Name, setting: setting);
@@ -258,11 +297,12 @@ namespace Corprio.SocialWorker.Controllers
                     string endPoint = post.PostedWith == MetaProduct.Facebook
                         ? $"{BaseUrl}/{ApiVersion}/{post.FacebookPage.PageId}/messages"
                         : $"{BaseUrl}/{ApiVersion}/me/messages";
-
+                    
                     await ApiActionHelper.SendMessage(
                         httpClient: httpClient,
                         accessToken: post.FacebookPage.Token,
-                        endPoint: endPoint,
+                        messageEndPoint: endPoint,
+                        threadEndPoint: $"{BaseUrl}/{ApiVersion}/{post.FacebookPage.PageId}/release_thread_control",
                         message: message,
                         recipientId: change.Value.From.Id);
                 }
@@ -271,7 +311,7 @@ namespace Corprio.SocialWorker.Controllers
         }
 
         /// <summary>
-        /// Respond to webhook triggered by feeds
+        /// Respond to webhook triggered by changes on feed (e.g., post, like)
         /// </summary>
         /// <param name="httpClient">HTTP client for executing API query</param>
         /// <param name="corprioClient">Client for Api requests among Corprio projects</param>
@@ -294,9 +334,15 @@ namespace Corprio.SocialWorker.Controllers
             {
                 foreach (FeedWebhookChange change in entry.Changes)
                 {                    
-                    if (string.IsNullOrWhiteSpace(change.Value?.Message))
+                    if (entry.WebhookEntryID == change.Value?.From?.Id)
                     {
-                        Log.Information("Ignoring feed change with no message (e.g., LIKE).");
+                        Log.Information("Ignoring feed changes triggered by the page itself.");
+                        continue;
+                    }
+                    
+                    if (change.Value?.Item != "comment" || string.IsNullOrWhiteSpace(change.Value?.Message))
+                    {
+                        Log.Information("Ignoring feed changes that are not comments or contain no message.");
                         continue;
                     }
                     
@@ -348,8 +394,13 @@ namespace Corprio.SocialWorker.Controllers
                     productId = Guid.Parse(existingProducts[0].ID);
 
                     setting = await applicationSettingService.GetSetting<ApplicationSetting>(post.FacebookPage.FacebookUser.OrganizationID);
-                    botStatus = await ReinventTheBot(corprioClient: corprioClient, organizationID: post.FacebookPage.FacebookUser.OrganizationID,
-                        facebookUser: post.FacebookPage.FacebookUser, interlocutorID: change.Value.From.Id);
+                    botStatus = await ReinventTheBot(
+                        corprioClient: corprioClient, 
+                        organizationID: post.FacebookPage.FacebookUser.OrganizationID,
+                        facebookUser: post.FacebookPage.FacebookUser, 
+                        interlocutorID: change.Value.From.Id, 
+                        metaUsername: change.Value.From.Name,
+                        unMute: true);
                     bot = new DomesticHelper(context: db, configuration: configuration, client: corprioClient,
                         organizationID: post.FacebookPage.FacebookUser.OrganizationID,
                         botStatus: botStatus, pageName: post.FacebookPage.Name, setting: setting);
@@ -378,7 +429,8 @@ namespace Corprio.SocialWorker.Controllers
                     await ApiActionHelper.SendMessage(
                         httpClient: httpClient,
                         accessToken: post.FacebookPage.Token,
-                        endPoint: endPoint,
+                        messageEndPoint: endPoint,
+                        threadEndPoint: $"{BaseUrl}/{ApiVersion}/{post.FacebookPage.PageId}/release_thread_control",
                         message: message,
                         recipientId: change.Value.From.Id);
                 }
@@ -411,13 +463,16 @@ namespace Corprio.SocialWorker.Controllers
             {
                 foreach (MessageWebhookMessaging messaging in entry.Messaging)
                 {
-                    if (string.IsNullOrWhiteSpace(messaging.Message?.Text))
+                    // regardless of which message the customer unsent, we take it as an attempt to cancel the current operation
+                    string messageText = messaging.Message?.IsDeleted == true ? DomesticHelper.KillCode : messaging.Message?.Text;
+
+                    if (string.IsNullOrWhiteSpace(messageText))
                     {
                         Log.Information("Ignoring message that does not contain text (e.g., thumb-up).");
                         continue;
                     }
                     
-                    if (messaging.Message.Text.EndsWith(BabelFish.RobotEmoji))
+                    if (messageText.EndsWith(BabelFish.RobotEmoji))
                     {
                         Log.Information($"Ignoring bot-generated message from {messaging.Recipient?.MetaID} to {messaging.Sender?.MetaID}");
                         continue;
@@ -426,11 +481,11 @@ namespace Corprio.SocialWorker.Controllers
                     if (string.IsNullOrWhiteSpace(messaging.Recipient?.MetaID) || string.IsNullOrWhiteSpace(messaging.Sender?.MetaID))
                     {
                         // note: we move on to the next message instead of throwing errors
-                        Log.Error($"Recipient/sender ID for \"{messaging.Message?.Text}\" is blank.");
+                        Log.Error($"Recipient/sender ID for \"{messageText}\" is blank.");
                         continue;
                     }                                        
 
-                    if (messaging.Message?.IsEcho == true || messaging.Sender.MetaID == entry.WebhookEntryID)
+                    if (messaging.Message.IsEcho == true || messaging.Sender.MetaID == entry.WebhookEntryID)
                     {
                         Log.Information($"Ignoring echo message from {messaging.Sender.MetaID}.");
                         continue;
@@ -459,23 +514,62 @@ namespace Corprio.SocialWorker.Controllers
                     {
                         // apparently Facebook may send multiple notifications for the same message,
                         // each of which uses a different sender ID and receipient ID to represent the same sender and receipient
-                        Log.Error($"Failed to find page, and its associated objects, based on recipient ID {messaging.Recipient.MetaID}.");
-                        Log.Information($"SenderID: {messaging.Sender.MetaID}; ReceipientID: {messaging.Recipient.MetaID}; Message: {messaging.Message.Text}");
+                        Log.Error($"Failed to find page, and its associated objects, based on recipient ID {messaging.Recipient.MetaID}.");                        
                         continue;                                                
                     }
                     Log.Information($"Found relevant page with senderID: {messaging.Sender.MetaID}, receipientID: {messaging.Recipient.MetaID}; message: {messaging.Message.Text}");
 
                     setting = await applicationSettingService.GetSetting<ApplicationSetting>(page.FacebookUser.OrganizationID);
 
-                    // assumption: senderId is the same regardless if (i) the sender made a comment on a post or (ii) sent a message via messenger
+                    // confirmed via testing: senderId is the same regardless if (i) the sender made a comment on a post
+                    // or (ii) sent a message via messenger
                     botStatus = await ReinventTheBot(corprioClient: corprioClient, organizationID: page.FacebookUser.OrganizationID, 
                         facebookUser: page.FacebookUser, interlocutorID: messaging.Sender.MetaID);
+                    if (botStatus.IsMuted) continue;
+                    
+                    messageText = messageText.Trim();
+                    if (messageText.Equals(BabelFish.SOS, StringComparison.OrdinalIgnoreCase) || messageText.Equals(BabelFish.SOS_CN, StringComparison.OrdinalIgnoreCase))
+                    {                        
+                        botStatus.IsMuted = true;
+                        db.MetaBotStatuses.Update(botStatus);
+                        await db.SaveChangesAsync();
+
+                        string platform = payload.Object == "instagram" ? "Instagram" : "Facebook";
+                        string customerName = string.IsNullOrWhiteSpace(botStatus.MetaUserName) ? Resources.SharedResource.Unknown_Italic : botStatus.MetaUserName;
+                        string customerEmail = string.IsNullOrWhiteSpace(botStatus.BuyerEmail) ? Resources.SharedResource.Unknown_Italic : botStatus.BuyerEmail;
+                        OrganizationCoreInfo org = await corprioClient.OrganizationApi.GetCoreInfo(page.FacebookUser.OrganizationID);
+                        if (org == null)
+                        {
+                            Log.Error("Failed to retrieve the organization email address.");
+                            continue;
+                        }
+
+                        var email = new Core.EmailMessage()
+                        {
+                            //ToEmails = [new Core.EmailAddress("frank@popularit.com")],
+                            ToEmails = [org.EmailAddress],
+                            Subject = "[" + Resources.SharedResource.AppName + "] " + string.Format(Resources.SharedResource.HumanEscalation_EmailSubject, page.Name, platform),
+                            Body = string.Format(Resources.SharedResource.HumanEscalation_EmailBody, platform, customerName, messaging.Sender.MetaID, customerEmail, page.Name)
+                        };
+
+                        try
+                        {
+                            await emailHelper.SendEmailAsync(email);
+                        }
+                        catch (Exception ex) 
+                        {
+                            Log.Error($"Failed to escalate to the merchant. {ex.Message}");
+                        }
+
+                        continue;
+                    }
+
                     bot = new DomesticHelper(context: db, configuration: configuration, client: corprioClient, organizationID: page.FacebookUser.OrganizationID, 
                         botStatus: botStatus, detectedLocales: messaging.Message?.NLP?.DetectedLocales, pageName: page.Name, setting: setting);
                     
                     try
                     {
-                        response = await bot.ThinkBeforeSpeak(messaging.Message.Text);
+                        response = await bot.ThinkBeforeSpeak(messageText);
                     }
                     catch (Exception ex)
                     {
@@ -490,7 +584,8 @@ namespace Corprio.SocialWorker.Controllers
                     await ApiActionHelper.SendMessage(
                         httpClient: httpClient,
                         accessToken: page.Token,
-                        endPoint: endPoint,
+                        messageEndPoint: endPoint,
+                        threadEndPoint: $"{BaseUrl}/{ApiVersion}/{page.PageId}/release_thread_control",
                         message: response,
                         recipientId: messaging.Sender.MetaID);
                 }
@@ -517,8 +612,8 @@ namespace Corprio.SocialWorker.Controllers
         /// <returns></returns>
         [HttpPost("/webhook")]
         public async Task<IActionResult> HandleWebhookPost([FromServices] ApplicationSettingService applicationSettingService, [FromServices] HttpClient httpClient)
-        {            
-            string hash = Request.Headers.ContainsKey("x-hub-signature-256") ? Request.Headers["x-hub-signature-256"] : string.Empty;            
+        {
+            string hash = Request.Headers.ContainsKey("x-hub-signature-256") ? Request.Headers["x-hub-signature-256"] : string.Empty;
             (bool verified, string requestString) = await HashCheck(request: Request, metaHash: hash);
             if (!verified)
             {
@@ -539,7 +634,7 @@ namespace Corprio.SocialWorker.Controllers
 
             // if the payload includes "Changes" and field is "feed", then presumably it is for webhook on feed
             FeedWebhookPayload feedWebhookPayload = requestString == null ? null : JsonConvert.DeserializeObject<FeedWebhookPayload>(requestString)!;
-            if (feedWebhookPayload?.Entry?.Any(x => x.Changes.Any(y => y.Field == "feed")) ?? false)
+            if (feedWebhookPayload?.Object == "page" && (feedWebhookPayload?.Entry?.Any(x => x.Changes.Any(y => y.Field == "feed")) ?? false))
             {
                 Log.Information("The webhook appears to be a feed webhook.");
                 return await HandleFeedWebhook(httpClient: httpClient, corprioClient: corprioClient,
@@ -548,7 +643,7 @@ namespace Corprio.SocialWorker.Controllers
 
             // if the payload includes "Changes" and field is "comment", then presumably it is for webhook on comment
             CommentWebhookPayload commentWebhookPayload = requestString == null ? null : JsonConvert.DeserializeObject<CommentWebhookPayload>(requestString)!;
-            if (commentWebhookPayload?.Entry?.Any(x => x.Changes.Any(y => y.Field == "comments")) ?? false)
+            if (commentWebhookPayload?.Object == "instagram" && (commentWebhookPayload?.Entry?.Any(x => x.Changes.Any(y => y.Field == "comments")) ?? false))
             {
                 Log.Information("The webhook appears to be a comment webhook.");
                 return await HandleCommentWebhook(httpClient: httpClient, corprioClient: corprioClient,

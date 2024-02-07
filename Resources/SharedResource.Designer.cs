@@ -1015,6 +1015,24 @@ namespace Corprio.SocialWorker.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to &lt;html&gt;&lt;body&gt;&lt;p&gt;A customer on &lt;b&gt;{0} Messenger&lt;/b&gt; would like to communicate with a human rather than a chatbot. Please refer to below for the customer&apos;s particulars and reach out to them accordingly.&lt;/p&gt;&lt;ul&gt;&lt;li&gt;{0} user name: {1}&lt;/li&gt;&lt;li&gt;{0} user ID: {2}&lt;/li&gt;&lt;li&gt;Email address: &lt;u&gt;{3}&lt;/u&gt;&lt;/li&gt;&lt;li&gt;Shopping at: &lt;b&gt;{4}&lt;/b&gt; ({0})&lt;/li&gt;&lt;/ul&gt;&lt;/body&gt;&lt;/html&gt;.
+        /// </summary>
+        public static string HumanEscalation_EmailBody {
+            get {
+                return ResourceManager.GetString("HumanEscalation_EmailBody", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A {0} customer on {1} Messenger would like to contact you.
+        /// </summary>
+        public static string HumanEscalation_EmailSubject {
+            get {
+                return ResourceManager.GetString("HumanEscalation_EmailSubject", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Line 1 cannot be blank..
         /// </summary>
         public static string InvalidFeedback_AddressLine1 {
@@ -2550,6 +2568,15 @@ namespace Corprio.SocialWorker.Resources {
         public static string UnitPrice {
             get {
                 return ResourceManager.GetString("UnitPrice", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;i&gt;Unknown&lt;/i&gt;.
+        /// </summary>
+        public static string Unknown_Italic {
+            get {
+                return ResourceManager.GetString("Unknown_Italic", resourceCulture);
             }
         }
         

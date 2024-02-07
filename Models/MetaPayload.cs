@@ -4,7 +4,12 @@ using Newtonsoft.Json;
 namespace Corprio.SocialWorker.Models
 {    
     public class OneLinePayload : MetaPayloadError
-    {        
+    {
+        /// <summary>
+        /// IMPORTANT: 
+        /// it is NOT always possible to use this ID to query the object, as it may be a page-scoped ID, 
+        /// which is assigned to a person the first time they send a message to a particular Page
+        /// </summary>
         [JsonProperty("id")]
         public string MetaID { get; set; }
     }

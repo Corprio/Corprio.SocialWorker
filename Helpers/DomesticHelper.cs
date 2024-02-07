@@ -40,7 +40,8 @@ namespace Corprio.SocialWorker.Helpers
 
         // magic numbers
         private const int ChoiceLimit = 10;
-        private const string KillCode = "!c";
+        public const string KillCode = "!c";
+        private const string KillCode_CN = "！c";  // note: the exclamation mark in Chinese is different from English
         private const int OTP_MaxFailedAttempts = 3;
         private const int OTP_Length = 6;
         private const int OTP_SecondsToExpire = 120;
@@ -165,7 +166,7 @@ namespace Corprio.SocialWorker.Helpers
             {
                 choices += $"{i + 1} - {attributeValues.Value[i].Name}\n";
             }
-            choices += ThusSpokeBabel(key: "Hint_Cancel", placeholders: [KillCode]);
+            choices += ThusSpokeBabel(key: "Hint_CancelAndEscalate", placeholders: [KillCode]);
             return choices;
         }
 
@@ -185,10 +186,12 @@ namespace Corprio.SocialWorker.Helpers
                     choices += $"{i + 1} - {Bot.ProductMemory[i].ProductName} \n";
             }
             choices += ThusSpokeBabel("NoneOfTheAbove") + "\n";
+            
             if (Bot.ProductMemory.Count > ChoiceLimit)
-            {                
                 choices += ThusSpokeBabel(key: "TooManyResults", placeholders: [ChoiceLimit.ToString()]) + "\n";
-            }
+            else
+                choices += ThusSpokeBabel("Hint_Escalate");
+
             return choices;
         }
         
@@ -579,11 +582,11 @@ namespace Corprio.SocialWorker.Helpers
                     ProductSummary product = Bot.ProductMemory[0];
                     return ThusSpokeBabel(key: "AskOneProduct", 
                         placeholders: product.ProductPriceValue.HasValue 
-                            ? [product.ProductName + "@" + product.ProductPriceCurrency + product.ProductPriceValue] 
+                            ? [product.ProductName + "@" + product.ProductPriceCurrency + product.ProductPriceValue?.ToString("F2")] 
                             : [product.ProductName]);
 
                 case BotTopic.ProductMC:
-                    return ThusSpokeBabel(key: "AskMultiProducts", placeholders: [ProductChoiceString()]);
+                    return ThusSpokeBabel("AskMultiProducts") + ProductChoiceString();
 
                 case BotTopic.ProductVariationMC:
                     KeyValuePair<string, List<VariationSummary>> attributeValues = Bot.VariationMemory.FirstOrDefault(x => x.Value.Count > 0);
@@ -625,7 +628,7 @@ namespace Corprio.SocialWorker.Helpers
                     return ThusSpokeBabel("AskCheckout");
 
                 case BotTopic.ClearCartYN:
-                    return ThusSpokeBabel(key: "AskClearCart", placeholders: [CartItemString(showPrice: false)]);
+                    return ThusSpokeBabel("AskClearCart") + "\n" + ThusSpokeBabel("Hint_Escalate");
 
                 case BotTopic.EmailOpen:
                     return ThusSpokeBabel("AskEmail");
@@ -636,7 +639,7 @@ namespace Corprio.SocialWorker.Helpers
                         Log.Error("The bot was expecting an ongoing promotion but there was none.");
                         return await Checkout();
                     }
-                    Log.Error("No promotion is implemented in the bot yet.");                    
+                    Log.Error("No promotion is implemented in the bot yet.");
                     return ThusSpokeBabel("Err_DefaultMsg");
 
                 default:
@@ -841,7 +844,7 @@ namespace Corprio.SocialWorker.Helpers
             }
             
             Bot.ThinkingOf = BotTopic.EmailConfirmationOpen;
-            Bot.OtpSessionID = sessionID;            
+            Bot.OtpSessionID = sessionID;
             await Save();
             return ThusSpokeBabel(key: "CodeSent", placeholders: [OTP_Length.ToString(), Bot.BuyerEmail, (OTP_SecondsToExpire/60).ToString(), KillCode]);
         }
@@ -1187,7 +1190,8 @@ namespace Corprio.SocialWorker.Helpers
             if (string.IsNullOrWhiteSpace(input)) return null;
 
             input = input.Trim();
-            if (input.Equals(KillCode, StringComparison.OrdinalIgnoreCase)) return await HandleCancel();
+            if (input.Equals(KillCode, StringComparison.OrdinalIgnoreCase) || input.Equals(KillCode_CN, StringComparison.OrdinalIgnoreCase)) 
+                return await HandleCancel();
             
             switch (Bot.ThinkingOf)
             {
@@ -1207,7 +1211,7 @@ namespace Corprio.SocialWorker.Helpers
                         await Save();
                         return await AskQuestion();
                     }
-                    return ThusSpokeBabel(key: "CannotFindProduct", placeholders: [input]);
+                    return ThusSpokeBabel(key: "CannotFindProduct", placeholders: [input]) + "\n" + ThusSpokeBabel("Hint_Escalate");
 
                 case BotTopic.NewCustomerYN:
                 case BotTopic.ProductYN:
