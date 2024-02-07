@@ -987,6 +987,12 @@
   <data name="ErrMsg_NoPaymentMethod" xml:space="preserve">
     <value>商户尚未设置支付方式。</value>
   </data>
+  <data name="HumanEscalation_EmailBody" xml:space="preserve">
+    <value>&lt;html&gt;&lt;body&gt;&lt;p&gt;有一位 &lt;b&gt;{0} Messenger&lt;/b&gt; 上的客户希望与真人而非聊天机器人进行交流。请参阅以下客户的详细资料并与他联系。&lt;/p&gt;&lt;ul&gt;&lt;li&gt;{0}用户名：{1}&lt;/li&gt;&lt;li&gt;{0}用户 ID：{2} &lt;/li&gt;&lt;li&gt;电子邮件地址：&lt;u&gt;{3}&lt;/u&gt;&lt;/li&gt;&lt;li&gt;购物地点：&lt;b&gt;{4}&lt;/b&gt; ({0})&lt;/li&gt;&lt;/ul&gt;&lt;/li&gt;&lt;/body&gt;&lt;/html&gt;</value>
+  </data>
+  <data name="HumanEscalation_EmailSubject" xml:space="preserve">
+    <value>一位 {1} Messenger 上的 {0} 客户希望与您联系</value>
+  </data>
   <data name="ModifySMTP" xml:space="preserve">
     <value>变更设置</value>
   </data>
@@ -998,5 +1004,8 @@
   </data>
   <data name="Tour_Rerun" xml:space="preserve">
     <value>如果您希望重温这个应用导航，请单击此按钮。</value>
+  </data>
+  <data name="Unknown_Italic" xml:space="preserve">
+    <value>&lt;i&gt;未知&lt;/i&gt;</value>
   </data>
 </root>

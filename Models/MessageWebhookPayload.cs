@@ -4,6 +4,32 @@ using Newtonsoft.Json;
 
 namespace Corprio.SocialWorker.Models
 {
+    /// <summary>
+    /// Examples from log:
+    /// {"object":"page",
+    ///  "entry":[
+    ///    {"id":"206070979425408","time":1707212090210, "messaging":[
+    ///     {"sender":{"id":"24266381753005180"},"recipient":{"id":"206070979425408"},"timestamp":1707212089992,
+    ///      "message":{"mid":"m_dUbr3n22bB5lu3yw12_U1AE_CMJRAw0ScbMqUb2EAOjmxmRMyKgip04DehusAun1K57iI4JUil3XkDzOcuZi7w",
+    ///                 "text":"\u4e0d",
+    ///                 "nlp":{"intents":[],"entities":{},"traits":{},"detected_locales":[{"locale":"zh_TW","confidence":0.5421}]}
+    ///     }
+    ///    ]
+    ///   }
+    ///  ]
+    /// }    
+    /// {"object":"instagram",
+    ///  "entry":[
+    ///    {"time":1707268409629,"id":"17841462460365475","messaging":[
+    ///      {"sender":{"id":"24286888740958239"},"recipient":{"id":"17841462460365475"},"timestamp":1707268406396,
+    ///       "message":{"mid":"aWdfZAG1faXRlbToxOklHTWVzc2FnZAUlEOjE3ODQxNDYyNDYwMzY1NDc1OjM0MDI4MjM2Njg0MTcxMDMwMTI0NDI1OTM4NDQzMzA2NDE5OTI0NTozMTQ5MzU0MzM1NzkyOTAyNzUxODIzNjIzMjU4MjY5Mjg2NAZDZD",
+    ///                 "text":"!h"}
+    ///       }
+    ///      ]
+    ///     }
+    ///    ]
+    ///   }
+    /// </summary>
     public class MessageWebhookPayload
     {
         [JsonProperty("object")]
@@ -66,6 +92,12 @@ namespace Corprio.SocialWorker.Models
         /// </summary>
         [JsonProperty("is_echo")]
         public bool? IsEcho { get; set; }
+
+        /// <summary>
+        /// True if a message was un-sent (Note: Text is null in this case)
+        /// </summary>
+        [JsonProperty("is_deleted")]
+        public bool? IsDeleted { get; set; }
 
         /// <summary>
         /// NLP-related properties provided by Wit.ai, which are available only if NLP has been turned on for the page

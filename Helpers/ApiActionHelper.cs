@@ -82,40 +82,77 @@ namespace Corprio.SocialWorker.Helpers
         /// Send a message: 
         /// - from IG Professional account (https://developers.facebook.com/docs/messenger-platform/instagram/features/send-message), or
         /// - from a FB page (https://developers.facebook.com/docs/messenger-platform/send-messages)
+        /// Release control of conversation:
+        /// https://developers.facebook.com/docs/messenger-platform/handover-protocol/conversation-control#releasing-control
         /// </summary>
         /// <param name="httpClient">HTTP client for executing API query</param>
         /// <param name="accessToken">A Page access token requested from a person who can perform the MESSAGE task on the FB Page (linked to the IG Professional account)</param>
-        /// <param name="endPoint">Endpoint to which the message will be sent</param>
+        /// <param name="messageEndPoint">Endpoint to which the message will be sent</param>
+        /// <param name="threadEndPoint">Endpoint to release control</param>
         /// <param name="message">Message to be sent</param>
-        /// <param name="recipientId">ID of the recipient, which - in the case of IG Messenger - MUST have sent the business a message</param>        
+        /// <param name="recipientId">ID of the recipient, which - in the case of IG Messenger - MUST have sent the business a message</param>
+        /// <param name="allowResend">True if the message is resent upon encountering certain error</param>        
         /// <returns>Payload returned by Meta API</returns>
-        public static async Task<MessageFeedback> SendMessage(HttpClient httpClient, string accessToken, string endPoint, string message,
-            string recipientId)
+        public static async Task<MessageFeedback> SendMessage(HttpClient httpClient, string accessToken, string messageEndPoint, 
+            string threadEndPoint, string message, string recipientId, bool allowResend = true)
         {            
             dynamic queryParams = new ExpandoObject();
             queryParams.access_token = accessToken;
             queryParams.recipient = new { id = recipientId };
             queryParams.message = new { text = message };
             // see Mesaging Types for FB: https://developers.facebook.com/docs/messenger-platform/send-messages#messaging_types
-            if (!endPoint.Contains(@"me/messages")) { queryParams.messaging_type = "RESPONSE"; }
+            if (!messageEndPoint.Contains(@"me/messages")) { queryParams.messaging_type = "RESPONSE"; }
             var httpRequest = new HttpRequestMessage()
             {
                 Method = HttpMethod.Post,
-                RequestUri = new Uri(endPoint),
+                RequestUri = new Uri(messageEndPoint),
                 Content = new StringContent(content: System.Text.Json.JsonSerializer.Serialize(queryParams), encoding: Encoding.UTF8, mediaType: "application/json")
             };
+
+            // note: the bot is supposed to send message ONLY when the thread is idle, so we don't bother to request control of conversation
+            // reference: https://developers.facebook.com/docs/messenger-platform/handover-protocol/conversation-control#request-control
             HttpResponseMessage response = await httpClient.SendAsync(httpRequest);
             if (!response.IsSuccessStatusCode)
             {
                 Log.Error($"HTTP request to send message fails. Response: {System.Text.Json.JsonSerializer.Serialize(response)}");
+                if (allowResend)
+                {
+                    string header = response.Headers.GetValues("WWW-Authenticate").FirstOrDefault();
+                    // note 1: apparently Facebook has a bug that sometimes fails to send message to an un-opt-out user
+                    // note 2: cannot rely on the error code because it is not always 551
+                    // reference: https://stackoverflow.com/questions/44379656/551-error-with-facebook-messenger-bot-this-person-isnt-available-right-now
+                    if (!string.IsNullOrWhiteSpace(header) && header.Contains("This person isn't available right now"))
+                    {
+                        Log.Information("Apparently had a this-person-isnt-available-right-now error; resending the message once.");
+                        return await SendMessage(httpClient: httpClient, accessToken: accessToken,
+                            messageEndPoint: messageEndPoint, threadEndPoint: threadEndPoint, message: message, 
+                            recipientId: recipientId, allowResend: false);
+                    }
+                }
                 return null;
-            }
+            }            
             string responseString = await response.Content.ReadAsStringAsync();
             MessageFeedback feedback = response?.Content == null ? new() : JsonConvert.DeserializeObject<MessageFeedback>(responseString)!;
             if (feedback?.Error != null)
             {
                 Log.Error($"Encountered an error when sending a message to {recipientId}. {feedback?.Error?.CustomErrorMessage()}");
             }
+
+            // as a good practice, we release control of conversation thread after sending each message
+            // reference: https://developers.facebook.com/docs/messenger-platform/handover-protocol/conversation-control#releasing-control
+            queryParams = new ExpandoObject();
+            queryParams.access_token = accessToken;
+            queryParams.recipient = new { id = recipientId };            
+            var releaseControlRequest = new HttpRequestMessage()
+            {
+                Method = HttpMethod.Post,
+                RequestUri = new Uri(threadEndPoint),
+                Content = new StringContent(content: System.Text.Json.JsonSerializer.Serialize(queryParams), encoding: Encoding.UTF8, mediaType: "application/json")
+            };            
+            response = await httpClient.SendAsync(releaseControlRequest);
+            responseString = await response.Content.ReadAsStringAsync();
+            Log.Information($"Releases control of conversation. Response: {responseString}");
+
             return feedback;
         }        
     }
