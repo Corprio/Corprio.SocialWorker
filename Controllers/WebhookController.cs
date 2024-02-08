@@ -443,7 +443,7 @@ namespace Corprio.SocialWorker.Controllers
                             httpClient: httpClient, 
                             accessToken: post.FacebookPage.Token, 
                             endPoint: $"{BaseUrl}/{ApiVersion}/{change.Value.CommentId}/comments", 
-                            message: Resources.SharedResource.AutoReplyComment);
+                            message: string.Format(Resources.SharedResource.AutoReplyComment, setting.KeywordForShoppingIntention));
 
                     }
                 }
