@@ -90,11 +90,10 @@ namespace Corprio.SocialWorker.Helpers
         /// <param name="messageEndPoint">Endpoint to which the message will be sent</param>
         /// <param name="threadEndPoint">Endpoint to release control</param>
         /// <param name="message">Message to be sent</param>
-        /// <param name="recipientId">ID of the recipient, which - in the case of IG Messenger - MUST have sent the business a message</param>
-        /// <param name="allowResend">True if the message is resent upon encountering certain error</param>        
+        /// <param name="recipientId">ID of the recipient, which - in the case of IG Messenger - MUST have sent the business a message</param>        
         /// <returns>Payload returned by Meta API</returns>
         public static async Task<MessageFeedback> SendMessage(HttpClient httpClient, string accessToken, string messageEndPoint, 
-            string threadEndPoint, string message, string recipientId, bool allowResend = true)
+            string threadEndPoint, string message, string recipientId)
         {            
             dynamic queryParams = new ExpandoObject();
             queryParams.access_token = accessToken;
@@ -102,6 +101,7 @@ namespace Corprio.SocialWorker.Helpers
             queryParams.message = new { text = message };
             // see Mesaging Types for FB: https://developers.facebook.com/docs/messenger-platform/send-messages#messaging_types
             if (!messageEndPoint.Contains(@"me/messages")) { queryParams.messaging_type = "RESPONSE"; }
+
             var httpRequest = new HttpRequestMessage()
             {
                 Method = HttpMethod.Post,
@@ -114,21 +114,22 @@ namespace Corprio.SocialWorker.Helpers
             HttpResponseMessage response = await httpClient.SendAsync(httpRequest);
             if (!response.IsSuccessStatusCode)
             {
-                Log.Error($"HTTP request to send message fails. Response: {System.Text.Json.JsonSerializer.Serialize(response)}");
-                if (allowResend)
-                {
-                    string header = response.Headers.GetValues("WWW-Authenticate").FirstOrDefault();
-                    // note 1: apparently Facebook has a bug that sometimes fails to send message to an un-opt-out user
-                    // note 2: cannot rely on the error code because it is not always 551
-                    // reference: https://stackoverflow.com/questions/44379656/551-error-with-facebook-messenger-bot-this-person-isnt-available-right-now
-                    if (!string.IsNullOrWhiteSpace(header) && header.Contains("This person isn't available right now"))
-                    {
-                        Log.Information("Apparently had a this-person-isnt-available-right-now error; resending the message once.");
-                        return await SendMessage(httpClient: httpClient, accessToken: accessToken,
-                            messageEndPoint: messageEndPoint, threadEndPoint: threadEndPoint, message: message, 
-                            recipientId: recipientId, allowResend: false);
-                    }
-                }
+                Log.Error($"HTTP request to send message fails. Response: {System.Text.Json.JsonSerializer.Serialize(response)}");                                
+                //if (allowResend)
+                //{
+                //    string header = response.Headers.GetValues("WWW-Authenticate").FirstOrDefault();
+                //    // note 1: apparently Facebook has a bug that sometimes fails to send message to an un-opt-out user
+                //    // note 2: cannot solely rely on the error code = #551 because someone on Stackoverflow reported it could be #200
+                //    // note 3: The error message can be "This person isn't available right now" or "This person isn't available at the moment"
+                //    // reference: https://stackoverflow.com/questions/44379656/551-error-with-facebook-messenger-bot-this-person-isnt-available-right-now
+                //    if (!string.IsNullOrWhiteSpace(header) && (header.Contains("#551") || header.Contains("This person isn't available")))
+                //    {
+                //        Log.Information("Resending the message once to handle this-person-isnt-available-right-now error.");
+                //        return await SendMessage(httpClient: httpClient, accessToken: accessToken,
+                //            messageEndPoint: messageEndPoint, threadEndPoint: threadEndPoint, message: message, 
+                //            recipientId: recipientId, allowResend: false);
+                //    }
+                //}
                 return null;
             }            
             string responseString = await response.Content.ReadAsStringAsync();
@@ -152,7 +153,7 @@ namespace Corprio.SocialWorker.Helpers
             response = await httpClient.SendAsync(releaseControlRequest);
             responseString = await response.Content.ReadAsStringAsync();
             Log.Information($"Releases control of conversation. Response: {responseString}");
-
+            
             return feedback;
         }        
     }

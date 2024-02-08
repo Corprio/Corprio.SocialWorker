@@ -151,6 +151,15 @@ namespace Corprio.SocialWorker.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Hello, our chatbot tried to send you a direct message but failed. To proceed with your purchase, please copy the product name from the post and send it via direct message to our Facebook Page. Thank you. 🤖.
+        /// </summary>
+        public static string AutoReplyComment {
+            get {
+                return ResourceManager.GetString("AutoReplyComment", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Bill sales order.
         /// </summary>
         public static string BillSalesOrder {

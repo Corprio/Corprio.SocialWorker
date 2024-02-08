@@ -22,6 +22,8 @@ using Corprio.AspNetCore.Site.Services;
 using System.ServiceModel.Channels;
 using Corprio.DataModel.Business;
 using Corprio.Core;
+using Azure.Core;
+using System.Net;
 
 namespace Corprio.SocialWorker.Controllers
 {
@@ -422,17 +424,28 @@ namespace Corprio.SocialWorker.Controllers
                     }
                     message += BabelFish.RobotEmoji;
 
-                    string endPoint = post.PostedWith == MetaProduct.Facebook
+                    string messageEndPoint = post.PostedWith == MetaProduct.Facebook
                         ? $"{BaseUrl}/{ApiVersion}/{post.FacebookPage.PageId}/messages"
-                        : $"{BaseUrl}/{ApiVersion}/me/messages";
+                        : $"{BaseUrl}/{ApiVersion}/me/messages";                    
 
-                    await ApiActionHelper.SendMessage(
+                    MessageFeedback feedback = await ApiActionHelper.SendMessage(
                         httpClient: httpClient,
                         accessToken: post.FacebookPage.Token,
-                        messageEndPoint: endPoint,
+                        messageEndPoint: messageEndPoint,
                         threadEndPoint: $"{BaseUrl}/{ApiVersion}/{post.FacebookPage.PageId}/release_thread_control",
                         message: message,
                         recipientId: change.Value.From.Id);
+
+                    // if the message failed to be sent, make a reply to the post
+                    if (feedback == null && !string.IsNullOrWhiteSpace(change.Value.CommentId))
+                    {
+                        await ApiActionHelper.PostOrComment(
+                            httpClient: httpClient, 
+                            accessToken: post.FacebookPage.Token, 
+                            endPoint: $"{BaseUrl}/{ApiVersion}/{change.Value.CommentId}/comments", 
+                            message: Resources.SharedResource.AutoReplyComment);
+
+                    }
                 }
             }
             return StatusCode(200);
@@ -521,7 +534,7 @@ namespace Corprio.SocialWorker.Controllers
 
                     setting = await applicationSettingService.GetSetting<ApplicationSetting>(page.FacebookUser.OrganizationID);
 
-                    // confirmed via testing: senderId is the same regardless if (i) the sender made a comment on a post
+                    // confirmed via testing: senderId is the same regardless if the sender (i) made a comment on a post
                     // or (ii) sent a message via messenger
                     botStatus = await ReinventTheBot(corprioClient: corprioClient, organizationID: page.FacebookUser.OrganizationID, 
                         facebookUser: page.FacebookUser, interlocutorID: messaging.Sender.MetaID);

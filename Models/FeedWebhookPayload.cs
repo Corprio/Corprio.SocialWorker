@@ -76,6 +76,12 @@ namespace Corprio.SocialWorker.Models
         public string Item { get; set; }
 
         /// <summary>
+        /// The comment ID
+        /// </summary>
+        [JsonProperty("comment_id")]
+        public string CommentId { get; set; }
+
+        /// <summary>
         /// The post ID
         /// </summary>
         [JsonProperty("post_id")]

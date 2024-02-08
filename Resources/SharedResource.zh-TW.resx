@@ -969,6 +969,9 @@
   <data name="Warning_para3" xml:space="preserve">
     <value>您即將終止 {0} 與 Facebook 帳號的連接。此操作無法撤消，並且會產生以下影響：</value>
   </data>
+  <data name="AutoReplyComment" xml:space="preserve">
+    <value>您好，我們的聊天機器人嘗試向您發送私訊但失敗。要繼續購買，請複製貼文中的產品名稱並私訊到我們的 Facebook 頁面。謝謝。 🤖</value>
+  </data>
   <data name="ErrMsg_BlankPostMsg" xml:space="preserve">
     <value>貼文不能留白。</value>
   </data>
