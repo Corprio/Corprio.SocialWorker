@@ -31,7 +31,7 @@
             @* col.Add().Caption(localizer["Publish"]).Name("Publish").Type(GridCommandColumnType.Buttons).Width(52).ShowInColumnChooser(false)
             .Buttons(b => b.Add().Hint(localizer["PublishProductHint"]).Icon("upload").OnClick("PublishProduct").CssClass("publish-btn")); *@
             col.AddFor(m => m.PostIDs).DataType(GridColumnDataType.Object).Caption(localizer["Publish"]).Name("Publish").Width(52).ShowInColumnChooser(false)
-            .AllowFiltering(false).AllowSorting(false).CssClass("publish-col").CellTemplate(@<text>
+            .AllowFiltering(false).AllowSorting(false).AllowExporting(false).CssClass("publish-col").CellTemplate(@<text>
             <% if (data.PostIDs.length) { %>
                 @Html.DevExtreme().Button().Icon("exportselected").OnClick("function() { PublishProduct(data) }").Hint(localizer["PublishProductHint2"])
             <% } else {%>
