@@ -970,7 +970,7 @@
     <value>You are about to disconnect {0} from your Facebook account. This action cannot be undone and has the following implications:</value>
   </data>
   <data name="AutoReplyComment" xml:space="preserve">
-    <value>Hello, our chatbot tried to send you a direct message but failed. To proceed with your purchase, please copy the product name from the post and send it via direct message to our Facebook Page. Thank you. 🤖</value>
+    <value>Hello, our chatbot tried to send you a direct message but failed. To proceed with your purchase, please send '{0}' via direct message to our Facebook Page. Thank you. 🤖</value>
   </data>
   <data name="ErrMsg_BlankPostMsg" xml:space="preserve">
     <value>Content of the post cannot be blank.</value>
@@ -1010,5 +1010,11 @@
   </data>
   <data name="Unknown_Italic" xml:space="preserve">
     <value>&lt;i&gt;Unknown&lt;/i&gt;</value>
+  </data>
+  <data name="ErrMsg_FacebookNotLoggedIn" xml:space="preserve">
+    <value>Please make sure you have logged into Facebook.</value>
+  </data>
+  <data name="PublishProductPrompt2" xml:space="preserve">
+    <value>The following post will be made to your Facebook page(s) and Instagram account(s). Please review and confirm.</value>
   </data>
 </root>

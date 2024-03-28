@@ -1,7 +1,4 @@
-﻿@using Corprio.DataModel.Business.Products
-@using Corprio.AspNetCore.Site.Extensions
-@using Corprio.SocialWorker.Models
-@inject System.Text.Encodings.Web.JavaScriptEncoder encoder
+﻿@inject System.Text.Encodings.Web.JavaScriptEncoder encoder
 @inject Corprio.CorprioAPIClient.APIClient corprio
 @inject Microsoft.Extensions.Configuration.IConfiguration configuration
 @{
@@ -47,7 +44,7 @@
             col.AddFor(m => m.GlobalizedDescription).DataType(GridColumnDataType.String).GlobalText().Visible(false);
             col.AddFor(m => m.GlobalizedLongDescription).DataType(GridColumnDataType.String).GlobalHTML().Visible(false);
             col.AddFor(m => m.DefaultBarcode).DataType(GridColumnDataType.String).Visible(false);
-            col.AddFor(m => m.Nature).DataType(GridColumnDataType.Number).LookupEnum(typeof(ProductNature)).Visible(false);
+            col.AddFor(m => m.Nature).DataType(GridColumnDataType.Number).LookupEnum(typeof(Corprio.DataModel.Business.Products.ProductNature)).Visible(false);
             col.AddFor(m => m.ProductTypeID).DataType(GridColumnDataType.String)
             .LookupProductType(organizationID)
             .CalculateDisplayValue(nameof(ProductViewModel.ProductTypeName))
@@ -77,7 +74,7 @@
             .CalculateFilterExpression("filterTag")
             .FilterOperations(new GridFilterOperations[] { GridFilterOperations.Equal })
             .CellTemplate(new JS("TagsCellTemplate"))
-            .EditCellTemplate(new TemplateName("TagsEditTemplate"))
+            @* .EditCellTemplate(new TemplateName("TagsEditTemplate")) *@
             .AllowSorting(false);
             col.AddFor(m => m.IsMasterProduct).Visible(false).CellTemplate(new JS(@$"corprio.ui.boolColumnCellTemplate('{Corprio.DataModel.Resources.Resource.IsMasterProduct}')"));            
             col.AddFor(m => m.Disabled).DataType(GridColumnDataType.Boolean).FilterValue(false).Width(60).CellTemplate(new JS(@$"corprio.ui.boolColumnCellTemplate('{Corprio.DataModel.Resources.Resource.IsDisabled}')"));
@@ -94,11 +91,12 @@
             items.Add().Name(DataGridToolbarItem.ColumnChooserButton).Location(ToolbarItemLocation.After);
             items.Add().Name(DataGridToolbarItem.ExportButton).Location(ToolbarItemLocation.After);
         }))
-    )    
-    <div id="load-panel"></div>
+    )        
+    <div id="load-panel"></div>    
 </div>
 <vc:static-data model="@StaticDataRequestViewModel.All(true)" org-info="true" />
 <script>
+    let facebookId;
     const viewSettingConfig = corprio.gridViewStateConfig("product", "grd");
     const langs = StaticData.OrgInfo.SupportedLanguages;    
     function loadPanel() {
@@ -117,17 +115,17 @@
         console.log(e);        
         return $.post({
             url: "@Url.Action("PreviewProductPost", new { organizationID })",
-            data: { productID: e.ID, }
+            data: { productID: e.ID }
         }).done(function (result) {            
             if (!result) return;   // see PostTemplateSummary for the shape of this object
-            let warning = "@encoder.Encode(localizer["PublishProductPrompt"])";
-            warning = warning.replaceAll('{0}', result.Keyword);
+            let warning = "@encoder.Encode(localizer["PublishProductPrompt2"])";
+            // warning = warning.replaceAll('{0}', result.Keyword);
             var prompt = DevExpress.ui.dialog.custom({
                 title: "@encoder.Encode(localizer["PublishProduct"])",
                 dragEnabled: false,
                 messageHtml:
                     `<div class="mb-3">${warning}</div>` +
-                    `<textarea id="post-message" class="form-control" rows="6" cols="40">${result.Preview}</textarea>`,
+                    `<textarea id="post-message" class="form-control" rows="6" cols="40">${result}</textarea>`,
                 buttons: [{
                     text: "@encoder.Encode(localizer["Confirm"])",
                     onClick: function () {
@@ -136,8 +134,9 @@
                             url: "@Url.Action("PublishProduct", new { organizationID })",
                             type: 'POST',
                             data: {
-                                productID: e.ID,
-                                message: $('#post-message').val()
+                                productID: e.ID,                                
+                                message: $('#post-message').val(),
+                                facebookUserID: facebookId,
                             }                            
                         }).done(function () {
                             var message = DevExpress.ui.dialog.custom({
@@ -170,7 +169,7 @@
             return numberFormat.format(rowData.ListPrice_Value);
         }
     }        
-
+    
     function imageCellDisplay(cellElement, cellInfo) {
         if (cellInfo.value && cellInfo.value.UrlKey) cellElement.append($("<img>", { "src": '@corprio.ImageApi.UrlPrefix(organizationID, ImageSize.Thumbnail)' + cellInfo.value.UrlKey, "alt": cellInfo.data.Code }));
     }
@@ -199,7 +198,7 @@
     
     function filterTag(filterValue, selectedFilterOperation) {
         return ["EntityProperties.Any(Name==\"tag\" && Value==\"" + filterValue + "\")", "=", "true"];
-    }    
+    }
     
     // when a row is clicked, redirect to ProductMaster's edit page, unless it is the Publish button being clicked
     function onCellClick(e) {                
@@ -216,8 +215,9 @@
     // since this page may become the login landing page, it should trigger refresh access token whenever possible
     window.fbAsyncInit = function () {
         FB.init({ appId: '@metaApiID', cookie: true, xfbml: true, version: '@metaApiVersion' });        
-        FB.getLoginStatus(function (response) {   // Called after the JS SDK has been initialized.            
+        FB.getLoginStatus(function (response) {   // Called after the JS SDK has been initialized.                        
             if (response?.status === 'connected') {
+                facebookId = response.authResponse?.userID;
                 return $.ajax({
                     type: 'POST',
                     url: '/' + '@organizationID' + '/ConnectFacebook/RefreshAccessToken',
@@ -246,7 +246,7 @@
     })
 
 </script>
-@using (Html.DevExtreme().NamedTemplate("TagsEditTemplate"))
+@* @using (Html.DevExtreme().NamedTemplate("TagsEditTemplate"))
 {
     @(Html.DevExtreme().TagBox()
                 .DataSource(d => d.ConfigController("ProductPublication", "GetDistinctProductPropertyValues", organizationID, "", new { propertyName = "tag" }))
@@ -259,4 +259,4 @@
                 .OnValueChanged("function(e) {setValue(e.value);}")
                 .OnSelectionChanged("function(e) {component.updateDimensions}")
             )
-}
+} *@

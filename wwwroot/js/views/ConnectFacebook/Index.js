@@ -10,8 +10,75 @@
 })(self, () => {
 return /******/ (() => { // webpackBootstrap
 /******/ 	"use strict";
+/******/ 	var __webpack_modules__ = ({
+
+/***/ "./Views/Shared/Constants.ts":
+/*!***********************************!*\
+  !*** ./Views/Shared/Constants.ts ***!
+  \***********************************/
+/***/ ((__unused_webpack_module, exports) => {
+
+
+//export const PERMISSIONS: string[] = ['email', 'public_profile', 'business_management', 'pages_manage_metadata',
+//    'pages_messaging', 'pages_manage_posts', 'pages_manage_engagement', 'instagram_basic', 'instagram_content_publish',
+//    'instagram_manage_comments', 'instagram_manage_messages'];
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.WEBHOOKS = exports.PERMISSIONS = void 0;
+/**
+ * updates on 8 Feb 2024:
+ * - advanced access for 'instagram_manage_comments' is NOT required for receiving webhook triggered by no-role users
+ * - advanced access for 'pages_messaging' is NOT required for sending messages to no-role users
+ * - advanced access for 'instagram_manage_messages' is required for sending messages to no-role users
+ * - 'business_management' is required for viewing pages managed by the user
+ * - 'pages_read_engagement' is required for creating posts on FB pages
+ * - 'pages_manage_metadata' is required for managing webhooks
+ * - 'pages_read_user_content' is required for reading comments on posts on FB pages
+ * - 'pages_manage_engagement' is retained for making comments on other comments on FB pages
+ */
+//export const PERMISSIONS: string[] = ['email', 'public_profile', 'business_management', 'pages_show_list', 'pages_manage_metadata',
+//    'pages_messaging', 'pages_manage_posts', 'instagram_basic', 'instagram_content_publish', 'pages_manage_engagement',
+//    'instagram_manage_comments', 'instagram_manage_messages', 'pages_read_engagement', 'pages_read_user_content'];
+exports.PERMISSIONS = ['email', 'public_profile', 'business_management', 'pages_show_list', 'pages_manage_metadata',
+    'pages_messaging', 'pages_manage_posts', 'instagram_basic', 'instagram_content_publish', 'instagram_manage_messages'];
+exports.WEBHOOKS = [
+    /*'feed',*/
+    // webhook for pages: https://developers.facebook.com/docs/graph-api/webhooks/getting-started/webhooks-for-pages/
+    'messages',
+    // any other webhook event: https://developers.facebook.com/docs/messenger-platform/webhook/#events
+];
+
+
+/***/ })
+
+/******/ 	});
+/************************************************************************/
+/******/ 	// The module cache
+/******/ 	var __webpack_module_cache__ = {};
+/******/ 	
+/******/ 	// The require function
+/******/ 	function __webpack_require__(moduleId) {
+/******/ 		// Check if module is in cache
+/******/ 		var cachedModule = __webpack_module_cache__[moduleId];
+/******/ 		if (cachedModule !== undefined) {
+/******/ 			return cachedModule.exports;
+/******/ 		}
+/******/ 		// Create a new module (and put it into the cache)
+/******/ 		var module = __webpack_module_cache__[moduleId] = {
+/******/ 			// no module.id needed
+/******/ 			// no module.loaded needed
+/******/ 			exports: {}
+/******/ 		};
+/******/ 	
+/******/ 		// Execute the module function
+/******/ 		__webpack_modules__[moduleId](module, module.exports, __webpack_require__);
+/******/ 	
+/******/ 		// Return the exports of the module
+/******/ 		return module.exports;
+/******/ 	}
+/******/ 	
+/************************************************************************/
 var __webpack_exports__ = {};
-// This entry need to be wrapped in an IIFE because it uses a non-standard name for the exports (exports).
+// This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
 (() => {
 var exports = __webpack_exports__;
 /*!****************************************!*\
@@ -19,18 +86,15 @@ var exports = __webpack_exports__;
   \****************************************/
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-// 'business_management' is required for viewing pages managed by the user
-const permissions = ['email', 'public_profile', 'business_management', 'pages_manage_metadata',
-    'pages_messaging', 'pages_manage_posts', 'pages_manage_engagement', 'instagram_basic', 'instagram_content_publish',
-    'instagram_manage_comments', 'instagram_manage_messages'];
+const Constants_1 = __webpack_require__(/*! ../Shared/Constants */ "./Views/Shared/Constants.ts");
 // https://github.com/DefinitelyTyped/DefinitelyTyped/blob/master/types/facebook-js-sdk/index.d.ts
 /// <reference types="facebook-js-sdk" />
 // For the order of the following three code blocks, see: https://www.devils-heaven.com/facebook-javascript-sdk-login
 window.fbAsyncInit = function () {
     FB.init({
         appId: '312852768233605',
-        cookie: true, // Enable cookies to allow the server to access the session.
-        xfbml: true, // Parse social plugins on this webpage.
+        cookie: true,
+        xfbml: true,
         version: 'v18.0' // Use this Graph API version for this call.
     });
     FB.getLoginStatus(function (response) {
@@ -57,7 +121,7 @@ document.addEventListener("DOMContentLoaded", (event) => {
                 checkLoginState();
             }
         }, {
-            scope: permissions.toString(),
+            scope: Constants_1.PERMISSIONS.toString(),
             return_scopes: true
         });
     });
@@ -130,12 +194,7 @@ function turnOrNLP(page_id, page_access_token) {
 function addPageSubscriptions(page_id, page_access_token) {
     console.log(`Subscribing to page ${page_id}`);
     return FB.api(`/${page_id}/subscribed_apps`, 'post', {
-        subscribed_fields: [
-            'feed',
-            // webhook for pages: https://developers.facebook.com/docs/graph-api/webhooks/getting-started/webhooks-for-pages/
-            'messages',
-            // any other webhook event: https://developers.facebook.com/docs/messenger-platform/webhook/#events
-        ],
+        subscribed_fields: Constants_1.WEBHOOKS,
         access_token: page_access_token,
     }, function (response) {
         console.log('Response from subscribed_apps:');

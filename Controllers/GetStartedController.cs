@@ -44,7 +44,7 @@ namespace Corprio.SocialWorker.Controllers
         /// <param name="organizationID">Organization ID</param>
         /// <returns>View</returns>
         public override IActionResult Index([FromRoute] Guid organizationID)
-        {
+        {            
             ApplicationSetting applicationSetting = applicationSettingService.GetSetting<ApplicationSetting>(organizationID).ConfigureAwait(false).GetAwaiter().GetResult();
             bool firstVisit = string.IsNullOrWhiteSpace(applicationSetting?.KeywordForShoppingIntention);
             bool updated = false;  // if true, then the setting needs to be saved
@@ -131,7 +131,7 @@ namespace Corprio.SocialWorker.Controllers
         /// <returns>Status code</returns>
         public async Task<IActionResult> Save([FromRoute] Guid organizationID, [FromForm] ApplicationSetting model)
         {
-            if (string.IsNullOrWhiteSpace(model.KeywordForShoppingIntention)) throw new Exception("Keyword cannot be blank.");
+            //if (string.IsNullOrWhiteSpace(model.KeywordForShoppingIntention)) throw new Exception("Keyword cannot be blank.");
 
             ApplicationSetting setting = await applicationSettingService.GetSetting<ApplicationSetting>(organizationID);            
             Core.Utility.PropertyCopier.Copy(source: model, target: setting, ignoreNotUpdatable: false, copyKeyProperties: false, excludeProperties: null);

@@ -151,7 +151,7 @@ namespace Corprio.SocialWorker.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Hello, our chatbot tried to send you a direct message but failed. To proceed with your purchase, please copy the product name from the post and send it via direct message to our Facebook Page. Thank you. 🤖.
+        ///   Looks up a localized string similar to Hello, our chatbot tried to send you a direct message but failed. To proceed with your purchase, please send &apos;{0}&apos; via direct message to our Facebook Page. Thank you. 🤖.
         /// </summary>
         public static string AutoReplyComment {
             get {
@@ -660,6 +660,15 @@ namespace Corprio.SocialWorker.Resources {
         public static string ErrMsg_CustomerNotFound {
             get {
                 return ResourceManager.GetString("ErrMsg_CustomerNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Please make sure you have logged into Facebook..
+        /// </summary>
+        public static string ErrMsg_FacebookNotLoggedIn {
+            get {
+                return ResourceManager.GetString("ErrMsg_FacebookNotLoggedIn", resourceCulture);
             }
         }
         
@@ -1713,6 +1722,15 @@ namespace Corprio.SocialWorker.Resources {
         public static string PublishProductPrompt {
             get {
                 return ResourceManager.GetString("PublishProductPrompt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The following post will be made to your Facebook page(s) and Instagram account(s). Please review and confirm..
+        /// </summary>
+        public static string PublishProductPrompt2 {
+            get {
+                return ResourceManager.GetString("PublishProductPrompt2", resourceCulture);
             }
         }
         

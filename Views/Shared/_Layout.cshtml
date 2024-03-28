@@ -9,7 +9,7 @@
 @inject Microsoft.AspNetCore.Hosting.IWebHostEnvironment env
 
 @{
-    string clientLibVersion = "2.6.6"; //version of npm package @corprio/aspnetcore-site
+    string clientLibVersion = "2.6.18"; //version of npm package @corprio/aspnetcore-site
     string clientID = configuration["CorprioClientCredential:ClientID"];
     Corprio.AspNetCore.Site.Models.AppMenu menu = await userPreferenceService.GetAppMenu(clientID, Corprio.SocialWorker.Models.Menu.StandardMenu);
     Guid organizationID = Context.SelectedOrganizationID() ?? Guid.Empty;    

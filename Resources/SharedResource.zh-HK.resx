@@ -970,7 +970,7 @@
     <value>您即將終止 {0} 與 Facebook 帳號的連接。此操作無法撤消，並且會產生以下影響：</value>
   </data>
   <data name="AutoReplyComment" xml:space="preserve">
-    <value>您好，我們的聊天機器人嘗試向您發送私訊但失敗。要繼續購買，請複製貼文中的產品名稱並私訊到我們的 Facebook 頁面。謝謝。 🤖</value>
+    <value>您好，我們的聊天機器人嘗試向您發送私訊但失敗。要繼續購買，請私訊「{0}」到我們的 Facebook 頁面。謝謝。 🤖</value>
   </data>
   <data name="ErrMsg_BlankPostMsg" xml:space="preserve">
     <value>貼文不能留白。</value>
@@ -991,7 +991,7 @@
     <value>商戶尚未設定支付方式。</value>
   </data>
   <data name="HumanEscalation_EmailBody" xml:space="preserve">
-    <value>&lt;html&gt;&lt;body&gt;&lt;p&gt;有一位 &lt;b&gt;{0} Messenger&lt;/b&gt; 上的客戶希望與真人而非聊天機器人溝通。請參閱以下客戶的詳細資料並與他聯絡。 &lt;/p&gt;&lt;ul&gt;&lt;li&gt;{0}使用者名稱：{1}&lt;/li&gt;&lt;li&gt;{0}使用者ID：{2} &lt;/li&gt;&lt;li&gt;電子郵件地址：&lt;u&gt;{ 3}&lt;/u&gt;&lt;/li&gt;&lt;li&gt;購物地點：&lt;b&gt;{4}&lt;/b&gt; ({0})&lt;/li&gt;&lt;/ul&gt;&lt;/li&gt;&lt;/body&gt;&lt;/html&gt;</value>
+    <value>&lt;html&gt;&lt;body&gt;&lt;p&gt;有一位 &lt;b&gt;{0} Messenger&lt;/b&gt; 上的客戶希望與真人而非聊天機器人溝通。請參閱以下客戶的詳細資料並與他聯絡。 &lt;/p&gt;&lt;ul&gt;&lt;li&gt;{0}使用者名稱：{1}&lt;/li&gt;&lt;li&gt;{0}使用者ID：{2} &lt;/li&gt;&lt;li&gt;電子郵件地址：&lt;u&gt;{3}&lt;/u&gt;&lt;/li&gt;&lt;li&gt;購物地點：&lt;b&gt;{4}&lt;/b&gt; ({0})&lt;/li&gt;&lt;/ul&gt;&lt;/body&gt;&lt;/html&gt;</value>
   </data>
   <data name="HumanEscalation_EmailSubject" xml:space="preserve">
     <value>一位 {1} Messenger 上的 {0} 客戶希望與您聯繫</value>

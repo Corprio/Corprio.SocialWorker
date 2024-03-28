@@ -89,12 +89,12 @@ namespace Corprio.SocialWorker.Controllers
                 "IsMasterProduct,MasterProductID,MasterProduct.Code as MasterProductCode,ExternalOrganizationID)",
                 loadDataOptions: loadOptions?.ToCorprioLoadDataOption());
             PagedList<ProductViewModel> pagedList = list.ConvertTo<ProductViewModel>();
-
+            
             return Json(pagedList.ToLoadResult());
         }
 
         [HttpPost]
-        public async Task<PostTemplateSummary> PreviewProductPost([FromRoute] Guid organizationID, Guid productID)
+        public async Task<string> PreviewProductPost([FromRoute] Guid organizationID, Guid productID)
         {
             if (productID.Equals(Guid.Empty)) throw new Exception(Resources.SharedResource.ErrMsg_InvalidProductID);
             Product product = await corprioClient.ProductApi.Get(organizationID: organizationID, id: productID)
@@ -114,11 +114,13 @@ namespace Corprio.SocialWorker.Controllers
                     currencyCode: coreInfo.CurrencyCode);
             }
 
-            PostTemplateSummary summary = new() { 
-                Keyword = applicationSetting.KeywordForShoppingIntention,
-                Preview = applicationSetting.ProductPostMessage(product: product, coreInfo: coreInfo, publicPrice: price), 
-            };
-            return summary;            
+            return applicationSetting.ProductPostMessage(product: product, coreInfo: coreInfo, publicPrice: price);
+
+            //PostTemplateSummary summary = new() { 
+            //    Keyword = applicationSetting.KeywordForShoppingIntention,
+            //    Preview = applicationSetting.ProductPostMessage(product: product, coreInfo: coreInfo, publicPrice: price), 
+            //};
+            //return summary;            
         }
 
         /// <summary>
@@ -127,17 +129,35 @@ namespace Corprio.SocialWorker.Controllers
         /// <param name="organizationID">Organization ID</param>
         /// <param name="productID">ID of the product to be published</param>
         /// <param name="message">Text to be included in the post</param>
+        /// <param name="facebookUserID">Facebook user ID assigned by Meta (mandatory if the organization is linked with more than 1 active FB account)</param>
         /// <returns>Status code</returns>
         /// <exception cref="Exception"></exception>
         [HttpPost]
-        public async Task<IActionResult> PublishProduct([FromRoute] Guid organizationID, Guid productID, string message)
+        public async Task<IActionResult> PublishProduct([FromRoute] Guid organizationID, Guid productID, string message, 
+            string facebookUserID)
         {
             if (productID.Equals(Guid.Empty)) throw new Exception(Resources.SharedResource.ErrMsg_InvalidProductID);
             if (string.IsNullOrWhiteSpace(message)) throw new Exception(Resources.SharedResource.ErrMsg_BlankPostMsg);
             message = UtilityHelper.UncleanAndClean(userInput: message, onceIsOK: true);
             List<string> errorMessages = [];
-            MetaUser metaUser = db.MetaUsers.Include(x => x.Pages).FirstOrDefault(x => x.OrganizationID == organizationID && x.Dormant == false)
-                ?? throw new Exception(Resources.SharedResource.ErrMsg_ValidMetaProfileNotFound);
+            
+            // it is possible that one organization is linked to multiple Facebook accounts
+            int activeMetaUserNumber = db.MetaUsers.Where(x => x.OrganizationID == organizationID && x.Dormant == false).Count();
+            if (activeMetaUserNumber == 0) throw new Exception(Resources.SharedResource.ErrMsg_ValidMetaProfileNotFound);
+
+            MetaUser metaUser;
+            if (activeMetaUserNumber > 1)
+            {
+                if (string.IsNullOrWhiteSpace(facebookUserID)) 
+                    throw new Exception(Resources.SharedResource.ErrMsg_FacebookNotLoggedIn);
+
+                metaUser = db.MetaUsers.Include(x => x.Pages).FirstOrDefault(x => x.OrganizationID == organizationID && x.Dormant == false && x.FacebookUserID == facebookUserID)
+                    ?? throw new Exception(Resources.SharedResource.ErrMsg_ValidMetaProfileNotFound);
+            }
+            else
+            {
+                metaUser = db.MetaUsers.Include(x => x.Pages).First(x => x.OrganizationID == organizationID && x.Dormant == false);
+            }            
 
             if (metaUser.Pages.Count == 0)
             {

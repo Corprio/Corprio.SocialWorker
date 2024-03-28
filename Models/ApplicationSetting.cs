@@ -131,7 +131,7 @@ namespace Corprio.SocialWorker.Models
                 : string.Join(TemplateComponent.Separator, DefaultTemplate.DefaultTempalte_Product);            
 
             message = message.Replace(TemplateComponent.LineBreak, "\n")
-                .Replace(TemplateComponent.DefaultMessage, BabelFish.Vocab["HowToBuy"][UtilityHelper.NICAM(coreInfo)].Replace("{0}", product.Name).Replace("{1}", KeywordForShoppingIntention))
+                .Replace(TemplateComponent.DefaultMessage, BabelFish.Vocab["HowToBuy"][UtilityHelper.NICAM(coreInfo)].Replace("{0}", product.Name).Replace("{1}", product.Code))
                 .Replace(TemplateComponent.Keyword, KeywordForShoppingIntention)
                 .Replace(TemplateComponent.ProductName, product.Name)
                 .Replace(TemplateComponent.ProductCode, product.Code)

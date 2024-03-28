@@ -1,13 +1,10 @@
+import { PERMISSIONS, WEBHOOKS } from '../Shared/Constants';
+
 declare const vdata: {
     actions: {
         refreshAccessToken: string;
     };
 };
-
-// 'business_management' is required for viewing pages managed by the user
-const permissions: string[] = ['email', 'public_profile', 'business_management', 'pages_manage_metadata',
-    'pages_messaging', 'pages_manage_posts', 'pages_manage_engagement', 'instagram_basic', 'instagram_content_publish',
-    'instagram_manage_comments', 'instagram_manage_messages'];
 
 // https://github.com/DefinitelyTyped/DefinitelyTyped/blob/master/types/facebook-js-sdk/index.d.ts
 /// <reference types="facebook-js-sdk" />
@@ -46,7 +43,7 @@ document.addEventListener("DOMContentLoaded", (event) => {
                 checkLoginState();
             } 
         }, {            
-            scope: permissions.toString(),
+            scope: PERMISSIONS.toString(),
             return_scopes: true
         });
     });
@@ -131,12 +128,7 @@ function addPageSubscriptions(page_id: string, page_access_token: string) {
         `/${page_id}/subscribed_apps`,
         'post',
         {
-            subscribed_fields: [
-                'feed',
-                // webhook for pages: https://developers.facebook.com/docs/graph-api/webhooks/getting-started/webhooks-for-pages/
-                'messages',
-                // any other webhook event: https://developers.facebook.com/docs/messenger-platform/webhook/#events
-            ],
+            subscribed_fields: WEBHOOKS,
             access_token: page_access_token,
         },
         function (response: any) {

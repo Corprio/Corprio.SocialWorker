@@ -8,6 +8,8 @@ namespace Corprio.SocialWorker.Dictionaries
     {
         public const string SOS = "!h";
         public const string SOS_CN = "！h";
+        public const string BotSummon = "!a";
+        public const string BotSummon_CN = "!a";
         public const string ProductEpName = "MetaPostId";
         public const string CustomerEpName = "MetaSenderId";
         public const string CustomDataKeyForMetaUser = "MetaUser";
@@ -120,8 +122,8 @@ namespace Corprio.SocialWorker.Dictionaries
             ["Err_DefaultMsg"] = new Dictionary<BotLanguage, string>()
             {
                 [BotLanguage.English] = $"Error in the chatbot. Please visit the relevant catalogue if you wish to make a purchase. Sorry for any inconvenience caused. If you wish to chat with a human, please input '{SOS}'. Our team will reach out to you. ",
-                [BotLanguage.TraditionalChinese] = $"機器人發生錯誤。如果您想購買商品，請造訪相關的商品目錄。給您帶來不便，敬請原諒。如果您希望與真人而非聊天機器人交談，請輸入「{SOS}」，我們的團隊將與您聯繫。",
-                [BotLanguage.SimplifiedChinese] = $"机器人发生错误。如果您想购买商品，请造访相关的商品目录。给您带来不便，敬请原谅。如果您希望与真人而非聊天机器人交谈，请输入「{SOS}」，我们的团队将与您联系。",
+                [BotLanguage.TraditionalChinese] = $"機器人發生錯誤。如果您想購買商品，請造訪相關的商品目錄。給您帶來不便，敬請原諒。如果您希望與真人而非聊天機器人交談，請輸入「{SOS_CN}」，我們的團隊將與您聯繫。",
+                [BotLanguage.SimplifiedChinese] = $"机器人发生错误。如果您想购买商品，请造访相关的商品目录。给您带来不便，敬请原谅。如果您希望与真人而非聊天机器人交谈，请输入「{SOS_CN}」，我们的团队将与您联系。",
             },
             ["Err_InvalidEmail"] = new Dictionary<BotLanguage, string>()
             {
@@ -183,6 +185,12 @@ namespace Corprio.SocialWorker.Dictionaries
                 [BotLanguage.TraditionalChinese] = "我們的確認碼無法傳送到您提供的電子郵件地址。請使用一個有效的電子郵件地址重試。",
                 [BotLanguage.SimplifiedChinese] = "我们的确认码无法传送到您提供的电子邮件地址。请使用一个有效的电子邮件地址重试。",
             },
+            ["Escalated"] = new Dictionary<BotLanguage, string>()
+            {
+                [BotLanguage.English] = $"Your request to speak with a human agent is received; our staff will contact you shortly. If you wish to speak with a chatbot again, please input '{BotSummon}'. ",
+                [BotLanguage.TraditionalChinese] = $"已收到您希望與真人對話的請求，我們的工作人員將盡快與您聯繫。如果您想再次與聊天機器人對話，請輸入「{BotSummon_CN}」。",
+                [BotLanguage.SimplifiedChinese] = $"已收到您希望与真人对话的请求，我们的工作人员会尽快与您联系。如果您想再次与聊天机器人对话，请输入「{BotSummon_CN}」。",
+            },
             ["Hint_Cancel"] = new Dictionary<BotLanguage, string>()
             {
                 [BotLanguage.English] = "(Note: You can input '{0}' to cancel the current operation.) ",
@@ -192,14 +200,14 @@ namespace Corprio.SocialWorker.Dictionaries
             ["Hint_CancelAndEscalate"] = new Dictionary<BotLanguage, string>()
             {
                 [BotLanguage.English] = $"(Note: You can input '{{0}}' to cancel the current operation. If you wish to chat with a human rather than a bot, input '{SOS}' and our team will reach out to you.) ",
-                [BotLanguage.TraditionalChinese] = $"（提示：輸入「{{0}}」可以取消目前操作。如果您希望與真人而非聊天機器人交談，請輸入「{SOS}」，我們的團隊將與您聯繫。）",
-                [BotLanguage.SimplifiedChinese] = $"（提示：输入「{{0}}」可以取消目前操作。如果您希望与真人而非聊天机器人交谈，请输入「{SOS}」，我们的团队将与您联系。）",
+                [BotLanguage.TraditionalChinese] = $"（提示：輸入「{{0}}」可以取消目前操作。如果您希望與真人而非聊天機器人交談，請輸入「{SOS_CN}」，我們的團隊將與您聯繫。）",
+                [BotLanguage.SimplifiedChinese] = $"（提示：输入「{{0}}」可以取消目前操作。如果您希望与真人而非聊天机器人交谈，请输入「{SOS_CN}」，我们的团队将与您联系。）",
             },
             ["Hint_Escalate"] = new Dictionary<BotLanguage, string>()
             {
                 [BotLanguage.English] = $"(Note: If you wish to chat with a human rather than a bot, input '{SOS}' and our team will reach out to you.) ",
-                [BotLanguage.TraditionalChinese] = $"（提示：如果您希望與真人而非聊天機器人交談，請輸入「{SOS}」，我們的團隊將與您聯繫。）",
-                [BotLanguage.SimplifiedChinese] = $"（提示：如果您希望与真人而非聊天机器人交谈，请输入「{SOS}」，我们的团队将与您联系。）",
+                [BotLanguage.TraditionalChinese] = $"（提示：如果您希望與真人而非聊天機器人交談，請輸入「{SOS_CN}」，我們的團隊將與您聯繫。）",
+                [BotLanguage.SimplifiedChinese] = $"（提示：如果您希望与真人而非聊天机器人交谈，请输入「{SOS_CN}」，我们的团队将与您联系。）",
             },
             ["Hint_GenByBot"] = new Dictionary<BotLanguage, string>()
             {
@@ -209,9 +217,9 @@ namespace Corprio.SocialWorker.Dictionaries
             },
             ["HowToBuy"] = new Dictionary<BotLanguage, string>()
             {
-                [BotLanguage.English] = "Reply to this post with \"{1}\" if you like to buy \"{0}\".",
-                [BotLanguage.TraditionalChinese] = "如果您想購買「{0}」，請以「{1}」回覆此貼文。",
-                [BotLanguage.SimplifiedChinese] = "如果您想购买「{0}」，请以「{1}」回覆此贴文。",
+                [BotLanguage.English] = "Send \"{1}\" in a direct message to us if you like to buy \"{0}\".",
+                [BotLanguage.TraditionalChinese] = "如果您想購買「{0}」，請發送私訊「{1}」給我們。",
+                [BotLanguage.SimplifiedChinese] = "如果您想购买「{0}」，请发送私信「{1}」给我们。",
             },
             ["ListCart"] = new Dictionary<BotLanguage, string>()
             {
@@ -234,8 +242,8 @@ namespace Corprio.SocialWorker.Dictionaries
             ["TooManyResults"] = new Dictionary<BotLanguage, string>()
             {
                 [BotLanguage.English] = $"(Note: More than {{0}} results were found and some are not included above. You may want to try a different input. If you wish to chat with a human rather than a bot, input '{SOS}' and our team will reach out to you.) ",
-                [BotLanguage.TraditionalChinese] = $"（注意：找到了超過{{0}}個結果，有些結果未包含在上面。您可以考慮嘗試不同的關鍵字。如果您希望與真人而非聊天機器人交談，請輸入「{SOS}」，我們的團隊將與您聯繫。）",
-                [BotLanguage.SimplifiedChinese] = $"（注意：找到了超过{{0}}个结果，有些结果未包含在上面。您可以考虑尝试不同的关键字。如果您希望与真人而非聊天机器人交谈，请输入「{SOS}」，我们的团队将与您联系。）",
+                [BotLanguage.TraditionalChinese] = $"（注意：找到了超過{{0}}個結果，有些結果未包含在上面。您可以考慮嘗試不同的關鍵字。如果您希望與真人而非聊天機器人交談，請輸入「{SOS_CN}」，我們的團隊將與您聯繫。）",
+                [BotLanguage.SimplifiedChinese] = $"（注意：找到了超过{{0}}个结果，有些结果未包含在上面。您可以考虑尝试不同的关键字。如果您希望与真人而非聊天机器人交谈，请输入「{SOS_CN}」，我们的团队将与您联系。）",
             },
             ["VisitCatalogue"] = new Dictionary<BotLanguage, string>()
             {

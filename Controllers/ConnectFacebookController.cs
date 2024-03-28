@@ -14,6 +14,7 @@ using Corprio.Core;
 using System.Linq;
 using Corprio.Core.Utility;
 using Microsoft.EntityFrameworkCore;
+using Corprio.SocialWorker.Helpers;
 
 namespace Corprio.SocialWorker.Controllers
 {
@@ -130,7 +131,7 @@ namespace Corprio.SocialWorker.Controllers
             }
 
             // the following query returns all pages on which the Facebook user has a role
-            string responseString = await GetQuery(httpClient: httpClient, userAccessToken: token, endPoint: $"{BaseUrl}/{metaId}/accounts");            
+            string responseString = await ApiActionHelper.GetQuery(httpClient: httpClient, accessToken: token, endPoint: $"{BaseUrl}/{metaId}/accounts");            
             MeAccountsPayload payload = JsonConvert.DeserializeObject<MeAccountsPayload>(responseString)!;
             if (payload?.Error != null)
             {
@@ -149,7 +150,7 @@ namespace Corprio.SocialWorker.Controllers
 
                 // the following query returns the IG account associated with the FB page
                 // (note: not every FB page is associated with an IG account)
-                responseString = await GetQuery(httpClient: httpClient, userAccessToken: page.AccessToken, endPoint: $"{BaseUrl}/{ApiVersion}/{page.Id}?fields=instagram_business_account");
+                responseString = await ApiActionHelper.GetQuery(httpClient: httpClient, accessToken: page.AccessToken, endPoint: $"{BaseUrl}/{ApiVersion}/{page.Id}?fields=instagram_business_account");
                 FbPagePayload pagePayload = JsonConvert.DeserializeObject<FbPagePayload>(responseString)!;
                 if (pagePayload?.Error != null)
                 {

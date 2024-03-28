@@ -29,8 +29,7 @@ namespace Corprio.SocialWorker.Controllers
         /// <returns>Status code</returns>
         public async Task<IActionResult> TerminateConnection([FromRoute] Guid organizationID)
         {
-            // theoritically there should only be up to one non-dormant profile for an organization,
-            // but we use Where() instead of FirstOrDefault() just to be on the safe side
+            // it is possible that one organization is linked to multiple Facebook accounts
             var activeMetaUsers = db.MetaUsers.Where(x => x.OrganizationID == organizationID && x.Dormant == false);
             if (!activeMetaUsers.Any()) return StatusCode(200);
 

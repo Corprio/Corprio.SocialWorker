@@ -1152,6 +1152,23 @@ namespace Corprio.SocialWorker.Helpers
         }
 
         /// <summary>
+        /// Unmute the bot and restart a conversation
+        /// </summary>
+        /// <returns></returns>
+        public async Task<string> getWoke()
+        {
+            Bot.IsMuted = false;
+            Bot.ThinkingOf = BotTopic.Limbo;
+            Bot.PostedProductID = null;
+            Bot.ProductMemory.Clear();
+            Bot.VariationMemory.Clear();
+            Bot.AttributeValueMemory.Clear();
+            Bot.Cart.Clear();
+            await Save();
+            return await AskQuestion();
+        }
+
+        /// <summary>
         /// Generate a message as if the user has selected a product id
         /// </summary>
         /// <param name="productId">Product ID that the user has selected</param>

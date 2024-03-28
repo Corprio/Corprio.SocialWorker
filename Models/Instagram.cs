@@ -56,7 +56,7 @@ namespace Corprio.SocialWorker.Models
         /// * username — Username of the Instagram user who created the IG Comment.
         /// </summary>
         [JsonProperty("from")]
-        public IgFrom From { get; set; }
+        public IgUser From { get; set; }
 
         /// <summary>
         /// IG Comment ID.
@@ -70,21 +70,6 @@ namespace Corprio.SocialWorker.Models
         [JsonProperty("text")]
         public string Text { get; set; }
     }        
-
-    public class IgFrom
-    {
-        /// <summary>
-        /// IGSID of the Instagram user who created the IG Comment.
-        /// </summary>
-        [JsonProperty("id")]
-        public string Id { get; set; }
-
-        /// <summary>
-        /// Username of the Instagram user who created the IG Comment.
-        /// </summary>
-        [JsonProperty("username")]
-        public string Username { get; set; }
-    }
 
     /// <summary>
     /// IG comment on an IG comment

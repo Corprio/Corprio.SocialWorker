@@ -317,12 +317,12 @@
                                 <option value="@TemplateComponent.ProductListPrice">@localizer["Template_ProductListPrice"]</option>
                                 <option value="@TemplateComponent.ProductPublicPrice">@localizer["Template_ProductPublicPrice"]</option>
                                 <option value="@TemplateComponent.DefaultMessage">@localizer["Template_DefaultMessage"]</option>
-                                <option value="@TemplateComponent.Keyword">@localizer["Template_Keyword"]</option>
+                                @* <option value="@TemplateComponent.Keyword">@localizer["Template_Keyword"]</option> *@
                             </select>
                             <div class="input-group-append">
                                 <button id="component-btn-product" class="btn btn-outline-primary" type="button" data-toggle="tooltip" data-placement="right" title="@localizer["Tooltip_StandardMessageComponent"]">@globalLocalizer["Add"]</button>
                             </div>                             
-                            <div class="invalid-feedback">@localizer["InvalidFeedback_NoKeyword"]</div>
+                            @* <div class="invalid-feedback">@localizer["InvalidFeedback_NoKeyword"]</div> *@
                         </div>
 
                         <div class="input-group mb-3">
@@ -333,7 +333,7 @@
                             </div>
                         </div>
 
-                        <div class="input-group mb-3">
+                        @* <div class="input-group mb-3">
                             <label class="my-1 mr-2" for="keyword-input-product">
                                 @localizer["Template_Keyword"]
                                 <a class="helpicon " tabindex="-1" data-toggle="popover" data-trigger="hover" data-container="body" data-placement="top" data-html="true" data-content="@localizer["Tooltip_Keyword"]" data-original-title="" title="">
@@ -342,7 +342,7 @@
                             </label>
                             <input type="text" id="keyword-input-product" class="form-control" placeholder="@localizer["Placeholder_Keyword"]">                            
                             <div class="invalid-feedback">@localizer["InvalidFeedback_KeywordLength"]</div>
-                        </div>
+                        </div> *@
 
                         <button id="restore-default-btn-product" class="btn btn-outline-danger mb-3" type="button">@localizer["DefaultSetting"]</button>                        
                     </div>

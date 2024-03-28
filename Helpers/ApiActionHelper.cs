@@ -8,11 +8,39 @@ using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using DevExpress.XtraRichEdit.Import.Html;
+using Azure.Core;
+using Org.BouncyCastle.Cms;
+using System.Net.Http.Headers;
 
 namespace Corprio.SocialWorker.Helpers
 {
     public class ApiActionHelper
     {
+        /// <summary>
+        /// Get information from Facebook API
+        /// </summary>
+        /// <param name="httpClient">HTTP client for executing API query</param>        
+        /// <param name="accessToken">Access token</param>
+        /// <param name="endPoint">Endpoint at which the query is performed</param>
+        /// <returns>API response in string format</returns>
+        public static async Task<string> GetQuery(HttpClient httpClient, string accessToken, string endPoint)
+        {
+            var httpRequest = new HttpRequestMessage()
+            {
+                Method = HttpMethod.Get,
+                RequestUri = new Uri(endPoint),
+            };
+            httpRequest.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+            HttpResponseMessage response = await httpClient.SendAsync(httpRequest);
+            if (!response.IsSuccessStatusCode)
+            {
+                Log.Error($"HTTP request to get Facebook account info fails. Response: {System.Text.Json.JsonSerializer.Serialize(response)}");
+                return string.Empty;
+            }
+            return await response.Content.ReadAsStringAsync();
+        }
+
         /// <summary>
         /// Make a post or comment
         /// publish to a page: https://developers.facebook.com/docs/graph-api/reference/v18.0/page/feed#publish
@@ -55,13 +83,15 @@ namespace Corprio.SocialWorker.Helpers
                 queryParams.url = mediaUrl;
                 if (!published) queryParams.published = published;
             }
-            
+            string content = System.Text.Json.JsonSerializer.Serialize(queryParams);
+
             var httpRequest = new HttpRequestMessage()
             {
                 Method = HttpMethod.Post,
                 RequestUri = new Uri(endPoint),
-                Content = new StringContent(content: System.Text.Json.JsonSerializer.Serialize(queryParams), encoding: Encoding.UTF8, mediaType: "application/json")
+                Content = new StringContent(content: content, encoding: Encoding.UTF8, mediaType: "application/json")
             };
+            Log.Information($"Posting to {endPoint}: {content}");
 
             HttpResponseMessage response = await httpClient.SendAsync(httpRequest);
             if (!response.IsSuccessStatusCode)
@@ -79,11 +109,41 @@ namespace Corprio.SocialWorker.Helpers
         }
 
         /// <summary>
+        /// Pass/release/request control from a conversation
+        /// https://developers.facebook.com/docs/messenger-platform/instagram/features/handover-protocol#releasing-thread-control
+        /// </summary>
+        /// <param name="httpClient">HTTP client for executing API query</param>
+        /// <param name="accessToken">Page access token</param>
+        /// <param name="endPoint">API Endpoint, which indicates if the thread is released, passed or requested</param>
+        /// <param name="interlocutorId">ID of the person having a conversation with the App</param>
+        /// <param name="targetAppId">App to receive control of the conversation</param>
+        /// <returns></returns>
+        public static async Task ControlConversationThread(HttpClient httpClient, string accessToken, string endPoint, 
+            string interlocutorId, string targetAppId = null)
+        {
+            dynamic queryParams = new ExpandoObject();
+            queryParams.access_token = accessToken;
+            queryParams.recipient = new { id = interlocutorId };
+            if (!string.IsNullOrEmpty(targetAppId)) { queryParams.target_app_id = targetAppId; }
+            string content = System.Text.Json.JsonSerializer.Serialize(queryParams);
+
+            var releaseControlRequest = new HttpRequestMessage()
+            {
+                Method = HttpMethod.Post,
+                RequestUri = new Uri(endPoint),
+                Content = new StringContent(content: content, encoding: Encoding.UTF8, mediaType: "application/json")
+            };
+            Log.Information($"Handover protocol - endpoint: {endPoint}; request: {content}");
+
+            HttpResponseMessage response = await httpClient.SendAsync(releaseControlRequest);
+            string responseString = await response.Content.ReadAsStringAsync();
+            Log.Information($"Response to thread control control: {responseString}");
+        }
+
+        /// <summary>
         /// Send a message: 
         /// - from IG Professional account (https://developers.facebook.com/docs/messenger-platform/instagram/features/send-message), or
-        /// - from a FB page (https://developers.facebook.com/docs/messenger-platform/send-messages)
-        /// Release control of conversation:
-        /// https://developers.facebook.com/docs/messenger-platform/handover-protocol/conversation-control#releasing-control
+        /// - from a FB page (https://developers.facebook.com/docs/messenger-platform/send-messages)        
         /// </summary>
         /// <param name="httpClient">HTTP client for executing API query</param>
         /// <param name="accessToken">A Page access token requested from a person who can perform the MESSAGE task on the FB Page (linked to the IG Professional account)</param>
@@ -101,13 +161,14 @@ namespace Corprio.SocialWorker.Helpers
             queryParams.message = new { text = message };
             // see Mesaging Types for FB: https://developers.facebook.com/docs/messenger-platform/send-messages#messaging_types
             if (!messageEndPoint.Contains(@"me/messages")) { queryParams.messaging_type = "RESPONSE"; }
-
+            string content = System.Text.Json.JsonSerializer.Serialize(queryParams);
             var httpRequest = new HttpRequestMessage()
             {
                 Method = HttpMethod.Post,
                 RequestUri = new Uri(messageEndPoint),
-                Content = new StringContent(content: System.Text.Json.JsonSerializer.Serialize(queryParams), encoding: Encoding.UTF8, mediaType: "application/json")
+                Content = new StringContent(content: content, encoding: Encoding.UTF8, mediaType: "application/json")
             };
+            Log.Information($"Sending message to {messageEndPoint}: {content}");
 
             // note: the bot is supposed to send message ONLY when the thread is idle, so we don't bother to request control of conversation
             // reference: https://developers.facebook.com/docs/messenger-platform/handover-protocol/conversation-control#request-control
@@ -141,19 +202,9 @@ namespace Corprio.SocialWorker.Helpers
 
             // as a good practice, we release control of conversation thread after sending each message
             // reference: https://developers.facebook.com/docs/messenger-platform/handover-protocol/conversation-control#releasing-control
-            queryParams = new ExpandoObject();
-            queryParams.access_token = accessToken;
-            queryParams.recipient = new { id = recipientId };            
-            var releaseControlRequest = new HttpRequestMessage()
-            {
-                Method = HttpMethod.Post,
-                RequestUri = new Uri(threadEndPoint),
-                Content = new StringContent(content: System.Text.Json.JsonSerializer.Serialize(queryParams), encoding: Encoding.UTF8, mediaType: "application/json")
-            };            
-            response = await httpClient.SendAsync(releaseControlRequest);
-            responseString = await response.Content.ReadAsStringAsync();
-            Log.Information($"Releases control of conversation. Response: {responseString}");
-            
+            await ControlConversationThread(endPoint: threadEndPoint, 
+                accessToken: accessToken, interlocutorId: recipientId, httpClient: httpClient);
+
             return feedback;
         }        
     }

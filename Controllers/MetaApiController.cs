@@ -41,31 +41,7 @@ namespace Corprio.SocialWorker.Controllers
         {
             return base.Index(organizationID);
         }
-
-        /// <summary>
-        /// Get information from Facebook API
-        /// </summary>
-        /// <param name="httpClient">HTTP client for executing API query</param>        
-        /// <param name="userAccessToken">User access token</param>
-        /// <param name="endPoint">Endpoint at which the query is performed</param>
-        /// <returns>API response in string format</returns>
-        protected async Task<string> GetQuery(HttpClient httpClient, string userAccessToken, string endPoint)
-        {
-            var httpRequest = new HttpRequestMessage()
-            {
-                Method = HttpMethod.Get,
-                RequestUri = new Uri(endPoint),
-            };
-            httpRequest.Headers.Authorization = new AuthenticationHeaderValue("Bearer", userAccessToken);
-            HttpResponseMessage response = await httpClient.SendAsync(httpRequest);
-            if (!response.IsSuccessStatusCode)
-            {
-                Log.Error($"HTTP request to get Facebook account info fails. Response: {System.Text.Json.JsonSerializer.Serialize(response)}");
-                return string.Empty;
-            }
-            return await response.Content.ReadAsStringAsync();
-        }
-
+        
         /// <summary>
         /// Turn on Meta's Built-in NLP to help detect locale (and meaning)
         /// https://developers.facebook.com/docs/graph-api/reference/page/nlp_configs/
