@@ -30,7 +30,7 @@ namespace Corprio.SocialWorker
                 Configuration.GetConnectionString("ApplicationDB")));
 
             services.AddSingleton<GlobalListService>();
-            services.AddSingleton<IProductTourService, ProductTourService>();
+            services.AddProductTour<ProductTourService>();
             services.AddSingleton<IEmailSender, AsyncEmailSender>();
             services.AddSingleton<EmailHelper>();
             services.Configure<SmtpHostSetting>(Configuration.GetSection(nameof(SmtpHostSetting)));

@@ -13,7 +13,7 @@
     Guid organizationID = Context.SelectedOrganizationID() ?? Guid.Empty;    
 }
 <!DOCTYPE html>
-<html lang="en">
+<html lang="@LanguageHelper.CurrentLang()">
 <head>
     
     <meta charset="utf-8" />
@@ -63,9 +63,9 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.2.1/jszip.min.js"></script>
-        <script src="https://cdn3.devexpress.com/jslib/22.2.3/js/dx.all.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/devextreme-aspnet-data/2.8.2/dx.aspnet.data.min.js"></script>
-        <script src="https://cdn3.devexpress.com/jslib/22.2.3/js/dx.aspnet.mvc.js"></script>
+        <script src="https://cdn3.devexpress.com/jslib/23.2.3/js/dx.all.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/devextreme-aspnet-data/3.0.0/dx.aspnet.data.min.js"></script>
+        <script src="https://cdn3.devexpress.com/jslib/23.2.3/js/dx.aspnet.mvc.js"></script>
         <script src="~/node_modules/@("@")corprio/aspnetcore-site/dist/js/corprio.bundle.min.js?v=@clientLibVersion"></script>
         <script src="~/node_modules/@("@")corprio/aspnetcore-site/@LanguageHelper.LoadMessagesJs()?v=@clientLibVersion" type="module"></script>
         @RenderSection("ScriptsPro", required: false)
