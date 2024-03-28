@@ -46,7 +46,7 @@ namespace Corprio.SocialWorker.Controllers
         public override IActionResult Index([FromRoute] Guid organizationID)
         {            
             ApplicationSetting applicationSetting = applicationSettingService.GetSetting<ApplicationSetting>(organizationID).ConfigureAwait(false).GetAwaiter().GetResult();
-            bool firstVisit = string.IsNullOrWhiteSpace(applicationSetting?.KeywordForShoppingIntention);
+            bool firstVisit = applicationSetting == null;
             bool updated = false;  // if true, then the setting needs to be saved
             if (firstVisit)
             {
@@ -135,7 +135,7 @@ namespace Corprio.SocialWorker.Controllers
 
             ApplicationSetting setting = await applicationSettingService.GetSetting<ApplicationSetting>(organizationID);            
             Core.Utility.PropertyCopier.Copy(source: model, target: setting, ignoreNotUpdatable: false, copyKeyProperties: false, excludeProperties: null);
-            applicationSettingService.SaveSetting(organizationID: organizationID, setting: setting).ConfigureAwait(false).GetAwaiter(); ;            
+            applicationSettingService.SaveSetting(organizationID: organizationID, setting: setting).ConfigureAwait(false).GetAwaiter();
 
             return StatusCode(200);
         }

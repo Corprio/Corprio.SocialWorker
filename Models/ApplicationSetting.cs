@@ -106,7 +106,7 @@ namespace Corprio.SocialWorker.Models
         /// <summary>
         /// Keyword for indicating purchase intention. This keyword will be assigned to the next FB/IG post.
         /// </summary>
-        [Required(ErrorMessageResourceType = typeof(Resource), ErrorMessageResourceName = "MsgRequired")]
+        //[Required(ErrorMessageResourceType = typeof(Resource), ErrorMessageResourceName = "MsgRequired")]
         [StringLength(10)]
         public string KeywordForShoppingIntention { get; set; }
 

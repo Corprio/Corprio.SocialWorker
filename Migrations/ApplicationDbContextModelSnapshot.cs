@@ -63,7 +63,7 @@ namespace Corprio.SocialWorker.Migrations
 
                     b.HasKey("ID");
 
-                    b.ToTable("CommentWebhooks");
+                    b.ToTable("CommentWebhooks", (string)null);
                 });
 
             modelBuilder.Entity("Corprio.SocialWorker.Models.DbFriendlyBot", b =>
@@ -147,7 +147,7 @@ namespace Corprio.SocialWorker.Migrations
 
                     b.HasIndex("FacebookUserID");
 
-                    b.ToTable("MetaBotStatuses");
+                    b.ToTable("MetaBotStatuses", (string)null);
                 });
 
             modelBuilder.Entity("Corprio.SocialWorker.Models.FeedWebhook", b =>
@@ -194,7 +194,7 @@ namespace Corprio.SocialWorker.Migrations
 
                     b.HasKey("ID");
 
-                    b.ToTable("FeedWebhooks");
+                    b.ToTable("FeedWebhooks", (string)null);
                 });
 
             modelBuilder.Entity("Corprio.SocialWorker.Models.MessageWebhook", b =>
@@ -241,7 +241,7 @@ namespace Corprio.SocialWorker.Migrations
 
                     b.HasKey("ID");
 
-                    b.ToTable("MessageWebhooks");
+                    b.ToTable("MessageWebhooks", (string)null);
                 });
 
             modelBuilder.Entity("Corprio.SocialWorker.Models.MetaPage", b =>
@@ -298,7 +298,7 @@ namespace Corprio.SocialWorker.Migrations
 
                     b.HasIndex("FacebookUserID");
 
-                    b.ToTable("MetaPages");
+                    b.ToTable("MetaPages", (string)null);
                 });
 
             modelBuilder.Entity("Corprio.SocialWorker.Models.MetaPost", b =>
@@ -350,7 +350,7 @@ namespace Corprio.SocialWorker.Migrations
 
                     b.HasIndex("FacebookPageID");
 
-                    b.ToTable("MetaPosts");
+                    b.ToTable("MetaPosts", (string)null);
                 });
 
             modelBuilder.Entity("Corprio.SocialWorker.Models.MetaUser", b =>
@@ -400,7 +400,7 @@ namespace Corprio.SocialWorker.Migrations
 
                     b.HasKey("ID");
 
-                    b.ToTable("MetaUsers");
+                    b.ToTable("MetaUsers", (string)null);
                 });
 
             modelBuilder.Entity("Corprio.SocialWorker.Models.DbFriendlyBot", b =>

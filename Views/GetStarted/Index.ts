@@ -228,6 +228,7 @@ function restoreKeyword() {
  * @returns
  */
 function restoreTemplate(messageType: MessageType) {    
+    console.log(vdata.model.productTemplate);
     const templateString = messageType === MessageType.CataloguePost ? vdata.model.catalogueTemplate : vdata.model.productTemplate;
     if (!templateString) { return; }
     const templateArray = templateString.split(vdata.templateComponents.separator);
@@ -530,6 +531,7 @@ function handleFbLoginStatusChange(response: facebook.StatusResponse) {
  */
 function saveSettings(previewCheckout: boolean, previewThankyou: boolean) {
     let validationResult = DevExpress.validationEngine.validateGroup();    
+    console.log(validationResult);
     if (!validationResult.isValid) { return; }
     
     if ($("#ShipToCustomer").dxCheckBox("option", "value") && $("#DeliveryCharge").dxNumberBox("option", "value") > 0) {
