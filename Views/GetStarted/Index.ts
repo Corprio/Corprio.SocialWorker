@@ -822,5 +822,5 @@ $(function () {
     $('#preview-checkout').on('click', function () { saveSettings(true, false) });
     $('#preview-thank-you').on('click', function () { saveSettings(false, true) });
     
-    corprio.page.initTour({ defaultTour: 'getstarted.index', autoStart: true, driverCssLoaded: true }); // must set driverCssLoaded to true    
+    corprio.page.initTour({ defaultTour: 'getstarted.index', autoStart: true });  
 });
