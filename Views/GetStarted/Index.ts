@@ -228,7 +228,7 @@ function restoreKeyword() {
  * @returns
  */
 function restoreTemplate(messageType: MessageType) {    
-    console.log(vdata.model.productTemplate);
+    /*console.log(vdata.model.productTemplate);*/
     const templateString = messageType === MessageType.CataloguePost ? vdata.model.catalogueTemplate : vdata.model.productTemplate;
     if (!templateString) { return; }
     const templateArray = templateString.split(vdata.templateComponents.separator);
@@ -530,8 +530,7 @@ function handleFbLoginStatusChange(response: facebook.StatusResponse) {
  * Validate and submit the setting to backend for saving 
  */
 function saveSettings(previewCheckout: boolean, previewThankyou: boolean) {
-    let validationResult = DevExpress.validationEngine.validateGroup();    
-    console.log(validationResult);
+    let validationResult = DevExpress.validationEngine.validateGroup();        
     if (!validationResult.isValid) { return; }
     
     if ($("#ShipToCustomer").dxCheckBox("option", "value") && $("#DeliveryCharge").dxNumberBox("option", "value") > 0) {
@@ -755,6 +754,8 @@ $(function () {
         }
     });
 
+    corprio.page.initTour({ defaultTour: 'getstarted.index', autoStart: true, driverCssLoaded: true }); // must set driverCssLoaded to true
+
     // facebook-related stuff
     $(Selector.loginButton).on('click', function () {
         console.log('Logging into Facebook...');
@@ -820,7 +821,5 @@ $(function () {
 
     // miscellaneous
     $('#preview-checkout').on('click', function () { saveSettings(true, false) });
-    $('#preview-thank-you').on('click', function () { saveSettings(false, true) });
-    
-    corprio.page.initTour({ defaultTour: 'getstarted.index', autoStart: true, driverCssLoaded: true }); // must set driverCssLoaded to true    
+    $('#preview-thank-you').on('click', function () { saveSettings(false, true) });        
 });
