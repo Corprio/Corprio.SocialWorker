@@ -43,7 +43,7 @@ exports.PERMISSIONS = ['email', 'public_profile', 'business_management', 'pages_
 exports.WEBHOOKS = [
     /*'feed',*/
     // webhook for pages: https://developers.facebook.com/docs/graph-api/webhooks/getting-started/webhooks-for-pages/
-    'messages',
+    'messages', 'mention',
     // any other webhook event: https://developers.facebook.com/docs/messenger-platform/webhook/#events
 ];
 

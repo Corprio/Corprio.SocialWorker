@@ -9,7 +9,7 @@
 @inject Microsoft.AspNetCore.Hosting.IWebHostEnvironment env
 
 @{
-    string clientLibVersion = "2.6.18"; //version of npm package @corprio/aspnetcore-site
+    string clientLibVersion = "2.6.20"; //version of npm package @corprio/aspnetcore-site
     string clientID = configuration["CorprioClientCredential:ClientID"];
     Corprio.AspNetCore.Site.Models.AppMenu menu = await userPreferenceService.GetAppMenu(clientID, Corprio.SocialWorker.Models.Menu.StandardMenu);
     Guid organizationID = Context.SelectedOrganizationID() ?? Guid.Empty;    
@@ -105,7 +105,8 @@
         IgnoreSection("ScriptsDev");
     }
     @* Start: Required by exporting from dxDataGrid *@
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js"></script>
+    @* <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js"></script> *@
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/3.3.1/exceljs.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/1.3.8/FileSaver.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-polyfill/7.4.0/polyfill.min.js"></script>
     @* End: Required by exporting from dxDataGrid *@

@@ -1011,4 +1011,10 @@
   <data name="Unknown_Italic" xml:space="preserve">
     <value>&lt;i&gt;未知&lt;/i&gt;</value>
   </data>
+  <data name="StoryMention_EmailBody" xml:space="preserve">
+    <value>&lt;html&gt;&lt;body&gt;&lt;p&gt;一位顾客在 Instagram 上提到了 &lt;b&gt;{0}&lt;/b&gt;。详情如下。&lt;/p&gt;&lt;ul&gt;&lt;li&gt;Instagram 用户名：{1}&lt;/li&gt;&lt;li&gt;Instagram 用户 ID：{2}&lt;/li&gt;&lt;li&gt;Instagram 故事：&lt;a href="{3}"&gt;{1} 的 Instagram 故事&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;small&gt;注意：当 Instagram 故事被用户删除或故事发布后已过去 24 小时，该 Instagram 故事将消失。因此上面的链接可能无法再访问。&lt;/small&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</value>
+  </data>
+  <data name="StoryMention_EmailSubject" xml:space="preserve">
+    <value>一位顾客在 Instagram 故事中提到了{0}</value>
+  </data>
 </root>

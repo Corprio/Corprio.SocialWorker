@@ -6,7 +6,7 @@
     "@babel/core": "^7.23.3",
     "@babel/preset-env": "^7.23.3",
     "@babel/preset-typescript": "^7.23.3",
-    "@corprio/aspnetcore-site": "2.6.18",
+    "@corprio/aspnetcore-site": "2.6.20",
     "@corprio/devexpress-localization": "^1.1.1",
     "@corprio/gulp-typescript": "1.0.7",
     "@devexpress/analytics-core": "23.2.3",

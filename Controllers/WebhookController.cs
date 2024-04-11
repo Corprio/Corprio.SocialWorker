@@ -25,6 +25,7 @@ using Corprio.Core;
 using Azure.Core;
 using System.Net;
 using Org.BouncyCastle.Cms;
+using DevExpress.Drawing.Internal.Fonts.Interop;
 
 namespace Corprio.SocialWorker.Controllers
 {
@@ -482,30 +483,15 @@ namespace Corprio.SocialWorker.Controllers
             foreach (MessageWebhookEntry entry in payload.Entry)
             {
                 foreach (MessageWebhookMessaging messaging in entry.Messaging)
-                {
-                    // regardless of which message the customer unsent, we take it as an attempt to cancel the current operation
-                    string messageText = messaging.Message?.IsDeleted == true ? DomesticHelper.KillCode : messaging.Message?.Text;
-
-                    if (string.IsNullOrWhiteSpace(messageText))
-                    {
-                        Log.Information("Ignoring message that does not contain text (e.g., thumb-up).");
-                        continue;
-                    }
-                    
-                    if (messageText.EndsWith(BabelFish.RobotEmoji))
-                    {
-                        Log.Information($"Ignoring bot-generated message from {messaging.Sender?.MetaID} to {messaging.Recipient?.MetaID}");
-                        continue;
-                    }
-
+                {                    
                     if (string.IsNullOrWhiteSpace(messaging.Recipient?.MetaID) || string.IsNullOrWhiteSpace(messaging.Sender?.MetaID))
                     {
                         // note: we move on to the next message instead of throwing errors
-                        Log.Error($"Recipient/sender ID for \"{messageText}\" is blank.");
+                        Log.Information($"Ignoring webhook entry without sender/recipient's ID.");
                         continue;
                     }                                        
 
-                    if (messaging.Message.IsEcho == true || messaging.Sender.MetaID == entry.WebhookEntryID)
+                    if (messaging.Message?.IsEcho == true || messaging.Sender.MetaID == entry.WebhookEntryID)
                     {
                         Log.Information($"Ignoring echo message from {messaging.Sender.MetaID}.");
                         continue;
@@ -515,6 +501,87 @@ namespace Corprio.SocialWorker.Controllers
                         && x.SenderID == messaging.Sender.MetaID && x.RecipientID == messaging.Recipient.MetaID))
                     {                        
                         Log.Information($"Ignoring duplicated webhook from {messaging.Sender.MetaID} to {messaging.Recipient.MetaID} at {messaging.Timestamp}.");
+                        continue;
+                    }                    
+
+                    if (payload.Object == "instagram" && (messaging.Message.Attachments?.Any(a => a.Type == "story_mention") ?? false))
+                    {
+                        // "remember" which webhooks have been processed
+                        db.MessageWebhooks.Add(new MessageWebhook
+                        {
+                            ID = Guid.NewGuid(),
+                            RecipientID = messaging.Recipient.MetaID,
+                            SenderID = messaging.Sender.MetaID,
+                            TimeStamp = messaging.Timestamp,
+                        });
+                        await db.SaveChangesAsync();
+                        Log.Information("The webhook appears to be for Instagram story mention.");
+
+                        page = db.MetaPages.Include(x => x.FacebookUser).FirstOrDefault(x => x.InstagramID == messaging.Recipient.MetaID && x.FacebookUser.Dormant == false);
+                        if (page?.FacebookUser?.OrganizationID == null)
+                        {
+                            // apparently Facebook may send multiple notifications for the same message,
+                            // each of which uses a different sender ID and receipient ID to represent the same sender and receipient
+                            Log.Error($"Failed to find page, and its associated objects, based on recipient ID {messaging.Recipient.MetaID}.");
+                            continue;
+                        }
+                        Log.Information($"Found relevant page with receipientID: {messaging.Recipient.MetaID}.");
+
+                        // find the sender's IG user name so that it can be included in the notification to merchant
+                        string igQueryResult = await ApiActionHelper.GetQuery(
+                            httpClient: httpClient,
+                            accessToken: page.Token,
+                            endPoint: $"{BaseUrl}/{ApiVersion}/{messaging.Sender.MetaID}?fields=username");
+                        if (string.IsNullOrWhiteSpace(igQueryResult))
+                        {
+                            Log.Error($"Failed to query the Instagram username of {messaging.Sender.MetaID}");
+                            continue;
+                        }
+                        string  igUserName = JsonConvert.DeserializeObject<IgUser>(igQueryResult)?.Username;
+                        if (string.IsNullOrWhiteSpace(igUserName))
+                        {
+                            Log.Error($"Instagram username of {messaging.Sender.MetaID} is blank.");
+                            continue;
+                        }
+
+                        OrganizationCoreInfo coreInfo = await corprioClient.OrganizationApi.GetCoreInfo(page.FacebookUser.OrganizationID);
+                        if (coreInfo == null)
+                        {
+                            Log.Error("Failed to retrieve the organization email address.");
+                            continue;
+                        }
+
+                        var email = new Core.EmailMessage()
+                        {
+                            ToEmails = [coreInfo.EmailAddress],
+                            Subject = "[" + Resources.SharedResource.AppName + "] " + string.Format(Resources.SharedResource.StoryMention_EmailSubject, page.Name),
+                            Body = string.Format(Resources.SharedResource.StoryMention_EmailBody, page.Name, igUserName, messaging.Sender.MetaID, messaging.Message.Attachments[0].Payload?.URL)
+                        };
+
+                        try
+                        {
+                            await emailHelper.SendEmailAsync(email);
+                        }
+                        catch (Exception ex)
+                        {
+                            Log.Error($"Failed to notify the merchant about the story mention. {ex.Message}");
+                        }
+
+                        continue;
+                    }
+
+                    // regardless of which message the customer unsent, we take it as an attempt to cancel the current operation
+                    string messageText = messaging.Message?.IsDeleted == true ? DomesticHelper.KillCode : messaging.Message?.Text;
+
+                    if (string.IsNullOrWhiteSpace(messageText))
+                    {
+                        Log.Information("Ignoring message that does not contain text (e.g., thumb-up).");
+                        continue;
+                    }
+
+                    if (messageText.EndsWith(BabelFish.RobotEmoji))
+                    {
+                        Log.Information($"Ignoring bot-generated message from {messaging.Sender?.MetaID} to {messaging.Recipient?.MetaID}");
                         continue;
                     }
 
@@ -527,6 +594,7 @@ namespace Corprio.SocialWorker.Controllers
                         TimeStamp = messaging.Timestamp,
                     });
                     await db.SaveChangesAsync();
+                    Log.Information($"The webhook appears to be for {payload.Object} direct message.");
 
                     page = payload.Object == "instagram"
                         ? db.MetaPages.Include(x => x.FacebookUser).ThenInclude(x => x.Bots).FirstOrDefault(x => x.InstagramID == messaging.Recipient.MetaID && x.FacebookUser.Dormant == false)
@@ -538,7 +606,7 @@ namespace Corprio.SocialWorker.Controllers
                         Log.Error($"Failed to find page, and its associated objects, based on recipient ID {messaging.Recipient.MetaID}.");                        
                         continue;                                                
                     }
-                    Log.Information($"Found relevant page with senderID: {messaging.Sender.MetaID}, receipientID: {messaging.Recipient.MetaID}; message: {messaging.Message.Text}");
+                    Log.Information($"Found relevant page with receipientID: {messaging.Recipient.MetaID}; senderID: {messaging.Sender.MetaID}, message: {messaging.Message.Text}");
 
                     setting = await applicationSettingService.GetSetting<ApplicationSetting>(page.FacebookUser.OrganizationID);
 
@@ -706,12 +774,12 @@ namespace Corprio.SocialWorker.Controllers
 
             // if the payload includes "Messaging" and one of its element has sender, then presumably it is for webhook on messages
             MessageWebhookPayload messageWebhookPayload = requestString == null ? null : JsonConvert.DeserializeObject<MessageWebhookPayload>(requestString)!;
-            if (messageWebhookPayload?.Entry?.Any(x => x.Messaging?.Any(y => !string.IsNullOrWhiteSpace(y.Sender?.MetaID)) ?? false) ?? false)
+            if (messageWebhookPayload?.Entry?.Any(e => e.Messaging?.Any(m => !string.IsNullOrWhiteSpace(m.Sender?.MetaID)) ?? false) ?? false)
             {
                 Log.Information("The webhook appears to be a message webhook.");
                 return await HandleMessageWebhook(httpClient: httpClient, corprioClient: corprioClient, 
                     applicationSettingService: applicationSettingService, payload: messageWebhookPayload);
-            }
+            }            
 
             //// if the payload includes "Changes" and field is "feed", then presumably it is for webhook on feed
             //FeedWebhookPayload feedWebhookPayload = requestString == null ? null : JsonConvert.DeserializeObject<FeedWebhookPayload>(requestString)!;

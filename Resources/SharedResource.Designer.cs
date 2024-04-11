@@ -2194,6 +2194,24 @@ namespace Corprio.SocialWorker.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to &lt;html&gt;&lt;body&gt;&lt;p&gt;A customer mentioned &lt;b&gt;{0}&lt;/b&gt; on Instagram. Please refer to below for details.&lt;/p&gt;&lt;ul&gt;&lt;li&gt;Instagram user name: {1}&lt;/li&gt;&lt;li&gt;Instagram user ID: {2}&lt;/li&gt;&lt;li&gt;Instagram story: &lt;a href=&quot;{3}&quot;&gt;{1}&apos;s Instagram Story&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;small&gt;Note: Instagram story is ephemeral by nature - that is, it will disappear after 24 hours or when deleted by the user - so the link above may no longer be accessible.&lt;/small&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;.
+        /// </summary>
+        public static string StoryMention_EmailBody {
+            get {
+                return ResourceManager.GetString("StoryMention_EmailBody", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A customer mentioned {0} in their Instagram story.
+        /// </summary>
+        public static string StoryMention_EmailSubject {
+            get {
+                return ResourceManager.GetString("StoryMention_EmailSubject", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Sub-total.
         /// </summary>
         public static string Subtotal {

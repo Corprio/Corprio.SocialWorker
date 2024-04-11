@@ -82,6 +82,12 @@ namespace Corprio.SocialWorker.Models
         public string Mid { get; set; }
 
         /// <summary>
+        /// Attachments of the message
+        /// </summary>
+        [JsonProperty("attachments")]
+        public List<WebhookMessageAttachment> Attachments { get; set; }
+
+        /// <summary>
         /// Text message
         /// </summary>
         [JsonProperty("text")]
@@ -104,6 +110,53 @@ namespace Corprio.SocialWorker.Models
         /// </summary>
         [JsonProperty("nlp")]
         public NLPprops NLP { get; set; }
+    }
+
+    /// <summary>
+    /// Reference: https://developers.facebook.com/docs/messenger-platform/instagram/features/story-mention/
+    /// Example of story mention webhook:
+    //    {
+    //      object: 'instagram',
+    //      entry: [
+    //          {
+    //              time: 1712740660167,
+    //              id: '17841465042465777',
+    //              messaging: [
+    //                  {
+    //                      sender: { id: '25071364142507508' },
+    //                      recipient: { id: '17841465042465777' },
+    //                      timestamp: 1712740659552,
+    //                      message: {
+    //                          mid: 'aWdfZAG1faXRlbToxOklHTWVzc2FnZAUlEOjE3ODQxNDY1MDQyNDY1Nzc3OjM0MDI4MjM2Njg0MTcxMDMwMTI0NDI3NjAxODIwMDg3MjI1NTA1OTozMTU5NDQ4ODYxMTQwMTMyMDUzNjE1NDI5MjUzNTQyNzA3MgZDZD',
+    //                          attachments: [
+    //                              {
+    //                                  type: 'story_mention',
+    //                                  payload: { url: 'https://lookaside.fbsbx.com/ig_messaging_cdn/?asset_id=18076257598480693&signature=Abye-Y37CDo2_N8AtgvClxzxqaegnCS1QEXlNjO3ZhHlTP8nIaFTsU8eNKQmx06QdzlmKY6VX8-wIawG67pMdGG2rhkM80pPINoxK3Gontv333WOhZWjoSFAM2z0uH8J43W4NsPX1Vm--jDisGXIyET7GfRnJ0WSDA8tE7-1sJVFKjgXYRKP6N-DhP7Wi-2r7622b8DS83M4nq9N7bEqu41xfTpsN1U' }
+    //                              }
+    //                          ]
+    //                      }
+    //                  }
+    //              ]
+    //          }
+    //      ]
+    //  }
+    /// </summary>
+    public class WebhookMessageAttachment
+    {
+        /// <summary>
+        /// For example: 'story_mention'
+        /// </summary>
+        [JsonProperty("type")]
+        public string Type { get; set; }
+
+        [JsonProperty("payload")]
+        public WebhookMessageAttachmentPayload Payload { get; set; }
+    }
+
+    public class WebhookMessageAttachmentPayload
+    {
+        [JsonProperty("url")]
+        public string URL { get; set; }
     }
 
     public class NLPprops

@@ -1017,4 +1017,10 @@
   <data name="PublishProductPrompt2" xml:space="preserve">
     <value>The following post will be made to your Facebook page(s) and Instagram account(s). Please review and confirm.</value>
   </data>
+  <data name="StoryMention_EmailBody" xml:space="preserve">
+    <value>&lt;html&gt;&lt;body&gt;&lt;p&gt;A customer mentioned &lt;b&gt;{0}&lt;/b&gt; on Instagram. Please refer to below for details.&lt;/p&gt;&lt;ul&gt;&lt;li&gt;Instagram user name: {1}&lt;/li&gt;&lt;li&gt;Instagram user ID: {2}&lt;/li&gt;&lt;li&gt;Instagram story: &lt;a href="{3}"&gt;{1}'s Instagram Story&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;small&gt;Note: Instagram story is ephemeral by nature - that is, it will disappear after 24 hours or when deleted by the user - so the link above may no longer be accessible.&lt;/small&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</value>
+  </data>
+  <data name="StoryMention_EmailSubject" xml:space="preserve">
+    <value>A customer mentioned {0} in their Instagram story</value>
+  </data>
 </root>

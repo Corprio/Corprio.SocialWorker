@@ -754,7 +754,7 @@ $(function () {
         }
     });
 
-    corprio.page.initTour({ defaultTour: 'getstarted.index', autoStart: true, driverCssLoaded: true }); // must set driverCssLoaded to true
+    corprio.page.initTour({ defaultTour: 'getstarted.index', autoStart: true });
 
     // facebook-related stuff
     $(Selector.loginButton).on('click', function () {
