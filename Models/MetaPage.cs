@@ -56,6 +56,11 @@ namespace Corprio.SocialWorker.Models
         /// <summary>
         /// Posts that were made on the page or the IG account associated with the page.
         /// </summary>
-        public List<MetaPost> Posts { get; set; } = new List<MetaPost>();
+        public List<MetaPost> Posts { get; set; } = [];
+
+        /// <summary>
+        /// Story mentions of the IG account associated with the page.
+        /// </summary>
+        public List<MetaMention> Mentions { get; set; } = [];
     }
 }

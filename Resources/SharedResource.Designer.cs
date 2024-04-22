@@ -2194,6 +2194,42 @@ namespace Corprio.SocialWorker.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Story mentions.
+        /// </summary>
+        public static string StoryMention {
+            get {
+                return ResourceManager.GetString("StoryMention", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Story creation date.
+        /// </summary>
+        public static string StoryMention_createDate {
+            get {
+                return ResourceManager.GetString("StoryMention_createDate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Story creator.
+        /// </summary>
+        public static string StoryMention_creator {
+            get {
+                return ResourceManager.GetString("StoryMention_creator", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to See the Instagram stories that have mentioned your Instagram Business account(s)..
+        /// </summary>
+        public static string StoryMention_Desc {
+            get {
+                return ResourceManager.GetString("StoryMention_Desc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to &lt;html&gt;&lt;body&gt;&lt;p&gt;A customer mentioned &lt;b&gt;{0}&lt;/b&gt; on Instagram. Please refer to below for details.&lt;/p&gt;&lt;ul&gt;&lt;li&gt;Instagram user name: {1}&lt;/li&gt;&lt;li&gt;Instagram user ID: {2}&lt;/li&gt;&lt;li&gt;Instagram story: &lt;a href=&quot;{3}&quot;&gt;{1}&apos;s Instagram Story&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;small&gt;Note: Instagram story is ephemeral by nature - that is, it will disappear after 24 hours or when deleted by the user - so the link above may no longer be accessible.&lt;/small&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;.
         /// </summary>
         public static string StoryMention_EmailBody {
@@ -2208,6 +2244,24 @@ namespace Corprio.SocialWorker.Resources {
         public static string StoryMention_EmailSubject {
             get {
                 return ResourceManager.GetString("StoryMention_EmailSubject", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to View the story. (Note: Instagram story will disappear after 24 hours or when deleted by the user, so the link above may no longer be accessible.).
+        /// </summary>
+        public static string StoryMention_hint {
+            get {
+                return ResourceManager.GetString("StoryMention_hint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Mentioned.
+        /// </summary>
+        public static string StoryMention_mentioned {
+            get {
+                return ResourceManager.GetString("StoryMention_mentioned", resourceCulture);
             }
         }
         

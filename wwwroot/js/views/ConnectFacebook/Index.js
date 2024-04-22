@@ -93,8 +93,8 @@ const Constants_1 = __webpack_require__(/*! ../Shared/Constants */ "./Views/Shar
 window.fbAsyncInit = function () {
     FB.init({
         appId: '312852768233605',
-        cookie: true, // Enable cookies to allow the server to access the session.
-        xfbml: true, // Parse social plugins on this webpage.
+        cookie: true,
+        xfbml: true,
         version: 'v18.0' // Use this Graph API version for this call.
     });
     FB.getLoginStatus(function (response) {

@@ -19,13 +19,8 @@ using Corprio.DataModel.Shared;
 using System.Linq.Dynamic.Core;
 using Microsoft.EntityFrameworkCore;
 using Corprio.AspNetCore.Site.Services;
-using System.ServiceModel.Channels;
 using Corprio.DataModel.Business;
 using Corprio.Core;
-using Azure.Core;
-using System.Net;
-using Org.BouncyCastle.Cms;
-using DevExpress.Drawing.Internal.Fonts.Interop;
 
 namespace Corprio.SocialWorker.Controllers
 {
@@ -126,14 +121,13 @@ namespace Corprio.SocialWorker.Controllers
         /// <summary>
         /// Find the bot that was chatting with the interlocutor; if none is found, a new bot is created
         /// </summary>
-        /// <param name="corprioClient">Client for executing API requests among Corprio projects</param>
-        /// <param name="organizationID">Organization ID</param>
+        /// <param name="corprioClient">Client for executing API requests among Corprio projects</param>        
         /// <param name="facebookUser">Owner of the bot</param>
         /// <param name="interlocutorID">Meta ID of the person chatting with the bot</param>
         /// <param name="metaUsername">Meta username of the person chatting with the bot</param>
         /// <param name="unMute">If true, unmute the bot so that it reads and responds to webhook payload</param>
         /// <returns>Bot</returns>
-        public async Task<DbFriendlyBot> ReinventTheBot(APIClient corprioClient, Guid organizationID, MetaUser facebookUser, 
+        public async Task<DbFriendlyBot> ReinventTheBot(APIClient corprioClient, MetaUser facebookUser, 
             string interlocutorID, string metaUsername = null, bool unMute = false)
         {
             DbFriendlyBot botStatus = facebookUser.Bots.FirstOrDefault(x => x.BuyerID == interlocutorID);
@@ -149,7 +143,7 @@ namespace Corprio.SocialWorker.Controllers
                 };
 
                 List<dynamic> existingCustomers = await corprioClient.CustomerApi.Query(
-                    organizationID: organizationID,
+                    organizationID: facebookUser.OrganizationID,
                     selector: "new (ID)",
                     where: "EntityProperties.Any(Name==@0 && Value==@1)",
                     orderBy: "ID",
@@ -161,7 +155,7 @@ namespace Corprio.SocialWorker.Controllers
                     botStatus.BuyerCorprioID = Guid.Parse(existingCustomers[0].ID);
                 }
                 db.MetaBotStatuses.Add(botStatus);
-                await db.SaveChangesAsync();                
+                await db.SaveChangesAsync();
             }
             else
             {
@@ -274,8 +268,7 @@ namespace Corprio.SocialWorker.Controllers
 
                     setting = await applicationSettingService.GetSetting<ApplicationSetting>(post.FacebookPage.FacebookUser.OrganizationID);
                     botStatus = await ReinventTheBot(
-                        corprioClient: corprioClient, 
-                        organizationID: post.FacebookPage.FacebookUser.OrganizationID,
+                        corprioClient: corprioClient,                         
                         facebookUser: post.FacebookPage.FacebookUser, 
                         interlocutorID: change.Value.From.Id, 
                         metaUsername: change.Value.From.Username,
@@ -405,8 +398,7 @@ namespace Corprio.SocialWorker.Controllers
 
                     setting = await applicationSettingService.GetSetting<ApplicationSetting>(post.FacebookPage.FacebookUser.OrganizationID);
                     botStatus = await ReinventTheBot(
-                        corprioClient: corprioClient, 
-                        organizationID: post.FacebookPage.FacebookUser.OrganizationID,
+                        corprioClient: corprioClient,                         
                         facebookUser: post.FacebookPage.FacebookUser, 
                         interlocutorID: change.Value.From.Id, 
                         metaUsername: change.Value.From.Name,
@@ -477,6 +469,8 @@ namespace Corprio.SocialWorker.Controllers
             DomesticHelper bot;
             string response;
             string endPoint;
+            bool isStoryMention;
+            string messageText;
 
             // note: it is possible for more than one entry/messaging to come in, as Meta aggregates up to 1,000 event notifications
             // see Frequency at https://developers.facebook.com/docs/graph-api/webhooks/getting-started
@@ -502,87 +496,33 @@ namespace Corprio.SocialWorker.Controllers
                     {                        
                         Log.Information($"Ignoring duplicated webhook from {messaging.Sender.MetaID} to {messaging.Recipient.MetaID} at {messaging.Timestamp}.");
                         continue;
-                    }                    
+                    }
 
-                    if (payload.Object == "instagram" && (messaging.Message.Attachments?.Any(a => a.Type == "story_mention") ?? false))
+                    isStoryMention = payload.Object == "instagram" && (messaging.Message.Attachments?.Any(a => a.Type == "story_mention") ?? false);                    
+                    messageText = messaging.Message?.IsDeleted == true 
+                        ? BabelFish.KillCode  // regardless of which message the customer unsent, we take it as an attempt to cancel the current operation
+                        : string.IsNullOrEmpty(messaging.Message?.Text) ? string.Empty : messaging.Message.Text;
+                    messageText = messageText.Trim();
+
+                    // check if the message is empty or bot-generated ONLY IF it is NOT a story_metnion
+                    if (!isStoryMention)
                     {
-                        // "remember" which webhooks have been processed
-                        db.MessageWebhooks.Add(new MessageWebhook
+                        if (string.IsNullOrWhiteSpace(messageText))
                         {
-                            ID = Guid.NewGuid(),
-                            RecipientID = messaging.Recipient.MetaID,
-                            SenderID = messaging.Sender.MetaID,
-                            TimeStamp = messaging.Timestamp,
-                        });
-                        await db.SaveChangesAsync();
+                            Log.Information("Ignoring message that does not contain text (e.g., thumb-up).");
+                            continue;
+                        }
+
+                        if (messageText.EndsWith(BabelFish.RobotEmoji))
+                        {
+                            Log.Information($"Ignoring bot-generated message from {messaging.Sender?.MetaID} to {messaging.Recipient?.MetaID}");
+                            continue;
+                        }
+                        Log.Information($"The webhook appears to be for {payload.Object} direct message.");
+                    }
+                    else
+                    {
                         Log.Information("The webhook appears to be for Instagram story mention.");
-
-                        page = db.MetaPages.Include(x => x.FacebookUser).FirstOrDefault(x => x.InstagramID == messaging.Recipient.MetaID && x.FacebookUser.Dormant == false);
-                        if (page?.FacebookUser?.OrganizationID == null)
-                        {
-                            // apparently Facebook may send multiple notifications for the same message,
-                            // each of which uses a different sender ID and receipient ID to represent the same sender and receipient
-                            Log.Error($"Failed to find page, and its associated objects, based on recipient ID {messaging.Recipient.MetaID}.");
-                            continue;
-                        }
-                        Log.Information($"Found relevant page with receipientID: {messaging.Recipient.MetaID}.");
-
-                        // find the sender's IG user name so that it can be included in the notification to merchant
-                        string igQueryResult = await ApiActionHelper.GetQuery(
-                            httpClient: httpClient,
-                            accessToken: page.Token,
-                            endPoint: $"{BaseUrl}/{ApiVersion}/{messaging.Sender.MetaID}?fields=username");
-                        if (string.IsNullOrWhiteSpace(igQueryResult))
-                        {
-                            Log.Error($"Failed to query the Instagram username of {messaging.Sender.MetaID}");
-                            continue;
-                        }
-                        string  igUserName = JsonConvert.DeserializeObject<IgUser>(igQueryResult)?.Username;
-                        if (string.IsNullOrWhiteSpace(igUserName))
-                        {
-                            Log.Error($"Instagram username of {messaging.Sender.MetaID} is blank.");
-                            continue;
-                        }
-
-                        OrganizationCoreInfo coreInfo = await corprioClient.OrganizationApi.GetCoreInfo(page.FacebookUser.OrganizationID);
-                        if (coreInfo == null)
-                        {
-                            Log.Error("Failed to retrieve the organization email address.");
-                            continue;
-                        }
-
-                        var email = new Core.EmailMessage()
-                        {
-                            ToEmails = [coreInfo.EmailAddress],
-                            Subject = "[" + Resources.SharedResource.AppName + "] " + string.Format(Resources.SharedResource.StoryMention_EmailSubject, page.Name),
-                            Body = string.Format(Resources.SharedResource.StoryMention_EmailBody, page.Name, igUserName, messaging.Sender.MetaID, messaging.Message.Attachments[0].Payload?.URL)
-                        };
-
-                        try
-                        {
-                            await emailHelper.SendEmailAsync(email);
-                        }
-                        catch (Exception ex)
-                        {
-                            Log.Error($"Failed to notify the merchant about the story mention. {ex.Message}");
-                        }
-
-                        continue;
-                    }
-
-                    // regardless of which message the customer unsent, we take it as an attempt to cancel the current operation
-                    string messageText = messaging.Message?.IsDeleted == true ? DomesticHelper.KillCode : messaging.Message?.Text;
-
-                    if (string.IsNullOrWhiteSpace(messageText))
-                    {
-                        Log.Information("Ignoring message that does not contain text (e.g., thumb-up).");
-                        continue;
-                    }
-
-                    if (messageText.EndsWith(BabelFish.RobotEmoji))
-                    {
-                        Log.Information($"Ignoring bot-generated message from {messaging.Sender?.MetaID} to {messaging.Recipient?.MetaID}");
-                        continue;
                     }
 
                     // "remember" which webhooks have been processed
@@ -594,7 +534,6 @@ namespace Corprio.SocialWorker.Controllers
                         TimeStamp = messaging.Timestamp,
                     });
                     await db.SaveChangesAsync();
-                    Log.Information($"The webhook appears to be for {payload.Object} direct message.");
 
                     page = payload.Object == "instagram"
                         ? db.MetaPages.Include(x => x.FacebookUser).ThenInclude(x => x.Bots).FirstOrDefault(x => x.InstagramID == messaging.Recipient.MetaID && x.FacebookUser.Dormant == false)
@@ -603,8 +542,8 @@ namespace Corprio.SocialWorker.Controllers
                     {
                         // apparently Facebook may send multiple notifications for the same message,
                         // each of which uses a different sender ID and receipient ID to represent the same sender and receipient
-                        Log.Error($"Failed to find page, and its associated objects, based on recipient ID {messaging.Recipient.MetaID}.");                        
-                        continue;                                                
+                        Log.Error($"Failed to find page, and its associated objects, based on recipient ID {messaging.Recipient.MetaID}.");
+                        continue;
                     }
                     Log.Information($"Found relevant page with receipientID: {messaging.Recipient.MetaID}; senderID: {messaging.Sender.MetaID}, message: {messaging.Message.Text}");
 
@@ -612,8 +551,9 @@ namespace Corprio.SocialWorker.Controllers
 
                     // confirmed via testing: senderId is the same regardless if the sender (i) made a comment on a post
                     // or (ii) sent a message via messenger
-                    botStatus = await ReinventTheBot(corprioClient: corprioClient, organizationID: page.FacebookUser.OrganizationID, 
-                        facebookUser: page.FacebookUser, interlocutorID: messaging.Sender.MetaID);
+                    botStatus = await ReinventTheBot(corprioClient: corprioClient,
+                        facebookUser: page.FacebookUser,
+                        interlocutorID: messaging.Sender.MetaID);
 
                     if (string.IsNullOrWhiteSpace(botStatus.MetaUserName))
                     {
@@ -623,19 +563,19 @@ namespace Corprio.SocialWorker.Controllers
                         {
                             botStatus.MetaUserName = payload.Object == "instagram"
                                 ? JsonConvert.DeserializeObject<IgUser>(queryResult)?.Username
-                                : JsonConvert.DeserializeObject<FbUser>(queryResult)?.Name;                            
+                                : JsonConvert.DeserializeObject<FbUser>(queryResult)?.Name;
                         }
                         db.MetaBotStatuses.Update(botStatus);
                         await db.SaveChangesAsync();
-                    }
+                    }                                        
 
-                    messageText = messageText.Trim();                    
+                    // if muted, either unmute or do nothing
                     if (botStatus.IsMuted)
                     {
                         if (messageText.Equals(BabelFish.BotSummon, StringComparison.OrdinalIgnoreCase) || messageText.Equals(BabelFish.BotSummon_CN, StringComparison.OrdinalIgnoreCase))
                         {
                             Log.Information($"The interlocutor {messaging.Sender.MetaID} has opted in to receiving automated responses from Facebook user {page.FacebookUser.FacebookUserID}.");
-                                                        
+
                             bot = new DomesticHelper(context: db, configuration: configuration, client: corprioClient, organizationID: page.FacebookUser.OrganizationID,
                                 botStatus: botStatus, detectedLocales: messaging.Message?.NLP?.DetectedLocales, pageName: page.Name, setting: setting);
 
@@ -650,18 +590,89 @@ namespace Corprio.SocialWorker.Controllers
                                 messageEndPoint: endPoint,
                                 threadEndPoint: $"{BaseUrl}/{ApiVersion}/{page.PageId}/release_thread_control",
                                 message: await bot.getWoke(),
-                                recipientId: messaging.Sender.MetaID);
-
-                            continue;
+                                recipientId: messaging.Sender.MetaID);                            
                         }
-
-                        Log.Information($"The interlocutor {messaging.Sender.MetaID} has opted out of receiving automated responses from Facebook user {page.FacebookUser.FacebookUserID}.");
+                        else
+                        {
+                            Log.Information($"The interlocutor {messaging.Sender.MetaID} has opted out of receiving automated responses from Facebook user {page.FacebookUser.FacebookUserID}.");
+                        }
+                        
                         continue;
                     }
 
                     bot = new DomesticHelper(context: db, configuration: configuration, client: corprioClient, organizationID: page.FacebookUser.OrganizationID,
                         botStatus: botStatus, detectedLocales: messaging.Message?.NLP?.DetectedLocales, pageName: page.Name, setting: setting);
 
+                    // handle 'Story Mentions' to meet Facebook App review requirement
+                    if (isStoryMention)
+                    {
+                        try
+                        {
+                            response = await bot.AcknowledgeMention();
+                        }
+                        catch (Exception ex)
+                        {
+                            Log.Error($"The bot failed to generate a message. Error: {ex.Message}");
+                            response = bot.ThusSpokeBabel("Err_DefaultMsg");
+                        }
+                        // note: the bot must respond with something in 30 seconds (source: https://developers.facebook.com/docs/messenger-platform/policy/responsiveness)
+                        if (string.IsNullOrWhiteSpace(response)) response = bot.ThusSpokeBabel("Err_DefaultMsg");
+                        response += BabelFish.RobotEmoji;
+
+                        await ApiActionHelper.SendMessage(
+                            httpClient: httpClient,
+                            accessToken: page.Token,
+                            messageEndPoint: $"{BaseUrl}/{ApiVersion}/me/messages",
+                            threadEndPoint: $"{BaseUrl}/{ApiVersion}/{page.PageId}/release_thread_control",
+                            message: response,
+                            recipientId: messaging.Sender.MetaID); ;
+                        
+                        // save the CDN URL
+                        string igNameQueryResult = await ApiActionHelper.GetQuery(
+                            httpClient: httpClient, 
+                            accessToken: page.Token, 
+                            endPoint: $"{BaseUrl}/{ApiVersion}/{messaging.Sender.MetaID}?fields=username");
+
+                        var metaMention = new MetaMention()
+                        {
+                            ID = Guid.NewGuid(),
+                            FacebookPageID = page.ID,
+                            CreatorID = messaging.Sender.MetaID,
+                            CreatorName = botStatus.MetaUserName,
+                            CDNUrl = messaging.Message.Attachments[0].Payload.URL,
+                            Mentioned = string.IsNullOrWhiteSpace(igNameQueryResult) ? string.Empty : JsonConvert.DeserializeObject<IgUser>(igNameQueryResult)?.Username,
+                        };
+                        db.MetaMentions.Add(metaMention);
+                        await db.SaveChangesAsync();
+
+                        //// re-do the following part
+                        //OrganizationCoreInfo coreInfo = await corprioClient.OrganizationApi.GetCoreInfo(page.FacebookUser.OrganizationID);
+                        //if (coreInfo == null)
+                        //{
+                        //    Log.Error("Failed to retrieve the organization email address.");
+                        //    continue;
+                        //}
+
+                        //var email = new Core.EmailMessage()
+                        //{
+                        //    ToEmails = [coreInfo.EmailAddress],
+                        //    Subject = "[" + Resources.SharedResource.AppName + "] " + string.Format(Resources.SharedResource.StoryMention_EmailSubject, page.Name),
+                        //    Body = string.Format(Resources.SharedResource.StoryMention_EmailBody, page.Name, botStatus.MetaUserName, messaging.Sender.MetaID, messaging.Message.Attachments[0].Payload?.URL)
+                        //};
+
+                        //try
+                        //{
+                        //    await emailHelper.SendEmailAsync(email);
+                        //}
+                        //catch (Exception ex)
+                        //{
+                        //    Log.Error($"Failed to notify the merchant about the story mention. {ex.Message}");
+                        //}
+
+                        continue;
+                    }
+                    
+                    // escalate to human agent if the user requests to speak with a human rather than a bot
                     if (messageText.Equals(BabelFish.SOS, StringComparison.OrdinalIgnoreCase) || messageText.Equals(BabelFish.SOS_CN, StringComparison.OrdinalIgnoreCase))
                     {
                         Log.Information($"The interlocutor elected to speak with human agent by inputting {messageText}");
@@ -716,6 +727,7 @@ namespace Corprio.SocialWorker.Controllers
                         continue;
                     }                    
                     
+                    // reply to direct message that does NOT involve human agent escalation
                     try
                     {
                         response = await bot.ThinkBeforeSpeak(messageText);

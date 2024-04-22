@@ -16,6 +16,7 @@ namespace Corprio.SocialWorker.Models
         public DbSet<MetaPage> MetaPages { get; set; }
         public DbSet<DbFriendlyBot> MetaBotStatuses { get; set; }        
         public DbSet<MetaPost> MetaPosts { get; set; }
+        public DbSet<MetaMention> MetaMentions { get; set; }
         public DbSet<MessageWebhook> MessageWebhooks { get; set; }
         public DbSet<FeedWebhook> FeedWebhooks { get; set; }
         public DbSet<CommentWebhook> CommentWebhooks { get; set; }

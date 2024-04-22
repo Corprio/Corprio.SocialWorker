@@ -1023,4 +1023,22 @@
   <data name="StoryMention_EmailSubject" xml:space="preserve">
     <value>A customer mentioned {0} in their Instagram story</value>
   </data>
+  <data name="StoryMention" xml:space="preserve">
+    <value>Story mentions</value>
+  </data>
+  <data name="StoryMention_createDate" xml:space="preserve">
+    <value>Story creation date</value>
+  </data>
+  <data name="StoryMention_creator" xml:space="preserve">
+    <value>Story creator</value>
+  </data>
+  <data name="StoryMention_Desc" xml:space="preserve">
+    <value>See the Instagram stories that have mentioned your Instagram Business account(s).</value>
+  </data>
+  <data name="StoryMention_hint" xml:space="preserve">
+    <value>View the story. (Note: Instagram story will disappear after 24 hours or when deleted by the user, so the link above may no longer be accessible.)</value>
+  </data>
+  <data name="StoryMention_mentioned" xml:space="preserve">
+    <value>Mentioned</value>
+  </data>
 </root>

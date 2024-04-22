@@ -39,9 +39,7 @@ namespace Corprio.SocialWorker.Helpers
         private readonly ApplicationSetting AppSetting;
 
         // magic numbers
-        private const int ChoiceLimit = 10;
-        public const string KillCode = "!c";
-        private const string KillCode_CN = "！c";  // note: the exclamation mark in Chinese is different from English
+        private const int ChoiceLimit = 10;        
         private const int OTP_MaxFailedAttempts = 3;
         private const int OTP_Length = 6;
         private const int OTP_SecondsToExpire = 120;
@@ -166,7 +164,7 @@ namespace Corprio.SocialWorker.Helpers
             {
                 choices += $"{i + 1} - {attributeValues.Value[i].Name}\n";
             }
-            choices += ThusSpokeBabel(key: "Hint_CancelAndEscalate", placeholders: [KillCode]);
+            choices += ThusSpokeBabel("Hint_CancelAndEscalate");
             return choices;
         }
 
@@ -732,7 +730,7 @@ namespace Corprio.SocialWorker.Helpers
                     }
                     
                     if (answer > attributeValues.Value.Count || answer < 1) 
-                        return $"{ThusSpokeBabel("Err_NotUnderstand")}\n{await AskQuestion()}";                    
+                        return $"{ThusSpokeBabel("Err_NotUnderstand")}\n{await AskQuestion()}";
                     
                     return await UpdateAttributeValuesMemory(attributeType: attributeValues.Key, code: attributeValues.Value[answer - 1].Code);
 
@@ -846,7 +844,7 @@ namespace Corprio.SocialWorker.Helpers
             Bot.ThinkingOf = BotTopic.EmailConfirmationOpen;
             Bot.OtpSessionID = sessionID;
             await Save();
-            return ThusSpokeBabel(key: "CodeSent", placeholders: [OTP_Length.ToString(), Bot.BuyerEmail, (OTP_SecondsToExpire/60).ToString(), KillCode]);
+            return ThusSpokeBabel(key: "CodeSent", placeholders: [OTP_Length.ToString(), Bot.BuyerEmail, (OTP_SecondsToExpire/60).ToString()]);
         }
 
         /// <summary>
@@ -1168,6 +1166,11 @@ namespace Corprio.SocialWorker.Helpers
             return await AskQuestion();
         }
 
+        public async Task<string> AcknowledgeMention()
+        {
+            return $"{ThusSpokeBabel(key: "AcknowlegeMention", placeholders: [Bot.MetaUserName])}\n{await AskQuestion()}";
+        }
+
         /// <summary>
         /// Generate a message as if the user has selected a product id
         /// </summary>
@@ -1207,7 +1210,7 @@ namespace Corprio.SocialWorker.Helpers
             if (string.IsNullOrWhiteSpace(input)) return null;
 
             input = input.Trim();
-            if (input.Equals(KillCode, StringComparison.OrdinalIgnoreCase) || input.Equals(KillCode_CN, StringComparison.OrdinalIgnoreCase)) 
+            if (input.Equals(BabelFish.KillCode, StringComparison.OrdinalIgnoreCase) || input.Equals(BabelFish.KillCode_CN, StringComparison.OrdinalIgnoreCase)) 
                 return await HandleCancel();
             
             switch (Bot.ThinkingOf)

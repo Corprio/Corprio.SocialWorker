@@ -5,14 +5,14 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
 
 namespace Corprio.SocialWorker.Models
-{        
+{
     /// <summary>
-    /// Facebook post
+    /// Story mention
     /// </summary>
-    public class MetaPost : Entity
+    public class MetaMention : Entity
     {
         /// <summary>
-        /// Entity ID of Facebook page (not the ID assigned by Facebook to a page).
+        /// Entity ID of Facebook page (not the ID assigned by Facebook to a page) that is mentioned or has its Instagram Business Account mentioned
         /// </summary>
         [Required(ErrorMessageResourceType = typeof(Resource), ErrorMessageResourceName = "MsgRequired")]
         public Guid FacebookPageID { get; set; }
@@ -24,22 +24,27 @@ namespace Corprio.SocialWorker.Models
         public MetaPage FacebookPage { get; set; }
 
         /// <summary>
-        /// The ID representing a post.
+        /// Instagram ID of the person who creates the story mention.
         /// </summary>
         [Required(ErrorMessageResourceType = typeof(Resource), ErrorMessageResourceName = "MsgRequired")]
-        [StringLength(50, MinimumLength = 1)]
-        public string PostId { get; set; }
+        public string CreatorID { get; set; }
 
         /// <summary>
-        /// Keyword for indicating purchase intention. The chatbot will 'reach out' to anyone who replies to the post with this keyword.
+        /// Instagram username of the person who creates the story mention.
         /// </summary>
         [Required(ErrorMessageResourceType = typeof(Resource), ErrorMessageResourceName = "MsgRequired")]
-        [StringLength(10)]
-        public string KeywordForShoppingIntention { get; set; } = "BUY";
+        public string CreatorName { get; set; }
 
         /// <summary>
-        /// Meta product with which the post was made (e.g., Instagram).
+        /// URL of rich media content shared by Instagram users. 
+        /// The CDN URL is privacy-aware and will not return the media when the content has been deleted or has expired.
         /// </summary>
-        public MetaProduct PostedWith { get; set; }
+        [Required(ErrorMessageResourceType = typeof(Resource), ErrorMessageResourceName = "MsgRequired")]
+        public string CDNUrl { get; set; }
+
+        /// <summary>
+        /// Name of FB page / IG account being mentioned
+        /// </summary>
+        public string Mentioned {  get; set; }
     }
 }

@@ -6,17 +6,25 @@ namespace Corprio.SocialWorker.Dictionaries
 {
     public class BabelFish
     {
+        public const string KillCode = "!c";
+        public const string KillCode_CN = "！c"; // note: the exclamation mark in Chinese is different from English
         public const string SOS = "!h";
         public const string SOS_CN = "！h";
         public const string BotSummon = "!a";
-        public const string BotSummon_CN = "!a";
+        public const string BotSummon_CN = "！a";
         public const string ProductEpName = "MetaPostId";
         public const string CustomerEpName = "MetaSenderId";
         public const string CustomDataKeyForMetaUser = "MetaUser";
-        public const string RobotEmoji = "🤖";
+        public const string RobotEmoji = "🤖";        
 
         public static readonly Dictionary<string, Dictionary<BotLanguage, string>> Vocab = new()
-        {            
+        {
+            ["AcknowlegeMention"] = new Dictionary<BotLanguage, string>()
+            {
+                [BotLanguage.English] = "{0}, thanks for mentioning us in your story. ",
+                [BotLanguage.TraditionalChinese] = "{0}，感謝您在故事中提到我們。",
+                [BotLanguage.SimplifiedChinese] = "{0}，感谢您在故事中提到我们。",
+            },
             ["AskCheckout"] = new Dictionary<BotLanguage, string>()
             {
                 [BotLanguage.English] = "Do you want to checkout now? Please answer in YES or NO. ",
@@ -91,9 +99,9 @@ namespace Corprio.SocialWorker.Dictionaries
             },
             ["CodeSent"] = new Dictionary<BotLanguage, string>()
             {
-                [BotLanguage.English] = "A {0}-digit confirmation code has been sent to email {1}. Please input the code in {2} minutes. If you wish to use another email address for receiving the confirmation code, please input '{3}'.",
-                [BotLanguage.TraditionalChinese] = "一個{0}位數字的確認碼已傳送至電子郵件地址 {1}。請在{2}分鐘內輸入該確認碼。如果您想使用其他電子郵件地址接收確認碼，請輸入「{3}」。",
-                [BotLanguage.SimplifiedChinese] = "一个{0}位数字的确认码已传送至电子邮件地址 {1}。请在{2}分钟内输入该确认码。如果您想使用其他电子邮件地址接收确认码，请输入「{3}」。",
+                [BotLanguage.English] = $"A {{0}}-digit confirmation code has been sent to email {{1}}. Please input the code in {{2}} minutes. If you wish to use another email address for receiving the confirmation code, please input '{KillCode}'.",
+                [BotLanguage.TraditionalChinese] = $"一個{{0}}位數字的確認碼已傳送至電子郵件地址 {{1}}。請在{{2}}分鐘內輸入該確認碼。如果您想使用其他電子郵件地址接收確認碼，請輸入「{KillCode_CN}」。",
+                [BotLanguage.SimplifiedChinese] = $"一个{{0}}位数字的确认码已传送至电子邮件地址 {{1}}。请在{{2}}分钟内输入该确认码。如果您想使用其他电子邮件地址接收确认码，请输入「{KillCode_CN}」。",
             },
             ["DefaultKeyWordForShoppingIntention"] = new Dictionary<BotLanguage, string>()
             {
@@ -199,9 +207,9 @@ namespace Corprio.SocialWorker.Dictionaries
             },
             ["Hint_CancelAndEscalate"] = new Dictionary<BotLanguage, string>()
             {
-                [BotLanguage.English] = $"(Note: You can input '{{0}}' to cancel the current operation. If you wish to chat with a human rather than a bot, input '{SOS}' and our team will reach out to you.) ",
-                [BotLanguage.TraditionalChinese] = $"（提示：輸入「{{0}}」可以取消目前操作。如果您希望與真人而非聊天機器人交談，請輸入「{SOS_CN}」，我們的團隊將與您聯繫。）",
-                [BotLanguage.SimplifiedChinese] = $"（提示：输入「{{0}}」可以取消目前操作。如果您希望与真人而非聊天机器人交谈，请输入「{SOS_CN}」，我们的团队将与您联系。）",
+                [BotLanguage.English] = $"(Note: You can input '{KillCode}' to cancel the current operation. If you wish to chat with a human rather than a bot, input '{SOS}' and our team will reach out to you.) ",
+                [BotLanguage.TraditionalChinese] = $"（提示：輸入「{KillCode_CN}」可以取消目前操作。如果您希望與真人而非聊天機器人交談，請輸入「{SOS_CN}」，我們的團隊將與您聯繫。）",
+                [BotLanguage.SimplifiedChinese] = $"（提示：输入「{KillCode_CN}」可以取消目前操作。如果您希望与真人而非聊天机器人交谈，请输入「{SOS_CN}」，我们的团队将与您联系。）",
             },
             ["Hint_Escalate"] = new Dictionary<BotLanguage, string>()
             {

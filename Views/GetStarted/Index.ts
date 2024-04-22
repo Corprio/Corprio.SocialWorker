@@ -821,7 +821,5 @@ $(function () {
 
     // miscellaneous
     $('#preview-checkout').on('click', function () { saveSettings(true, false) });
-    $('#preview-thank-you').on('click', function () { saveSettings(false, true) });
-    
-    corprio.page.initTour({ defaultTour: 'getstarted.index', autoStart: true });  
+    $('#preview-thank-you').on('click', function () { saveSettings(false, true) });       
 });

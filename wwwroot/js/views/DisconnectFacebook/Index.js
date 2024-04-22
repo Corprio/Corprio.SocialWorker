@@ -47,8 +47,8 @@ function disconnectFacebook() {
 window.fbAsyncInit = function () {
     FB.init({
         appId: vdata.settings.metaApiID,
-        cookie: true, // Enable cookies to allow the server to access the session.
-        xfbml: true, // Parse social plugins on this webpage.
+        cookie: true,
+        xfbml: true,
         version: vdata.settings.metaApiVersion
     });
 };

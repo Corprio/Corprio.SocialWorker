@@ -1017,4 +1017,28 @@
   <data name="StoryMention_EmailSubject" xml:space="preserve">
     <value>一位顾客在 Instagram 故事中提到了{0}</value>
   </data>
+  <data name="btnCreateShipment" xml:space="preserve">
+    <value>发货</value>
+  </data>
+  <data name="String" xml:space="preserve">
+    <value>CourierService</value>
+  </data>
+  <data name="StoryMention" xml:space="preserve">
+    <value>限时动态提及</value>
+  </data>
+  <data name="StoryMention_createDate" xml:space="preserve">
+    <value>限时动态日期</value>
+  </data>
+  <data name="StoryMention_creator" xml:space="preserve">
+    <value>限时动态创建者</value>
+  </data>
+  <data name="StoryMention_Desc" xml:space="preserve">
+    <value>查看提到您的 Instagram 帐户的限时动态。</value>
+  </data>
+  <data name="StoryMention_hint" xml:space="preserve">
+    <value>查看限时动态。（注意：Instagram 故事将在 24 小时后或被用户删除后消失，因此上面的链接可能无法再访问。）</value>
+  </data>
+  <data name="StoryMention_mentioned" xml:space="preserve">
+    <value>提及</value>
+  </data>
 </root>

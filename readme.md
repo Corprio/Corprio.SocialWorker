@@ -31,11 +31,10 @@ The Social Media Marketer Application must be registered in [Corprio Portal](htt
 ## Set up webhook for development
 The application uses webhook to respond facebook for messages inputted by customers in messengers.  In development, developers can use ngrok to redirect the facebook requests to localhost.
 1. Sign up at [ngrok](https://ngrok.com/)
-1. Download and install the ngrok agent in the developer machine
-1. 
-1. Connect the ngrok agent to your account
-1. Create a static domain in ngrok (optional step)
-1. Redirect web requests to localhost by running the command
+2. Download and install the ngrok agent in the developer machine
+3. Connect the ngrok agent to your account
+4. Create a static domain in ngrok (optional step)
+5. Redirect web requests to localhost by running the command
 ```
 ngrok http --domain=pleasant-definitely-macaw.ngrok-free.app https://localhost:44330 --host-header="localhost:44330"
 ```

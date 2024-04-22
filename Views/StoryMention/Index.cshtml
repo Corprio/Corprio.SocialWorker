@@ -1,0 +1,56 @@
+﻿@using Corprio.Core.Utility
+@inject System.Text.Encodings.Web.JavaScriptEncoder encoder
+@inject Corprio.CorprioAPIClient.APIClient corprio
+@inject Microsoft.Extensions.Configuration.IConfiguration configuration
+@{
+    Guid organizationID = Context.SelectedOrganizationID() ?? Guid.Empty;
+    ViewData["Title"] = @localizer["StoryMention"];    
+    string appBaseUrl = configuration["AppBaseUrl"];
+    string metaApiID = configuration["MetaApiSetting:AppId"];
+    string metaApiVersion = configuration["MetaApiSetting:ApiVersion"];
+    string shortName = await corprio.OrganizationApi.GetShortName(organizationID);
+}
+<script src="~/js/views/StoryMention/Index.js" asp-append-version="true"></script>
+
+<script>
+    const vdata = {        
+        localizer: {            
+            error: '@StringHelper.Encode(localizer["Error"])',
+            fbAlreadyConnected: '@StringHelper.Encode(localizer["FB_AlreadyConnected"])',
+            fbConnected: '@StringHelper.Encode(localizer["FB_connected"])',
+            fbNotConnected: '@StringHelper.Encode(localizer["FB_not_connected"])',            
+            storyMentionCreator: '@StringHelper.Encode(localizer["StoryMention_creator"])',
+            storyMentionDate: '@StringHelper.Encode(localizer["StoryMention_createDate"])',
+            storyMentionHint: '@StringHelper.Encode(localizer["StoryMention_hint"])',
+            storyMentionMentioned: '@StringHelper.Encode(localizer["StoryMention_mentioned"])',
+            
+        },                
+        settings: {
+            appBaseUrl: '@appBaseUrl',            
+            metaApiID: '@metaApiID',
+            metaApiVersion: '@metaApiVersion',
+            organizationID: '@organizationID',            
+            shortName: '@shortName',
+        },
+        url: {
+            getPage: '@StringHelper.Encode(@Url.Action("GetPage", "StoryMention", new { organizationID }))',
+            testCDN: '@StringHelper.Encode(@Url.Action("TestCDN", "StoryMention", new { organizationID }))',
+        }
+    };
+</script>
+<script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js"></script>
+<div class="m-4">
+    <div class="title-border-l">
+        <h4>@localizer["StoryMention"]</h4>
+        <p>@localizer["StoryMention_Desc"]</p>
+    </div>
+    <div class="wrapper mt-4">
+        <button class="btn btn-primary mt-2" id="loginBtn" style="display: block;">@localizer["LoginFB"]</button>
+        <button class="btn btn-primary mt-2" id="logoutBtn" style="display: none;">@localizer["LogoutFB"]</button>
+
+        <div id="fb-dialogue" class="mt-2" style="max-width: 770px;"></div>        
+        <div id="mentions" class="mt-2"></div>
+        <div id="popup"></div>
+    </div>
+</div>
+<vc:static-data model="@StaticDataRequestViewModel.All(true)" org-info="true" />
