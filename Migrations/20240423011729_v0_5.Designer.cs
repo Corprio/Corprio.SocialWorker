@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Corprio.SocialWorker.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240422101808_v0_7")]
-    partial class v0_7
+    [Migration("20240423011729_v0_5")]
+    partial class v0_5
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
