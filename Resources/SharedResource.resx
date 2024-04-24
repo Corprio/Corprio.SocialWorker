@@ -1024,7 +1024,7 @@
     <value>A customer mentioned {0} in their Instagram story</value>
   </data>
   <data name="StoryMention" xml:space="preserve">
-    <value>Story mentions</value>
+    <value>Story Mentions</value>
   </data>
   <data name="StoryMention_createDate" xml:space="preserve">
     <value>Story creation date</value>

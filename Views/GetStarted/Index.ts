@@ -74,9 +74,6 @@ declare const vdata: {
 // https://github.com/DefinitelyTyped/DefinitelyTyped/blob/master/types/facebook-js-sdk/index.d.ts
 /// <reference types="facebook-js-sdk" />
 
-
-
-
 // magic numbers
 const DATASET_TRUEVALUE = 'true-value';  // this attribute contains the value of a standard component (e.g., %lineBreak%)
 const DATASET_REORDERED = 'reordered';  // this attribute indicates if the block will be moved to another position

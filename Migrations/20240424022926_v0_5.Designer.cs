@@ -4,6 +4,7 @@ using Corprio.SocialWorker.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Corprio.SocialWorker.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240424022926_v0_5")]
+    partial class v0_5
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -256,8 +259,7 @@ namespace Corprio.SocialWorker.Migrations
 
                     b.Property<string>("CDNUrl")
                         .IsRequired()
-                        .HasMaxLength(2000)
-                        .HasColumnType("nvarchar(2000)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTimeOffset>("CreateDate")
                         .HasColumnType("datetimeoffset");
@@ -268,13 +270,11 @@ namespace Corprio.SocialWorker.Migrations
 
                     b.Property<string>("CreatorID")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("CreatorName")
                         .IsRequired()
-                        .HasMaxLength(300)
-                        .HasColumnType("nvarchar(300)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid>("FacebookPageID")
                         .HasColumnType("uniqueidentifier");
@@ -287,8 +287,7 @@ namespace Corprio.SocialWorker.Migrations
                         .HasColumnType("nvarchar(200)");
 
                     b.Property<string>("Mentioned")
-                        .HasMaxLength(300)
-                        .HasColumnType("nvarchar(300)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<byte[]>("RowVersion")
                         .IsConcurrencyToken()
@@ -380,6 +379,7 @@ namespace Corprio.SocialWorker.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("KeywordForShoppingIntention")
+                        .IsRequired()
                         .HasMaxLength(10)
                         .HasColumnType("nvarchar(10)");
 

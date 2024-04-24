@@ -27,12 +27,14 @@ namespace Corprio.SocialWorker.Models
         /// Instagram ID of the person who creates the story mention.
         /// </summary>
         [Required(ErrorMessageResourceType = typeof(Resource), ErrorMessageResourceName = "MsgRequired")]
+        [StringLength(50, MinimumLength = 1)]
         public string CreatorID { get; set; }
 
         /// <summary>
         /// Instagram username of the person who creates the story mention.
         /// </summary>
         [Required(ErrorMessageResourceType = typeof(Resource), ErrorMessageResourceName = "MsgRequired")]
+        [StringLength(300, MinimumLength = 1)]
         public string CreatorName { get; set; }
 
         /// <summary>
@@ -40,11 +42,13 @@ namespace Corprio.SocialWorker.Models
         /// The CDN URL is privacy-aware and will not return the media when the content has been deleted or has expired.
         /// </summary>
         [Required(ErrorMessageResourceType = typeof(Resource), ErrorMessageResourceName = "MsgRequired")]
+        [StringLength(2000, MinimumLength = 1)]
         public string CDNUrl { get; set; }
 
         /// <summary>
         /// Name of FB page / IG account being mentioned
         /// </summary>
+        [StringLength(300)]
         public string Mentioned {  get; set; }
     }
 }

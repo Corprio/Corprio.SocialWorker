@@ -33,7 +33,7 @@ namespace Corprio.SocialWorker.Models
         /// <summary>
         /// Keyword for indicating purchase intention. The chatbot will 'reach out' to anyone who replies to the post with this keyword.
         /// </summary>
-        [Required(ErrorMessageResourceType = typeof(Resource), ErrorMessageResourceName = "MsgRequired")]
+        //[Required(ErrorMessageResourceType = typeof(Resource), ErrorMessageResourceName = "MsgRequired")]
         [StringLength(10)]
         public string KeywordForShoppingIntention { get; set; } = "BUY";
 

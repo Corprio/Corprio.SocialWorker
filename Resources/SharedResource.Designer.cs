@@ -2194,7 +2194,7 @@ namespace Corprio.SocialWorker.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Story mentions.
+        ///   Looks up a localized string similar to Story Mentions.
         /// </summary>
         public static string StoryMention {
             get {
