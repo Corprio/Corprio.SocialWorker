@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Corprio.SocialWorker.Models.Meta;
 
 namespace Corprio.SocialWorker.Controllers
 {

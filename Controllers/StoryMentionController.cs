@@ -4,12 +4,7 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using Corprio.SocialWorker.Models;
 using System.Linq;
-using Microsoft.EntityFrameworkCore;
-using Corprio.DataModel;
-using Microsoft.AspNetCore.Http;
-using DevExpress.XtraPrinting.BarCode.EPC;
 using System.Net.Http;
-using System.Text;
 
 namespace Corprio.SocialWorker.Controllers
 {
@@ -39,7 +34,7 @@ namespace Corprio.SocialWorker.Controllers
         //    var httpRequest = new HttpRequestMessage()
         //    {
         //        Method = HttpMethod.Get,
-        //        RequestUri = new System.Uri(url),                
+        //        RequestUri = new System.Uri(url),
         //    };
 
         //    var response = await httpClient.SendAsync(httpRequest);

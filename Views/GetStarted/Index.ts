@@ -1,27 +1,43 @@
 import { MessageType, Selector } from './Enums';
-import { DraggedBlock, Selected, TemplateDetails, StringifiedTemplate } from './Interfaces';
+import { DraggedBlock, Selected, TemplateDetails, StringifiedTemplate, LineCredential } from './Interfaces';
 import { PERMISSIONS, WEBHOOKS } from '../Shared/Constants';
 
 declare const vdata: {
     actions: {
+        disableLineCredential: string;
+        getLineCredential: string;
         refreshAccessToken: string;
+        saveLineCredential: string;
         saveSetting: string;
     };
     localizer: {
+        altText_line_channel_basic: string;
+        altText_line_channel_messaging: string;
+        altText_line_console: string;
+        altText_line_provider: string;
+        btnSaveCredential: string;
+        btnTestCredential: string;
         catalogueCode: string;
         catalogueEndDate: string;
         catalogueName: string;
         catalogueStartDate: string;
         catalogueUrl: string;
         defaultMessage: string;
+        delete: string;
+        dialog_TestSuccess: string;
         error: string;
         fbAlreadyConnected: string;
         fbConnected: string;
         fbNotConnected: string;
+        label_channelID: string;
+        label_channelName: string;
+        label_channelSecret: string;
+        label_channelToken: string;
         msgMissingDeliveryChargeProductError: string;
         msgSettingSaved: string;
         newLine: string;
         period: string;
+        processing: string;
         productCode: string;
         productDescription: string;
         productListPrice: string;
@@ -31,6 +47,26 @@ declare const vdata: {
         reconnectFacebook: string;
         saveTemplateMessage: string;
         saveTemplateTitle: string;
+        success: string;
+        tip_WhatIsChannelID: string;
+        tip_WhatIsChannelName: string;
+        tip_WhatIsChannelSecret: string;
+        tip_WhatIsChannelToken: string;
+        title_ManageLineChannel: string;
+        title_ManageLineCredential: string;
+        title_channelID: string;
+        title_channelName: string;
+        title_channelSecret: string;
+        title_channelToken: string;
+        tutorial_line_channelid_step1: string;
+        tutorial_line_channelid_step2: string;
+        tutorial_line_channelid_step3: string;
+        tutorial_line_channelname_step3: string;
+        tutorial_line_secret_step3: string;
+        tutorial_line_token_step3: string;
+        tutorial_line_token_step4: string;
+        tutorial_login_1: string;
+        tutorial_login_2: string;
     };
     model: {
         catalogueTemplate: string;
@@ -113,9 +149,6 @@ const selectorMapping: Record<MessageType, Selected> = {
 
 // contains all the values of a valid select options and maps them to the text that should be rendered in the template and preview panels
 let validSelectOptions: Record<string, TemplateDetails> = {};
-
-// HTML element that will be displayed when 'loading' happens
-let loadIndicatorTop;
 
 // this object 'remembers' the value and message type of the block being dragged
 const draggedBlock: DraggedBlock = { value: null, type: null };
@@ -225,7 +258,7 @@ function restoreKeyword() {
  * @returns
  */
 function restoreTemplate(messageType: MessageType) {    
-    /*console.log(vdata.model.productTemplate);*/
+    console.log(vdata.model.productTemplate);
     const templateString = messageType === MessageType.CataloguePost ? vdata.model.catalogueTemplate : vdata.model.productTemplate;
     if (!templateString) { return; }
     const templateArray = templateString.split(vdata.templateComponents.separator);
@@ -273,6 +306,336 @@ function restoreDefaultTemplate(messageType: MessageType) {
     }
     renderTemplate(defaultTemplate, messageType);
     renderPreview(messageType);
+}
+
+function retrieveCredential(): LineCredential {
+    const credential: LineCredential = {
+        ID: $('#credential-id').val()?.toString()?.trim(),
+        /*ChannelID: $('#credential-channelid').val()?.toString()?.trim(),*/
+        ChannelName: $('#credential-channelname').val()?.toString()?.trim(),
+        ChannelSecret: $('#credential-secret-secret').val()?.toString()?.trim(),
+        ChannelToken: $('#credential-secret-token').val()?.toString()?.trim(),
+    };
+    return credential;
+}
+
+/**
+ * A list item for tutorial, specifically about how to log in
+ * @param loginPageUrl
+ * @returns
+ */
+function loginStepComponent(loginPageUrl) {
+    return $('<li>')
+        .attr('value', 1)
+        .html(`${vdata.localizer.tutorial_login_1} <a href="${loginPageUrl}" target="_blank">${loginPageUrl}</a> ${vdata.localizer.tutorial_login_2}`);
+}
+
+/**
+ * A generic list item for tutorial
+ * @param itemNumber
+ * @param instructionHTML
+ * @returns
+ */
+function stepComponent(itemNumber, instructionHTML) {
+    return $('<li>').attr('value', itemNumber).html(instructionHTML);
+}
+
+/**
+ * A generic list item for tutorial, containing an image that can be enlarged
+ * @param imageSrc1
+ * @param imageAlt1
+ * @returns
+ */
+function imageComponent(imageSrc1, imageAlt1) {
+    return $('<li>').addClass('no-style').append(
+        $('<img class="w-100 rounded mb-3 tutorialImg">')
+            .attr('src', imageSrc1)
+            .attr('alt', imageAlt1)
+            .on('click', function () {
+                $('#imagePopup').dxPopup({
+                    visible: true,
+                    width: "90%",
+                    height: "95%",
+                    contentTemplate: (content) => {
+                        const $wrapper = $('<div class="h-100" style="overflow-y: scroll; scroll-behavior: smooth;">');
+                        $wrapper.append($(`<img class="w-100 rounded m-1" src="${imageSrc1}" alt="${imageAlt1}" />`));
+                        content.append($wrapper);
+                    },
+                    hideOnOutsideClick: true,
+                    showCloseButton: true,
+                    showTitle: false,
+                })
+            })
+    );
+}
+
+function tutorialTemplate(attribute: string) {    
+    const $steps = $('<ol>');
+    $steps.append(loginStepComponent('https://developers.line.biz/console'));
+    switch (attribute) {
+        case 'channelid':
+            $steps.append(
+                stepComponent(2, vdata.localizer.tutorial_line_channelid_step1),
+                imageComponent('/images/line_channelid_step1.png', vdata.localizer.altText_line_console),
+                stepComponent(3, vdata.localizer.tutorial_line_channelid_step2),
+                imageComponent('/images/line_channelid_step2.png', vdata.localizer.altText_line_provider),
+                stepComponent(4, vdata.localizer.tutorial_line_channelid_step3),
+                imageComponent('/images/line_channelid_step3.png', vdata.localizer.altText_line_channel_basic),
+            );
+            return $steps;
+
+        case 'channelname':
+            $steps.append(
+                stepComponent(2, vdata.localizer.tutorial_line_channelid_step1),
+                imageComponent('/images/line_channelid_step1.png', vdata.localizer.altText_line_console),
+                stepComponent(3, vdata.localizer.tutorial_line_channelid_step2),
+                imageComponent('/images/line_channelid_step2.png', vdata.localizer.altText_line_provider),
+                stepComponent(4, vdata.localizer.tutorial_line_channelname_step3),
+                imageComponent('/images/line_channelname_step3.png', vdata.localizer.altText_line_channel_basic),
+            );
+            return $steps;
+
+        case 'secret-secret':
+            $steps.append(
+                stepComponent(2, vdata.localizer.tutorial_line_channelid_step1),
+                imageComponent('/images/line_channelid_step1.png', vdata.localizer.altText_line_console),
+                stepComponent(3, vdata.localizer.tutorial_line_channelid_step2),
+                imageComponent('/images/line_channelid_step2.png', vdata.localizer.altText_line_provider),
+                stepComponent(4, vdata.localizer.tutorial_line_secret_step3),
+                imageComponent('/images/line_secret_step3.png', vdata.localizer.altText_line_channel_basic),
+            );
+            return $steps;
+
+        case 'secret-token':
+            $steps.append(
+                stepComponent(2, vdata.localizer.tutorial_line_channelid_step1),
+                imageComponent('/images/line_channelid_step1.png', vdata.localizer.altText_line_console),
+                stepComponent(3, vdata.localizer.tutorial_line_channelid_step2),
+                imageComponent('/images/line_channelid_step2.png', vdata.localizer.altText_line_provider),
+                stepComponent(4, vdata.localizer.tutorial_line_token_step3),
+                imageComponent('/images/line_token_step3.png', vdata.localizer.altText_line_channel_messaging),
+                stepComponent(5, vdata.localizer.tutorial_line_token_step4),
+                imageComponent('/images/line_token_step4.png', vdata.localizer.altText_line_channel_messaging),
+            );
+            return $steps;
+
+        default:
+            return;
+    }
+}
+
+function showTutorial(small: HTMLElement) {
+    const attribute = $(small).data('attribute');
+
+    let popupTitle: string;
+    switch (attribute) {
+        case 'channelid':
+            popupTitle = vdata.localizer.tip_WhatIsChannelID;
+            break;
+        case 'channelname':
+            popupTitle = vdata.localizer.tip_WhatIsChannelName;
+            break;
+        case 'secret-secret':
+            popupTitle = vdata.localizer.tip_WhatIsChannelSecret;
+            break;
+        case 'secret-token':
+            popupTitle = vdata.localizer.tip_WhatIsChannelToken;
+            break;
+    }
+
+    const $popup = $("#tutorial-popup").dxPopup({
+        contentTemplate: () => tutorialTemplate(attribute),
+        showTitle: true,
+        title: popupTitle,
+        hideOnOutsideClick: true,
+        showCloseButton: true,
+        maxWidth: 500,
+        height: '95%',
+    }).dxPopup('instance');
+    $popup.show();
+    
+}
+
+function formGroupComponent(title: string, attribute: string, label: string, tip: string) {
+    let type;
+    if (attribute.includes('secret')) {
+        type = 'password';
+    } else {
+        type = attribute === 'url' ? 'url' : 'text';
+    }    
+
+    return $('<div class="form-group">').append(
+        $(`<label title="${title}" class="required" for="credential-${attribute}">`).text(label),
+        $(`<input type="${type}" id="credential-${attribute}" class="form-control input-${attribute}" value="">`),
+        $(`<small class="font-italic text-info tip-${attribute} credential-tip" data-credential="" data-attribute="${attribute}" >`).on('click', function () { showTutorial(this) }).text(tip),
+    );
+}   
+
+function credentialPopupTemplate() {
+    const $div = $('<div class="d-flex flex-column h-100">');
+    
+    const $ID = $(`<input type="hidden" id="credential-id" class="form-control value="">`);
+
+    //const $channelID = formGroupComponent(
+    //    vdata.localizer.title_channelID,
+    //    'channelid',
+    //    vdata.localizer.label_channelID,
+    //    vdata.localizer.tip_WhatIsChannelID
+    //);
+
+    const $channelName = formGroupComponent(
+        vdata.localizer.title_channelName,
+        'channelname',
+        vdata.localizer.label_channelName,
+        vdata.localizer.tip_WhatIsChannelName
+    );
+
+    const $channelSecret = formGroupComponent(
+        vdata.localizer.title_channelSecret,
+        'secret-secret',
+        vdata.localizer.label_channelSecret,
+        vdata.localizer.tip_WhatIsChannelSecret
+    );
+
+    const $channelToken = formGroupComponent(
+        vdata.localizer.title_channelToken,
+        'secret-token',
+        vdata.localizer.label_channelToken,
+        vdata.localizer.tip_WhatIsChannelToken
+    );
+
+    $div.append($ID, $channelName, $channelSecret, $channelToken);
+    return $div;
+}
+
+/**
+ * Create an instance of load indicator
+ * @returns
+ */
+function loadPanel() {
+    return $('#load-panel').dxLoadPanel({
+        message: vdata.localizer.processing,
+        visible: false,
+        showIndicator: true,
+        showPane: true,
+        shading: true,
+        hideOnOutsideClick: false
+    }).dxLoadPanel('instance');
+}
+
+/**
+ * Render a credential popup
+ * @param credential
+ */
+function showCredentialPopup(credential: LineCredential = null) {
+    const $menu = $('#line-credential-menu').dxPopup('instance');
+
+    const deleteButton: DevExpress.ui.dxPopup.ToolbarItem = {
+        widget: 'dxButton',
+        toolbar: 'bottom',
+        location: 'before',
+        options: {
+            stylingMode: 'contained',
+            type: 'danger',
+            text: vdata.localizer.delete,
+            onClick: function () {
+                $menu.hide();
+                loadPanel().show();
+                return $.ajax({
+                    url: vdata.actions.disableLineCredential,
+                    method: "DELETE",
+                    data: { channelID: credential?.ID },
+                    success: function () { $popup.hide(); },
+                    error: corprio.formatError,
+                    complete: function () { loadPanel().hide(); },
+                });
+            },
+        },
+    };
+
+    const saveButton: DevExpress.ui.dxPopup.ToolbarItem = {
+        widget: 'dxButton',
+        toolbar: 'bottom',
+        location: 'after',
+        options: {
+            stylingMode: 'contained',
+            text: vdata.localizer.btnSaveCredential,
+            onClick: function () {
+                $menu.hide();
+                loadPanel().show();
+                return $.ajax({
+                    url: vdata.actions.saveLineCredential,
+                    method: "POST",
+                    data: {
+                        credential: retrieveCredential(),
+                    },
+                    success: function () { $popup.hide(); },
+                    error: corprio.formatError,
+                    complete: function () { loadPanel().hide(); },
+                });
+            },
+        },
+    };
+    
+    const $popup = $("#line-credential-popup").dxPopup({
+        contentTemplate: credentialPopupTemplate,
+        showTitle: true,
+        title: vdata.localizer.title_ManageLineCredential,
+        hideOnOutsideClick: true,
+        showCloseButton: true,
+        toolbarItems: credential?.ID ? [deleteButton, saveButton] : [saveButton]
+    }).dxPopup('instance');
+    $popup.show();
+
+    // update the popup's HTML elements with relevant values, data attributes, etc.
+    $('#credential-id').val(credential?.ID ?? '');
+    /*$('#credential-channelid').val(credential?.ChannelID ?? '');*/
+    $('#credential-channelname').val(credential?.ChannelName ?? '');
+    $('#credential-secret-secret').val(credential?.ChannelSecret ?? '');
+    $('#credential-secret-token').val(credential?.ChannelToken ?? '');
+}
+
+/**
+ * Render clickable cards that can trigger a credential popup
+ * @param credentials
+ * @returns
+ */
+function renderLineCredentialCards(credentials: LineCredential[]) {
+    const $container = $('<div>').append(
+        $('<div class="credential-card rounded shadow p-3 bg-white text-primary m-3">').text('+ New Channel').on('click', () => showCredentialPopup())
+    );
+
+    for (const credential of credentials) {
+        $container.append(
+            $('<div class="credential-card rounded shadow p-3 bg-white text-success m-3">').html(`<i class="fas fa-edit"></i> ${credential.ChannelName}`).on('click', () => showCredentialPopup(credential))
+        );
+    }    
+
+    return $container;
+}
+
+/**
+ * Get Line credentials
+ * @returns
+ */
+function getLineCredentials() {    
+    return $.ajax({
+        url: vdata.actions.getLineCredential,
+        method: "POST",        
+        error: corprio.formatError,
+        success: function (credentials: LineCredential[]) {                                                
+            const $menu = $("#line-credential-menu").dxPopup({
+                contentTemplate: () => renderLineCredentialCards(credentials),
+                showTitle: true,
+                title: vdata.localizer.title_ManageLineChannel,
+                hideOnOutsideClick: true,
+                showCloseButton: true,
+                maxWidth: 300,
+                height: '60%',
+            }).dxPopup('instance');
+            $menu.show();
+        },
+    });
 }
 
 /**
@@ -430,9 +793,7 @@ function addComponent(messageType: MessageType) {
  * Assign values to global variables
  * @returns
  */
-function initializeGlobalVariables() {
-    loadIndicatorTop = $(Selector.loadIndicator_Top).dxLoadIndicator({ visible: false }).dxLoadIndicator('instance');
-
+function initializeGlobalVariables() {    
     selectorMapping[MessageType.CataloguePost].validSelectOptions[vdata.templateComponents.newLineValue] = { panel: '&#9166;', preview: '\n' };
     selectorMapping[MessageType.CataloguePost].validSelectOptions[vdata.templateComponents.defaultMessageValue] = { panel: '{'+ vdata.localizer.defaultMessage +'}', preview: vdata.sampleValues.defaultCatalogueMessage };
     selectorMapping[MessageType.CataloguePost].validSelectOptions[vdata.templateComponents.catalogueNameValue] = { panel: '{'+ vdata.localizer.catalogueName +'}', preview: 'Example Catalogue' };
@@ -515,11 +876,11 @@ function handleFbLoginStatusChange(response: facebook.StatusResponse) {
             `</div>`
         $(Selector.fbDialogue).empty().append(alert);
         
-        $(Selector.saveSettingButtons).attr('disabled', 'disabled');
-        $(selectorMapping[MessageType.ProductPost].blockPanel).empty();
-        $(selectorMapping[MessageType.CataloguePost].blockPanel).empty();
-        $(selectorMapping[MessageType.ProductPost].previewPanel).empty();
-        $(selectorMapping[MessageType.CataloguePost].previewPanel).empty();
+        /*$(Selector.saveSettingButtons).attr('disabled', 'disabled');*/
+        //$(selectorMapping[MessageType.ProductPost].blockPanel).empty();
+        //$(selectorMapping[MessageType.CataloguePost].blockPanel).empty();
+        //$(selectorMapping[MessageType.ProductPost].previewPanel).empty();
+        //$(selectorMapping[MessageType.CataloguePost].previewPanel).empty();
     }
 }
 
@@ -548,8 +909,7 @@ function saveSettings(previewCheckout: boolean, previewThankyou: boolean) {
     const catalogueTemplate: StringifiedTemplate = vdata.settings.env === "PRD"
         ? { isValid: true, keyword: '', templateString: '' }
         : stringifyTemplate(MessageType.CataloguePost);
-    if (!catalogueTemplate.isValid) { return; }
-    // ditto
+    if (!catalogueTemplate.isValid) { return; }    
     $('#CataloguePostTemplate').val(catalogueTemplate.templateString);
     
     const savedData = new FormData(<HTMLFormElement>$("#settings-form")[0]);
@@ -606,12 +966,16 @@ function refreshAccessToken(metaId: string, accessToken: string) {
             console.log(`Token for ${metaId} is fed to backend successfully.`);
             initializeGlobalVariables();  // initialize global variables again because theoritically fbAsyncInit and its callbacks can all run before DOM is loaded            
             /*restoreKeyword();*/
-            restoreTemplate(MessageType.ProductPost);
-            restoreTemplate(MessageType.CataloguePost);
-            $(Selector.saveSettingButtons).removeAttr('disabled');            
+            //restoreTemplate(MessageType.ProductPost);
+            //restoreTemplate(MessageType.CataloguePost);
+            /*$(Selector.saveSettingButtons).removeAttr('disabled');*/
         },
         error: function (jqXHR, textStatus, errorThrown) {
-            $(Selector.saveSettingButtons).attr('disabled', 'disabled');            
+            /*$(Selector.saveSettingButtons).attr('disabled', 'disabled');*/
+            //$(selectorMapping[MessageType.ProductPost].blockPanel).empty();
+            //$(selectorMapping[MessageType.CataloguePost].blockPanel).empty();
+            //$(selectorMapping[MessageType.ProductPost].previewPanel).empty();
+            //$(selectorMapping[MessageType.CataloguePost].previewPanel).empty();
 
             if (jqXHR.status === 500) {
                 return FB.logout(checkLoginState);
@@ -811,12 +1175,15 @@ $(function () {
 
     // template-related stuff    
     $(Selector.catalogueSetting).toggle(vdata.settings.env !== "PRD");
-    initializeGlobalVariables();    
+    initializeGlobalVariables();
+    restoreTemplate(MessageType.ProductPost);
+    restoreTemplate(MessageType.CataloguePost);
     AssignEventListenersForTemplates(MessageType.CataloguePost);    
     AssignEventListenersForTemplates(MessageType.ProductPost);    
     $(Selector.saveSettingButtons).on('click', function () { saveSettings(false, false) });
 
     // miscellaneous
     $('#preview-checkout').on('click', function () { saveSettings(true, false) });
-    $('#preview-thank-you').on('click', function () { saveSettings(false, true) });       
+    $('#preview-thank-you').on('click', function () { saveSettings(false, true) });
+    $('#line-credential-btn').on('click', getLineCredentials);
 });

@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Corprio.SocialWorker.Models.Meta;
+using Corprio.SocialWorker.Models.Line;
 
 namespace Corprio.SocialWorker.Models
 {
@@ -14,12 +16,13 @@ namespace Corprio.SocialWorker.Models
         
         public DbSet<MetaUser> MetaUsers { get; set; }
         public DbSet<MetaPage> MetaPages { get; set; }
-        public DbSet<DbFriendlyBot> MetaBotStatuses { get; set; }        
+        public DbSet<DbFriendlyBot> BotStatuses { get; set; }
         public DbSet<MetaPost> MetaPosts { get; set; }
         public DbSet<MetaMention> MetaMentions { get; set; }
-        public DbSet<MessageWebhook> MessageWebhooks { get; set; }
-        public DbSet<FeedWebhook> FeedWebhooks { get; set; }
-        public DbSet<CommentWebhook> CommentWebhooks { get; set; }
+        public DbSet<MetaMessageWebhook> MetaMessageWebhooks { get; set; }
+        public DbSet<MetaFeedWebhook> MetaFeedWebhooks { get; set; }
+        public DbSet<MetaCommentWebhook> MetaCommentWebhooks { get; set; }
+        public DbSet<LineChannel> LineChannels { get; set; }
 
         //// https://devblogs.microsoft.com/dotnet/announcing-ef7-release-candidate-2/
         //// Note: didn't use Json column to store the bot statuses because it does not support collection of primitive types

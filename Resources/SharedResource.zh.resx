@@ -403,10 +403,10 @@
     <value>您想发布此商品目录吗？一则介绍它的贴文将会发布到您的 Facebook 专页和 Instagram 帐户。</value>
   </data>
   <data name="PublishProductHint" xml:space="preserve">
-    <value>在 Facebook 和 Instagram 上发布有关此产品的帖子</value>
+    <value>在社交媒体（包括您的 Facebook 页面、Instagram 帐户和 Line 频道）上发布有关此产品的帖子</value>
   </data>
   <data name="PublishProductPrompt" xml:space="preserve">
-    <value>以下的帖子将会发布到您的 Facebook 专页和 Instagram 帐户。请检查帖子的内容并确保其中包含关键字「{0}」。聊天机器人会自动联系以 「{0}」 回复这帖子的顾客。</value>
+    <value>以下的帖子将会发布到您的社交媒体（包括您的 Facebook 页面、Instagram 帐户和 Line 频道）。请检查帖子的内容并确保其中包含关键字「{0}」。聊天机器人会自动联系以 「{0}」 回复这帖子的顾客。</value>
   </data>
   <data name="UnitOfMeasure" xml:space="preserve">
     <value>单位</value>
@@ -1000,7 +1000,7 @@
     <value>变更设置</value>
   </data>
   <data name="PublishProductHint2" xml:space="preserve">
-    <value>在 Facebook 和 Instagram 上发布有关此产品的帖子（注：此产品之前已经发布）</value>
+    <value>在社交媒体上发布有关此产品的帖子（注：此产品之前已经发布）</value>
   </data>
   <data name="Tour_PublishCol_Desc" xml:space="preserve">
     <value>选择您想要发布到 Facebook 和 Instagram的产品，然后单击此栏中相应的图标。</value>
@@ -1040,5 +1040,140 @@
   </data>
   <data name="StoryMention_mentioned" xml:space="preserve">
     <value>提及</value>
+  </data>
+  <data name="Connect_Line" xml:space="preserve">
+    <value>连接 Line</value>
+  </data>
+  <data name="Connect_Line_Desc1" xml:space="preserve">
+    <value>把</value>
+  </data>
+  <data name="Connect_Line_Desc2" xml:space="preserve">
+    <value>与您的 Line channel 连接。</value>
+  </data>
+  <data name="Label_channelID" xml:space="preserve">
+    <value>Channel ID</value>
+  </data>
+  <data name="Label_channelSecret" xml:space="preserve">
+    <value>Channel secret</value>
+  </data>
+  <data name="Label_channelToken" xml:space="preserve">
+    <value>Channel access token (long-lived)</value>
+  </data>
+  <data name="Line_instruction_1" xml:space="preserve">
+    <value>用您的 Line channel ID、channel secret 和 channel access token 填写下面的表格。</value>
+  </data>
+  <data name="Line_instruction_2" xml:space="preserve">
+    <value>访问  Line Developer Console &gt; Messaging API，然后输入以下网址作为您的 Webhook URL：https://socialmediamarketer.corprio.com/line</value>
+  </data>
+  <data name="Tip_WhatIsChannelID" xml:space="preserve">
+    <value>在哪里可以找到我的 Channel ID？</value>
+  </data>
+  <data name="Tip_WhatIsChannelSecret" xml:space="preserve">
+    <value>在哪里可以找到我的 Channel secret？</value>
+  </data>
+  <data name="Tip_WhatIsChannelToken" xml:space="preserve">
+    <value>在哪里可以找到我的 Channel access token？</value>
+  </data>
+  <data name="Title_channelID" xml:space="preserve">
+    <value>Line 为您的频道分配的唯一标识符</value>
+  </data>
+  <data name="Title_channelSecret" xml:space="preserve">
+    <value>Line 为您的 Line channel 分配的唯一密钥</value>
+  </data>
+  <data name="Title_channelToken" xml:space="preserve">
+    <value>您在 Line Developer Console 中生成的访问令牌</value>
+  </data>
+  <data name="AltText_line_channel_basic" xml:space="preserve">
+    <value>Line 的 Developer Console 中的 Channel - Basic setting 页面</value>
+  </data>
+  <data name="AltText_line_channel_messaging" xml:space="preserve">
+    <value>Line 的 Developer Console 中的 Channel - Messaging API 页面</value>
+  </data>
+  <data name="AltText_line_console" xml:space="preserve">
+    <value>Line 的 Developer Console 页面</value>
+  </data>
+  <data name="AltText_line_provider" xml:space="preserve">
+    <value>Line 的 Developer Console 中的 provider 页面</value>
+  </data>
+  <data name="btnSaveCredential" xml:space="preserve">
+    <value>储存</value>
+  </data>
+  <data name="btnTestCredential" xml:space="preserve">
+    <value>测试</value>
+  </data>
+  <data name="Dialog_TestSuccess" xml:space="preserve">
+    <value>您的 Line 频道已与 {0} 连接。</value>
+  </data>
+  <data name="ErrMsg_InvalidChannelSecret" xml:space="preserve">
+    <value>请确保 channel secret 正确，并稍后重试。</value>
+  </data>
+  <data name="ErrMsg_InvalidChannelToken" xml:space="preserve">
+    <value>请确保 channel token 正确，并稍后重试。</value>
+  </data>
+  <data name="ErrMsg_MissingChannelName" xml:space="preserve">
+    <value>请输入Line channel 的名称。</value>
+  </data>
+  <data name="ErrMsg_MissingChannelSecret" xml:space="preserve">
+    <value>请输入channel secret。</value>
+  </data>
+  <data name="ErrMsg_MissingChannelToken" xml:space="preserve">
+    <value>请输入channel token。</value>
+  </data>
+  <data name="Label_channelName" xml:space="preserve">
+    <value>Line channel 名称</value>
+  </data>
+  <data name="Tip_WhatIsChannelName" xml:space="preserve">
+    <value>如何找到我的 Line channel 名称？</value>
+  </data>
+  <data name="Title_channelName" xml:space="preserve">
+    <value>您的 Line channel 的名称。</value>
+  </data>
+  <data name="Title_ManageLineCredential" xml:space="preserve">
+    <value>管理 Line API 凭证</value>
+  </data>
+  <data name="Tutorial_line_channelid_step1" xml:space="preserve">
+    <value>选择您的 Line channel 的 provider。</value>
+  </data>
+  <data name="Tutorial_line_channelid_step2" xml:space="preserve">
+    <value>选择您想要连接的 Line channel。请注意，该 Line channel 必须是 Messaging API channel。</value>
+  </data>
+  <data name="Tutorial_line_channelid_step3" xml:space="preserve">
+    <value>访问 Basic settings 以查找您的channel ID。请参阅下面的屏幕截图了解其位置。</value>
+  </data>
+  <data name="Tutorial_line_channelname_step3" xml:space="preserve">
+    <value>访问 Basic settings 以查找您的 Line channel 名称。请参阅下面的屏幕截图了解其位置。</value>
+  </data>
+  <data name="Tutorial_line_secret_step3" xml:space="preserve">
+    <value>访问 Basic settings 以查找您的channel secret。请参阅下面的屏幕截图了解其位置。</value>
+  </data>
+  <data name="Tutorial_line_token_step3" xml:space="preserve">
+    <value>选择 Messaging API。</value>
+  </data>
+  <data name="Tutorial_line_token_step4" xml:space="preserve">
+    <value>Channel token 的位置请参考下面的截图。</value>
+  </data>
+  <data name="Tutorial_login_1" xml:space="preserve">
+    <value>访问</value>
+  </data>
+  <data name="Tutorial_login_2" xml:space="preserve">
+    <value>并登录。</value>
+  </data>
+  <data name="ErrMsg_ChannelNameTooLong" xml:space="preserve">
+    <value>Line channel 名称不能超过 20 个字符。</value>
+  </data>
+  <data name="ErrMsg_MissingChannelID" xml:space="preserve">
+    <value>请输入channel ID。</value>
+  </data>
+  <data name="PublishProductPrompt2" xml:space="preserve">
+    <value>以下的帖子将会发布到您的社交媒体（包括您的 Facebook 页面、Instagram 帐户和 Line 频道）。请检查并确认帖子的内容。</value>
+  </data>
+  <data name="ErrMsg_DuplicatedChannelSecret" xml:space="preserve">
+    <value>具有相同 channel secret 的 Line channel 已存在。</value>
+  </data>
+  <data name="Title_ManageLineChannel" xml:space="preserve">
+    <value>管理 Line channel</value>
+  </data>
+  <data name="ErrMsg_ValidMetaProfileAndLineChannelNotFound" xml:space="preserve">
+    <value>该公司没有与任何 Facebook 帐户或 Line channel 建立有效连接。</value>
   </data>
 </root>

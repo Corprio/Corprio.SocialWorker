@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
 
-namespace Corprio.SocialWorker.Models
+namespace Corprio.SocialWorker.Models.Meta
 {
     /// <summary>
     /// Natural languages that the bot can handle and speak
@@ -35,10 +35,10 @@ namespace Corprio.SocialWorker.Models
     /// Meta products
     /// </summary>
     public enum MetaProduct
-    {        
-        Facebook,        
+    {
+        Facebook,
         Instagram
-    }    
+    }
 
     /// <summary>
     /// Selected languages that can be detected by Meta NLP

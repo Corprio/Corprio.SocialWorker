@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Newtonsoft.Json;
 
-namespace Corprio.SocialWorker.Models
+namespace Corprio.SocialWorker.Models.Meta
 {
     public class GroupFeedWebhookPayload
     {

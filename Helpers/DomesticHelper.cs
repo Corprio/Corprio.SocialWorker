@@ -21,6 +21,7 @@ using Microsoft.Extensions.Configuration;
 using Corprio.DataModel.Business.Logistic;
 using System.Net.Mail;
 using System.ServiceModel.Channels;
+using Corprio.SocialWorker.Models.Meta;
 
 namespace Corprio.SocialWorker.Helpers
 {
@@ -35,7 +36,7 @@ namespace Corprio.SocialWorker.Helpers
         private readonly Guid OrgID;
         private readonly string PageName;
         private readonly DbFriendlyBot Shell;
-        private readonly MetaBotStatus Bot;
+        private readonly BotStatus Bot;
         private readonly ApplicationSetting AppSetting;
 
         // magic numbers
@@ -87,7 +88,7 @@ namespace Corprio.SocialWorker.Helpers
             // auto-correct any impossible state before saving
             if (Bot.BuyerCorprioID != null) Bot.NewCustomer = false;
             
-            db.MetaBotStatuses.Update(Shell.ReadyToSave(Bot));
+            db.BotStatuses.Update(Shell.ReadyToSave(Bot));
             try
             {
                 await db.SaveChangesAsync();
@@ -426,6 +427,13 @@ namespace Corprio.SocialWorker.Helpers
                 DeliveryPhoneNumbers = new List<Global.Geography.PhoneNumber>(),
                 OrderDate = DateTimeOffset.Now,
                 WarehouseID = AppSetting.WarehouseID,
+                EntityProperties = [
+                    new EntityProperty 
+                    { 
+                        Name = BabelFish.SalesOrderEpName, 
+                        Value = Bot.BuyerID 
+                    }
+                    ],  // this EP will be used to trace a sales order back to the bot
             };
             if (!string.IsNullOrWhiteSpace(customer.BusinessPartner.PrimaryMobilePhoneNumber_SubscriberNumber))
             {
@@ -883,8 +891,14 @@ namespace Corprio.SocialWorker.Helpers
                             GivenName = StringHelper.StringTruncate(splits[0], 100),
                             PrimaryEmail = emailAddress                        
                         },
-                        Source = "Facebook/Instagram",
-                        EntityProperties = [new EntityProperty() { Name = BabelFish.CustomerEpName, Value = Bot.BuyerID }],
+                        Source = Bot.FacebookUserID != null ? "Facebook/Instagram" : "Line",
+                        EntityProperties = [
+                            new EntityProperty 
+                            { 
+                                Name = Bot.FacebookUserID != null ? BabelFish.MetaCustomerEpName : BabelFish.LineCustomerEpName, 
+                                Value = Bot.BuyerID 
+                            }
+                            ],
                     });
             }
             catch (ApiExecutionException ex)
@@ -944,7 +958,7 @@ namespace Corprio.SocialWorker.Helpers
         }
         
         /// <summary>
-        /// Update a customer's entity properties with a Facebook user ID
+        /// Update a customer's entity properties with a social media user ID
         /// </summary>
         /// <returns>True if the update is completed</returns>
         private async Task<bool> UpdateCustomerEp()
@@ -964,7 +978,14 @@ namespace Corprio.SocialWorker.Helpers
 
             // note: we allow 1 customer to be associated with more than 1 social media account, so we don't use AddUpdateEntityProperty(),
             // which may over-write any EP with the same name
-            (customer.EntityProperties ??= new List<EntityProperty>()).Add(new EntityProperty() { Name = BabelFish.CustomerEpName, Value = Bot.BuyerID });
+            (customer.EntityProperties ??= []).Add(
+                new EntityProperty 
+                { 
+                    Name = Bot.FacebookUserID != null ? BabelFish.MetaCustomerEpName : BabelFish.LineCustomerEpName, 
+                    Value = Bot.BuyerID 
+                }
+                );
+
             try
             {
                 await Client.CustomerApi.Update(organizationID: OrgID, customer: customer);
@@ -1168,7 +1189,7 @@ namespace Corprio.SocialWorker.Helpers
 
         public async Task<string> AcknowledgeMention()
         {
-            return $"{ThusSpokeBabel(key: "AcknowlegeMention", placeholders: [Bot.MetaUserName])}\n{await AskQuestion()}";
+            return $"{ThusSpokeBabel(key: "AcknowlegeMention", placeholders: [Bot.BuyerUserName])}\n{await AskQuestion()}";
         }
 
         /// <summary>

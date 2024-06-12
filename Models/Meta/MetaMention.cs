@@ -4,7 +4,7 @@ using System;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
 
-namespace Corprio.SocialWorker.Models
+namespace Corprio.SocialWorker.Models.Meta
 {
     /// <summary>
     /// Story mention
@@ -49,6 +49,6 @@ namespace Corprio.SocialWorker.Models
         /// Name of FB page / IG account being mentioned
         /// </summary>
         [StringLength(300)]
-        public string Mentioned {  get; set; }
+        public string Mentioned { get; set; }
     }
 }

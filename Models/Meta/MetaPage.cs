@@ -5,8 +5,8 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Corprio.SocialWorker.Models
-{            
+namespace Corprio.SocialWorker.Models.Meta
+{
     /// <summary>
     /// Facebook page
     /// </summary>
@@ -52,7 +52,7 @@ namespace Corprio.SocialWorker.Models
         /// </summary>
         [StringLength(300)]
         public string InstagramID { get; set; }
-        
+
         /// <summary>
         /// Posts that were made on the page or the IG account associated with the page.
         /// </summary>

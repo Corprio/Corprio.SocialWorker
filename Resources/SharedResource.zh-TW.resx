@@ -1035,4 +1035,139 @@
   <data name="StoryMention_mentioned" xml:space="preserve">
     <value>提及</value>
   </data>
+  <data name="Connect_Line" xml:space="preserve">
+    <value>連結 Line</value>
+  </data>
+  <data name="Connect_Line_Desc1" xml:space="preserve">
+    <value>把</value>
+  </data>
+  <data name="Connect_Line_Desc2" xml:space="preserve">
+    <value>與您的 Line channel 連結。</value>
+  </data>
+  <data name="Label_channelID" xml:space="preserve">
+    <value>Channel ID</value>
+  </data>
+  <data name="Label_channelSecret" xml:space="preserve">
+    <value>Channel secret</value>
+  </data>
+  <data name="Label_channelToken" xml:space="preserve">
+    <value>Channel access token (long-lived)</value>
+  </data>
+  <data name="Line_instruction_1" xml:space="preserve">
+    <value>用您的 Line channel ID、channel secret 和 channel access token 填寫下面的表格。</value>
+  </data>
+  <data name="Line_instruction_2" xml:space="preserve">
+    <value>造訪 Line Developer Console &gt; Messaging API，然後輸入以下網址作為您的 Webhook URL：https://socialmediamarketer.corprio.com/line</value>
+  </data>
+  <data name="Tip_WhatIsChannelID" xml:space="preserve">
+    <value>在哪裡可以找到我的 Channel ID？</value>
+  </data>
+  <data name="Tip_WhatIsChannelSecret" xml:space="preserve">
+    <value>在哪裡可以找到我的 Channel secret？</value>
+  </data>
+  <data name="Tip_WhatIsChannelToken" xml:space="preserve">
+    <value>在哪裡可以找到我的 Channel access token？</value>
+  </data>
+  <data name="Title_channelID" xml:space="preserve">
+    <value>Line 為您的 Line channel 分配的唯一識別符</value>
+  </data>
+  <data name="Title_channelSecret" xml:space="preserve">
+    <value>Line 為您的頻道分配的唯一密鑰</value>
+  </data>
+  <data name="Title_channelToken" xml:space="preserve">
+    <value>您在 Line Developer Console 中產生的存取權令牌</value>
+  </data>
+  <data name="AltText_line_channel_basic" xml:space="preserve">
+    <value>Line 的 Developer Console 中的 Channel - Basic setting 頁面</value>
+  </data>
+  <data name="AltText_line_channel_messaging" xml:space="preserve">
+    <value>Line 的 Developer Console 中的 Channel - Messaging API 頁面</value>
+  </data>
+  <data name="AltText_line_console" xml:space="preserve">
+    <value>Line 的 Developer Console 頁面</value>
+  </data>
+  <data name="AltText_line_provider" xml:space="preserve">
+    <value>Line 的 Developer Console 中的 provider 頁面</value>
+  </data>
+  <data name="btnSaveCredential" xml:space="preserve">
+    <value>儲存</value>
+  </data>
+  <data name="btnTestCredential" xml:space="preserve">
+    <value>測試</value>
+  </data>
+  <data name="Dialog_TestSuccess" xml:space="preserve">
+    <value>您的 Line 頻道已與 {0} 連線。</value>
+  </data>
+  <data name="ErrMsg_InvalidChannelSecret" xml:space="preserve">
+    <value>請確保 channel secret 正確，並稍後重試。</value>
+  </data>
+  <data name="ErrMsg_InvalidChannelToken" xml:space="preserve">
+    <value>請確保 channel token 正確，並稍後重試。</value>
+  </data>
+  <data name="ErrMsg_MissingChannelName" xml:space="preserve">
+    <value>請輸入Line channel 的名稱。</value>
+  </data>
+  <data name="ErrMsg_MissingChannelSecret" xml:space="preserve">
+    <value>請輸入channel secret。</value>
+  </data>
+  <data name="ErrMsg_MissingChannelToken" xml:space="preserve">
+    <value>請輸入channel token。</value>
+  </data>
+  <data name="Label_channelName" xml:space="preserve">
+    <value>Line channel 名稱</value>
+  </data>
+  <data name="Tip_WhatIsChannelName" xml:space="preserve">
+    <value>如何找到我的 Line channel 名稱？</value>
+  </data>
+  <data name="Title_channelName" xml:space="preserve">
+    <value>您的 Line channel 的名稱。</value>
+  </data>
+  <data name="Title_ManageLineCredential" xml:space="preserve">
+    <value>管理 Line API 憑證</value>
+  </data>
+  <data name="Tutorial_line_channelid_step1" xml:space="preserve">
+    <value>選擇您的 Line channel 的 provider。</value>
+  </data>
+  <data name="Tutorial_line_channelid_step2" xml:space="preserve">
+    <value>選擇您想要連接的 Line channel。請注意，該 Line channel 必須是 Messaging API channel。</value>
+  </data>
+  <data name="Tutorial_line_channelid_step3" xml:space="preserve">
+    <value>造訪 Basic settings 以尋找您的channel ID。請參閱下面的螢幕截圖以了解其位置。</value>
+  </data>
+  <data name="Tutorial_line_channelname_step3" xml:space="preserve">
+    <value>造訪 Basic settings 以尋找您的 Line channel 名稱。請參閱下面的螢幕截圖以了解其位置。</value>
+  </data>
+  <data name="Tutorial_line_secret_step3" xml:space="preserve">
+    <value>造訪 Basic settings 以尋找您的channel secret。請參閱下面的螢幕截圖以了解其位置。</value>
+  </data>
+  <data name="Tutorial_line_token_step3" xml:space="preserve">
+    <value>選擇 Messaging API。</value>
+  </data>
+  <data name="Tutorial_line_token_step4" xml:space="preserve">
+    <value>Channel token 的位置請參考下面的截圖。</value>
+  </data>
+  <data name="Tutorial_login_1" xml:space="preserve">
+    <value>訪問</value>
+  </data>
+  <data name="Tutorial_login_2" xml:space="preserve">
+    <value>並登入。</value>
+  </data>
+  <data name="ErrMsg_ChannelNameTooLong" xml:space="preserve">
+    <value>Line channel 名稱不能超過 20 個字元。</value>
+  </data>
+  <data name="ErrMsg_MissingChannelID" xml:space="preserve">
+    <value>請輸入channel ID。</value>
+  </data>
+  <data name="PublishProductPrompt2" xml:space="preserve">
+    <value>以下的貼文將會發佈到您的社群媒體（包括您的 Facebook 頁面、Instagram 帳號和 Line 頻道）。請檢查並確認貼文的內容。</value>
+  </data>
+  <data name="ErrMsg_DuplicatedChannelSecret" xml:space="preserve">
+    <value>具有相同 channel secret 的 Line channel 已存在。</value>
+  </data>
+  <data name="Title_ManageLineChannel" xml:space="preserve">
+    <value>管理 Line channel</value>
+  </data>
+  <data name="ErrMsg_ValidMetaProfileAndLineChannelNotFound" xml:space="preserve">
+    <value>該公司沒有與任何 Facebook 帳戶或 Line channel 建立有效連結。</value>
+  </data>
 </root>

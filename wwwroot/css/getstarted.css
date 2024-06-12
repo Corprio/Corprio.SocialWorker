@@ -56,3 +56,80 @@ section {
         flex: 0 0 0;
     }
 }
+
+.form-group small:hover {
+    cursor: pointer;
+}
+
+ol li {
+    margin-bottom: 12px;
+}
+
+.no-style {
+    list-style-type: none;
+}
+
+.tutorialImg:hover {
+    cursor: pointer;
+}
+
+.card-1 {
+    padding: 2rem 1.5rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+    border-radius: 1rem;
+}
+
+.credential-card:hover {
+    cursor: pointer;
+}
+
+.sign-in-btn {
+    font-weight: bold;
+    padding: 0 8px 0 0;
+    border-radius: 2px;
+    box-shadow: 0 1px 3px rgb(0 0 0 / 12%), 0 1px 2px rgb(0 0 0 / 24%);
+    font-family: 'Roboto-Medium', sans-serif;
+    font-size: 14px;
+}
+
+    .sign-in-btn.green {
+        background-color: #06C755;
+        color: white;
+    }
+
+    .sign-in-btn.blue {
+        background-color: #1877F2;
+        color: white;
+    }
+
+    .sign-in-btn:hover {
+        box-shadow: 0 2px 6px rgba(0,0,0,0.15), 0 1px 2px rgba(0,0,0,0.24);
+    }
+
+    .sign-in-btn span {
+        height: 40px;
+        width: 40px;        
+        display: inline-block;
+        border-radius: 2px;
+        margin-right: 13px;
+    }
+
+        .sign-in-btn span .blue-span {        
+            background-color: #1877F2;
+        }
+
+        .sign-in-btn span .green-span {
+            background-color: #06C755;
+        }
+
+    .sign-in-btn .green-span img {
+        width: 36px;
+        height: 36px;
+        margin: 2px;
+    }
+
+    .sign-in-btn .blue-span img {
+        width: 24px;
+        height: 24px;
+        margin: 4px 8px 12px 8px;
+    }

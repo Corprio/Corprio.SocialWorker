@@ -4,8 +4,8 @@ using System;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
 
-namespace Corprio.SocialWorker.Models
-{        
+namespace Corprio.SocialWorker.Models.Meta
+{
     /// <summary>
     /// Facebook post
     /// </summary>

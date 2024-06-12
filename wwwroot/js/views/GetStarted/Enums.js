@@ -47,7 +47,6 @@ var Selector;
     Selector["fbDialogue"] = "#fb-dialogue";
     Selector["fbDialogue2"] = "#fb-dialogue2";
     Selector["keywordInput_Product"] = "#keyword-input-product";
-    Selector["loadIndicator_Top"] = "#load-indicator-top";
     Selector["loginButton"] = "#loginBtn";
     Selector["logoutButton"] = "#logoutBtn";
     Selector["previewButtons"] = ".preview-btn";

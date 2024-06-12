@@ -4,6 +4,8 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Corprio.DataModel;
 using Corprio.DataModel.Resources;
+using Corprio.SocialWorker.Models.Line;
+using Corprio.SocialWorker.Models.Meta;
 using Newtonsoft.Json;
 
 namespace Corprio.SocialWorker.Models
@@ -21,15 +23,25 @@ namespace Corprio.SocialWorker.Models
         public string BuyerID { get; set; }
 
         /// <summary>
-        /// Entity ID of Facebook user (not the ID assigned by Facebook to its user) who owns the bot.
+        /// Entity ID of Line channel (not the ID assigned by Line to channels) who owns the bot.
         /// </summary>
-        [Required(ErrorMessageResourceType = typeof(Resource), ErrorMessageResourceName = "MsgRequired")]
-        public Guid FacebookUserID { get; set; }
+        public Guid? LineChannelID { get; set; }
+
+        /// <summary>
+        /// Line channel object.
+        /// </summary>
+        [ForeignKey(nameof(LineChannelID))]
+        public LineChannel LineChannel { get; set; }
+
+        /// <summary>
+        /// Entity ID of Facebook user (not the ID assigned by Facebook to its user) who owns the bot.
+        /// </summary>        
+        public Guid? FacebookUserID { get; set; }
 
         /// <summary>
         /// Facebook user object.
         /// </summary>
-        [ForeignKey("FacebookUserID")]
+        [ForeignKey(nameof(FacebookUserID))]
         public MetaUser FacebookUser { get; set; }
 
         /// <summary>
@@ -98,48 +110,52 @@ namespace Corprio.SocialWorker.Models
         public bool IsMuted { get; set; }
 
         /// <summary>
-        /// Facebook/Instagram username of the customer, obtained from comment/feed webhook payload
+        /// Facebook/Instagram/Line username of the customer, obtained from comment/feed webhook payload
         /// </summary>
-        public string MetaUserName { get; set; }
+        public string BuyerUserName { get; set; }
 
         /// <summary>
         /// Turn a database-friendly bot into a bot with object properties
         /// </summary>
         /// <returns>A bot with object properties</returns>
-        public MetaBotStatus ReadyToWork()
+        public BotStatus ReadyToWork()
         {
             if (this == null) return null;
 
-            var bot = new MetaBotStatus()
-            {
-                BuyerID = this.BuyerID,
-                FacebookUserID = this.FacebookUserID,
-                FacebookUser = this.FacebookUser,
-                Language = this.Language,
-                ThinkingOf = this.ThinkingOf,                
-                BuyerCorprioID = this.BuyerCorprioID,
-                BuyerEmail = this.BuyerEmail,
-                OtpSessionID = this.OtpSessionID,                
-                PostedProductID = this.PostedProductID,
-                NewCustomer = this.NewCustomer,
-                IsMuted = this.IsMuted,
-                MetaUserName = this.MetaUserName,
-            };
+            var bot = new BotStatus();
+            //{
+            //    BuyerID = this.BuyerID,
+            //    LineChannelID = this.LineChannelID,
+            //    LineChannel = this.LineChannel,
+            //    FacebookUserID = this.FacebookUserID,
+            //    FacebookUser = this.FacebookUser,
+            //    Language = this.Language,
+            //    ThinkingOf = this.ThinkingOf,                
+            //    BuyerCorprioID = this.BuyerCorprioID,
+            //    BuyerEmail = this.BuyerEmail,
+            //    OtpSessionID = this.OtpSessionID,                
+            //    PostedProductID = this.PostedProductID,
+            //    NewCustomer = this.NewCustomer,
+            //    IsMuted = this.IsMuted,
+            //    CustomerUserName = this.CustomerUserName,
+            //};
+
+            Core.Utility.PropertyCopier.Copy(source: this, target: bot);
 
             if (!string.IsNullOrWhiteSpace(this.ProductMemoryString))
-                bot.ProductMemory = JsonConvert.DeserializeObject<List<ProductSummary>>(this.ProductMemoryString)!;
+                bot.ProductMemory = JsonConvert.DeserializeObject<List<ProductSummary>>(this.ProductMemoryString);
             bot.ProductMemory ??= [];
 
             if (!string.IsNullOrWhiteSpace(this.VariationMemoryString))
-                bot.VariationMemory = JsonConvert.DeserializeObject<List<KeyValuePair<string, List<VariationSummary>>>>(this.VariationMemoryString)!;
+                bot.VariationMemory = JsonConvert.DeserializeObject<List<KeyValuePair<string, List<VariationSummary>>>>(this.VariationMemoryString);
             bot.VariationMemory ??= [];
 
             if (!string.IsNullOrWhiteSpace(this.AttributeValueMemoryString))
-                bot.AttributeValueMemory = JsonConvert.DeserializeObject<List<KeyValuePair<string, string>>>(this.AttributeValueMemoryString)!;
+                bot.AttributeValueMemory = JsonConvert.DeserializeObject<List<KeyValuePair<string, string>>>(this.AttributeValueMemoryString);
             bot.AttributeValueMemory ??= [];
 
             if (!string.IsNullOrWhiteSpace(this.CartString))
-                bot.Cart = JsonConvert.DeserializeObject<List<BotBasket>>(this.CartString)!;                                    
+                bot.Cart = JsonConvert.DeserializeObject<List<BotBasket>>(this.CartString);
             bot.Cart ??= [];
 
             return bot;
@@ -150,25 +166,29 @@ namespace Corprio.SocialWorker.Models
         /// </summary>
         /// <param name="bot">A bot with object properties</param>
         /// <returns>A database-friendly bot with updated properties</returns>
-        public DbFriendlyBot ReadyToSave(MetaBotStatus bot)
+        public DbFriendlyBot ReadyToSave(BotStatus bot)
         {
             if (bot == null) return this;
-            this.BuyerID = bot.BuyerID;
-            this.FacebookUserID = bot.FacebookUserID;
-            this.FacebookUser = bot.FacebookUser;
-            this.Language = bot.Language;
-            this.ThinkingOf = bot.ThinkingOf;
-            this.PostedProductID = bot.PostedProductID;
-            this.NewCustomer = bot.NewCustomer;
+            Core.Utility.PropertyCopier.Copy(source: bot, target: this);
+
+            //this.BuyerID = bot.BuyerID;
+            //this.LineChannelID = bot.LineChannelID;
+            //this.LineChannel = bot.LineChannel;
+            //this.FacebookUserID = bot.FacebookUserID;
+            //this.FacebookUser = bot.FacebookUser;
+            //this.Language = bot.Language;
+            //this.ThinkingOf = bot.ThinkingOf;
+            //this.PostedProductID = bot.PostedProductID;
+            //this.NewCustomer = bot.NewCustomer;
             this.ProductMemoryString = System.Text.Json.JsonSerializer.Serialize(bot.ProductMemory);
             this.VariationMemoryString = System.Text.Json.JsonSerializer.Serialize(bot.VariationMemory);
             this.AttributeValueMemoryString = System.Text.Json.JsonSerializer.Serialize(bot.AttributeValueMemory);
             this.CartString = System.Text.Json.JsonSerializer.Serialize(bot.Cart);            
-            this.BuyerCorprioID = bot.BuyerCorprioID;
-            this.BuyerEmail = bot.BuyerEmail;
-            this.OtpSessionID = bot.OtpSessionID;
-            this.IsMuted = bot.IsMuted;
-            this.MetaUserName = bot.MetaUserName;
+            //this.BuyerCorprioID = bot.BuyerCorprioID;
+            //this.BuyerEmail = bot.BuyerEmail;
+            //this.OtpSessionID = bot.OtpSessionID;
+            //this.IsMuted = bot.IsMuted;
+            //this.CustomerUserName = bot.CustomerUserName;
             return this;
         }
     }        

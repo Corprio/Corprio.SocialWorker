@@ -403,10 +403,10 @@
     <value>Do you want to publish this catalogue? A post will be made to your Facebook page(s) and Instagram account(s).</value>
   </data>
   <data name="PublishProductHint" xml:space="preserve">
-    <value>Publish a post about this product to Facebook and Instagram</value>
+    <value>Publish a post about this product to social media, such as your Facebook pages, Instagram accounts and Line channels.</value>
   </data>
   <data name="PublishProductPrompt" xml:space="preserve">
-    <value>The following post will be made to your Facebook page(s) and Instagram account(s). Please review and ensure that the keyword '{0}' is included. The chatbot will automatically reach out to anyone replying to your post with {0}.</value>
+    <value>The following post will be made to your social media (e.g., Facebook pages, Instagram accounts and Line channels). Please review and ensure that the keyword '{0}' is included. The chatbot will automatically reach out to anyone replying to your post with {0}.</value>
   </data>
   <data name="UnitOfMeasure" xml:space="preserve">
     <value>Unit Of Measure</value>
@@ -1000,7 +1000,7 @@
     <value>Modify setting</value>
   </data>
   <data name="PublishProductHint2" xml:space="preserve">
-    <value>Publish a post about this product to Facebook and Instagram (Note: this product was published previously)</value>
+    <value>Publish a post about this product to social media. (Note: this product was published previously)</value>
   </data>
   <data name="Tour_PublishCol_Desc" xml:space="preserve">
     <value>Select the product you would like to publish and click the corresponding icon in this column.</value>
@@ -1015,7 +1015,7 @@
     <value>Please make sure you have logged into Facebook.</value>
   </data>
   <data name="PublishProductPrompt2" xml:space="preserve">
-    <value>The following post will be made to your Facebook page(s) and Instagram account(s). Please review and confirm.</value>
+    <value>The following post will be made to your social media (e.g., Facebook pages, Instagram accounts and Line channels). Please review and confirm.</value>
   </data>
   <data name="StoryMention_EmailBody" xml:space="preserve">
     <value>&lt;html&gt;&lt;body&gt;&lt;p&gt;A customer mentioned &lt;b&gt;{0}&lt;/b&gt; on Instagram. Please refer to below for details.&lt;/p&gt;&lt;ul&gt;&lt;li&gt;Instagram user name: {1}&lt;/li&gt;&lt;li&gt;Instagram user ID: {2}&lt;/li&gt;&lt;li&gt;Instagram story: &lt;a href="{3}"&gt;{1}'s Instagram Story&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;small&gt;Note: Instagram story is ephemeral by nature - that is, it will disappear after 24 hours or when deleted by the user - so the link above may no longer be accessible.&lt;/small&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</value>
@@ -1040,5 +1040,137 @@
   </data>
   <data name="StoryMention_mentioned" xml:space="preserve">
     <value>Mentioned</value>
+  </data>
+  <data name="Connect_Line" xml:space="preserve">
+    <value>Connet Line</value>
+  </data>
+  <data name="Connect_Line_Desc1" xml:space="preserve">
+    <value>Connect</value>
+  </data>
+  <data name="Connect_Line_Desc2" xml:space="preserve">
+    <value>with your Line channel.</value>
+  </data>
+  <data name="Label_channelID" xml:space="preserve">
+    <value>Channel ID</value>
+  </data>
+  <data name="Label_channelSecret" xml:space="preserve">
+    <value>Channel secret</value>
+  </data>
+  <data name="Label_channelToken" xml:space="preserve">
+    <value>Channel access token (long-lived)</value>
+  </data>
+  <data name="Line_instruction_1" xml:space="preserve">
+    <value>Complete the form below with your Line channel ID, channel secret and channel access token.</value>
+  </data>
+  <data name="Line_instruction_2" xml:space="preserve">
+    <value>Visit Line Developer Console &gt; Messaging API, and input the following as your webhook URL: https://socialmediamarketer.corprio.com/line</value>
+  </data>
+  <data name="Tip_WhatIsChannelID" xml:space="preserve">
+    <value>Where can I find my channel ID?</value>
+  </data>
+  <data name="Tip_WhatIsChannelSecret" xml:space="preserve">
+    <value>Where can I find my channel secret?</value>
+  </data>
+  <data name="Tip_WhatIsChannelToken" xml:space="preserve">
+    <value>Where can I find my channel access token?</value>
+  </data>
+  <data name="Title_channelID" xml:space="preserve">
+    <value>Unique identifier assigned by Line to your channel</value>
+  </data>
+  <data name="Title_channelSecret" xml:space="preserve">
+    <value>Unique secret key assigned by Line to your channel</value>
+  </data>
+  <data name="Title_channelToken" xml:space="preserve">
+    <value>Long-lived access token you generated in Line Developer Console</value>
+  </data>
+  <data name="AltText_line_channel_basic" xml:space="preserve">
+    <value>Channel - Basic setting page in Line Developer Console</value>
+  </data>
+  <data name="AltText_line_channel_messaging" xml:space="preserve">
+    <value>Channel - Messaging API page in Line Developer Console</value>
+  </data>
+  <data name="AltText_line_console" xml:space="preserve">
+    <value>Developer Console page of Line</value>
+  </data>
+  <data name="AltText_line_provider" xml:space="preserve">
+    <value>Provider page in Line Developer Console</value>
+  </data>
+  <data name="btnSaveCredential" xml:space="preserve">
+    <value>Save</value>
+  </data>
+  <data name="btnTestCredential" xml:space="preserve">
+    <value>Test</value>
+  </data>
+  <data name="Dialog_TestSuccess" xml:space="preserve">
+    <value>Your Line channel is connected with {0}.</value>
+  </data>
+  <data name="ErrMsg_InvalidChannelSecret" xml:space="preserve">
+    <value>Please make sure the channel secret is correct and try again.</value>
+  </data>
+  <data name="ErrMsg_InvalidChannelToken" xml:space="preserve">
+    <value>Please make sure the channel token is correct and try again.</value>
+  </data>
+  <data name="ErrMsg_MissingChannelName" xml:space="preserve">
+    <value>Please input the Line channel name.</value>
+  </data>
+  <data name="ErrMsg_MissingChannelSecret" xml:space="preserve">
+    <value>Please input the channel secret.</value>
+  </data>
+  <data name="ErrMsg_MissingChannelToken" xml:space="preserve">
+    <value>Please input the channel token.</value>
+  </data>
+  <data name="Label_channelName" xml:space="preserve">
+    <value>Line channel name</value>
+  </data>
+  <data name="Tip_WhatIsChannelName" xml:space="preserve">
+    <value>What is my Line channel name?</value>
+  </data>
+  <data name="Title_channelName" xml:space="preserve">
+    <value>The name of your Line channel.</value>
+  </data>
+  <data name="Title_ManageLineCredential" xml:space="preserve">
+    <value>Manage Line API credential</value>
+  </data>
+  <data name="Tutorial_line_channelid_step1" xml:space="preserve">
+    <value>Select the provider that owns your Line channel.</value>
+  </data>
+  <data name="Tutorial_line_channelid_step2" xml:space="preserve">
+    <value>Select the Line channel with which you would like to connect. Please note that the channel must be a Messaging API channel.</value>
+  </data>
+  <data name="Tutorial_line_channelid_step3" xml:space="preserve">
+    <value>Visit Basic settings to find your channel ID. Please refer to the screenshot below for its location.</value>
+  </data>
+  <data name="Tutorial_line_channelname_step3" xml:space="preserve">
+    <value>Visit Basic settings to find your channel name. Please refer to the screenshot below for its location.</value>
+  </data>
+  <data name="Tutorial_line_secret_step3" xml:space="preserve">
+    <value>Visit Basic settings to find your channel secret. Please refer to the screenshot below for its location.</value>
+  </data>
+  <data name="Tutorial_line_token_step3" xml:space="preserve">
+    <value>Select Messaging API.</value>
+  </data>
+  <data name="Tutorial_line_token_step4" xml:space="preserve">
+    <value>Please refer to the screenshot below for the location of channel token.</value>
+  </data>
+  <data name="Tutorial_login_1" xml:space="preserve">
+    <value>Visit</value>
+  </data>
+  <data name="Tutorial_login_2" xml:space="preserve">
+    <value>and log in.</value>
+  </data>
+  <data name="ErrMsg_ChannelNameTooLong" xml:space="preserve">
+    <value>Channel name cannot have more than 20 characters.</value>
+  </data>
+  <data name="ErrMsg_MissingChannelID" xml:space="preserve">
+    <value>Please input the channel ID.</value>
+  </data>
+  <data name="ErrMsg_DuplicatedChannelSecret" xml:space="preserve">
+    <value>A Line channel with the same channel secret already exists.</value>
+  </data>
+  <data name="Title_ManageLineChannel" xml:space="preserve">
+    <value>Manage Line channels</value>
+  </data>
+  <data name="ErrMsg_ValidMetaProfileAndLineChannelNotFound" xml:space="preserve">
+    <value>The organization does not have a valid connection with any Facebook account or Line channel.</value>
   </data>
 </root>

@@ -22,28 +22,30 @@ using Microsoft.EntityFrameworkCore;
 using Corprio.DataModel.Business.Sales;
 using Corprio.Global.Measure;
 using Corprio.AspNetCore.Site.Services;
+using Corprio.SocialWorker.Models.Meta;
+using Corprio.SocialWorker.Models.Line;
+using Corprio.SocialWorker.Services;
 
 namespace Corprio.SocialWorker.Controllers
 {
     public class ProductPublicationController : MetaApiController
     {
-        private readonly ApplicationDbContext db;
-        private readonly APIClient corprioClient;
-        private readonly HttpClient httpClient;
-        private readonly ApplicationSettingService applicationSettingService;
+        readonly ApplicationDbContext _db;
+        readonly APIClient _corprioClient;                
+        readonly ApplicationSettingService _applicationSettingService;
 
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="context"></param>
         /// <param name="configuration"></param>
-        public ProductPublicationController(ApplicationDbContext context, APIClient corprioClient, HttpClient httpClient, 
-            ApplicationSettingService applicationSettingService, IConfiguration configuration) : base(configuration)
+        public ProductPublicationController(ApplicationDbContext context, APIClient corprioClient, 
+            ApplicationSettingService applicationSettingService, IConfiguration configuration, 
+            IHttpClientFactory httpClientFactory) : base(configuration, httpClientFactory)
         {
-            db = context;
-            this.corprioClient = corprioClient;
-            this.httpClient = httpClient;
-            this.applicationSettingService = applicationSettingService;
+            _db = context;
+            _corprioClient = corprioClient;            
+            _applicationSettingService = applicationSettingService;            
         }
 
         /// <summary>
@@ -66,7 +68,7 @@ namespace Corprio.SocialWorker.Controllers
         [HttpGet("/ProductPublication/GetDistinctProductPropertyValues")]
         public Task<IEnumerable<string>> GetDistinctProductPropertyValues(Guid organizationID, string propertyName)
         {
-            return corprioClient.ProductApi.GetDistinctPropertyValues(organizationID: organizationID, propertyName: propertyName);
+            return _corprioClient.ProductApi.GetDistinctPropertyValues(organizationID: organizationID, propertyName: propertyName);
         }
 
         /// <summary>
@@ -79,8 +81,8 @@ namespace Corprio.SocialWorker.Controllers
             RequiredPermissions = new DataAction[] { DataAction.Read })]
         public async Task<IActionResult> GetPage(DataSourceLoadOptions loadOptions)
         {
-            var orgInfo = await corprioClient.OrganizationApi.GetCoreInfo(OrganizationID);
-            PagedList<dynamic> list = await corprioClient.ProductApi.QueryPage(
+            var orgInfo = await _corprioClient.OrganizationApi.GetCoreInfo(OrganizationID);
+            PagedList<dynamic> list = await _corprioClient.ProductApi.QueryPage(
                 organizationID: OrganizationID,
                 selector: $"new (ID,Code,Name,EntityProperties.Where(Name=\"tag\").Select(Value) as Tags,EntityProperties.Where(Name=\"{BabelFish.ProductEpName}\").Select(Value) as PostIDs,"
                 + "Description,GlobalizedName,GlobalizedDescription,GlobalizedLongDescription,DefaultBarcode,Nature,ProductTypeID,ProductType.Name as ProductTypeName,"
@@ -97,16 +99,16 @@ namespace Corprio.SocialWorker.Controllers
         public async Task<string> PreviewProductPost([FromRoute] Guid organizationID, Guid productID)
         {
             if (productID.Equals(Guid.Empty)) throw new Exception(Resources.SharedResource.ErrMsg_InvalidProductID);
-            Product product = await corprioClient.ProductApi.Get(organizationID: organizationID, id: productID)
+            Product product = await _corprioClient.ProductApi.Get(organizationID: organizationID, id: productID)
                 ?? throw new Exception(Resources.SharedResource.ErrMsg_ProductNotFound);
-            OrganizationCoreInfo coreInfo = await corprioClient.OrganizationApi.GetCoreInfo(organizationID)
+            OrganizationCoreInfo coreInfo = await _corprioClient.OrganizationApi.GetCoreInfo(organizationID)
                 ?? throw new Exception(Resources.SharedResource.ErrMsg_OrganizationInfoNotFound);
-            ApplicationSetting applicationSetting = await applicationSettingService.GetSetting<ApplicationSetting>(organizationID)
+            ApplicationSetting applicationSetting = await _applicationSettingService.GetSetting<ApplicationSetting>(organizationID)
                 ?? throw new Exception(Resources.SharedResource.ErrMsg_AppSettingNotFound);
             PriceWithCurrency price = null;
             if (applicationSetting.ProductPostTemplate?.Contains(TemplateComponent.ProductPublicPrice) ?? false)
             {
-                price = await corprioClient.SellingPriceApi.GetPriceForCustomerPriceGroup(
+                price = await _corprioClient.SellingPriceApi.GetPriceForCustomerPriceGroup(
                     organizationID: organizationID,
                     productID: productID,
                     customerPriceGroupID: CustomerPriceGroup.PublicGroupID,
@@ -141,46 +143,65 @@ namespace Corprio.SocialWorker.Controllers
             message = UtilityHelper.UncleanAndClean(userInput: message, onceIsOK: true);
             List<string> errorMessages = [];
             
-            // it is possible that one organization is linked to multiple Facebook accounts
-            int activeMetaUserNumber = db.MetaUsers.Where(x => x.OrganizationID == organizationID && x.Dormant == false).Count();
-            if (activeMetaUserNumber == 0) throw new Exception(Resources.SharedResource.ErrMsg_ValidMetaProfileNotFound);
+            // it is possible that one organization is linked to multiple Facebook accounts            
+            List<MetaUser> activeMetaUsers = _db.MetaUsers.Include(x => x.Pages).Where(x => x.OrganizationID == organizationID && x.Dormant == false).ToList();
+            List<LineChannel> activeLineChannels = _db.LineChannels.Where(r => r.OrganizationID == organizationID && r.Dormant == false).ToList();
+            if (activeMetaUsers.Count == 0 && activeLineChannels.Count == 0) 
+                throw new Exception(Resources.SharedResource.ErrMsg_ValidMetaProfileAndLineChannelNotFound);
 
-            MetaUser metaUser;
-            if (activeMetaUserNumber > 1)
-            {
-                if (string.IsNullOrWhiteSpace(facebookUserID)) 
-                    throw new Exception(Resources.SharedResource.ErrMsg_FacebookNotLoggedIn);
+            //MetaUser metaUser;
+            //if (activeMetaUsers.Count > 1)
+            //{
+            //    if (string.IsNullOrWhiteSpace(facebookUserID))
+            //        throw new Exception(Resources.SharedResource.ErrMsg_FacebookNotLoggedIn);
 
-                metaUser = db.MetaUsers.Include(x => x.Pages).FirstOrDefault(x => x.OrganizationID == organizationID && x.Dormant == false && x.FacebookUserID == facebookUserID)
-                    ?? throw new Exception(Resources.SharedResource.ErrMsg_ValidMetaProfileNotFound);
-            }
-            else
-            {
-                metaUser = db.MetaUsers.Include(x => x.Pages).First(x => x.OrganizationID == organizationID && x.Dormant == false);
-            }            
+            //    metaUser = activeMetaUsers.FirstOrDefault(x => x.FacebookUserID == facebookUserID) 
+            //        ?? throw new Exception(Resources.SharedResource.ErrMsg_ValidMetaProfileNotFound);
+            //}
+            //else if (activeMetaUsers.Count == 1)
+            //{
+            //    metaUser = activeMetaUsers[0];
+            //}
+            //else
+            //{
+            //    metaUser = null;
+            //}
 
-            if (metaUser.Pages.Count == 0)
-            {
-                errorMessages.Add($"{organizationID} has no Facebook pages to publish product {productID}.");
-                Log.Information(errorMessages.Last());
-                return StatusCode(400, errorMessages);
-            }
+            //if (activeMetaUserNumber > 1)
+            //{
+            //    if (string.IsNullOrWhiteSpace(facebookUserID)) 
+            //        throw new Exception(Resources.SharedResource.ErrMsg_FacebookNotLoggedIn);
 
-            Product product = await corprioClient.ProductApi.Get(organizationID: organizationID, id: productID)
+            //    metaUser = _db.MetaUsers.Include(x => x.Pages).FirstOrDefault(x => x.OrganizationID == organizationID && x.Dormant == false && x.FacebookUserID == facebookUserID)
+            //        ?? throw new Exception(Resources.SharedResource.ErrMsg_ValidMetaProfileNotFound);
+            //}
+            //else
+            //{
+            //    metaUser = _db.MetaUsers.Include(x => x.Pages).First(x => x.OrganizationID == organizationID && x.Dormant == false);
+            //}            
+
+            //if (metaUser != null && metaUser.Pages.Count == 0)
+            //{
+            //    errorMessages.Add($"{organizationID} has no Facebook pages to publish product {productID}.");
+            //    Log.Information(errorMessages.Last());
+            //    return StatusCode(400, errorMessages);
+            //}
+
+            #region Create image URLs
+            Product product = await _corprioClient.ProductApi.Get(organizationID: organizationID, id: productID)
                 ?? throw new Exception(Resources.SharedResource.ErrMsg_ProductNotFound);
-            ApplicationSetting applicationSetting = await applicationSettingService.GetSetting<ApplicationSetting>(organizationID)
+            ApplicationSetting applicationSetting = await _applicationSettingService.GetSetting<ApplicationSetting>(organizationID)
                 ?? throw new Exception(Resources.SharedResource.ErrMsg_AppSettingNotFound);
 
             // we need to use a set because child products may share the same image(s) with their parent or peers
-            HashSet<Guid> imageIds = UtilityHelper.ReturnImageUrls(product);
-            product.Variations ??= [];
-            if (product.IsMasterProduct && product.Variations.Count > 0)
+            HashSet<Guid> imageIds = UtilityHelper.ReturnImageUrls(product);                        
+            if (product.IsMasterProduct && product.Variations?.Count > 0)
             {
                 PagedList<Product> childProducts;
                 int pageNum = 0;
                 do
                 {
-                    childProducts = await corprioClient.ProductApi.QueryPageChildProducts<Product>(
+                    childProducts = await _corprioClient.ProductApi.QueryPageChildProducts<Product>(
                         organizationID: organizationID,
                         masterProductID: productID,
                         selector: "new (ID, Image01ID, Image02ID, Image03ID, Image04ID, Image05ID, Image06ID, Image07ID, Image08ID)",
@@ -204,27 +225,107 @@ namespace Corprio.SocialWorker.Controllers
             string imageUrlKey, imageUrl;
             foreach (Guid imageId in imageIds)
             {
-                imageUrlKey = await corprioClient.ImageApi.UrlKey(organizationID: organizationID, id: imageId);
+                imageUrlKey = await _corprioClient.ImageApi.UrlKey(organizationID: organizationID, id: imageId);
                 if (string.IsNullOrWhiteSpace(imageUrlKey)) continue;
-                imageUrl = corprioClient.ImageApi.Url(organizationID: organizationID, imageUrlKey: imageUrlKey);
+                imageUrl = _corprioClient.ImageApi.Url(organizationID: organizationID, imageUrlKey: imageUrlKey);
                 if (string.IsNullOrWhiteSpace(imageUrl)) continue;
 
                 // DEV ONLY: the imageUrl generated in DEV environment won't work, so we re-assign a publicly accessible URL to it FOR NOW
-                if (imageUrl.Contains("localhost")) imageUrl = GenerateImageUrlForDev();
+                //if (imageUrl.Contains("localhost")) imageUrl = GenerateImageUrlForDev();
+                if (imageUrl.Contains("localhost")) imageUrl = imageUrl.Replace(_configuration["AppBaseUrl"], _configuration["WebhookCallbackUrl"]);
                 imageUrls.Add(imageUrl);
             }
+            #endregion
+            product.EntityProperties ??= [];  // make sure the EP is not null, as it will be updated later
+            bool success = true;  // if false, then 400 + error messages are returned
+
+            LineApiService lineApiService;
+            List<LineMessage> lineMessages;
+            foreach (LineChannel lineChannel in activeLineChannels)
+            {
+                lineApiService = new LineApiService(
+                    context: _db,
+                    httpClientFactory: _httpClientFactory,
+                    configuration: _configuration,
+                    lineChannel: lineChannel,
+                    applicationSettingService: _applicationSettingService);
+                
+                lineMessages = [new LineMessage { Type = "text", Text = message }];
+                for (int i = 0; i < imageUrls.Count; i++)  
+                {
+                    if (i == 4) break; // up to 4 images (+ 1 text) can be included in a Line message
+                    lineMessages.Add(new LineMessage 
+                    { 
+                        Type = "image",                        
+                        PreviewImageUrl = imageUrls[i],
+                        OriginalContentUrl = imageUrls[i] 
+                    }
+                    );
+                }
+                try
+                {
+                    await lineApiService.SendBroadcastMessage(lineMessages);
+                }
+                catch (Exception ex)
+                {
+                    Log.Error(ex.Message);
+                    errorMessages.Add(ex.Message);
+                    success = false;
+                }
+            }
+            // need this EP to indicate that the product has been published
+            product.EntityProperties.Add(new EntityProperty() { Name = BabelFish.ProductEpName, Value = "NA" });
 
             string postId;
             MetaPost post;
-            product.EntityProperties ??= [];
-            bool success = true;
-            foreach (MetaPage page in metaUser.Pages)
-            {                
-                // note: if there are no images to begin with, we simply don't attempt to post anything to IG
-                if (!string.IsNullOrWhiteSpace(page.InstagramID) && imageUrls.Count > 0)
+            foreach (MetaUser metaUser in activeMetaUsers)
+            {
+                if (metaUser.Pages == null || metaUser.Pages.Count == 0)
                 {
-                    postId = await MakeIgCarouselPost(httpClient: httpClient, accessToken: page.Token, igUserId: page.InstagramID,
-                        mediaUrls: imageUrls, message: message);
+                    errorMessages.Add($"Facebook user {metaUser.FacebookUserID} has no Facebook pages to publish product {productID}.");
+                    Log.Information(errorMessages.Last());
+                    continue;
+                }
+
+                foreach (MetaPage page in metaUser.Pages)
+                {
+                    postId = await MakeFbMultiPhotoPost(accessToken: page.Token,
+                        pageId: page.PageId, imageUrls: imageUrls, message: message);
+                    if (string.IsNullOrWhiteSpace(postId))
+                    {
+                        errorMessages.Add($"Failed to make multi-photo post to {page.Name}");
+                        Log.Error(errorMessages.Last());
+                        success = false;
+                    }
+                    else
+                    {
+                        post = new MetaPost()
+                        {
+                            ID = Guid.NewGuid(),
+                            FacebookPageID = page.ID,
+                            KeywordForShoppingIntention = applicationSetting.KeywordForShoppingIntention,
+                            PostId = postId,
+                            PostedWith = MetaProduct.Facebook
+                        };
+                        try
+                        {
+                            _db.MetaPosts.Add(post);
+                            await _db.SaveChangesAsync();
+                        }
+                        catch (Exception ex)
+                        {
+                            errorMessages.Add($"Failed to save FB post ID {postId}. {ex.Message}");
+                            Log.Error(errorMessages.Last());
+                            success = false;
+                        }
+                        product.EntityProperties.Add(new EntityProperty() { Name = BabelFish.ProductEpName, Value = postId });
+                    }
+
+                    // note: if there are no images to begin with, we simply don't attempt to post anything to IG
+                    if (string.IsNullOrWhiteSpace(page.InstagramID) && imageUrls.Count > 0) continue;
+
+                    postId = await MakeIgCarouselPost(accessToken: page.Token, igUserId: page.InstagramID,
+                            mediaUrls: imageUrls, message: message);
                     if (string.IsNullOrWhiteSpace(postId))
                     {
                         errorMessages.Add($"Failed to publish carousel post to {page.Name}-{page.InstagramID}");
@@ -243,8 +344,8 @@ namespace Corprio.SocialWorker.Controllers
                         };
                         try
                         {
-                            db.MetaPosts.Add(post);
-                            await db.SaveChangesAsync();
+                            _db.MetaPosts.Add(post);
+                            await _db.SaveChangesAsync();
                         }
                         catch (Exception ex)
                         {
@@ -255,45 +356,13 @@ namespace Corprio.SocialWorker.Controllers
                         product.EntityProperties.Add(new EntityProperty() { Name = BabelFish.ProductEpName, Value = postId });
                     }
                 }
-
-                postId = await MakeFbMultiPhotoPost(httpClient: httpClient, accessToken: page.Token,
-                    pageId: page.PageId, imageUrls: imageUrls, message: message);
-                if (string.IsNullOrWhiteSpace(postId))
-                {
-                    errorMessages.Add($"Failed to make multi-photo post to {page.Name}");
-                    Log.Error(errorMessages.Last());
-                    success = false;
-                }
-                else
-                {
-                    post = new MetaPost() 
-                    { 
-                        ID = Guid.NewGuid(),
-                        FacebookPageID = page.ID,
-                        KeywordForShoppingIntention = applicationSetting.KeywordForShoppingIntention,
-                        PostId = postId,
-                        PostedWith = MetaProduct.Facebook                         
-                    };
-                    try
-                    {
-                        db.MetaPosts.Add(post);
-                        await db.SaveChangesAsync();
-                    }
-                    catch (Exception ex)
-                    {
-                        errorMessages.Add($"Failed to save FB post ID {postId}. {ex.Message}");
-                        Log.Error(errorMessages.Last());
-                        success = false;
-                    }
-                    product.EntityProperties.Add(new EntityProperty() { Name = BabelFish.ProductEpName, Value = postId });
-                }
             }
 
             try
             {
                 // note: we allow 1 product to be associated with more than 1 post (e.g., 1 on FB and 1 on IG), so we don't use AddUpdateEntityProperty(),
                 // which may over-write any EP with the same name
-                await corprioClient.ProductApi.Update(organizationID: organizationID, product: product, updateChildren: true);
+                await _corprioClient.ProductApi.Update(organizationID: organizationID, product: product, updateChildren: true);
             }
             catch (ApiExecutionException ex)
             {

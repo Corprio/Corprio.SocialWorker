@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Newtonsoft.Json;
 
-namespace Corprio.SocialWorker.Models
+namespace Corprio.SocialWorker.Models.Meta
 {
     /// <summary>
     /// Reference: https://developers.facebook.com/docs/graph-api/webhooks/reference/page/#feed
@@ -93,7 +93,7 @@ namespace Corprio.SocialWorker.Models
         /// </summary>
         [JsonProperty("verb")]
         public string Verb { get; set; }
-        
+
         [JsonProperty("created_time")]
         public double CreatedTime { get; set; }
 

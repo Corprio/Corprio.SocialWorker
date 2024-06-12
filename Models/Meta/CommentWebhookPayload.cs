@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Corprio.SocialWorker.Models
+namespace Corprio.SocialWorker.Models.Meta
 {
     /// <summary>
     /// Reference: https://developers.facebook.com/docs/graph-api/webhooks/reference/instagram/#comments
@@ -66,7 +66,7 @@ namespace Corprio.SocialWorker.Models
         /// </summary>
         [JsonProperty("id")]
         public string WebhookChangeID { get; set; }
-        
+
         /// <summary>
         /// Instagram-scoped ID and username of the Instagram user who created the comment
         /// </summary>

@@ -2,12 +2,12 @@
 using Corprio.DataModel.Resources;
 using System.ComponentModel.DataAnnotations;
 
-namespace Corprio.SocialWorker.Models
+namespace Corprio.SocialWorker.Models.Meta
 {
     /// <summary>
     /// MessageWebhook that has been processed by WebhookController
     /// </summary>
-    public class MessageWebhook : Entity
+    public class MetaMessageWebhook : Entity
     {
         [Required(ErrorMessageResourceType = typeof(Resource), ErrorMessageResourceName = "MsgRequired")]
         [StringLength(50, MinimumLength = 1)]

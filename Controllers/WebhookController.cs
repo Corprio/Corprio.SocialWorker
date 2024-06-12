@@ -21,19 +21,23 @@ using Microsoft.EntityFrameworkCore;
 using Corprio.AspNetCore.Site.Services;
 using Corprio.DataModel.Business;
 using Corprio.Core;
+using Corprio.SocialWorker.Services;
+using Line.Messaging.Webhooks;
+using Corprio.SocialWorker.Models.Meta;
+using Corprio.SocialWorker.Models.Line;
 
 namespace Corprio.SocialWorker.Controllers
 {
     public class WebhookController : Controller
     {
-        private readonly ApplicationDbContext db;
-        readonly IHttpClientFactory httpClientFactory;
-        readonly IConfiguration configuration;
-        readonly EmailHelper emailHelper;
+        private readonly ApplicationDbContext _db;
+        readonly IHttpClientFactory _httpClientFactory;
+        readonly IConfiguration _configuration;
+        readonly EmailHelper _emailHelper;        
         
-        private readonly string ApiVersion;
-        private readonly string AppSecret;
-        private readonly string BaseUrl;
+        readonly string _metaApiVersion;
+        readonly string _metaAppSecret;
+        readonly string _metaBaseUrl;        
         
         /// <summary>
         /// Constructor
@@ -44,14 +48,14 @@ namespace Corprio.SocialWorker.Controllers
         public WebhookController(ApplicationDbContext context, IHttpClientFactory httpClientFactory, 
             IConfiguration configuration, EmailHelper emailHelper) : base()
         {
-            db = context;
-            this.httpClientFactory = httpClientFactory;
-            this.configuration = configuration;
-            this.emailHelper = emailHelper;
-            
-            ApiVersion = configuration["MetaApiSetting:ApiVersion"];
-            BaseUrl = configuration["MetaApiSetting:BaseUrl"];
-            AppSecret = configuration["MetaApiSetting:AppSecret"];
+            _db = context;
+            _httpClientFactory = httpClientFactory;
+            _configuration = configuration;
+            _emailHelper = emailHelper;            
+
+            _metaApiVersion = configuration["MetaApiSetting:ApiVersion"];
+            _metaBaseUrl = configuration["MetaApiSetting:BaseUrl"];
+            _metaAppSecret = configuration["MetaApiSetting:AppSecret"];            
         }
 
         /// <summary>
@@ -109,7 +113,7 @@ namespace Corprio.SocialWorker.Controllers
 
             // note: we MUST compute HMAC based on escaped unicode version of the payload
             requestBody = EncodeNonAsciiCharacters(requestBody);
-            var hmac = new HMACSHA256(Encoding.UTF8.GetBytes(AppSecret));
+            var hmac = new HMACSHA256(Encoding.UTF8.GetBytes(_metaAppSecret));
             hmac.Initialize();
             byte[] rawHmac = hmac.ComputeHash(Encoding.UTF8.GetBytes(requestBody));
             // note: do NOT use ToBase64String()
@@ -139,7 +143,7 @@ namespace Corprio.SocialWorker.Controllers
                     FacebookUserID = facebookUser.ID,
                     BuyerID = interlocutorID,
                     ThinkingOf = BotTopic.Limbo,
-                    MetaUserName = metaUsername
+                    BuyerUserName = metaUsername
                 };
 
                 List<dynamic> existingCustomers = await corprioClient.CustomerApi.Query(
@@ -147,15 +151,15 @@ namespace Corprio.SocialWorker.Controllers
                     selector: "new (ID)",
                     where: "EntityProperties.Any(Name==@0 && Value==@1)",
                     orderBy: "ID",
-                    whereArguments: new string[] { BabelFish.CustomerEpName, interlocutorID },
+                    whereArguments: new string[] { BabelFish.MetaCustomerEpName, interlocutorID },
                     skip: 0,
                     take: 1);
                 if (existingCustomers.Count > 0)
                 {
                     botStatus.BuyerCorprioID = Guid.Parse(existingCustomers[0].ID);
                 }
-                db.MetaBotStatuses.Add(botStatus);
-                await db.SaveChangesAsync();
+                _db.BotStatuses.Add(botStatus);
+                await _db.SaveChangesAsync();
             }
             else
             {
@@ -166,16 +170,16 @@ namespace Corprio.SocialWorker.Controllers
                     botStatus.IsMuted = false;
                 }
 
-                if (!string.IsNullOrEmpty(metaUsername) && metaUsername != botStatus.MetaUserName)
+                if (!string.IsNullOrEmpty(metaUsername) && metaUsername != botStatus.BuyerUserName)
                 {
                     updated = true;
-                    botStatus.MetaUserName = metaUsername;
+                    botStatus.BuyerUserName = metaUsername;
                 }
 
                 if (updated)
                 {
-                    db.MetaBotStatuses.Update(botStatus);
-                    await db.SaveChangesAsync();
+                    _db.BotStatuses.Update(botStatus);
+                    await _db.SaveChangesAsync();
                 }                
             }
             
@@ -218,21 +222,21 @@ namespace Corprio.SocialWorker.Controllers
                         continue;
                     }
 
-                    if (null != db.CommentWebhooks.FirstOrDefault(x => x.MediaItemID == change.Value.Media.Id && x.WebhookChangeID == change.Value.WebhookChangeID))
+                    if (null != _db.MetaCommentWebhooks.FirstOrDefault(x => x.MediaItemID == change.Value.Media.Id && x.WebhookChangeID == change.Value.WebhookChangeID))
                     {
                         Log.Information($"Ignoring duplicated webhook change {change.Value.WebhookChangeID} on media item {change.Value.Media.Id}.");
                         continue;
                     }
                                         
-                    db.CommentWebhooks.Add(new CommentWebhook
+                    _db.MetaCommentWebhooks.Add(new MetaCommentWebhook
                     {
                         ID = Guid.NewGuid(),                        
                         MediaItemID = change.Value.Media.Id,
                         WebhookChangeID = change.Value.WebhookChangeID,
                     });
-                    await db.SaveChangesAsync();
+                    await _db.SaveChangesAsync();
 
-                    post = db.MetaPosts
+                    post = _db.MetaPosts
                         .Include(x => x.FacebookPage)
                         .ThenInclude(x => x.FacebookUser)
                         .ThenInclude(x => x.Bots)
@@ -273,7 +277,7 @@ namespace Corprio.SocialWorker.Controllers
                         interlocutorID: change.Value.From.Id, 
                         metaUsername: change.Value.From.Username,
                         unMute: true);
-                    bot = new DomesticHelper(context: db, configuration: configuration, client: corprioClient,
+                    bot = new DomesticHelper(context: _db, configuration: _configuration, client: corprioClient,
                         organizationID: post.FacebookPage.FacebookUser.OrganizationID,
                         botStatus: botStatus, pageName: post.FacebookPage.Name, setting: setting);
                     string message;
@@ -295,14 +299,14 @@ namespace Corprio.SocialWorker.Controllers
                     message += BabelFish.RobotEmoji;
 
                     string endPoint = post.PostedWith == MetaProduct.Facebook
-                        ? $"{BaseUrl}/{ApiVersion}/{post.FacebookPage.PageId}/messages"
-                        : $"{BaseUrl}/{ApiVersion}/me/messages";
+                        ? $"{_metaBaseUrl}/{_metaApiVersion}/{post.FacebookPage.PageId}/messages"
+                        : $"{_metaBaseUrl}/{_metaApiVersion}/me/messages";
                     
                     await ApiActionHelper.SendMessage(
                         httpClient: httpClient,
                         accessToken: post.FacebookPage.Token,
                         messageEndPoint: endPoint,
-                        threadEndPoint: $"{BaseUrl}/{ApiVersion}/{post.FacebookPage.PageId}/release_thread_control",
+                        threadEndPoint: $"{_metaBaseUrl}/{_metaApiVersion}/{post.FacebookPage.PageId}/release_thread_control",
                         message: message,
                         recipientId: change.Value.From.Id);
                 }
@@ -346,23 +350,23 @@ namespace Corprio.SocialWorker.Controllers
                         continue;
                     }
                     
-                    if (null != db.FeedWebhooks.FirstOrDefault(x => x.CreatedTime == change.Value.CreatedTime
+                    if (null != _db.MetaFeedWebhooks.FirstOrDefault(x => x.CreatedTime == change.Value.CreatedTime
                         && x.SenderID == change.Value.From.Id && x.PostID == change.Value.PostId))
                     {                        
                         Log.Information($"Ignoring duplicated webhook from {change.Value.From.Id} on post {change.Value.PostId} at {change.Value.CreatedTime}.");
                         continue;
                     }
 
-                    db.FeedWebhooks.Add(new FeedWebhook
+                    _db.MetaFeedWebhooks.Add(new MetaFeedWebhook
                     {
                         ID = Guid.NewGuid(),
                         CreatedTime = change.Value.CreatedTime,
                         PostID = change.Value.PostId,
                         SenderID = change.Value.From.Id,
                     });
-                    await db.SaveChangesAsync();
+                    await _db.SaveChangesAsync();
 
-                    post = db.MetaPosts
+                    post = _db.MetaPosts
                         .Include(x => x.FacebookPage)
                         .ThenInclude(x => x.FacebookUser)
                         .ThenInclude(x => x.Bots)
@@ -403,7 +407,7 @@ namespace Corprio.SocialWorker.Controllers
                         interlocutorID: change.Value.From.Id, 
                         metaUsername: change.Value.From.Name,
                         unMute: true);
-                    bot = new DomesticHelper(context: db, configuration: configuration, client: corprioClient,
+                    bot = new DomesticHelper(context: _db, configuration: _configuration, client: corprioClient,
                         organizationID: post.FacebookPage.FacebookUser.OrganizationID,
                         botStatus: botStatus, pageName: post.FacebookPage.Name, setting: setting);
                     
@@ -425,14 +429,14 @@ namespace Corprio.SocialWorker.Controllers
                     message += BabelFish.RobotEmoji;
 
                     string messageEndPoint = post.PostedWith == MetaProduct.Facebook
-                        ? $"{BaseUrl}/{ApiVersion}/{post.FacebookPage.PageId}/messages"
-                        : $"{BaseUrl}/{ApiVersion}/me/messages";                    
+                        ? $"{_metaBaseUrl}/{_metaApiVersion}/{post.FacebookPage.PageId}/messages"
+                        : $"{_metaBaseUrl}/{_metaApiVersion}/me/messages";                    
 
                     MessageFeedback feedback = await ApiActionHelper.SendMessage(
                         httpClient: httpClient,
                         accessToken: post.FacebookPage.Token,
                         messageEndPoint: messageEndPoint,
-                        threadEndPoint: $"{BaseUrl}/{ApiVersion}/{post.FacebookPage.PageId}/release_thread_control",
+                        threadEndPoint: $"{_metaBaseUrl}/{_metaApiVersion}/{post.FacebookPage.PageId}/release_thread_control",
                         message: message,
                         recipientId: change.Value.From.Id);
 
@@ -442,7 +446,7 @@ namespace Corprio.SocialWorker.Controllers
                         await ApiActionHelper.PostOrComment(
                             httpClient: httpClient, 
                             accessToken: post.FacebookPage.Token, 
-                            endPoint: $"{BaseUrl}/{ApiVersion}/{change.Value.CommentId}/comments", 
+                            endPoint: $"{_metaBaseUrl}/{_metaApiVersion}/{change.Value.CommentId}/comments", 
                             message: string.Format(Resources.SharedResource.AutoReplyComment, setting.KeywordForShoppingIntention));
 
                     }
@@ -460,7 +464,7 @@ namespace Corprio.SocialWorker.Controllers
         /// <param name="payload">Webhook payload</param>
         /// <returns>Status code</returns>
         /// <exception cref="Exception"></exception>
-        public async Task<IActionResult> HandleMessageWebhook(HttpClient httpClient, APIClient corprioClient, 
+        public async Task<IActionResult> HandleMetaMessageWebhook(HttpClient httpClient, APIClient corprioClient, 
             ApplicationSettingService applicationSettingService, MessageWebhookPayload payload)
         {
             ApplicationSetting setting;
@@ -491,7 +495,7 @@ namespace Corprio.SocialWorker.Controllers
                         continue;
                     }
 
-                    if (null != db.MessageWebhooks.FirstOrDefault(x => x.TimeStamp == messaging.Timestamp 
+                    if (null != _db.MetaMessageWebhooks.FirstOrDefault(x => x.TimeStamp == messaging.Timestamp 
                         && x.SenderID == messaging.Sender.MetaID && x.RecipientID == messaging.Recipient.MetaID))
                     {                        
                         Log.Information($"Ignoring duplicated webhook from {messaging.Sender.MetaID} to {messaging.Recipient.MetaID} at {messaging.Timestamp}.");
@@ -526,18 +530,18 @@ namespace Corprio.SocialWorker.Controllers
                     }
 
                     // "remember" which webhooks have been processed
-                    db.MessageWebhooks.Add(new MessageWebhook
+                    _db.MetaMessageWebhooks.Add(new MetaMessageWebhook
                     {
                         ID = Guid.NewGuid(),
                         RecipientID = messaging.Recipient.MetaID,
                         SenderID = messaging.Sender.MetaID,
                         TimeStamp = messaging.Timestamp,
                     });
-                    await db.SaveChangesAsync();
+                    await _db.SaveChangesAsync();
 
                     page = payload.Object == "instagram"
-                        ? db.MetaPages.Include(x => x.FacebookUser).ThenInclude(x => x.Bots).FirstOrDefault(x => x.InstagramID == messaging.Recipient.MetaID && x.FacebookUser.Dormant == false)
-                        : db.MetaPages.Include(x => x.FacebookUser).ThenInclude(x => x.Bots).FirstOrDefault(x => x.PageId == messaging.Recipient.MetaID && x.FacebookUser.Dormant == false);
+                        ? _db.MetaPages.Include(x => x.FacebookUser).ThenInclude(x => x.Bots).FirstOrDefault(x => x.InstagramID == messaging.Recipient.MetaID && x.FacebookUser.Dormant == false)
+                        : _db.MetaPages.Include(x => x.FacebookUser).ThenInclude(x => x.Bots).FirstOrDefault(x => x.PageId == messaging.Recipient.MetaID && x.FacebookUser.Dormant == false);
                     if (page?.FacebookUser?.OrganizationID == null)
                     {
                         // apparently Facebook may send multiple notifications for the same message,
@@ -555,18 +559,18 @@ namespace Corprio.SocialWorker.Controllers
                         facebookUser: page.FacebookUser,
                         interlocutorID: messaging.Sender.MetaID);
 
-                    if (string.IsNullOrWhiteSpace(botStatus.MetaUserName))
+                    if (string.IsNullOrWhiteSpace(botStatus.BuyerUserName))
                     {
-                        endPoint = payload.Object == "instagram" ? $"{BaseUrl}/{ApiVersion}/{messaging.Sender.MetaID}?fields=username" : $"{BaseUrl}/{ApiVersion}/{messaging.Sender.MetaID}?fields=name";
+                        endPoint = payload.Object == "instagram" ? $"{_metaBaseUrl}/{_metaApiVersion}/{messaging.Sender.MetaID}?fields=username" : $"{_metaBaseUrl}/{_metaApiVersion}/{messaging.Sender.MetaID}?fields=name";
                         string queryResult = await ApiActionHelper.GetQuery(httpClient: httpClient, accessToken: page.Token, endPoint: endPoint);
                         if (!string.IsNullOrWhiteSpace(queryResult))
                         {
-                            botStatus.MetaUserName = payload.Object == "instagram"
+                            botStatus.BuyerUserName = payload.Object == "instagram"
                                 ? JsonConvert.DeserializeObject<IgUser>(queryResult)?.Username
                                 : JsonConvert.DeserializeObject<FbUser>(queryResult)?.Name;
                         }
-                        db.MetaBotStatuses.Update(botStatus);
-                        await db.SaveChangesAsync();
+                        _db.BotStatuses.Update(botStatus);
+                        await _db.SaveChangesAsync();
                     }                                        
 
                     // if muted, either unmute or do nothing
@@ -576,19 +580,19 @@ namespace Corprio.SocialWorker.Controllers
                         {
                             Log.Information($"The interlocutor {messaging.Sender.MetaID} has opted in to receiving automated responses from Facebook user {page.FacebookUser.FacebookUserID}.");
 
-                            bot = new DomesticHelper(context: db, configuration: configuration, client: corprioClient, organizationID: page.FacebookUser.OrganizationID,
+                            bot = new DomesticHelper(context: _db, configuration: _configuration, client: corprioClient, organizationID: page.FacebookUser.OrganizationID,
                                 botStatus: botStatus, detectedLocales: messaging.Message?.NLP?.DetectedLocales, pageName: page.Name, setting: setting);
 
                             //await ApiActionHelper.ControlConversationThread(httpClient: httpClient, accessToken: page.Token, 
                             //    endPoint: $"{BaseUrl}/{ApiVersion}/{page.PageId}/request_thread_control",
                             //    interlocutorId: messaging.Sender.MetaID);
 
-                            endPoint = payload.Object == "instagram" ? $"{BaseUrl}/{ApiVersion}/me/messages" : $"{BaseUrl}/{ApiVersion}/{messaging.Recipient.MetaID}/messages";
+                            endPoint = payload.Object == "instagram" ? $"{_metaBaseUrl}/{_metaApiVersion}/me/messages" : $"{_metaBaseUrl}/{_metaApiVersion}/{messaging.Recipient.MetaID}/messages";
                             await ApiActionHelper.SendMessage(
                                 httpClient: httpClient,
                                 accessToken: page.Token,
                                 messageEndPoint: endPoint,
-                                threadEndPoint: $"{BaseUrl}/{ApiVersion}/{page.PageId}/release_thread_control",
+                                threadEndPoint: $"{_metaBaseUrl}/{_metaApiVersion}/{page.PageId}/release_thread_control",
                                 message: await bot.getWoke(),
                                 recipientId: messaging.Sender.MetaID);                            
                         }
@@ -600,7 +604,7 @@ namespace Corprio.SocialWorker.Controllers
                         continue;
                     }
 
-                    bot = new DomesticHelper(context: db, configuration: configuration, client: corprioClient, organizationID: page.FacebookUser.OrganizationID,
+                    bot = new DomesticHelper(context: _db, configuration: _configuration, client: corprioClient, organizationID: page.FacebookUser.OrganizationID,
                         botStatus: botStatus, detectedLocales: messaging.Message?.NLP?.DetectedLocales, pageName: page.Name, setting: setting);
 
                     // handle 'Story Mentions' to meet Facebook App review requirement
@@ -622,28 +626,28 @@ namespace Corprio.SocialWorker.Controllers
                         await ApiActionHelper.SendMessage(
                             httpClient: httpClient,
                             accessToken: page.Token,
-                            messageEndPoint: $"{BaseUrl}/{ApiVersion}/me/messages",
-                            threadEndPoint: $"{BaseUrl}/{ApiVersion}/{page.PageId}/release_thread_control",
+                            messageEndPoint: $"{_metaBaseUrl}/{_metaApiVersion}/me/messages",
+                            threadEndPoint: $"{_metaBaseUrl}/{_metaApiVersion}/{page.PageId}/release_thread_control",
                             message: response,
-                            recipientId: messaging.Sender.MetaID); ;
+                            recipientId: messaging.Sender.MetaID);
                         
                         // save the CDN URL
                         string igNameQueryResult = await ApiActionHelper.GetQuery(
                             httpClient: httpClient, 
                             accessToken: page.Token, 
-                            endPoint: $"{BaseUrl}/{ApiVersion}/{messaging.Sender.MetaID}?fields=username");
+                            endPoint: $"{_metaBaseUrl}/{_metaApiVersion}/{messaging.Sender.MetaID}?fields=username");
 
                         var metaMention = new MetaMention()
                         {
                             ID = Guid.NewGuid(),
                             FacebookPageID = page.ID,
                             CreatorID = messaging.Sender.MetaID,
-                            CreatorName = botStatus.MetaUserName,
+                            CreatorName = botStatus.BuyerUserName,
                             CDNUrl = messaging.Message.Attachments[0].Payload.URL,
                             Mentioned = string.IsNullOrWhiteSpace(igNameQueryResult) ? string.Empty : JsonConvert.DeserializeObject<IgUser>(igNameQueryResult)?.Username,
                         };
-                        db.MetaMentions.Add(metaMention);
-                        await db.SaveChangesAsync();
+                        _db.MetaMentions.Add(metaMention);
+                        await _db.SaveChangesAsync();
 
                         //// re-do the following part
                         //OrganizationCoreInfo coreInfo = await corprioClient.OrganizationApi.GetCoreInfo(page.FacebookUser.OrganizationID);
@@ -678,17 +682,17 @@ namespace Corprio.SocialWorker.Controllers
                         Log.Information($"The interlocutor elected to speak with human agent by inputting {messageText}");
 
                         botStatus.IsMuted = true;
-                        db.MetaBotStatuses.Update(botStatus);
-                        await db.SaveChangesAsync();
+                        _db.BotStatuses.Update(botStatus);
+                        await _db.SaveChangesAsync();
 
-                        endPoint = payload.Object == "instagram" ? $"{BaseUrl}/{ApiVersion}/me/messages" : $"{BaseUrl}/{ApiVersion}/{messaging.Recipient.MetaID}/messages";
+                        endPoint = payload.Object == "instagram" ? $"{_metaBaseUrl}/{_metaApiVersion}/me/messages" : $"{_metaBaseUrl}/{_metaApiVersion}/{messaging.Recipient.MetaID}/messages";
                         await ApiActionHelper.SendMessage(
                             httpClient: httpClient,
                             accessToken: page.Token,
                             messageEndPoint: endPoint,
-                            threadEndPoint: $"{BaseUrl}/{ApiVersion}/{page.PageId}/release_thread_control",
+                            threadEndPoint: $"{_metaBaseUrl}/{_metaApiVersion}/{page.PageId}/release_thread_control",
                             message: bot.ThusSpokeBabel("Escalated"),
-                            recipientId: messaging.Sender.MetaID); ;
+                            recipientId: messaging.Sender.MetaID);
 
                         //if (payload.Object == "instagram")
                         //{                            
@@ -699,7 +703,7 @@ namespace Corprio.SocialWorker.Controllers
                         //}
 
                         string platform = payload.Object == "instagram" ? "Instagram" : "Facebook";
-                        string customerName = string.IsNullOrWhiteSpace(botStatus.MetaUserName) ? Resources.SharedResource.Unknown_Italic : botStatus.MetaUserName;
+                        string customerName = string.IsNullOrWhiteSpace(botStatus.BuyerUserName) ? Resources.SharedResource.Unknown_Italic : botStatus.BuyerUserName;
                         string customerEmail = string.IsNullOrWhiteSpace(botStatus.BuyerEmail) ? Resources.SharedResource.Unknown_Italic : botStatus.BuyerEmail;
                         OrganizationCoreInfo org = await corprioClient.OrganizationApi.GetCoreInfo(page.FacebookUser.OrganizationID);
                         if (org == null)
@@ -717,7 +721,7 @@ namespace Corprio.SocialWorker.Controllers
 
                         try
                         {
-                            await emailHelper.SendEmailAsync(email);
+                            await _emailHelper.SendEmailAsync(email);
                         }
                         catch (Exception ex) 
                         {
@@ -741,12 +745,12 @@ namespace Corprio.SocialWorker.Controllers
                     if (string.IsNullOrWhiteSpace(response)) response = bot.ThusSpokeBabel("Err_DefaultMsg");
                     response += BabelFish.RobotEmoji;
 
-                    endPoint = payload.Object == "instagram" ? $"{BaseUrl}/{ApiVersion}/me/messages" : $"{BaseUrl}/{ApiVersion}/{messaging.Recipient.MetaID}/messages";
+                    endPoint = payload.Object == "instagram" ? $"{_metaBaseUrl}/{_metaApiVersion}/me/messages" : $"{_metaBaseUrl}/{_metaApiVersion}/{messaging.Recipient.MetaID}/messages";
                     await ApiActionHelper.SendMessage(
                         httpClient: httpClient,
                         accessToken: page.Token,
                         messageEndPoint: endPoint,
-                        threadEndPoint: $"{BaseUrl}/{ApiVersion}/{page.PageId}/release_thread_control",
+                        threadEndPoint: $"{_metaBaseUrl}/{_metaApiVersion}/{page.PageId}/release_thread_control",
                         message: response,
                         recipientId: messaging.Sender.MetaID);
                 }
@@ -754,25 +758,65 @@ namespace Corprio.SocialWorker.Controllers
             return StatusCode(200);
         }
 
+        [HttpPost("{organizationID:guid}/{channelID:guid}/line")]
+        public async Task<IActionResult> HandleLineWebhookPost([FromServices] ApplicationSettingService applicationSettingService, 
+            [FromRoute] Guid organizationID, [FromRoute] Guid channelID)
+        {
+            LineChannel channel = _db.LineChannels.FirstOrDefault(
+                r => r.OrganizationID == organizationID && r.ID == channelID && r.Dormant == false);
+            if (channel == null) return BadRequest("Channel not found.");
+
+            string hash = Request.Headers?.ContainsKey("x-line-signature") ?? false 
+                ? Request.Headers["x-line-signature"] 
+                : string.Empty;
+
+            Request.Body.Position = 0;
+            StreamReader reader = new(Request.Body);
+            string requestBody = await reader.ReadToEndAsync();
+
+            var lineApiService = new LineApiService(context: _db, 
+                httpClientFactory: _httpClientFactory,                 
+                configuration: _configuration, 
+                lineChannel: channel,
+                applicationSettingService: applicationSettingService,
+                emailHelper: _emailHelper);
+
+            if (!lineApiService.ValidateWebhook(hash: hash, requestBody: requestBody)) 
+                return BadRequest("Invalid webhook.");
+
+
+            dynamic val = JsonConvert.DeserializeObject(requestBody);
+            IEnumerable<WebhookEvent> events = WebhookEventParser.ParseEvents(val.events);
+
+            if (events == null)
+            {
+                Log.Information("Line's webhook content contains null events.");
+                return Ok();
+            }
+            await lineApiService.RunAsync(events);
+
+            return Ok();
+        }
+
         /// <summary>
         /// Handle webhook notification sent via HTTP GET method, which normally is for verifying our callback URL
         /// </summary>
         /// <returns>Status code along with a challenge code</returns>
         [HttpGet("/webhook")]
-        public IActionResult HandleWebhookGet()
+        public IActionResult HandleMetaWebhookGet()
         {
             string challengeCode = Request.Query.ContainsKey("hub.challenge") ? Request.Query["hub.challenge"] : string.Empty;
             return StatusCode(200, challengeCode);
         }
 
         /// <summary>
-        /// Handle webhook notification sent via HTTP POST method
+        /// Handle Meta webhook notification sent via HTTP POST method
         /// </summary>
         /// <param name="applicationSettingService">Application setting service</param>
         /// <param name="httpClient">HTTP client for executing API query</param>
         /// <returns></returns>
         [HttpPost("/webhook")]
-        public async Task<IActionResult> HandleWebhookPost([FromServices] ApplicationSettingService applicationSettingService, [FromServices] HttpClient httpClient)
+        public async Task<IActionResult> HandleMetaWebhookPost([FromServices] ApplicationSettingService applicationSettingService, [FromServices] HttpClient httpClient)
         {
             string hash = Request.Headers.ContainsKey("x-hub-signature-256") ? Request.Headers["x-hub-signature-256"] : string.Empty;
             (bool verified, string requestString) = await HashCheck(request: Request, metaHash: hash);
@@ -781,20 +825,28 @@ namespace Corprio.SocialWorker.Controllers
                 Log.Information($"Invalid webhook notification. Request: {requestString}");
                 return StatusCode(200);
             }
-            APIClient corprioClient = new(httpClientFactory.CreateClient("webhookClient"));
+            APIClient corprioClient = new(_httpClientFactory.CreateClient("webhookClient"));
             Log.Information($"Webhook content: {requestString}");
 
             // if the payload includes "Messaging" and one of its element has sender, then presumably it is for webhook on messages
-            MessageWebhookPayload messageWebhookPayload = requestString == null ? null : JsonConvert.DeserializeObject<MessageWebhookPayload>(requestString)!;
+            MessageWebhookPayload messageWebhookPayload;
+            try
+            {
+                messageWebhookPayload = JsonConvert.DeserializeObject<MessageWebhookPayload>(requestString);
+            }
+            catch
+            {
+                messageWebhookPayload = null;
+            }            
             if (messageWebhookPayload?.Entry?.Any(e => e.Messaging?.Any(m => !string.IsNullOrWhiteSpace(m.Sender?.MetaID)) ?? false) ?? false)
             {
                 Log.Information("The webhook appears to be a message webhook.");
-                return await HandleMessageWebhook(httpClient: httpClient, corprioClient: corprioClient, 
+                return await HandleMetaMessageWebhook(httpClient: httpClient, corprioClient: corprioClient, 
                     applicationSettingService: applicationSettingService, payload: messageWebhookPayload);
             }            
 
             //// if the payload includes "Changes" and field is "feed", then presumably it is for webhook on feed
-            //FeedWebhookPayload feedWebhookPayload = requestString == null ? null : JsonConvert.DeserializeObject<FeedWebhookPayload>(requestString)!;
+            //FeedWebhookPayload feedWebhookPayload = requestString == null ? null : JsonConvert.DeserializeObject<FeedWebhookPayload>(requestString);
             //if (feedWebhookPayload?.Object == "page" && (feedWebhookPayload?.Entry?.Any(x => x.Changes.Any(y => y.Field == "feed")) ?? false))
             //{
             //    Log.Information("The webhook appears to be a feed webhook.");
@@ -803,7 +855,7 @@ namespace Corprio.SocialWorker.Controllers
             //}
 
             //// if the payload includes "Changes" and field is "comment", then presumably it is for webhook on comment
-            //CommentWebhookPayload commentWebhookPayload = requestString == null ? null : JsonConvert.DeserializeObject<CommentWebhookPayload>(requestString)!;
+            //CommentWebhookPayload commentWebhookPayload = requestString == null ? null : JsonConvert.DeserializeObject<CommentWebhookPayload>(requestString);
             //if (commentWebhookPayload?.Object == "instagram" && (commentWebhookPayload?.Entry?.Any(x => x.Changes.Any(y => y.Field == "comments")) ?? false))
             //{
             //    Log.Information("The webhook appears to be a comment webhook.");
@@ -826,7 +878,7 @@ namespace Corprio.SocialWorker.Controllers
         public async Task<IActionResult> TriggerPostingCatalogue([FromServices] HttpClient httpClient, [FromRoute] Guid organizationID,
             [FromHeader] CorprioRequestHeader header, [FromBody] ComputeHashRequest body, [FromRoute] Guid productlistID)
         {
-            APIClient corprioClient = new(httpClientFactory.CreateClient("webhookClient"));
+            APIClient corprioClient = new(_httpClientFactory.CreateClient("webhookClient"));
             var hashRequest = new ComputeHashRequest()
             {
                 OrganizationID = body.OrganizationID,
@@ -855,7 +907,7 @@ namespace Corprio.SocialWorker.Controllers
         public async Task<IActionResult> TriggerPostingProduct([FromServices] HttpClient httpClient, [FromRoute] Guid organizationID, 
             [FromHeader] CorprioRequestHeader header, [FromBody] ComputeHashRequest body, [FromRoute] Guid productID)
         {            
-            APIClient corprioClient = new(httpClientFactory.CreateClient("webhookClient"));            
+            APIClient corprioClient = new(_httpClientFactory.CreateClient("webhookClient"));            
             bool isValidHash = await corprioClient.ApplicationApi.ValidateHash(computeHashRequest: body, hash: header.Hash);
             if (!isValidHash) return StatusCode(401);
             return StatusCode(200);

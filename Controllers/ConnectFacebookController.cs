@@ -15,14 +15,16 @@ using System.Linq;
 using Corprio.Core.Utility;
 using Microsoft.EntityFrameworkCore;
 using Corprio.SocialWorker.Helpers;
+using Corprio.SocialWorker.Models.Meta;
 
 namespace Corprio.SocialWorker.Controllers
 {
     public class ConnectFacebookController : MetaApiController
     {
-        private readonly ApplicationDbContext db;        
+        private readonly ApplicationDbContext db;
 
-        public ConnectFacebookController(ApplicationDbContext context, IConfiguration configuration) : base(configuration)
+        public ConnectFacebookController(ApplicationDbContext context, IConfiguration configuration, 
+            IHttpClientFactory httpClientFactory) : base(configuration, httpClientFactory)
         {
             db = context;   
         }                
@@ -49,7 +51,7 @@ namespace Corprio.SocialWorker.Controllers
                 return null;
             }
             string responseString = await response.Content.ReadAsStringAsync();
-            LongLivedUserAccessTokenPayload payload = JsonConvert.DeserializeObject<LongLivedUserAccessTokenPayload>(responseString)!;
+            LongLivedUserAccessTokenPayload payload = JsonConvert.DeserializeObject<LongLivedUserAccessTokenPayload>(responseString);
             if (payload?.Error != null)
             {
                 Log.Error($"Encountered an error when getting long-lived access token. {payload?.Error?.CustomErrorMessage()}");
@@ -131,8 +133,8 @@ namespace Corprio.SocialWorker.Controllers
             }
 
             // the following query returns all pages on which the Facebook user has a role
-            string responseString = await ApiActionHelper.GetQuery(httpClient: httpClient, accessToken: token, endPoint: $"{BaseUrl}/{metaId}/accounts");            
-            MeAccountsPayload payload = JsonConvert.DeserializeObject<MeAccountsPayload>(responseString)!;
+            string responseString = await ApiActionHelper.GetQuery(httpClient: httpClient, accessToken: token, endPoint: $"{BaseUrl}/{metaId}/accounts");
+            MeAccountsPayload payload = JsonConvert.DeserializeObject<MeAccountsPayload>(responseString);
             if (payload?.Error != null)
             {
                 Log.Error($"Encountered an error when getting pages owned by {metaId}. {payload?.Error?.CustomErrorMessage()}");
@@ -151,7 +153,7 @@ namespace Corprio.SocialWorker.Controllers
                 // the following query returns the IG account associated with the FB page
                 // (note: not every FB page is associated with an IG account)
                 responseString = await ApiActionHelper.GetQuery(httpClient: httpClient, accessToken: page.AccessToken, endPoint: $"{BaseUrl}/{ApiVersion}/{page.Id}?fields=instagram_business_account");
-                FbPagePayload pagePayload = JsonConvert.DeserializeObject<FbPagePayload>(responseString)!;
+                FbPagePayload pagePayload = JsonConvert.DeserializeObject<FbPagePayload>(responseString);
                 if (pagePayload?.Error != null)
                 {
                     Log.Error($"Encountered an error in obtaining IG user ID for {page.Id}. {payload?.Error?.CustomErrorMessage()}");

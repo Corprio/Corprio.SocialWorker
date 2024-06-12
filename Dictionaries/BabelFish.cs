@@ -1,5 +1,4 @@
-﻿using Corprio.SocialWorker.Models;
-using DevExpress.CodeParser;
+﻿using Corprio.SocialWorker.Models.Meta;
 using System.Collections.Generic;
 
 namespace Corprio.SocialWorker.Dictionaries
@@ -13,7 +12,9 @@ namespace Corprio.SocialWorker.Dictionaries
         public const string BotSummon = "!a";
         public const string BotSummon_CN = "！a";
         public const string ProductEpName = "MetaPostId";
-        public const string CustomerEpName = "MetaSenderId";
+        public const string MetaCustomerEpName = "MetaSenderId";
+        public const string LineCustomerEpName = "LineSenderId";
+        public const string SalesOrderEpName = "SocialMediaUserId";
         public const string CustomDataKeyForMetaUser = "MetaUser";
         public const string RobotEmoji = "🤖";        
 

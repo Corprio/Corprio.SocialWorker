@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using Newtonsoft.Json;
 
-namespace Corprio.SocialWorker.Models
-{    
+namespace Corprio.SocialWorker.Models.Meta
+{
     public class OneLinePayload : MetaPayloadError
     {
         /// <summary>
@@ -96,8 +96,8 @@ namespace Corprio.SocialWorker.Models
 
         [JsonProperty("paging")]
         public Pagination Paging { get; set; }
-    }            
-    
+    }
+
     public class MetaPayloadError
     {
         [JsonProperty("error")]

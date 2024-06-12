@@ -17,6 +17,7 @@ using Corprio.AspNetCore.Site.Filters;
 using DevExtreme.AspNet.Mvc;
 using Corprio.DevExtremeLib;
 using Corprio.AspNetCore.Site.Services;
+using Corprio.SocialWorker.Models.Meta;
 
 namespace Corprio.SocialWorker.Controllers
 {
@@ -28,7 +29,8 @@ namespace Corprio.SocialWorker.Controllers
         /// Constructor
         /// </summary>
         /// <param name="configuration"></param>
-        public CataloguePublicationController(ApplicationDbContext context, IConfiguration configuration) : base(configuration)
+        public CataloguePublicationController(ApplicationDbContext context, 
+            IConfiguration configuration, IHttpClientFactory httpClientFactory) : base(configuration, httpClientFactory)
         {
             db = context;
         }
@@ -127,7 +129,7 @@ namespace Corprio.SocialWorker.Controllers
                 // note: if there are no images to begin with, we simply don't attempt to post anything to IG
                 if (!string.IsNullOrWhiteSpace(page.InstagramID) && imageUrls.Any())
                 {
-                    postId = await MakeIgCarouselPost(httpClient: httpClient, accessToken: page.Token, igUserId: page.InstagramID,
+                    postId = await MakeIgCarouselPost(accessToken: page.Token, igUserId: page.InstagramID,
                         mediaUrls: imageUrls, message: message);
                     if (string.IsNullOrWhiteSpace(postId))
                     {
@@ -137,7 +139,7 @@ namespace Corprio.SocialWorker.Controllers
                     }
                 }
 
-                postId = await MakeFbMultiPhotoPost(httpClient: httpClient, accessToken: page.Token,
+                postId = await MakeFbMultiPhotoPost(accessToken: page.Token,
                     pageId: page.PageId, imageUrls: imageUrls, message: message);
                 if (string.IsNullOrWhiteSpace(postId))
                 {

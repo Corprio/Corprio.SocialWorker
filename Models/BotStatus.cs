@@ -10,7 +10,7 @@ namespace Corprio.SocialWorker.Models
     /// <summary>
     /// Chat bot status
     /// </summary>
-    public class MetaBotStatus : DbFriendlyBot
+    public class BotStatus : DbFriendlyBot
     {                
         /// <summary>
         /// The product IDs and names that the bot 'remembers'.

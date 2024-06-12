@@ -30,3 +30,10 @@ export interface StringifiedTemplate {
     keyword: string,
     templateString: string
 }
+
+export type LineCredential = {
+    ID: string,    
+    ChannelName: string,
+    ChannelSecret: string,
+    ChannelToken: string
+}

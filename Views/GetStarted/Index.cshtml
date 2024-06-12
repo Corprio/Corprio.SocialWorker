@@ -33,25 +33,41 @@
     // use vdata to pass parameters to TS
     const vdata = {
         actions: {
+            disableLineCredential: '@StringHelper.Encode(@Url.Action("DisableLineCredential", "GetStarted", new { organizationID }))',
+            getLineCredential: '@StringHelper.Encode(@Url.Action("GetLineCredential", "GetStarted", new { organizationID }))',            
             refreshAccessToken: '@StringHelper.Encode(@Url.Action("RefreshAccessToken", "ConnectFacebook", new { organizationID }))',
-            saveSetting: '@StringHelper.Encode(@Url.Action("GetStarted", "Save", new { organizationID }))',            
+            saveSetting: '@StringHelper.Encode(@Url.Action("Save", "GetStarted", new { organizationID }))',
+            saveLineCredential: '@StringHelper.Encode(@Url.Action("SaveLineCredential", "GetStarted", new { organizationID }))',            
         },
         localizer: {
+            altText_line_console: '@StringHelper.Encode(localizer["AltText_line_console"])',
+            altText_line_provider: '@StringHelper.Encode(localizer["AltText_line_provider"])',
+            altText_line_channel_basic: '@StringHelper.Encode(localizer["AltText_line_channel_basic"])',
+            altText_line_channel_messaging: '@StringHelper.Encode(localizer["AltText_line_channel_messaging"])',
+            btnSaveCredential: '@StringHelper.Encode(localizer["btnSaveCredential"])',
+            btnTestCredential: '@StringHelper.Encode(localizer["btnTestCredential"])',
             catalogueCode: '@StringHelper.Encode(localizer["Template_CatalogueCode"])',
             catalogueEndDate: '@StringHelper.Encode(localizer["Template_CatalogueEndDate"])',
             catalogueName: '@StringHelper.Encode(localizer["Template_CatalogueName"])',
             catalogueStartDate: '@StringHelper.Encode(localizer["Template_CatalogueStartDate"])',
             catalogueUrl: '@StringHelper.Encode(localizer["Template_CatalogueURL"])',
             defaultMessage: '@StringHelper.Encode(localizer["Template_DefaultMessage"])',
+            delete: '@StringHelper.Encode(localizer["Delete"])',
+            dialog_TestSuccess: '@StringHelper.Encode(localizer["Dialog_TestSuccess"])',
             error: '@StringHelper.Encode(localizer["Error"])',
             fbAlreadyConnected: '@StringHelper.Encode(localizer["FB_AlreadyConnected"])',
             fbConnected: '@StringHelper.Encode(localizer["FB_connected"])',
-            fbNotConnected: '@StringHelper.Encode(localizer["FB_not_connected"])',            
+            fbNotConnected: '@StringHelper.Encode(localizer["FB_not_connected"])',                        
+            label_channelID: '@StringHelper.Encode(localizer["Label_channelID"])',
+            label_channelName: '@StringHelper.Encode(localizer["Label_channelName"])',
+            label_channelSecret: '@StringHelper.Encode(localizer["Label_channelSecret"])',
+            label_channelToken: '@StringHelper.Encode(localizer["Label_channelToken"])',            
             msgMissingDeliveryChargeProductError: '@StringHelper.Encode(localizer["MsgMissingDeliveryChargeProductError"])',
             msgSettingSaved: '@StringHelper.Encode(localizer["MsgSettingSaved"])',
             newLine: '@StringHelper.Encode(localizer["Template_NewLine"])',
             period: '@StringHelper.Encode(localizer["Period"])',
             productCode: '@StringHelper.Encode(localizer["Template_ProductCode"])',
+            processing: '@StringHelper.Encode(localizer["Processing"])',
             productDescription: '@StringHelper.Encode(localizer["Template_ProductDescription"])',
             productListPrice: '@StringHelper.Encode(localizer["Template_ProductListPrice"])',
             productName: '@StringHelper.Encode(localizer["Template_ProductName"])',
@@ -59,7 +75,27 @@
             productReplyKeyword: '@StringHelper.Encode(localizer["Template_Keyword"])',
             reconnectFacebook: '@StringHelper.Encode(localizer["ReconnectFacebook"])',
             saveTemplateTitle: '@StringHelper.Encode(localizer["TemplateSavedTitle"])',
-            saveTemplateMessage: '@StringHelper.Encode(localizer["TemplateSavedMessage"])',            
+            saveTemplateMessage: '@StringHelper.Encode(localizer["TemplateSavedMessage"])',
+            success: '@StringHelper.Encode(localizer["Success"])',            
+            tip_WhatIsChannelID: '@StringHelper.Encode(localizer["Tip_WhatIsChannelID"])',
+            tip_WhatIsChannelName: '@StringHelper.Encode(localizer["Tip_WhatIsChannelName"])',
+            tip_WhatIsChannelSecret: '@StringHelper.Encode(localizer["Tip_WhatIsChannelSecret"])',
+            tip_WhatIsChannelToken: '@StringHelper.Encode(localizer["Tip_WhatIsChannelToken"])',            
+            title_channelID: '@StringHelper.Encode(localizer["Title_channelID"])',
+            title_channelName: '@StringHelper.Encode(localizer["Title_channelName"])',
+            title_channelSecret: '@StringHelper.Encode(localizer["Title_channelSecret"])',            
+            title_channelToken: '@StringHelper.Encode(localizer["Title_channelToken"])',
+            title_ManageLineCredential: '@StringHelper.Encode(localizer["Title_ManageLineCredential"])',
+            title_ManageLineChannel: '@StringHelper.Encode(localizer["Title_ManageLineChannel"])',
+            tutorial_login_1: '@StringHelper.Encode(localizer["Tutorial_login_1"])',
+            tutorial_login_2: '@StringHelper.Encode(localizer["Tutorial_login_2"])',
+            tutorial_line_channelid_step1: '@StringHelper.Encode(localizer["Tutorial_line_channelid_step1"])',
+            tutorial_line_channelid_step2: '@StringHelper.Encode(localizer["Tutorial_line_channelid_step2"])',
+            tutorial_line_channelid_step3: '@StringHelper.Encode(localizer["Tutorial_line_channelid_step3"])',
+            tutorial_line_channelname_step3: '@StringHelper.Encode(localizer["Tutorial_line_channelname_step3"])',
+            tutorial_line_secret_step3: '@StringHelper.Encode(localizer["Tutorial_line_secret_step3"])',
+            tutorial_line_token_step3: '@StringHelper.Encode(localizer["Tutorial_line_token_step3"])',
+            tutorial_line_token_step4: '@StringHelper.Encode(localizer["Tutorial_line_token_step4"])',
         },
         model: {
             catalogueTemplate: '@StringHelper.Encode(Model.CataloguePostTemplate)',
@@ -108,7 +144,7 @@
             <i class="fa-light fa-bars"></i>
         </button>
         @ViewData["Title"]
-    </h4>        
+    </h4>
                 
     <div class="wrapper d-flex mt-4">        
         <div class="sidebar-wrapper hidden">
@@ -117,6 +153,7 @@
                     <h4 class="page-title d-none d-md-block">@ViewData["Title"]</h4>
                     <ul id="settings-nav" class="nav nav-pills flex-column">
                         <li class="nav-item"><a class="nav-link active" href="#fb-section">@localizer["FB"]</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#line-section">@localizer["Connect_Line"]</a></li>
                         <li class="nav-item"><a class="nav-link" href="#som-section">@localizer["SOM"]</a></li>
                         <li class="nav-item"><a class="nav-link" href="#delivery-section">@localizer["DeliveryMethod"]</a></li>
                         <li class="nav-item"><a class="nav-link" href="#payment-section">@localizer["PaymentMethod"]</a></li>
@@ -135,11 +172,29 @@
                     <p>@localizer["FB_Desc1"] <b>@orgInfo?.ShortName</b> @localizer["FB_Desc2"]</p>
                 </div>
                                 
-                <button class="btn btn-primary mt-2" id="loginBtn" style="display: block;">@localizer["LoginFB"]</button>
-                <button class="btn btn-primary mt-2" id="logoutBtn" style="display: none;">@localizer["LogoutFB"]</button>
+                <button class="btn sign-in-btn blue mt-2" id="loginBtn" style="display: block;">
+                    <span class="blue-span"><img class="fb" src="/images/fb.png"></span>
+                    @localizer["LoginFB"]
+                </button>
+                <button class="btn sign-in-btn blue mt-2" id="logoutBtn" style="display: none;">
+                    <span class="blue-span"><img class="fb" src="/images/fb.png"></span>
+                    @localizer["LogoutFB"]
+                </button>
 
                 <div id="fb-dialogue" class="mt-2"></div>
                 <div id="fb-dialogue2" class="mt-2"></div>
+            </section>
+
+            <section id="line-section">
+                <div class="title-border-l">
+                    <h4>@localizer["Connect_Line"]</h4>
+                    <p>@localizer["Connect_Line_Desc1"] <b>@orgInfo?.ShortName</b> @localizer["Connect_Line_Desc2"]</p>
+                </div>                
+
+                <button class="btn sign-in-btn green mt-2 pr-4" id="line-credential-btn">
+                    <span class="green-span"><img class="line" src="/images/line.png"></span>
+                    @localizer["Connect_Line"]
+                </button>
             </section>
             
             @*The form element does not cover templates because user inputs to them will be captured in the hidden inputs below using JS *@
@@ -291,11 +346,7 @@
                 <div class="title-border-l">
                     <h4>@localizer["SocialMediaTemplate"]</h4>
                     <p>@localizer["SocialMediaTemplate_Desc"]</p>
-                </div>
-
-                <div class="d-flex justify-content-center my-3">
-                    <div id="load-indicator-top"></div>
-                </div>
+                </div>                
                 
                 <div class="row mb-2">
                     <div class="col-sm">
@@ -404,6 +455,11 @@
         </div>                
     </div>
 </div>
+<div id="line-credential-menu"></div>
+<div id="line-credential-popup"></div>
+<div id="tutorial-popup"></div>
+<div id="imagePopup"></div>
+<div id="load-panel"></div>
 
 <vc:static-data model="@StaticDataRequestViewModel.All(true)" org-info="true" />
 <script>    

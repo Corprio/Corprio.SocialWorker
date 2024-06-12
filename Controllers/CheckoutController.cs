@@ -28,6 +28,7 @@ using Newtonsoft.Json.Linq;
 using Corprio.AspNetCore.Site.Services;
 using PhoneNumbers;
 using DevExpress.ClipboardSource.SpreadsheetML;
+using Corprio.SocialWorker.Dictionaries;
 
 namespace Corprio.SocialWorker.Controllers
 {
@@ -119,7 +120,7 @@ namespace Corprio.SocialWorker.Controllers
             EntityProperty checkoutEP = salesOrder.EntityProperties.FirstOrDefault(x => x.Name == EntityPropertyName);
             if (checkoutEP != null)
             {
-                SalesOrderCheckoutState state = JsonConvert.DeserializeObject<SalesOrderCheckoutState>(checkoutEP.Value)!;
+                SalesOrderCheckoutState state = JsonConvert.DeserializeObject<SalesOrderCheckoutState>(checkoutEP.Value);
                 if (state == null)
                 {
                     // note: we don't throw error, but act as if this is the first time this view is rendered for the customer
@@ -605,13 +606,17 @@ namespace Corprio.SocialWorker.Controllers
             SalesOrder salesOrder = await corprioClient.SalesOrderApi.Get(organizationID: organizationID, id: salesOrderID) 
                 ?? throw new Exception(Resources.SharedResource.ErrMsg_SalesOrderNotFound);
 
-            DbFriendlyBot bot = db.MetaBotStatuses.FirstOrDefault(x => x.BuyerCorprioID == salesOrder.CustomerID && x.FacebookUser.OrganizationID == organizationID && x.FacebookUser.Dormant == false); ;            
+            string buyerUserID = salesOrder.EntityProperties?.GetValue<string>(BabelFish.SalesOrderEpName);
+            if (string.IsNullOrWhiteSpace(buyerUserID)) 
+                return StatusCode(410, "The chatbot responsible for this sales order cannot be found.");
+
+            DbFriendlyBot bot = db.BotStatuses.FirstOrDefault(x => x.BuyerID == buyerUserID && (x.FacebookUser.Dormant == false || x.LineChannel.Dormant == false));
             if (bot == null)
             {
                 // note: the frontend must expect 410 = chat history not found
                 return StatusCode(410, "The chatbot responsible for this sales order is not found.");
             }
-            MetaBotStatus botStatus = bot.ReadyToWork();
+            BotStatus botStatus = bot.ReadyToWork();
 
             ApplicationSetting applicationSetting = await applicationSettingService.GetSetting<ApplicationSetting>(organizationID);            
             if (applicationSetting == null) return NotFound(Resources.SharedResource.ErrMsg_AppSettingNotFound);
@@ -637,7 +642,7 @@ namespace Corprio.SocialWorker.Controllers
                     UOMCode = line.UOMCode,
                 });
             }
-            db.MetaBotStatuses.Update(bot.ReadyToSave(botStatus));
+            db.BotStatuses.Update(bot.ReadyToSave(botStatus));
             await db.SaveChangesAsync();
 
             await corprioClient.SalesOrderApi.Void(organizationID: organizationID, id: salesOrderID);
@@ -726,11 +731,11 @@ namespace Corprio.SocialWorker.Controllers
             };
 
             // check if the customer has submitted the form for payment previously
-            salesOrder.EntityProperties ??= new List<EntityProperty>();
+            salesOrder.EntityProperties ??= [];
             EntityProperty checkoutEP = salesOrder.EntityProperties.FirstOrDefault(x => x.Name == EntityPropertyName);
             if (checkoutEP != null)
             {
-                SalesOrderCheckoutState checkoutStateInEP = JsonConvert.DeserializeObject<SalesOrderCheckoutState>(checkoutEP.Value)!;
+                SalesOrderCheckoutState checkoutStateInEP = JsonConvert.DeserializeObject<SalesOrderCheckoutState>(checkoutEP.Value);
                 if (checkoutStateInEP == null)
                 {
                     // note: we don't throw error, but act as if this is the first time the customer submits the form for payment.

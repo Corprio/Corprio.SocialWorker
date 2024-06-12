@@ -1,8 +1,8 @@
 ﻿using System;
 using Newtonsoft.Json;
 
-namespace Corprio.SocialWorker.Models
-{    
+namespace Corprio.SocialWorker.Models.Meta
+{
     /// <summary>
     /// Represents an Instagram album, photo, or video (uploaded video, live video, video created with the Instagram TV app, reel, or story).
     /// https://developers.facebook.com/docs/instagram-api/reference/ig-media
@@ -69,7 +69,7 @@ namespace Corprio.SocialWorker.Models
         /// </summary>
         [JsonProperty("text")]
         public string Text { get; set; }
-    }        
+    }
 
     /// <summary>
     /// IG comment on an IG comment

@@ -115,6 +115,42 @@ namespace Corprio.SocialWorker.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Channel - Basic setting page in Line Developer Console.
+        /// </summary>
+        public static string AltText_line_channel_basic {
+            get {
+                return ResourceManager.GetString("AltText_line_channel_basic", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Channel - Messaging API page in Line Developer Console.
+        /// </summary>
+        public static string AltText_line_channel_messaging {
+            get {
+                return ResourceManager.GetString("AltText_line_channel_messaging", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Developer Console page of Line.
+        /// </summary>
+        public static string AltText_line_console {
+            get {
+                return ResourceManager.GetString("AltText_line_console", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Provider page in Line Developer Console.
+        /// </summary>
+        public static string AltText_line_provider {
+            get {
+                return ResourceManager.GetString("AltText_line_provider", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Corprio Social Worker is a free application software for automating your product advertising and sales order handling.
         /// </summary>
         public static string AppDescription {
@@ -183,6 +219,24 @@ namespace Corprio.SocialWorker.Resources {
         public static string btnCreateInvoice {
             get {
                 return ResourceManager.GetString("btnCreateInvoice", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Save.
+        /// </summary>
+        public static string btnSaveCredential {
+            get {
+                return ResourceManager.GetString("btnSaveCredential", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Test.
+        /// </summary>
+        public static string btnTestCredential {
+            get {
+                return ResourceManager.GetString("btnTestCredential", resourceCulture);
             }
         }
         
@@ -336,6 +390,33 @@ namespace Corprio.SocialWorker.Resources {
         public static string ConfirmVoidSalesReturn {
             get {
                 return ResourceManager.GetString("ConfirmVoidSalesReturn", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Connet Line.
+        /// </summary>
+        public static string Connect_Line {
+            get {
+                return ResourceManager.GetString("Connect_Line", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Connect.
+        /// </summary>
+        public static string Connect_Line_Desc1 {
+            get {
+                return ResourceManager.GetString("Connect_Line_Desc1", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to with your Line channel..
+        /// </summary>
+        public static string Connect_Line_Desc2 {
+            get {
+                return ResourceManager.GetString("Connect_Line_Desc2", resourceCulture);
             }
         }
         
@@ -511,6 +592,15 @@ namespace Corprio.SocialWorker.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Your Line channel is connected with {0}..
+        /// </summary>
+        public static string Dialog_TestSuccess {
+            get {
+                return ResourceManager.GetString("Dialog_TestSuccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Disconnect.
         /// </summary>
         public static string Disconnect {
@@ -646,6 +736,15 @@ namespace Corprio.SocialWorker.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Channel name cannot have more than 20 characters..
+        /// </summary>
+        public static string ErrMsg_ChannelNameTooLong {
+            get {
+                return ResourceManager.GetString("ErrMsg_ChannelNameTooLong", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to We tried to restore this sales order to the chatbot conversing with you but failed. Please confirm if you wish to simply void this order..
         /// </summary>
         public static string ErrMsg_ChatbotNotFound {
@@ -660,6 +759,15 @@ namespace Corprio.SocialWorker.Resources {
         public static string ErrMsg_CustomerNotFound {
             get {
                 return ResourceManager.GetString("ErrMsg_CustomerNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A Line channel with the same channel secret already exists..
+        /// </summary>
+        public static string ErrMsg_DuplicatedChannelSecret {
+            get {
+                return ResourceManager.GetString("ErrMsg_DuplicatedChannelSecret", resourceCulture);
             }
         }
         
@@ -700,6 +808,24 @@ namespace Corprio.SocialWorker.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Please make sure the channel secret is correct and try again..
+        /// </summary>
+        public static string ErrMsg_InvalidChannelSecret {
+            get {
+                return ResourceManager.GetString("ErrMsg_InvalidChannelSecret", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Please make sure the channel token is correct and try again..
+        /// </summary>
+        public static string ErrMsg_InvalidChannelToken {
+            get {
+                return ResourceManager.GetString("ErrMsg_InvalidChannelToken", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Please provide a valid phone number for delivery..
         /// </summary>
         public static string ErrMsg_InvalidDeliveryPhone {
@@ -723,6 +849,42 @@ namespace Corprio.SocialWorker.Resources {
         public static string ErrMsg_InvalidProductID {
             get {
                 return ResourceManager.GetString("ErrMsg_InvalidProductID", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Please input the channel ID..
+        /// </summary>
+        public static string ErrMsg_MissingChannelID {
+            get {
+                return ResourceManager.GetString("ErrMsg_MissingChannelID", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Please input the Line channel name..
+        /// </summary>
+        public static string ErrMsg_MissingChannelName {
+            get {
+                return ResourceManager.GetString("ErrMsg_MissingChannelName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Please input the channel secret..
+        /// </summary>
+        public static string ErrMsg_MissingChannelSecret {
+            get {
+                return ResourceManager.GetString("ErrMsg_MissingChannelSecret", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Please input the channel token..
+        /// </summary>
+        public static string ErrMsg_MissingChannelToken {
+            get {
+                return ResourceManager.GetString("ErrMsg_MissingChannelToken", resourceCulture);
             }
         }
         
@@ -786,6 +948,15 @@ namespace Corprio.SocialWorker.Resources {
         public static string ErrMsg_UnselectedVariations {
             get {
                 return ResourceManager.GetString("ErrMsg_UnselectedVariations", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The organization does not have a valid connection with any Facebook account or Line channel..
+        /// </summary>
+        public static string ErrMsg_ValidMetaProfileAndLineChannelNotFound {
+            get {
+                return ResourceManager.GetString("ErrMsg_ValidMetaProfileAndLineChannelNotFound", resourceCulture);
             }
         }
         
@@ -1231,11 +1402,65 @@ namespace Corprio.SocialWorker.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Channel ID.
+        /// </summary>
+        public static string Label_channelID {
+            get {
+                return ResourceManager.GetString("Label_channelID", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Line channel name.
+        /// </summary>
+        public static string Label_channelName {
+            get {
+                return ResourceManager.GetString("Label_channelName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Channel secret.
+        /// </summary>
+        public static string Label_channelSecret {
+            get {
+                return ResourceManager.GetString("Label_channelSecret", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Channel access token (long-lived).
+        /// </summary>
+        public static string Label_channelToken {
+            get {
+                return ResourceManager.GetString("Label_channelToken", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Line.
         /// </summary>
         public static string Line {
             get {
                 return ResourceManager.GetString("Line", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Complete the form below with your Line channel ID, channel secret and channel access token..
+        /// </summary>
+        public static string Line_instruction_1 {
+            get {
+                return ResourceManager.GetString("Line_instruction_1", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Visit Line Developer Console &gt; Messaging API, and input the following as your webhook URL: https://socialmediamarketer.corprio.com/line.
+        /// </summary>
+        public static string Line_instruction_2 {
+            get {
+                return ResourceManager.GetString("Line_instruction_2", resourceCulture);
             }
         }
         
@@ -1699,7 +1924,7 @@ namespace Corprio.SocialWorker.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Publish a post about this product to Facebook and Instagram.
+        ///   Looks up a localized string similar to Publish a post about this product to social media, such as your Facebook pages, Instagram accounts and Line channels..
         /// </summary>
         public static string PublishProductHint {
             get {
@@ -1708,7 +1933,7 @@ namespace Corprio.SocialWorker.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Publish a post about this product to Facebook and Instagram (Note: this product was published previously).
+        ///   Looks up a localized string similar to Publish a post about this product to social media. (Note: this product was published previously).
         /// </summary>
         public static string PublishProductHint2 {
             get {
@@ -1717,7 +1942,7 @@ namespace Corprio.SocialWorker.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The following post will be made to your Facebook page(s) and Instagram account(s). Please review and ensure that the keyword &apos;{0}&apos; is included. The chatbot will automatically reach out to anyone replying to your post with {0}..
+        ///   Looks up a localized string similar to The following post will be made to your social media (e.g., Facebook pages, Instagram accounts and Line channels). Please review and ensure that the keyword &apos;{0}&apos; is included. The chatbot will automatically reach out to anyone replying to your post with {0}..
         /// </summary>
         public static string PublishProductPrompt {
             get {
@@ -1726,7 +1951,7 @@ namespace Corprio.SocialWorker.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The following post will be made to your Facebook page(s) and Instagram account(s). Please review and confirm..
+        ///   Looks up a localized string similar to The following post will be made to your social media (e.g., Facebook pages, Instagram accounts and Line channels). Please review and confirm..
         /// </summary>
         public static string PublishProductPrompt2 {
             get {
@@ -2455,11 +2680,101 @@ namespace Corprio.SocialWorker.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Where can I find my channel ID?.
+        /// </summary>
+        public static string Tip_WhatIsChannelID {
+            get {
+                return ResourceManager.GetString("Tip_WhatIsChannelID", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to What is my Line channel name?.
+        /// </summary>
+        public static string Tip_WhatIsChannelName {
+            get {
+                return ResourceManager.GetString("Tip_WhatIsChannelName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Where can I find my channel secret?.
+        /// </summary>
+        public static string Tip_WhatIsChannelSecret {
+            get {
+                return ResourceManager.GetString("Tip_WhatIsChannelSecret", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Where can I find my channel access token?.
+        /// </summary>
+        public static string Tip_WhatIsChannelToken {
+            get {
+                return ResourceManager.GetString("Tip_WhatIsChannelToken", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unique identifier assigned by Line to your channel.
+        /// </summary>
+        public static string Title_channelID {
+            get {
+                return ResourceManager.GetString("Title_channelID", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The name of your Line channel..
+        /// </summary>
+        public static string Title_channelName {
+            get {
+                return ResourceManager.GetString("Title_channelName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unique secret key assigned by Line to your channel.
+        /// </summary>
+        public static string Title_channelSecret {
+            get {
+                return ResourceManager.GetString("Title_channelSecret", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Long-lived access token you generated in Line Developer Console.
+        /// </summary>
+        public static string Title_channelToken {
+            get {
+                return ResourceManager.GetString("Title_channelToken", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Choose a different variant.
         /// </summary>
         public static string Title_EditVariant {
             get {
                 return ResourceManager.GetString("Title_EditVariant", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Manage Line channels.
+        /// </summary>
+        public static string Title_ManageLineChannel {
+            get {
+                return ResourceManager.GetString("Title_ManageLineChannel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Manage Line API credential.
+        /// </summary>
+        public static string Title_ManageLineCredential {
+            get {
+                return ResourceManager.GetString("Title_ManageLineCredential", resourceCulture);
             }
         }
         
@@ -2640,6 +2955,87 @@ namespace Corprio.SocialWorker.Resources {
         public static string Tour_Welcome_Title {
             get {
                 return ResourceManager.GetString("Tour_Welcome_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Select the provider that owns your Line channel..
+        /// </summary>
+        public static string Tutorial_line_channelid_step1 {
+            get {
+                return ResourceManager.GetString("Tutorial_line_channelid_step1", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Select the Line channel with which you would like to connect. Please note that the channel must be a Messaging API channel..
+        /// </summary>
+        public static string Tutorial_line_channelid_step2 {
+            get {
+                return ResourceManager.GetString("Tutorial_line_channelid_step2", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Visit Basic settings to find your channel ID. Please refer to the screenshot below for its location..
+        /// </summary>
+        public static string Tutorial_line_channelid_step3 {
+            get {
+                return ResourceManager.GetString("Tutorial_line_channelid_step3", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Visit Basic settings to find your channel name. Please refer to the screenshot below for its location..
+        /// </summary>
+        public static string Tutorial_line_channelname_step3 {
+            get {
+                return ResourceManager.GetString("Tutorial_line_channelname_step3", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Visit Basic settings to find your channel secret. Please refer to the screenshot below for its location..
+        /// </summary>
+        public static string Tutorial_line_secret_step3 {
+            get {
+                return ResourceManager.GetString("Tutorial_line_secret_step3", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Select Messaging API..
+        /// </summary>
+        public static string Tutorial_line_token_step3 {
+            get {
+                return ResourceManager.GetString("Tutorial_line_token_step3", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Please refer to the screenshot below for the location of channel token..
+        /// </summary>
+        public static string Tutorial_line_token_step4 {
+            get {
+                return ResourceManager.GetString("Tutorial_line_token_step4", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Visit.
+        /// </summary>
+        public static string Tutorial_login_1 {
+            get {
+                return ResourceManager.GetString("Tutorial_login_1", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to and log in..
+        /// </summary>
+        public static string Tutorial_login_2 {
+            get {
+                return ResourceManager.GetString("Tutorial_login_2", resourceCulture);
             }
         }
         

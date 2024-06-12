@@ -30,7 +30,7 @@ namespace Corprio.SocialWorker
                 Configuration.GetConnectionString("ApplicationDB")));
 
             services.AddSingleton<GlobalListService>();
-            services.AddProductTour<ProductTourService>();
+            services.AddProductTour<ProductTourService>();            
             services.AddSingleton<IEmailSender, AsyncEmailSender>();
             services.AddSingleton<EmailHelper>();
             services.Configure<SmtpHostSetting>(Configuration.GetSection(nameof(SmtpHostSetting)));
@@ -51,7 +51,7 @@ namespace Corprio.SocialWorker
         {
             // upgrade the stream so that it supports seeking and reading multiple times (essential for reading a http request as string)
             app.UseWhen(
-                context => context.Request.Headers.ContainsKey("x-hub-signature-256"),
+                context => context.Request.Headers.ContainsKey("x-hub-signature-256") || context.Request.Headers.ContainsKey("x-line-signature"),
                 appBuilder => appBuilder.Use(async (context, next) =>
                 {
                     context.Request.EnableBuffering();

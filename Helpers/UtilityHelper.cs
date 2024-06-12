@@ -3,8 +3,8 @@ using System;
 using System.Linq;
 using Corprio.DataModel.Business;
 using Corprio.Global.Globalization;
-using Corprio.SocialWorker.Models;
 using Corprio.DataModel.Business.Products;
+using Corprio.SocialWorker.Models.Meta;
 
 namespace Corprio.SocialWorker.Helpers
 {

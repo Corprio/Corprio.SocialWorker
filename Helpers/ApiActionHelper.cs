@@ -1,5 +1,4 @@
-﻿using Corprio.SocialWorker.Models;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System.Dynamic;
 using System.Net.Http;
 using System.Text;
@@ -12,6 +11,10 @@ using DevExpress.XtraRichEdit.Import.Html;
 using Azure.Core;
 using Org.BouncyCastle.Cms;
 using System.Net.Http.Headers;
+using Corprio.SocialWorker.Models.Meta;
+using Corprio.CorprioAPIClient;
+using Corprio.SocialWorker.Dictionaries;
+using Corprio.SocialWorker.Models;
 
 namespace Corprio.SocialWorker.Helpers
 {
@@ -100,7 +103,7 @@ namespace Corprio.SocialWorker.Helpers
                 return null;
             }
             string responseString = await response.Content.ReadAsStringAsync();
-            OneLinePayload payload = JsonConvert.DeserializeObject<OneLinePayload>(responseString)!;
+            OneLinePayload payload = JsonConvert.DeserializeObject<OneLinePayload>(responseString);
             if (payload?.Error != null)
             {
                 Log.Error($"Encountered an error in posting to {endPoint}. {payload?.Error?.CustomErrorMessage()}");
@@ -194,7 +197,7 @@ namespace Corprio.SocialWorker.Helpers
                 return null;
             }            
             string responseString = await response.Content.ReadAsStringAsync();
-            MessageFeedback feedback = response?.Content == null ? new() : JsonConvert.DeserializeObject<MessageFeedback>(responseString)!;
+            MessageFeedback feedback = response?.Content == null ? new() : JsonConvert.DeserializeObject<MessageFeedback>(responseString);
             if (feedback?.Error != null)
             {
                 Log.Error($"Encountered an error when sending a message to {recipientId}. {feedback?.Error?.CustomErrorMessage()}");

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Newtonsoft.Json;
 
-namespace Corprio.SocialWorker.Models
+namespace Corprio.SocialWorker.Models.Meta
 {
     public class LongLivedUserAccessTokenPayload : MetaPayloadError
     {
@@ -14,7 +14,7 @@ namespace Corprio.SocialWorker.Models
         [JsonProperty("expires_in")]
         public double ExpiresIn { get; set; }
     }
-    
+
     public class AppAccessTokenPayload
     {
         [JsonProperty("access_token")]
@@ -85,5 +85,5 @@ namespace Corprio.SocialWorker.Models
 
         [JsonProperty("paging")]
         public Pagination Paging { get; set; }
-    }  
+    }
 }

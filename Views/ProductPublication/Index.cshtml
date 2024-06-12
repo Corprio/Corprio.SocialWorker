@@ -112,7 +112,7 @@
     
     // triggered when the user elects to publish a product
     function PublishProduct(e) {
-        console.log(e);        
+        console.log(e);
         return $.post({
             url: "@Url.Action("PreviewProductPost", new { organizationID })",
             data: { productID: e.ID }
