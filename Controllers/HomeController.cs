@@ -30,7 +30,7 @@ namespace Corprio.SocialWorker.Controllers
         protected override IActionResult AuthenticatedLandingPage(APIClient corprio, Guid organizationID)
         {            
             ApplicationSetting applicationSetting = applicationSettingService.GetSetting<ApplicationSetting>(organizationID).ConfigureAwait(false).GetAwaiter().GetResult();
-            if (string.IsNullOrWhiteSpace(applicationSetting?.KeywordForShoppingIntention))
+            if (applicationSetting == null)
             {
                 return RedirectToAction("Index", "GetStarted", new { organizationID });
             }

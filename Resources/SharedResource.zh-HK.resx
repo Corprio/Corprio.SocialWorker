@@ -403,7 +403,7 @@
     <value>您想發佈此商品目錄嗎？一則介紹它的貼文將會發佈到您的 Facebook 專頁和 Instagram 帳戶。</value>
   </data>
   <data name="PublishProductHint" xml:space="preserve">
-    <value>在 Facebook 和 Instagram 上發布有關此產品的貼文</value>
+    <value>在社群媒體（包括您的 Facebook 頁面、Instagram 帳戶和 Line 頻道）上發布有關此產品的貼文</value>
   </data>
   <data name="PublishProductPrompt" xml:space="preserve">
     <value>以下的貼文將會發佈到您的 Facebook 專頁和 Instagram 帳號。請檢查帖子的內容並確保其中包含關鍵字「{0}」。聊天機器人會自動聯絡以 「{0}」 回覆這篇貼文的顧客。</value>
@@ -1000,7 +1000,7 @@
     <value>變更設定</value>
   </data>
   <data name="PublishProductHint2" xml:space="preserve">
-    <value>在 Facebook 和 Instagram 上發布有關此產品的貼文（註：此產品之前已經發布）</value>
+    <value>在社群媒體上發布有關此產品的貼文（註：此產品之前已經發布）</value>
   </data>
   <data name="Tour_PublishCol_Desc" xml:space="preserve">
     <value>選擇您想要發佈到 Facebook 和 Instagram的產品，然後點擊此欄中對應的圖示。</value>
@@ -1169,5 +1169,14 @@
   </data>
   <data name="ErrMsg_ValidMetaProfileAndLineChannelNotFound" xml:space="preserve">
     <value>該公司沒有與任何 Facebook 帳戶或 Line channel 建立有效連結。</value>
+  </data>
+  <data name="BroadcastHeader" xml:space="preserve">
+    <value>Line 廣播訊息標頭</value>
+  </data>
+  <data name="BroadcastHeader_Description" xml:space="preserve">
+    <value>此訊息會成為您 Line channel 的廣播訊息的第一行。</value>
+  </data>
+  <data name="ErrMsg_FacebookNotLoggedIn" xml:space="preserve">
+    <value>若要將貼文發佈到您的 Facebook 頁面和/或 Instagram 帳戶，請先登入您的 Facebook 帳戶。</value>
   </data>
 </root>

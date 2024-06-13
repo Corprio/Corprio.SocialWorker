@@ -197,7 +197,6 @@
                 </button>
             </section>
             
-            @*The form element does not cover templates because user inputs to them will be captured in the hidden inputs below using JS *@
             <form id="settings-form"  asp-action="save" asp-route-organizationID="@organizationID" enctype="multipart/form-data" onsubmit="return submitChanges()">                
                 @Html.DevExtreme().TextBoxFor(m => m.CataloguePostTemplate).Visible(false)
                 @Html.DevExtreme().TextBoxFor(m => m.KeywordForShoppingIntention).Visible(false)
@@ -340,115 +339,120 @@
                     </div>
                     <button type="button" id="preview-thank-you" class="btn btn-white mr-2 my-4"><i class="fas fa-save mr-2"></i>@localizer["Preview"]</button>
                 </section>
-            </form>
             
-            <section id="template-section">
-                <div class="title-border-l">
-                    <h4>@localizer["SocialMediaTemplate"]</h4>
-                    <p>@localizer["SocialMediaTemplate_Desc"]</p>
-                </div>                
-                
-                <div class="row mb-2">
-                    <div class="col-sm">
-                        <h5 class="mb-2">@localizer["Panel_Blocks"] - @localizer["PanelTitle_Product"]</h5>
-                        <div id="block-panel-product" class="rounded border border-success bg-white py-1 mb-3 setting-panel">&nbsp;</div>
-                        <div class="input-group mb-3">
-                            <label class="my-1 mr-2" for="component-select-product">
-                                @localizer["StandardMessageComponent"]                                
-                                <a class="helpicon " tabindex="-1" data-toggle="popover" data-trigger="hover" data-container="body" data-placement="top" data-html="true" data-content="@localizer["Tooltip_StandardMessageComponent"]" data-original-title="" title="">
-                                    <i class="fa-regular fa-circle-question" aria-hidden="true"></i>
-                                </a>
-                            </label>
-                            <select id="component-select-product" class="custom-select">
-                                <option selected disabled value="">---</option>
-                                <option value="@TemplateComponent.LineBreak">@localizer["Template_NewLine"]</option>
-                                <option value="@TemplateComponent.ProductName">@localizer["Template_ProductName"]</option>
-                                <option value="@TemplateComponent.ProductCode">@localizer["Template_ProductCode"]</option>
-                                <option value="@TemplateComponent.ProductDescription">@localizer["Template_ProductDescription"]</option>
-                                <option value="@TemplateComponent.ProductListPrice">@localizer["Template_ProductListPrice"]</option>
-                                <option value="@TemplateComponent.ProductPublicPrice">@localizer["Template_ProductPublicPrice"]</option>
-                                <option value="@TemplateComponent.DefaultMessage">@localizer["Template_DefaultMessage"]</option>
-                                @* <option value="@TemplateComponent.Keyword">@localizer["Template_Keyword"]</option> *@
-                            </select>
-                            <div class="input-group-append">
-                                <button id="component-btn-product" class="btn btn-outline-primary" type="button" data-toggle="tooltip" data-placement="right" title="@localizer["Tooltip_StandardMessageComponent"]">@globalLocalizer["Add"]</button>
-                            </div>                             
-                            @* <div class="invalid-feedback">@localizer["InvalidFeedback_NoKeyword"]</div> *@
-                        </div>
-
-                        <div class="input-group mb-3">
-                            <label class="my-1 mr-2" for="custom-input-product">@localizer["CustomText"]</label>
-                            <input type="text" id="custom-input-product" class="form-control" placeholder="@localizer["CustomText"]" aria-label="Custom Text" aria-describedby="basic-addon2">
-                            <div class="input-group-append">
-                                <button id="custom-btn-product" class="btn btn-outline-primary" type="button">@globalLocalizer["Add"]</button>
-                            </div>
-                        </div>
-
-                        @* <div class="input-group mb-3">
-                            <label class="my-1 mr-2" for="keyword-input-product">
-                                @localizer["Template_Keyword"]
-                                <a class="helpicon " tabindex="-1" data-toggle="popover" data-trigger="hover" data-container="body" data-placement="top" data-html="true" data-content="@localizer["Tooltip_Keyword"]" data-original-title="" title="">
-                                    <i class="fa-regular fa-circle-question" aria-hidden="true"></i>
-                                </a>
-                            </label>
-                            <input type="text" id="keyword-input-product" class="form-control" placeholder="@localizer["Placeholder_Keyword"]">                            
-                            <div class="invalid-feedback">@localizer["InvalidFeedback_KeywordLength"]</div>
-                        </div> *@
-
-                        <button id="restore-default-btn-product" class="btn btn-outline-danger mb-3" type="button">@localizer["DefaultSetting"]</button>                        
+                <section id="template-section">
+                    <div class="title-border-l">
+                        <h4>@localizer["SocialMediaTemplate"]</h4>
+                        <p>@localizer["SocialMediaTemplate_Desc"]</p>
+                    </div>                
+                    
+                    <div class="form-group mb-5">
+                        <h5><help-label asp-for="LineBroadcastHeader"></help-label></h5>
+                        @Html.DevExtreme().TextBoxFor(m => m.LineBroadcastHeader).Width("100%")
                     </div>
 
-                    <div class="col-sm">
-                        <h5 class="mb-2">@localizer["Panel_Preview"]</h5>
-                        <div id="preview-panel-product" class="rounded border border-success p-2 bg-white setting-panel">&nbsp;</div>
-                    </div>
-                </div>
-
-                <div id="catalogue-setting" class="mt-4">
                     <div class="row mb-2">
                         <div class="col-sm">
-                            <h5 class="mb-2">@localizer["Panel_Blocks"] - @localizer["PanelTitle_Catalogue"]</h5>
-                            <div id="block-panel-catalogue" class="rounded border border-success bg-white py-1 mb-3 setting-panel">&nbsp;</div>
+                            <h5 class="mb-2">@localizer["Panel_Blocks"] - @localizer["PanelTitle_Product"]</h5>
+                            <div id="block-panel-product" class="rounded border border-success bg-white py-1 mb-3 setting-panel">&nbsp;</div>
                             <div class="input-group mb-3">
-                                <label class="my-1 mr-2" for="component-select-catalogue">
-                                    @localizer["StandardMessageComponent"]
+                                <label class="my-1 mr-2" for="component-select-product">
+                                    @localizer["StandardMessageComponent"]                                
                                     <a class="helpicon " tabindex="-1" data-toggle="popover" data-trigger="hover" data-container="body" data-placement="top" data-html="true" data-content="@localizer["Tooltip_StandardMessageComponent"]" data-original-title="" title="">
                                         <i class="fa-regular fa-circle-question" aria-hidden="true"></i>
-                                    </a>                                    
+                                    </a>
                                 </label>
-                                <select id="component-select-catalogue" class="custom-select">
+                                <select id="component-select-product" class="custom-select">
                                     <option selected disabled value="">---</option>
                                     <option value="@TemplateComponent.LineBreak">@localizer["Template_NewLine"]</option>
-                                    <option value="@TemplateComponent.CatalogueName">@localizer["Template_CatalogueName"]</option>
-                                    <option value="@TemplateComponent.CatalogueCode">@localizer["Template_CatalogueCode"]</option>
-                                    <option value="@TemplateComponent.CatalogueStartDate">@localizer["Template_CatalogueStartDate"]</option>
-                                    <option value="@TemplateComponent.CatalogueEndDate">@localizer["Template_CatalogueEndDate"]</option>
-                                    <option value="@TemplateComponent.CatalogueUrl">@localizer["Template_CatalogueURL"]</option>
+                                    <option value="@TemplateComponent.ProductName">@localizer["Template_ProductName"]</option>
+                                    <option value="@TemplateComponent.ProductCode">@localizer["Template_ProductCode"]</option>
+                                    <option value="@TemplateComponent.ProductDescription">@localizer["Template_ProductDescription"]</option>
+                                    <option value="@TemplateComponent.ProductListPrice">@localizer["Template_ProductListPrice"]</option>
+                                    <option value="@TemplateComponent.ProductPublicPrice">@localizer["Template_ProductPublicPrice"]</option>
                                     <option value="@TemplateComponent.DefaultMessage">@localizer["Template_DefaultMessage"]</option>
+                                    @* <option value="@TemplateComponent.Keyword">@localizer["Template_Keyword"]</option> *@
                                 </select>
                                 <div class="input-group-append">
-                                    <button id="component-btn-catalogue" class="btn btn-outline-primary" type="button" data-toggle="tooltip" data-placement="right" title="@localizer["Tooltip_StandardMessageComponent"]">@globalLocalizer["Add"]</button>
-                                </div>
+                                    <button id="component-btn-product" class="btn btn-outline-primary" type="button" data-toggle="tooltip" data-placement="right" title="@localizer["Tooltip_StandardMessageComponent"]">@globalLocalizer["Add"]</button>
+                                </div>                             
+                                @* <div class="invalid-feedback">@localizer["InvalidFeedback_NoKeyword"]</div> *@
                             </div>
 
                             <div class="input-group mb-3">
-                                <label class="my-1 mr-2" for="custom-input-catalogue">@localizer["CustomText"]</label>
-                                <input type="text" id="custom-input-catalogue" class="form-control" placeholder="@localizer["CustomText"]" aria-label="Custom Text" aria-describedby="basic-addon2">
+                                <label class="my-1 mr-2" for="custom-input-product">@localizer["CustomText"]</label>
+                                <input type="text" id="custom-input-product" class="form-control" placeholder="@localizer["CustomText"]" aria-label="Custom Text" aria-describedby="basic-addon2">
                                 <div class="input-group-append">
-                                    <button id="custom-btn-catalogue" class="btn btn-outline-primary" type="button">@globalLocalizer["Add"]</button>
+                                    <button id="custom-btn-product" class="btn btn-outline-primary" type="button">@globalLocalizer["Add"]</button>
                                 </div>
                             </div>
-                            <button id="restore-default-btn-catalogue" class="btn btn-outline-danger mb-3" type="button">@localizer["DefaultSetting"]</button>                            
+
+                            @* <div class="input-group mb-3">
+                                <label class="my-1 mr-2" for="keyword-input-product">
+                                    @localizer["Template_Keyword"]
+                                    <a class="helpicon " tabindex="-1" data-toggle="popover" data-trigger="hover" data-container="body" data-placement="top" data-html="true" data-content="@localizer["Tooltip_Keyword"]" data-original-title="" title="">
+                                        <i class="fa-regular fa-circle-question" aria-hidden="true"></i>
+                                    </a>
+                                </label>
+                                <input type="text" id="keyword-input-product" class="form-control" placeholder="@localizer["Placeholder_Keyword"]">                            
+                                <div class="invalid-feedback">@localizer["InvalidFeedback_KeywordLength"]</div>
+                            </div> *@
+
+                            <button id="restore-default-btn-product" class="btn btn-outline-danger mb-3" type="button">@localizer["DefaultSetting"]</button>                        
                         </div>
 
                         <div class="col-sm">
                             <h5 class="mb-2">@localizer["Panel_Preview"]</h5>
-                            <div id="preview-panel-catalogue" class="rounded border border-success p-2 bg-white setting-panel">&nbsp;</div>
+                            <div id="preview-panel-product" class="rounded border border-success p-2 bg-white setting-panel">&nbsp;</div>
                         </div>
                     </div>
-                </div>
-            </section>
 
+                    <div id="catalogue-setting" class="mt-4">
+                        <div class="row mb-2">
+                            <div class="col-sm">
+                                <h5 class="mb-2">@localizer["Panel_Blocks"] - @localizer["PanelTitle_Catalogue"]</h5>
+                                <div id="block-panel-catalogue" class="rounded border border-success bg-white py-1 mb-3 setting-panel">&nbsp;</div>
+                                <div class="input-group mb-3">
+                                    <label class="my-1 mr-2" for="component-select-catalogue">
+                                        @localizer["StandardMessageComponent"]
+                                        <a class="helpicon " tabindex="-1" data-toggle="popover" data-trigger="hover" data-container="body" data-placement="top" data-html="true" data-content="@localizer["Tooltip_StandardMessageComponent"]" data-original-title="" title="">
+                                            <i class="fa-regular fa-circle-question" aria-hidden="true"></i>
+                                        </a>                                    
+                                    </label>
+                                    <select id="component-select-catalogue" class="custom-select">
+                                        <option selected disabled value="">---</option>
+                                        <option value="@TemplateComponent.LineBreak">@localizer["Template_NewLine"]</option>
+                                        <option value="@TemplateComponent.CatalogueName">@localizer["Template_CatalogueName"]</option>
+                                        <option value="@TemplateComponent.CatalogueCode">@localizer["Template_CatalogueCode"]</option>
+                                        <option value="@TemplateComponent.CatalogueStartDate">@localizer["Template_CatalogueStartDate"]</option>
+                                        <option value="@TemplateComponent.CatalogueEndDate">@localizer["Template_CatalogueEndDate"]</option>
+                                        <option value="@TemplateComponent.CatalogueUrl">@localizer["Template_CatalogueURL"]</option>
+                                        <option value="@TemplateComponent.DefaultMessage">@localizer["Template_DefaultMessage"]</option>
+                                    </select>
+                                    <div class="input-group-append">
+                                        <button id="component-btn-catalogue" class="btn btn-outline-primary" type="button" data-toggle="tooltip" data-placement="right" title="@localizer["Tooltip_StandardMessageComponent"]">@globalLocalizer["Add"]</button>
+                                    </div>
+                                </div>
+
+                                <div class="input-group mb-3">
+                                    <label class="my-1 mr-2" for="custom-input-catalogue">@localizer["CustomText"]</label>
+                                    <input type="text" id="custom-input-catalogue" class="form-control" placeholder="@localizer["CustomText"]" aria-label="Custom Text" aria-describedby="basic-addon2">
+                                    <div class="input-group-append">
+                                        <button id="custom-btn-catalogue" class="btn btn-outline-primary" type="button">@globalLocalizer["Add"]</button>
+                                    </div>
+                                </div>
+                                <button id="restore-default-btn-catalogue" class="btn btn-outline-danger mb-3" type="button">@localizer["DefaultSetting"]</button>                            
+                            </div>
+
+                            <div class="col-sm">
+                                <h5 class="mb-2">@localizer["Panel_Preview"]</h5>
+                                <div id="preview-panel-catalogue" class="rounded border border-success p-2 bg-white setting-panel">&nbsp;</div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </form>
+            
             <div class="w-100 d-flex py-2 justify-content-between sticky-bar border-top">
                 <button class="btn btn-info ml-auto save-setting-btn">@localizer["Save"]</button>
             </div>

@@ -1017,12 +1017,6 @@
   <data name="StoryMention_EmailSubject" xml:space="preserve">
     <value>一位顾客在 Instagram 故事中提到了{0}</value>
   </data>
-  <data name="btnCreateShipment" xml:space="preserve">
-    <value>发货</value>
-  </data>
-  <data name="String" xml:space="preserve">
-    <value>CourierService</value>
-  </data>
   <data name="StoryMention" xml:space="preserve">
     <value>限时动态提及</value>
   </data>
@@ -1175,5 +1169,14 @@
   </data>
   <data name="ErrMsg_ValidMetaProfileAndLineChannelNotFound" xml:space="preserve">
     <value>该公司没有与任何 Facebook 帐户或 Line channel 建立有效连接。</value>
+  </data>
+  <data name="BroadcastHeader" xml:space="preserve">
+    <value>Line 广播消息标头</value>
+  </data>
+  <data name="BroadcastHeader_Description" xml:space="preserve">
+    <value>此信息会成为您 Line channel 的广播消息的第一行。</value>
+  </data>
+  <data name="ErrMsg_FacebookNotLoggedIn" xml:space="preserve">
+    <value>要将帖子发布到您的 Facebook 页面和/或 Instagram 帐户，请先登录您的 Facebook 帐户。</value>
   </data>
 </root>

@@ -116,6 +116,13 @@ namespace Corprio.SocialWorker.Models
         public string ProductPostTemplate { get; set; }
 
         /// <summary>
+        /// Header in the broadcast message sent via Line
+        /// </summary>
+        [Display(Name = "BroadcastHeader", Description = "BroadcastHeader_Description", ResourceType = typeof(Resources.SharedResource))]
+        [StringLength(100)]
+        public string LineBroadcastHeader { get; set; } = "YOU WON'T BELIEVE IT.";
+
+        /// <summary>
         /// Generate the post for publishing a product to social media
         /// </summary>
         /// <param name="product">The product to be published</param>

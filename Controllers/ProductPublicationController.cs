@@ -135,57 +135,38 @@ namespace Corprio.SocialWorker.Controllers
         /// <returns>Status code</returns>
         /// <exception cref="Exception"></exception>
         [HttpPost]
-        public async Task<IActionResult> PublishProduct([FromRoute] Guid organizationID, Guid productID, string message, 
-            string facebookUserID)
+        public async Task<IActionResult> PublishProduct([FromRoute] Guid organizationID, Guid productID, 
+            string message, string facebookUserID)
         {
             if (productID.Equals(Guid.Empty)) throw new Exception(Resources.SharedResource.ErrMsg_InvalidProductID);
             if (string.IsNullOrWhiteSpace(message)) throw new Exception(Resources.SharedResource.ErrMsg_BlankPostMsg);
             message = UtilityHelper.UncleanAndClean(userInput: message, onceIsOK: true);
             List<string> errorMessages = [];
             
-            // it is possible that one organization is linked to multiple Facebook accounts            
+            // it is possible that one organization is linked to multiple Facebook accounts and Line channels
             List<MetaUser> activeMetaUsers = _db.MetaUsers.Include(x => x.Pages).Where(x => x.OrganizationID == organizationID && x.Dormant == false).ToList();
             List<LineChannel> activeLineChannels = _db.LineChannels.Where(r => r.OrganizationID == organizationID && r.Dormant == false).ToList();
             if (activeMetaUsers.Count == 0 && activeLineChannels.Count == 0) 
                 throw new Exception(Resources.SharedResource.ErrMsg_ValidMetaProfileAndLineChannelNotFound);
 
-            //MetaUser metaUser;
-            //if (activeMetaUsers.Count > 1)
-            //{
-            //    if (string.IsNullOrWhiteSpace(facebookUserID))
-            //        throw new Exception(Resources.SharedResource.ErrMsg_FacebookNotLoggedIn);
+            MetaUser metaUser = null;
+            if (activeMetaUsers.Count > 0)
+            {
+                // we require the user to have logged in Facebook because we want to make sure the token has been refreshed
+                if (string.IsNullOrWhiteSpace(facebookUserID))
+                {
+                    if (activeLineChannels.Count == 0) 
+                        throw new Exception(Resources.SharedResource.ErrMsg_FacebookNotLoggedIn);
 
-            //    metaUser = activeMetaUsers.FirstOrDefault(x => x.FacebookUserID == facebookUserID) 
-            //        ?? throw new Exception(Resources.SharedResource.ErrMsg_ValidMetaProfileNotFound);
-            //}
-            //else if (activeMetaUsers.Count == 1)
-            //{
-            //    metaUser = activeMetaUsers[0];
-            //}
-            //else
-            //{
-            //    metaUser = null;
-            //}
-
-            //if (activeMetaUserNumber > 1)
-            //{
-            //    if (string.IsNullOrWhiteSpace(facebookUserID)) 
-            //        throw new Exception(Resources.SharedResource.ErrMsg_FacebookNotLoggedIn);
-
-            //    metaUser = _db.MetaUsers.Include(x => x.Pages).FirstOrDefault(x => x.OrganizationID == organizationID && x.Dormant == false && x.FacebookUserID == facebookUserID)
-            //        ?? throw new Exception(Resources.SharedResource.ErrMsg_ValidMetaProfileNotFound);
-            //}
-            //else
-            //{
-            //    metaUser = _db.MetaUsers.Include(x => x.Pages).First(x => x.OrganizationID == organizationID && x.Dormant == false);
-            //}            
-
-            //if (metaUser != null && metaUser.Pages.Count == 0)
-            //{
-            //    errorMessages.Add($"{organizationID} has no Facebook pages to publish product {productID}.");
-            //    Log.Information(errorMessages.Last());
-            //    return StatusCode(400, errorMessages);
-            //}
+                    // continue to publish to Line even if the user hasn't logged in to Facebook
+                    errorMessages.Add(Resources.SharedResource.ErrMsg_FacebookNotLoggedIn);
+                }
+                else
+                {
+                    metaUser = activeMetaUsers.FirstOrDefault(x => x.FacebookUserID == facebookUserID)
+                        ?? throw new Exception(Resources.SharedResource.ErrMsg_ValidMetaProfileNotFound);
+                }
+            }
 
             #region Create image URLs
             Product product = await _corprioClient.ProductApi.Get(organizationID: organizationID, id: productID)
@@ -231,16 +212,15 @@ namespace Corprio.SocialWorker.Controllers
                 if (string.IsNullOrWhiteSpace(imageUrl)) continue;
 
                 // DEV ONLY: the imageUrl generated in DEV environment won't work, so we re-assign a publicly accessible URL to it FOR NOW
-                //if (imageUrl.Contains("localhost")) imageUrl = GenerateImageUrlForDev();
-                if (imageUrl.Contains("localhost")) imageUrl = imageUrl.Replace(_configuration["AppBaseUrl"], _configuration["WebhookCallbackUrl"]);
+                if (imageUrl.Contains("localhost")) imageUrl = GenerateImageUrlForDev();                
                 imageUrls.Add(imageUrl);
             }
             #endregion
             product.EntityProperties ??= [];  // make sure the EP is not null, as it will be updated later
-            bool success = true;  // if false, then 400 + error messages are returned
 
+            // assumption: the user want to publish the same messages to all Line channels connected with Corprio
             LineApiService lineApiService;
-            List<LineMessage> lineMessages;
+            List<ILineMessage> lineMessages;
             foreach (LineChannel lineChannel in activeLineChannels)
             {
                 lineApiService = new LineApiService(
@@ -250,18 +230,42 @@ namespace Corprio.SocialWorker.Controllers
                     lineChannel: lineChannel,
                     applicationSettingService: _applicationSettingService);
                 
-                lineMessages = [new LineMessage { Type = "text", Text = message }];
-                for (int i = 0; i < imageUrls.Count; i++)  
-                {
-                    if (i == 4) break; // up to 4 images (+ 1 text) can be included in a Line message
-                    lineMessages.Add(new LineMessage 
-                    { 
-                        Type = "image",                        
-                        PreviewImageUrl = imageUrls[i],
-                        OriginalContentUrl = imageUrls[i] 
+                lineMessages = [
+                    new LineFlexMessage 
+                    {                         
+                        AltText = message,
+                        Contents = new LineFlexMessageBubble
+                        {
+                            Styles = new LineFlexMessageBlockStyle
+                            {
+                                Header = new LineFlexMessageStyle { BackgroundColor = "#5C85FF" },
+                                Body = new LineFlexMessageStyle { BackgroundColor = "#5C85FF" },                                
+                            },
+                            Header = new LineFlexMessageBox
+                            {                                
+                                Layout = "vertical",
+                                Contents = [
+                                    new LineFlexMessageText 
+                                    { 
+                                        Text = !string.IsNullOrWhiteSpace(applicationSetting.LineBroadcastHeader) 
+                                        ? applicationSetting.LineBroadcastHeader 
+                                        : "!!!"
+                                    }],
+                            },
+                            Hero = new LineFlexMessageImage
+                            {                                
+                                Url = imageUrls[0],
+                                Size = "full",
+                            },
+                            Body = new LineFlexMessageBox
+                            {                                
+                                Layout = "vertical",
+                                Contents = [new LineFlexMessageText { Text = message }],
+                            },
+                        },
                     }
-                    );
-                }
+                    ];
+
                 try
                 {
                     await lineApiService.SendBroadcastMessage(lineMessages);
@@ -270,23 +274,21 @@ namespace Corprio.SocialWorker.Controllers
                 {
                     Log.Error(ex.Message);
                     errorMessages.Add(ex.Message);
-                    success = false;
                 }
             }
             // need this EP to indicate that the product has been published
             product.EntityProperties.Add(new EntityProperty() { Name = BabelFish.ProductEpName, Value = "NA" });
-
-            string postId;
-            MetaPost post;
-            foreach (MetaUser metaUser in activeMetaUsers)
+           
+            if (metaUser != null)
             {
                 if (metaUser.Pages == null || metaUser.Pages.Count == 0)
                 {
                     errorMessages.Add($"Facebook user {metaUser.FacebookUserID} has no Facebook pages to publish product {productID}.");
                     Log.Information(errorMessages.Last());
-                    continue;
                 }
 
+                string postId;
+                MetaPost post;
                 foreach (MetaPage page in metaUser.Pages)
                 {
                     postId = await MakeFbMultiPhotoPost(accessToken: page.Token,
@@ -294,8 +296,7 @@ namespace Corprio.SocialWorker.Controllers
                     if (string.IsNullOrWhiteSpace(postId))
                     {
                         errorMessages.Add($"Failed to make multi-photo post to {page.Name}");
-                        Log.Error(errorMessages.Last());
-                        success = false;
+                        Log.Error(errorMessages.Last());                        
                     }
                     else
                     {
@@ -315,8 +316,7 @@ namespace Corprio.SocialWorker.Controllers
                         catch (Exception ex)
                         {
                             errorMessages.Add($"Failed to save FB post ID {postId}. {ex.Message}");
-                            Log.Error(errorMessages.Last());
-                            success = false;
+                            Log.Error(errorMessages.Last());                            
                         }
                         product.EntityProperties.Add(new EntityProperty() { Name = BabelFish.ProductEpName, Value = postId });
                     }
@@ -329,8 +329,7 @@ namespace Corprio.SocialWorker.Controllers
                     if (string.IsNullOrWhiteSpace(postId))
                     {
                         errorMessages.Add($"Failed to publish carousel post to {page.Name}-{page.InstagramID}");
-                        Log.Error(errorMessages.Last());
-                        success = false;
+                        Log.Error(errorMessages.Last());                        
                     }
                     else
                     {
@@ -350,8 +349,7 @@ namespace Corprio.SocialWorker.Controllers
                         catch (Exception ex)
                         {
                             errorMessages.Add($"Failed to save IG post ID {postId}. {ex.Message}");
-                            Log.Error(errorMessages.Last());
-                            success = false;
+                            Log.Error(errorMessages.Last());                            
                         }
                         product.EntityProperties.Add(new EntityProperty() { Name = BabelFish.ProductEpName, Value = postId });
                     }
@@ -365,12 +363,12 @@ namespace Corprio.SocialWorker.Controllers
                 await _corprioClient.ProductApi.Update(organizationID: organizationID, product: product, updateChildren: true);
             }
             catch (ApiExecutionException ex)
-            {
-                Log.Error($"Failed to update the entity properties of product {productID} with post IDs. {ex.Message}");
-                success = false;
+            {                
+                errorMessages.Add($"Failed to update database for product {productID} with post IDs. {ex.Message}");
+                Log.Error(errorMessages.Last());
             }
 
-            return success ? StatusCode(200) : StatusCode(400, string.Join("\n", errorMessages.ToArray()));
+            return errorMessages.Count == 0 ? StatusCode(200) : StatusCode(400, string.Join("\n", errorMessages));
         }
     }
 }

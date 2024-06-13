@@ -1012,7 +1012,7 @@
     <value>&lt;i&gt;Unknown&lt;/i&gt;</value>
   </data>
   <data name="ErrMsg_FacebookNotLoggedIn" xml:space="preserve">
-    <value>Please make sure you have logged into Facebook.</value>
+    <value>To publish a post to your Facebook Page(s) and/or Instagram account(s), please log into your Facebook account first.</value>
   </data>
   <data name="PublishProductPrompt2" xml:space="preserve">
     <value>The following post will be made to your social media (e.g., Facebook pages, Instagram accounts and Line channels). Please review and confirm.</value>
@@ -1172,5 +1172,11 @@
   </data>
   <data name="ErrMsg_ValidMetaProfileAndLineChannelNotFound" xml:space="preserve">
     <value>The organization does not have a valid connection with any Facebook account or Line channel.</value>
+  </data>
+  <data name="BroadcastHeader" xml:space="preserve">
+    <value>Line Broadcast Header</value>
+  </data>
+  <data name="BroadcastHeader_Description" xml:space="preserve">
+    <value>This message will always appear as the first line of your Lne channels' broadcast messages.</value>
   </data>
 </root>

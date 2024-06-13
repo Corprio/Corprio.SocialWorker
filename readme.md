@@ -35,8 +35,9 @@ The application uses webhook to respond facebook for messages inputted by custom
 3. Connect the ngrok agent to your account
 4. Create a static domain in ngrok (optional step)
 5. Redirect web requests to localhost by running the command
+6. Update [WebhookCallbackUrl] in the appsettings.json file
 ```
-ngrok http --domain=pleasant-definitely-macaw.ngrok-free.app https://localhost:44330 --host-header="localhost:44330"
+ngrok http https://localhost:44330 --host-header="localhost:44330" --domain="YOUR_STATIC_DOMAIN_NAME"
 ```
 ![ngrok in action](resources/images/ngrok_in_action.png)
 

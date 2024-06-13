@@ -116,7 +116,7 @@ namespace Corprio.SocialWorker.Services
             return responseString;
         }
 
-        public async Task SendBroadcastMessage(List<LineMessage> messages)
+        public async Task SendBroadcastMessage(List<ILineMessage> messages)
         {
             string responseString = await LineApiRequest(method: HttpMethod.Post, 
                 endPoint: "v2/bot/message/broadcast",

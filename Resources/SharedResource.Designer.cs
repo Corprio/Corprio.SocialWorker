@@ -214,6 +214,24 @@ namespace Corprio.SocialWorker.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Line Broadcast Header.
+        /// </summary>
+        public static string BroadcastHeader {
+            get {
+                return ResourceManager.GetString("BroadcastHeader", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This message will always appear as the first line of your Lne channels&apos; broadcast messages..
+        /// </summary>
+        public static string BroadcastHeader_Description {
+            get {
+                return ResourceManager.GetString("BroadcastHeader_Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Create invoice.
         /// </summary>
         public static string btnCreateInvoice {
@@ -772,7 +790,7 @@ namespace Corprio.SocialWorker.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Please make sure you have logged into Facebook..
+        ///   Looks up a localized string similar to To publish a post to your Facebook Page(s) and/or Instagram account(s), please log into your Facebook account first..
         /// </summary>
         public static string ErrMsg_FacebookNotLoggedIn {
             get {
