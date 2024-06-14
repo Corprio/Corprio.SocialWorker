@@ -95,6 +95,13 @@ namespace Corprio.SocialWorker.Controllers
             return Json(pagedList.ToLoadResult());
         }
 
+        /// <summary>
+        /// Returns a product publication post based on the template configured in application setting
+        /// </summary>
+        /// <param name="organizationID">Organization ID</param>
+        /// <param name="productID">Product ID</param>
+        /// <returns>A product publication post</returns>
+        /// <exception cref="Exception"></exception>
         [HttpPost]
         public async Task<string> PreviewProductPost([FromRoute] Guid organizationID, Guid productID)
         {
@@ -131,7 +138,7 @@ namespace Corprio.SocialWorker.Controllers
         /// <param name="organizationID">Organization ID</param>
         /// <param name="productID">ID of the product to be published</param>
         /// <param name="message">Text to be included in the post</param>
-        /// <param name="facebookUserID">Facebook user ID assigned by Meta (mandatory if the organization is linked with more than 1 active FB account)</param>
+        /// <param name="facebookUserID">Facebook user ID assigned by Meta (optional)</param>
         /// <returns>Status code</returns>
         /// <exception cref="Exception"></exception>
         [HttpPost]

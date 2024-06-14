@@ -202,7 +202,7 @@ namespace Corprio.SocialWorker.Helpers
             {
                 Log.Error($"Encountered an error when sending a message to {recipientId}. {feedback?.Error?.CustomErrorMessage()}");
             }
-
+            
             // as a good practice, we release control of conversation thread after sending each message
             // reference: https://developers.facebook.com/docs/messenger-platform/handover-protocol/conversation-control#releasing-control
             await ControlConversationThread(endPoint: threadEndPoint, 

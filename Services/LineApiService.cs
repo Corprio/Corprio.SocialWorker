@@ -27,6 +27,11 @@ using System.ServiceModel.Channels;
 
 namespace Corprio.SocialWorker.Services
 {
+    /// <summary>
+    /// Line API service, instantiated for each Line channel
+    /// WebhookApplication is part of LineMessagingApi SDK. For its documentation, see:
+    /// https://github.com/pierre3/LineMessagingApi/blob/master/README.md
+    /// </summary>
     public class LineApiService : Line.Messaging.Webhooks.WebhookApplication
     {
         readonly ApplicationDbContext _db;         
@@ -37,7 +42,16 @@ namespace Corprio.SocialWorker.Services
 
         readonly string _baseUrl;        
         readonly LineChannel _channel;
-        
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="context">Database connection</param>
+        /// <param name="httpClientFactory">HTTP client factory</param>
+        /// <param name="configuration">Configuration</param>
+        /// <param name="lineChannel">Line channel</param>
+        /// <param name="applicationSettingService">Application setting service, required for chatbot</param>
+        /// <param name="emailHelper">Email helper, required for OnMessageAsync</param>
         public LineApiService(ApplicationDbContext context, IHttpClientFactory httpClientFactory, 
             IConfiguration configuration, LineChannel lineChannel,
             ApplicationSettingService applicationSettingService = null, EmailHelper emailHelper = null)
@@ -52,6 +66,12 @@ namespace Corprio.SocialWorker.Services
             _channel = lineChannel;            
         }
         
+        /// <summary>
+        /// Validate if a HTTP request genuinely came from Line
+        /// </summary>
+        /// <param name="hash">Hash included in the HTTP request's header</param>
+        /// <param name="requestBody">The HTTP request's body</param>
+        /// <returns></returns>
         public bool ValidateWebhook(string hash, string requestBody)
         {
             var hmac = new HMACSHA256(Encoding.UTF8.GetBytes(_channel.ChannelSecret));
@@ -62,6 +82,12 @@ namespace Corprio.SocialWorker.Services
             return hash == computedHash;
         }
 
+        /// <summary>
+        /// Checks if the configured webhook endpoint can receive a test webhook event.
+        /// https://developers.line.biz/en/reference/messaging-api/#test-webhook-endpoint
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="InvalidJsonException"></exception>
         public async Task<bool> TestWebhookEndpoint()
         {
             string response = await LineApiRequest(method: HttpMethod.Post,
@@ -80,6 +106,11 @@ namespace Corprio.SocialWorker.Services
             return payload?.Success ?? false;
         }
 
+        /// <summary>
+        /// Sets the webhook endpoint URL. It may take up to 1 minute for changes to take place due to caching.
+        /// https://developers.line.biz/en/reference/messaging-api/#set-webhook-endpoint-url
+        /// </summary>
+        /// <returns></returns>
         public async Task SetWebhookEndpoint()
         {            
             string baseUrl = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Production" 
@@ -91,6 +122,14 @@ namespace Corprio.SocialWorker.Services
                 json: new { endpoint = $"{baseUrl}/{_channel.OrganizationID}/{_channel.ID}/line" });
         }
 
+        /// <summary>
+        /// Execute Messaging API query
+        /// </summary>
+        /// <param name="method">HTTP method</param>
+        /// <param name="endPoint">API service endpoint</param>
+        /// <param name="json">Json body of the query, if any</param>
+        /// <returns>Serialized response from Line</returns>
+        /// <exception cref="Core.Exceptions.ApiExecutionException"></exception>
         private async Task<string> LineApiRequest(HttpMethod method, string endPoint, dynamic json = null)
         {
             string content = JsonConvert.SerializeObject(json);
@@ -106,8 +145,8 @@ namespace Corprio.SocialWorker.Services
 
             HttpClient client = _httpClientFactory.CreateClient();
             HttpResponseMessage response = await client.SendAsync(httpRequest);
-            //response.EnsureSuccessStatusCode();
-
+            
+            // do not run EnsureSuccessStatusCode() because we want to deserialize the response and display human-readable error messages to user
             string responseString = await response.Content.ReadAsStringAsync();
             if (string.IsNullOrWhiteSpace(responseString))
                 throw new Core.Exceptions.ApiExecutionException("Line returned an empty response.");
@@ -116,6 +155,14 @@ namespace Corprio.SocialWorker.Services
             return responseString;
         }
 
+        /// <summary>
+        /// Send a broadcast message through the Line channel
+        /// https://developers.line.biz/en/reference/messaging-api/#send-broadcast-message
+        /// </summary>
+        /// <param name="messages">Collection of Line message objects (up to 5)</param>
+        /// <returns></returns>
+        /// <exception cref="InvalidJsonException"></exception>
+        /// <exception cref="ApiExecutionException"></exception>
         public async Task SendBroadcastMessage(List<ILineMessage> messages)
         {
             string responseString = await LineApiRequest(method: HttpMethod.Post, 
@@ -145,6 +192,13 @@ namespace Corprio.SocialWorker.Services
             }
         }
 
+        /// <summary>
+        /// Send reply message
+        /// https://developers.line.biz/en/reference/messaging-api/#send-reply-message
+        /// </summary>
+        /// <param name="message">Text message to be sent</param>
+        /// <param name="replyToken">Token of the conversation to which the reply is made in response</param>
+        /// <returns></returns>
         private async Task SendReplyMessage(string message, string replyToken)
         {            
             await LineApiRequest(method: HttpMethod.Post, endPoint: "v2/bot/message/reply", 
@@ -155,6 +209,11 @@ namespace Corprio.SocialWorker.Services
                 );
         }
 
+        /// <summary>
+        /// Query a Line user profile
+        /// </summary>
+        /// <param name="userId">ID of the Line user to be queried</param>
+        /// <returns></returns>
         private async Task<LineUser> GetUserProfile(string userId)
         {
             string response = await LineApiRequest(method: HttpMethod.Get, endPoint: $"v2/bot/profile/{userId}");
@@ -172,6 +231,12 @@ namespace Corprio.SocialWorker.Services
             return lineUser;
         }
 
+        /// <summary>
+        /// Handle message event webhook
+        /// </summary>
+        /// <param name="ev">Message event</param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
         protected override async Task OnMessageAsync(MessageEvent ev)
         {            
             if (ev.Message.Type != EventMessageType.Text)

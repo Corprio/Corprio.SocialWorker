@@ -9,12 +9,11 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using Serilog;
-using DevExpress.XtraRichEdit.Import.Html;
 
 namespace Corprio.SocialWorker.Services
 {
     /// <summary>
-    /// DON'T USE THIS YET - Rewriting MetaApiController and ApiActionHelper into a service (WIP)
+    /// WORK IN PROGRESS - rewriting MetaApiController and ApiActionHelper into a service
     /// </summary>
     public class MetaApiService
     {

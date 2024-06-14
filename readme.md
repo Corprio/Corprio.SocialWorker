@@ -1,8 +1,8 @@
 ﻿# Social Media Marketer Application
 ## What is Social Media Marketer for?
-The **Social Media Marketer Application** is an add-in web application for posting products/catalogues on Facebook/Instagram and adding sales order in [Corprio](https://www.corprio.com) using conversations with a chatbot.
+The **Social Media Marketer Application** is an add-in web application for posting products on social media (including Facebook, Instagram and Line) and handles sales inquiry with a chatbot. The chatbot can add sales order in [Corprio](https://www.corprio.com).
 ## Technology
-The application is developed using ASP.NET Core 8 MVC. It communicates with Facebook via Meta API.
+The application is developed using ASP.NET Core 8 MVC. It communicates with Facebook via Meta API and with Line via Line Messaging API.
 ## Register Social Media Marketer in Corprio
 The Social Media Marketer Application must be registered in [Corprio Portal](https://portal.corprio.com) before users can subscribe to it.  Register the application with the parameters below.
 
@@ -29,7 +29,7 @@ The Social Media Marketer Application must be registered in [Corprio Portal](htt
 **Application type**: Automated
 
 ## Set up webhook for development
-The application uses webhook to respond facebook for messages inputted by customers in messengers.  In development, developers can use ngrok to redirect the facebook requests to localhost.
+When a customer sends a message to the chatbot (via Messenger or Line), the application receives a webhook notification. For Meta, the endpoint for receiving webhook must be manually configured in Meta Developer Portal. For Line, the endpoint is set programmatically (see _LineApiService.cs_). It is important to note that neither Meta nor Line accepts webhook endpoint on localhost. In development, developers can use ngrok to redirect the facebook requests to localhost.
 1. Sign up at [ngrok](https://ngrok.com/)
 2. Download and install the ngrok agent in the developer machine
 3. Connect the ngrok agent to your account

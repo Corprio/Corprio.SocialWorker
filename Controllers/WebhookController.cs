@@ -28,6 +28,9 @@ using Corprio.SocialWorker.Models.Line;
 
 namespace Corprio.SocialWorker.Controllers
 {
+    /// <summary>
+    /// Handles webhook notifications
+    /// </summary>
     public class WebhookController : Controller
     {
         private readonly ApplicationDbContext _db;
@@ -758,6 +761,14 @@ namespace Corprio.SocialWorker.Controllers
             return StatusCode(200);
         }
 
+        /// <summary>
+        /// Handle webhook notifications from Line
+        /// Even dummy notification from Line (for testing endpoint) is sent via HTTP POST method
+        /// </summary>
+        /// <param name="applicationSettingService"></param>
+        /// <param name="organizationID"></param>
+        /// <param name="channelID"></param>
+        /// <returns></returns>
         [HttpPost("{organizationID:guid}/{channelID:guid}/line")]
         public async Task<IActionResult> HandleLineWebhookPost([FromServices] ApplicationSettingService applicationSettingService, 
             [FromRoute] Guid organizationID, [FromRoute] Guid channelID)
@@ -865,55 +876,6 @@ namespace Corprio.SocialWorker.Controllers
 
             Log.Information("Cannot recognize the payload in webhook notification.");
             return StatusCode(200);
-        }
-        
-        /// <summary>
-        /// Trigger the publication of a catalogue / product list (WIP - this function is expected to cater API requests from other Apps)
-        /// </summary>
-        /// <param name="httpClient">HTTP client for executing API query</param>
-        /// <param name="organizationID">Organization ID</param>
-        /// <param name="productlistID">Entity ID of product list</param>        
-        /// <returns>Status code</returns>        
-        [HttpPost("/{organizationID:guid}/PublishCatalogue/{productlistID:guid}")]
-        public async Task<IActionResult> TriggerPostingCatalogue([FromServices] HttpClient httpClient, [FromRoute] Guid organizationID,
-            [FromHeader] CorprioRequestHeader header, [FromBody] ComputeHashRequest body, [FromRoute] Guid productlistID)
-        {
-            APIClient corprioClient = new(_httpClientFactory.CreateClient("webhookClient"));
-            var hashRequest = new ComputeHashRequest()
-            {
-                OrganizationID = body.OrganizationID,
-                Payload = System.Text.Json.JsonSerializer.Serialize(body),
-                RequestApplicationID = body.RequestApplicationID,
-                RequestUserID = body.RequestUserID,
-                Timestamp = body.Timestamp,
-                RequiredDataPermissions = body.RequiredDataPermissions,
-            };
-            bool isValidHash = await corprioClient.ApplicationApi.ValidateHash(computeHashRequest: hashRequest, hash: header.Hash);
-            if (!isValidHash) return StatusCode(401);
-            return StatusCode(200);
-            //(bool success, List<string> errorMessages) = await PublishCatalogue(httpClient: httpClient, corprioClient: corprioClient,
-            //    organizationID: organizationID, productlistID: productlistID);
-            //return success ? StatusCode(200) : StatusCode(400, errorMessages);
-        }
-
-        /// <summary>
-        /// Trigger the publication of a product (WIP - this function is expected to cater API requests from other Apps)
-        /// </summary>
-        /// <param name="httpClient">HTTP client for executing API query</param>        
-        /// <param name="organizationID">Organization ID</param>
-        /// <param name="productID">Entity ID of product</param>
-        /// <returns>Status code</returns>
-        [HttpPost("/{organizationID:guid}/PublishProduct/{productID:guid}")]
-        public async Task<IActionResult> TriggerPostingProduct([FromServices] HttpClient httpClient, [FromRoute] Guid organizationID, 
-            [FromHeader] CorprioRequestHeader header, [FromBody] ComputeHashRequest body, [FromRoute] Guid productID)
-        {            
-            APIClient corprioClient = new(_httpClientFactory.CreateClient("webhookClient"));            
-            bool isValidHash = await corprioClient.ApplicationApi.ValidateHash(computeHashRequest: body, hash: header.Hash);
-            if (!isValidHash) return StatusCode(401);
-            return StatusCode(200);
-            //(bool success, List<string> errorMessages) = await PublishProduct(httpClient: httpClient, corprioClient: corprioClient,
-            //    organizationID: organizationID, productID: productID);
-            //return success ? StatusCode(200) : StatusCode(400, errorMessages);
-        }
+        }        
     }
 }
