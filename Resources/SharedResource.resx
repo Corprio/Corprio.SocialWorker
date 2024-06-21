@@ -1171,7 +1171,7 @@
     <value>&lt;div class="d-flex justify-content-center"&gt;&lt;img class="border rounded" src='/images/post_in_IG.png' style='max-height:300px'/&gt;&lt;/div&gt;&lt;p&gt;You can then also find the post in your Instagram account. Note: if the product you publish does not have any image, no post can be made to Instagram.&lt;/p&gt;</value>
   </data>
   <data name="tour_desc_PublishedInLine" xml:space="preserve">
-    <value>&lt;div class="d-flex justify-content-center"&gt;&lt;img class="border rounded" src='/images/broadcast_in_Line.png' style='max-height:300px;'/&gt;&lt;/div&gt;&lt;p&gt;Provided you have connected your Corprio company with a Line channel in GetStated, you can check the broadcast message in your Line channel.&lt;/p&gt;</value>
+    <value>&lt;div class="d-flex justify-content-center"&gt;&lt;img class="border rounded" src='/images/broadcast_in_Line.png' style='max-height:300px;'/&gt;&lt;/div&gt;&lt;p&gt;Provided you have connected your Corprio company with a Line channel in GetStarted, you can check the broadcast message in your Line channel.&lt;/p&gt;</value>
   </data>
   <data name="tour_desc_PublishProductDemo" xml:space="preserve">
     <value>&lt;video autoplay loop style='max-width:100%;max-height:50vh;'&gt;&lt;source src='/images/publish_product.webm' type='video/webm' /&gt;&lt;/video&gt;&lt;div&gt;After clicking the publication button, review the message that will be posted to your social media. Then, click 'Confirm.'.&lt;/div&gt;</value>
