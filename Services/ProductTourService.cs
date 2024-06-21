@@ -12,121 +12,203 @@ namespace Corprio.SocialWorker.Services
             {
                 "getstarted.index" => new ProductTour
                 {
-                    Steps = new[]
-                    {
-                        new DriveStep {
+                    Steps = [
+                        new DriveStep
+                        {
                             Popover = new Popover
                             {
-                                Title = Resources.SharedResource.Tour_Welcome_Title,
-                                Description = string.Format(Resources.SharedResource.Tour_Welcome_Desc, Resources.SharedResource.AppName),
+                                Title = Resources.SharedResource.tour_title_Welcome,
+                                Description = Resources.SharedResource.tour_desc_Welcome,
                             }
                         },
-                        new DriveStep {
+                        new DriveStep
+                        {
                             Element = "#menu-item-GetStarted-0-0",
                             Popover = new Popover
                             {
-                                Description = string.Format(Resources.SharedResource.Tour_GetStarted_Desc, Resources.SharedResource.AppName)
+                                Title = Resources.SharedResource.tour_title_GetStarted,
+                                Description = Resources.SharedResource.tour_desc_GetStarted,
                             }
                         },
-                        new DriveStep {
+                        new DriveStep
+                        {
                             Element = "#menu-item-ProductPublication-0-1",
                             Popover = new Popover
                             {
-                                Description = Resources.SharedResource.Tour_ProductPublication_Desc,
+                                Title = Resources.SharedResource.tour_title_ProductPublication,
+                                Description = Resources.SharedResource.tour_desc_ProductPublication,
                             }
                         },
-                        new DriveStep {
+                        new DriveStep
+                        {
                             Element = "#menu-item-DisconnectFacebook-0-2",
                             Popover = new Popover
                             {
-                                Description = Resources.SharedResource.Tour_DisconnectFacebook_Desc,
+                                Title = Resources.SharedResource.tour_title_DisconnectFacebook,
+                                Description = Resources.SharedResource.tour_desc_DisconnectFacebook,
                             }
                         },
-                        new DriveStep {
+                        new DriveStep
+                        {
                             Element = "#fb-section",
                             Popover = new Popover
                             {
-                                Description = string.Format(Resources.SharedResource.Tour_FbSection_Desc, Resources.SharedResource.AppName),
+                                Title = Resources.SharedResource.tour_title_ConnectFacebook,
+                                Description = Resources.SharedResource.tour_desc_ConnectFacebook,
                             }
                         },
-                        new DriveStep {
+                        new DriveStep
+                        {
+                            Element = "#line-section",
+                            Popover = new Popover
+                            {
+                                Title = Resources.SharedResource.tour_title_ConnectLine,
+                                Description = Resources.SharedResource.tour_desc_ConnectLine,
+                            }
+                        },
+                        new DriveStep
+                        {
                             Element = "#som-section",
                             Popover = new Popover
                             {
-                                Description = string.Format(Resources.SharedResource.Tour_SomSection_Desc, Resources.SharedResource.AppName)
+                                Title = Resources.SharedResource.tour_title_SomSection,
+                                Description = Resources.SharedResource.tour_desc_SomSection,
                             }
                         },
-                        new DriveStep {
+                        new DriveStep
+                        {
                             Element = "#delivery-section",
                             Popover = new Popover
                             {
-                                Description = Resources.SharedResource.Tour_DelliverySection_Desc,
+                                Title = Resources.SharedResource.tour_title_DeliverySection,
+                                Description = Resources.SharedResource.tour_desc_DeliverySection,
                             }
                         },
-                        new DriveStep {
+                        new DriveStep
+                        {
                             Element = "#payment-section",
                             Popover = new Popover
                             {
-                                Description = Resources.SharedResource.Tour_PaymentSection_Desc,
+                                Title = Resources.SharedResource.tour_title_PaymentSection,
+                                Description = Resources.SharedResource.tour_desc_PaymentSection,
                             }
                         },
-                        new DriveStep {
+                        new DriveStep
+                        {
                             Element = "#checkout-section",
                             Popover = new Popover
                             {
-                                Description = Resources.SharedResource.Tour_CheckoutSection_Desc,
+                                Title = Resources.SharedResource.tour_title_CheckoutSection,
+                                Description = Resources.SharedResource.tour_desc_CheckoutSection,
                             }
                         },
-                        new DriveStep {
+                        new DriveStep
+                        {
                             Element = "#thankyou-section",
                             Popover = new Popover
                             {
-                                Description = Resources.SharedResource.Tour_ThankyouSection_Desc,
+                                Title = Resources.SharedResource.tour_title_ThankyouSection,
+                                Description = Resources.SharedResource.tour_desc_ThankyouSection,
                             }
                         },
-                        new DriveStep {
-                            Element = "#template-section",
+                        new DriveStep
+                        {
+                            Element = "#broadcast-setting",
                             Popover = new Popover
                             {
-                                Description = Resources.SharedResource.Tour_TemplateSection_Desc,
+                                Title = Resources.SharedResource.tour_title_BroadcastSetting,
+                                Description = Resources.SharedResource.tour_desc_BroadcastSetting,
                             }
                         },
-                        new DriveStep {
+                        new DriveStep
+                        {
+                            Element = "#product-setting",
+                            Popover = new Popover
+                            {
+                                Title = Resources.SharedResource.tour_title_ProductSetting,
+                                Description = Resources.SharedResource.tour_desc_ProductSetting,
+                            }
+                        },
+                        new DriveStep
+                        {
                             Element = ".save-setting-btn",
                             Popover = new Popover
                             {
-                                Description = string.Format(Resources.SharedResource.Tour_SaveButton_Desc, Resources.SharedResource.AppName),
+                                Title = Resources.SharedResource.tour_title_SaveButton,
+                                Description = Resources.SharedResource.tour_desc_SaveButton,
                             }
                         },
-                        new DriveStep {
-                            Element = ".tourButton",
-                            Popover = new Popover
-                            {
-                                Description = Resources.SharedResource.Tour_Rerun,
-                                OnNextClick = "refocus",  // note: the call-back is defined in the relevant cshtml file
-                            },                            
-                        },
-                    }
+                        DriveStep.QuickLaunchStep(),
+                        DriveStep.SwitchCompanyStep(),
+                        DriveStep.ManageAccountStep(),
+                        DriveStep.ChangeLanguageStep(),
+                        DriveStep.LastStep()
+                        ]
                 },
                 "productpublication.index" => new ProductTour
                 {
-                    Steps = new[]
-                    {
-                        new DriveStep {
+                    Steps = [
+                        new DriveStep
+                        {
                             Element = ".publish-col",
                             Popover = new Popover
                             {
-                                Description = Resources.SharedResource.Tour_PublishCol_Desc,
-                            },                            
+                                Title = Resources.SharedResource.tour_title_SelectProduct,
+                                Description = Resources.SharedResource.tour_desc_SelectProduct,
+                            },
                         },
-                        new DriveStep {
+                        new DriveStep
+                        {
                             Element = ".dx-icon-upload, .dx-icon-exportselected",
                             Popover = new Popover
                             {
-                                Description = Resources.SharedResource.Tour_PublishButton_Desc,
+                                Title = Resources.SharedResource.tour_title_PublishButton,
+                                Description = Resources.SharedResource.tour_desc_PublishButton,
                             },
                         },
-                    },                    
+                        new DriveStep
+                        {
+                            Popover = new Popover
+                            {
+                                Title = Resources.SharedResource.tour_title_PublishProductDemo,
+                                Description = Resources.SharedResource.tour_desc_PublishProductDemo,
+                            },
+                        },
+                        new DriveStep
+                        {
+                            Popover = new Popover
+                            {                                
+                                Title = Resources.SharedResource.tour_title_PublishedInFacebook,
+                                Description = Resources.SharedResource.tour_desc_PublishedInFacebook,
+                            },
+                        },
+                        new DriveStep
+                        {
+                            Popover = new Popover
+                            {                                
+                                Title = Resources.SharedResource.tour_title_PublishedInInstagram,
+                                Description = Resources.SharedResource.tour_desc_PublishedInInstagram,
+                            },
+                        },
+                        new DriveStep
+                        {
+                            Popover = new Popover
+                            {                                
+                                Title = Resources.SharedResource.tour_title_PublishedInLine,
+                                Description = Resources.SharedResource.tour_desc_PublishedInLine,
+                            },
+                        },
+                        new DriveStep
+                        {
+                            Popover = new Popover
+                            {
+                                PopoverClass = "corprio-wide-popover",
+                                Title = Resources.SharedResource.tour_title_HowToAddMyLineChannel,
+                                Description = Resources.SharedResource.tour_desc_HowToAddMyLineChannel,
+                            },
+                        },
+                        .. DriveStep.StandardGridIntro(isWideScreen: isWideScreen, hasLines: true),
+                        DriveStep.LastStep()],                    
                 },                
                 _ => null,
             };

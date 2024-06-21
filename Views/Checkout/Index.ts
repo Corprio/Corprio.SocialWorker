@@ -45,7 +45,7 @@ declare const vdata: {
         proceedToPayment: string;
         processing: string;
         quantity: string;
-        receipient: string;
+        recipient: string;
         remainingStockMessage: string;
         remainingStockTitle: string;
         save: string;
@@ -660,7 +660,7 @@ function prepareDeliveryMethodFields(defCallingCode: string) {
 
     const recipientDiv = $('<div id="recipient-section">').appendTo($deliveryMethodFieldset);
     recipientDiv.toggle(chosenDeliveryMethod === DeliveryOption.Shipping);
-    $('<h5>').addClass('mt-3').text(vdata.localizer.receipient).appendTo(recipientDiv);
+    $('<h5>').addClass('mt-3').text(vdata.localizer.recipient).appendTo(recipientDiv);
     $('<div>').addClass('d-flex').appendTo(recipientDiv).append(
         $('<div id="delivery-contact-given-name">').dxTextBox({
             value: (isPaymentClicked || isPreview) ? vdata.model.deliveryContact_GivenName : String($('#bill-person-given-name').find('input').val()),

@@ -325,7 +325,7 @@
     <value>Sorry, you do not have the "Approve" permission.</value>
   </data>
   <data name="PromptUnapprove" xml:space="preserve">
-    <value>Are you sure to unapprove this record?</value>
+    <value>Are you sure you want to unapprove this record?</value>
   </data>
   <data name="Unapprove" xml:space="preserve">
     <value>Unapprove</value>
@@ -418,7 +418,7 @@
     <value>Template saved</value>
   </data>
   <data name="CustomText" xml:space="preserve">
-    <value>CustomText</value>
+    <value>Custom Text</value>
   </data>
   <data name="DefaultDeliveryCharge" xml:space="preserve">
     <value>Default delivery charge</value>
@@ -756,9 +756,6 @@
   <data name="ProductDesc" xml:space="preserve">
     <value>Description</value>
   </data>
-  <data name="Receipient" xml:space="preserve">
-    <value>Receipient</value>
-  </data>
   <data name="Shipping" xml:space="preserve">
     <value>Shipping</value>
   </data>
@@ -891,48 +888,6 @@
   <data name="Title_EditVariant" xml:space="preserve">
     <value>Choose a different variant</value>
   </data>
-  <data name="Tour_CheckoutSection_Desc" xml:space="preserve">
-    <value>When your customer elects to check out, they will be re-directed to a checkout page to review their shopping cart and provide personal information. You can define any message you want to show to your customer at the checkout page.</value>
-  </data>
-  <data name="Tour_DelliverySection_Desc" xml:space="preserve">
-    <value>The delivery methods you set up here will be displayed to your customers when they check out.</value>
-  </data>
-  <data name="Tour_DisconnectFacebook_Desc" xml:space="preserve">
-    <value>Terminate the connection between your company and Facebook account.</value>
-  </data>
-  <data name="Tour_FbSection_Desc" xml:space="preserve">
-    <value>Connect your company with Facebook so that {0} can create posts/stories and respond to private messages / comments on your behalf.</value>
-  </data>
-  <data name="Tour_GetStarted_Desc" xml:space="preserve">
-    <value>Complete some simple configurations here to start using {0}.</value>
-  </data>
-  <data name="Tour_PaymentSection_Desc" xml:space="preserve">
-    <value>The payment methods you set up here will be made available to your customers when they check out.</value>
-  </data>
-  <data name="Tour_ProductPublication_Desc" xml:space="preserve">
-    <value>Once you have connected your company with your Facebook account, you can publish products to your Facebook pages and Instagram accounts.</value>
-  </data>
-  <data name="Tour_PublishButton_Desc" xml:space="preserve">
-    <value>Once a product is published, the button's icon would change. You can use it as a reference to tell if you have published this product already.</value>
-  </data>
-  <data name="Tour_SaveButton_Desc" xml:space="preserve">
-    <value>Don't forget to click save when you done with configuring {0}.</value>
-  </data>
-  <data name="Tour_SomSection_Desc" xml:space="preserve">
-    <value>Once you have connected your company with your Facebook account, a chatbot can handle messages your customers send to your Facebook pages and Instagram accounts. That chatbot will create sales orders according to your settings here.</value>
-  </data>
-  <data name="Tour_TemplateSection_Desc" xml:space="preserve">
-    <value>Define how your products/catalogues will be posted to your social media.</value>
-  </data>
-  <data name="Tour_ThankyouSection_Desc" xml:space="preserve">
-    <value>Define the thank-you message that you want to display to your customer after they complete checkout.</value>
-  </data>
-  <data name="Tour_Welcome_Desc" xml:space="preserve">
-    <value>Welcome to {0}.</value>
-  </data>
-  <data name="Tour_Welcome_Title" xml:space="preserve">
-    <value>Welcome</value>
-  </data>
   <data name="Warning_consequence1" xml:space="preserve">
     <value>You will not be able to publish products and/or catalogues of the company that is currently linked to Facebook.</value>
   </data>
@@ -1002,12 +957,6 @@
   <data name="PublishProductHint2" xml:space="preserve">
     <value>Publish a post about this product to social media. (Note: this product was published previously)</value>
   </data>
-  <data name="Tour_PublishCol_Desc" xml:space="preserve">
-    <value>Select the product you would like to publish and click the corresponding icon in this column.</value>
-  </data>
-  <data name="Tour_Rerun" xml:space="preserve">
-    <value>If you wish to have re-run site tour, simply click this button.</value>
-  </data>
   <data name="Unknown_Italic" xml:space="preserve">
     <value>&lt;i&gt;Unknown&lt;/i&gt;</value>
   </data>
@@ -1042,7 +991,7 @@
     <value>Mentioned</value>
   </data>
   <data name="Connect_Line" xml:space="preserve">
-    <value>Connet Line</value>
+    <value>Connect Line</value>
   </data>
   <data name="Connect_Line_Desc1" xml:space="preserve">
     <value>Connect</value>
@@ -1177,6 +1126,132 @@
     <value>Line Broadcast Header</value>
   </data>
   <data name="BroadcastHeader_Description" xml:space="preserve">
-    <value>This message will always appear as the first line of your Lne channels' broadcast messages.</value>
+    <value>This message will always appear as the first line of your Line channels' broadcast messages.</value>
+  </data>
+  <data name="tour_desc_BroadcastSetting" xml:space="preserve">
+    <value>Edit the header that will appear in your Line channels' broadcast messages.</value>
+  </data>
+  <data name="tour_desc_CheckoutSection" xml:space="preserve">
+    <value>When your customer elects to check out, they will be re-directed to a checkout page to review their shopping cart and provide personal information. You can define any message you want to show to your customer at the checkout page.</value>
+  </data>
+  <data name="tour_desc_ConnectFacebook" xml:space="preserve">
+    <value>Connect your Corprio company with Facebook so that Corprio-SocialMediaMarketer can create posts/stories and respond to private messages on your behalf.</value>
+  </data>
+  <data name="tour_desc_ConnectLine" xml:space="preserve">
+    <value>Connect your Corprio company with your Line channels so that Corprio-SocialMediaMarketer can create broadcast messages and respond to private messages on your behalf.</value>
+  </data>
+  <data name="tour_desc_DeliverySection" xml:space="preserve">
+    <value>The delivery methods you set up here will be displayed to your customers when they check out.</value>
+  </data>
+  <data name="tour_desc_DisconnectFacebook" xml:space="preserve">
+    <value>Terminate the connection between your Corprio company and Facebook account.</value>
+  </data>
+  <data name="tour_desc_GetStarted" xml:space="preserve">
+    <value>Complete some simple configurations here to start using Corprio-SocialMediaMarketer.</value>
+  </data>
+  <data name="tour_desc_HowToAddMyLineChannel" xml:space="preserve">
+    <value>&lt;img class="border rounded" src='/images/line_qr_code.png' style='width: 100%;'/&gt;&lt;p&gt;Don't forget that you must have added your Line channel as a friend before you can see its broadcast messages. The simplest way is to use Line App to scan the QR code in your Line Developers Console &gt; {Your Provider's Name} &gt; {Your Channel's Name} &gt; Messaging API settings.&lt;/p&gt;</value>
+  </data>
+  <data name="tour_desc_PaymentSection" xml:space="preserve">
+    <value>The payment methods you set up here will be made available to your customers when they check out.</value>
+  </data>
+  <data name="tour_desc_ProductPublication" xml:space="preserve">
+    <value>Once you have connected your Corprio company with your Facebook account and/or Line channels, you can publish products to your Facebook pages, Instagram accounts and/or Line channels.</value>
+  </data>
+  <data name="tour_desc_ProductSetting" xml:space="preserve">
+    <value>Define how your products will be posted to your social media.</value>
+  </data>
+  <data name="tour_desc_PublishButton" xml:space="preserve">
+    <value>Once a product is published, the button's icon would change. You can use it as a reference to tell if you have published this product already.</value>
+  </data>
+  <data name="tour_desc_PublishedInFacebook" xml:space="preserve">
+    <value>&lt;div class="d-flex justify-content-center"&gt;&lt;img class="border rounded" src='/images/post_in_FB.png' style='max-height:300px' /&gt;&lt;/div&gt;&lt;p&gt;Provided you have connected your Corprio company with Facebook in GetStarted, you can then check the post in your Facebook page.&lt;/p&gt;</value>
+  </data>
+  <data name="tour_desc_PublishedInInstagram" xml:space="preserve">
+    <value>&lt;div class="d-flex justify-content-center"&gt;&lt;img class="border rounded" src='/images/post_in_IG.png' style='max-height:300px'/&gt;&lt;/div&gt;&lt;p&gt;You can then also find the post in your Instagram account. Note: if the product you publish does not have any image, no post can be made to Instagram.&lt;/p&gt;</value>
+  </data>
+  <data name="tour_desc_PublishedInLine" xml:space="preserve">
+    <value>&lt;div class="d-flex justify-content-center"&gt;&lt;img class="border rounded" src='/images/broadcast_in_Line.png' style='max-height:300px;'/&gt;&lt;/div&gt;&lt;p&gt;Provided you have connected your Corprio company with a Line channel in GetStated, you can check the broadcast message in your Line channel.&lt;/p&gt;</value>
+  </data>
+  <data name="tour_desc_PublishProductDemo" xml:space="preserve">
+    <value>&lt;video autoplay loop style='max-width:100%;max-height:50vh;'&gt;&lt;source src='/images/publish_product.webm' type='video/webm' /&gt;&lt;/video&gt;&lt;div&gt;After clicking the publication button, review the message that will be posted to your social media. Then, click 'Confirm.'.&lt;/div&gt;</value>
+  </data>
+  <data name="tour_desc_SaveButton" xml:space="preserve">
+    <value>Don't forget to click save when you done with configuring Corprio-SocialMediaMarketer.</value>
+  </data>
+  <data name="tour_desc_SelectProduct" xml:space="preserve">
+    <value>Select the product you would like to publish and click the corresponding icon in this column.</value>
+  </data>
+  <data name="tour_desc_SomSection" xml:space="preserve">
+    <value>Once you have connected your Corprio company with your Facebook account and/or Line channels, a chatbot can handle messages your customers send to your Facebook pages, Instagram accounts and/or Line channels. That chatbot will create sales orders according to your settings here.</value>
+  </data>
+  <data name="tour_desc_ThankyouSection" xml:space="preserve">
+    <value>Define the thank-you message that you want to display to your customer after they complete checkout.</value>
+  </data>
+  <data name="tour_desc_Welcome" xml:space="preserve">
+    <value>Welcome to Corprio-SocialMediaMarketer.</value>
+  </data>
+  <data name="tour_title_BroadcastSetting" xml:space="preserve">
+    <value>Edit broadcast message's header</value>
+  </data>
+  <data name="tour_title_CheckoutSection" xml:space="preserve">
+    <value>Configure checkout page</value>
+  </data>
+  <data name="tour_title_ConnectFacebook" xml:space="preserve">
+    <value>Connect with Facebook</value>
+  </data>
+  <data name="tour_title_ConnectLine" xml:space="preserve">
+    <value>Connect with Line</value>
+  </data>
+  <data name="tour_title_DeliverySection" xml:space="preserve">
+    <value>Set up delivery method</value>
+  </data>
+  <data name="tour_title_DisconnectFacebook" xml:space="preserve">
+    <value>Disconnect from Facebook</value>
+  </data>
+  <data name="tour_title_GetStarted" xml:space="preserve">
+    <value>Configuration</value>
+  </data>
+  <data name="tour_title_HowToAddMyLineChannel" xml:space="preserve">
+    <value>Add your Line channel as friend</value>
+  </data>
+  <data name="tour_title_PaymentSection" xml:space="preserve">
+    <value>Set up payment method</value>
+  </data>
+  <data name="tour_title_ProductPublication" xml:space="preserve">
+    <value>Publish your products</value>
+  </data>
+  <data name="tour_title_ProductSetting" xml:space="preserve">
+    <value>Edit message template</value>
+  </data>
+  <data name="tour_title_PublishButton" xml:space="preserve">
+    <value>Publication button</value>
+  </data>
+  <data name="tour_title_PublishedInFacebook" xml:space="preserve">
+    <value>Post in Facebook</value>
+  </data>
+  <data name="tour_title_PublishedInInstagram" xml:space="preserve">
+    <value>Post in Instagram</value>
+  </data>
+  <data name="tour_title_PublishedInLine" xml:space="preserve">
+    <value>Broadcast in Line</value>
+  </data>
+  <data name="tour_title_PublishProductDemo" xml:space="preserve">
+    <value>Demo</value>
+  </data>
+  <data name="tour_title_SaveButton" xml:space="preserve">
+    <value>Save</value>
+  </data>
+  <data name="tour_title_SelectProduct" xml:space="preserve">
+    <value>Select product</value>
+  </data>
+  <data name="tour_title_SomSection" xml:space="preserve">
+    <value>Manage how sales orders are created</value>
+  </data>
+  <data name="tour_title_ThankyouSection" xml:space="preserve">
+    <value>Define thank-you message</value>
+  </data>
+  <data name="tour_title_Welcome" xml:space="preserve">
+    <value>Welcome</value>
   </data>
 </root>

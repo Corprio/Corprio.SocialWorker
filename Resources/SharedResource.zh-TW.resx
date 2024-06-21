@@ -756,9 +756,6 @@
   <data name="ProductDesc" xml:space="preserve">
     <value>描述</value>
   </data>
-  <data name="Receipient" xml:space="preserve">
-    <value>收件者</value>
-  </data>
   <data name="Shipping" xml:space="preserve">
     <value>送貨</value>
   </data>
@@ -891,48 +888,6 @@
   <data name="Title_EditVariant" xml:space="preserve">
     <value>更改選擇</value>
   </data>
-  <data name="Tour_CheckoutSection_Desc" xml:space="preserve">
-    <value>當您的客戶選擇結帳時，他們將被重新導向到結帳頁面以查看其購物車並提供個人資訊。您可以在此設定要在結帳頁面向客戶顯示的資訊。</value>
-  </data>
-  <data name="Tour_DelliverySection_Desc" xml:space="preserve">
-    <value>您在此設定的送貨方式將在您的客戶結帳時顯示給他們選擇。</value>
-  </data>
-  <data name="Tour_DisconnectFacebook_Desc" xml:space="preserve">
-    <value>終止您的公司和 Facebook 帳戶之間的連接。</value>
-  </data>
-  <data name="Tour_FbSection_Desc" xml:space="preserve">
-    <value>將您的公司與 Facebook 連接，以便 {0} 可以代替您建立貼文並回覆私人訊息/評論。</value>
-  </data>
-  <data name="Tour_GetStarted_Desc" xml:space="preserve">
-    <value>在此完成一些簡單的配置即讓{0}投入服務。</value>
-  </data>
-  <data name="Tour_PaymentSection_Desc" xml:space="preserve">
-    <value>您在此設定的付款方式將在您的客戶結帳時提供給他們選擇。</value>
-  </data>
-  <data name="Tour_ProductPublication_Desc" xml:space="preserve">
-    <value>將公司與 Facebook 帳戶連結後，您可以在此將產品發佈到 Facebook 專頁和 Instagram 帳戶。</value>
-  </data>
-  <data name="Tour_PublishButton_Desc" xml:space="preserve">
-    <value>產品發布後，其按鈕的圖示就會更新。您可以參考它來判斷該產品是否曾經發佈到社交媒體。</value>
-  </data>
-  <data name="Tour_SaveButton_Desc" xml:space="preserve">
-    <value>完成设置後，請不要忘記按一下「儲存」。</value>
-  </data>
-  <data name="Tour_SomSection_Desc" xml:space="preserve">
-    <value>將您的公司與 Facebook 帳戶連接後，{0}的聊天機器人就可以處理客戶發送到您的 Facebook 專頁和 Instagram 帳戶的資訊。該聊天機器人將根據您在此處的設定建立銷售訂單。</value>
-  </data>
-  <data name="Tour_TemplateSection_Desc" xml:space="preserve">
-    <value>在此設定如何將您的商品/目錄發佈到您的社交媒體。</value>
-  </data>
-  <data name="Tour_ThankyouSection_Desc" xml:space="preserve">
-    <value>在此設定您希望在客戶完成結帳後向其顯示的感謝訊息。</value>
-  </data>
-  <data name="Tour_Welcome_Desc" xml:space="preserve">
-    <value>歡迎來到{0}。</value>
-  </data>
-  <data name="Tour_Welcome_Title" xml:space="preserve">
-    <value>歡迎</value>
-  </data>
   <data name="Warning_consequence1" xml:space="preserve">
     <value>您將無法發布目前與 Facebook 連結的公司的產品和/或目錄。</value>
   </data>
@@ -1001,12 +956,6 @@
   </data>
   <data name="PublishProductHint2" xml:space="preserve">
     <value>在社群媒體上發布有關此產品的貼文（註：此產品之前已經發布）</value>
-  </data>
-  <data name="Tour_PublishCol_Desc" xml:space="preserve">
-    <value>選擇您想要發佈到 Facebook 和 Instagram的產品，然後點擊此欄中對應的圖示。</value>
-  </data>
-  <data name="Tour_Rerun" xml:space="preserve">
-    <value>如果您希望重溫這個應用導航，請單擊此按鈕。</value>
   </data>
   <data name="Unknown_Italic" xml:space="preserve">
     <value>&lt;i&gt;未知&lt;/i&gt;</value>
@@ -1178,5 +1127,131 @@
   </data>
   <data name="ErrMsg_FacebookNotLoggedIn" xml:space="preserve">
     <value>若要將貼文發佈到您的 Facebook 頁面和/或 Instagram 帳戶，請先登入您的 Facebook 帳戶。</value>
+  </data>
+  <data name="tour_desc_BroadcastSetting" xml:space="preserve">
+    <value>編輯將出現在您的 Line 廣播訊息中的標頭。</value>
+  </data>
+  <data name="tour_desc_CheckoutSection" xml:space="preserve">
+    <value>當您的客戶選擇結帳時，他們將被重新導向到結帳頁面以查看其購物車並提供個人資訊。您可以在此設定要在結帳頁面向客戶顯示的資訊。</value>
+  </data>
+  <data name="tour_desc_ConnectFacebook" xml:space="preserve">
+    <value>將您的 Corprio 公司與 Facebook 連接，以便 Corprio-SocialMediaMarketer 可以代替您創建貼文並回覆私人訊息。</value>
+  </data>
+  <data name="tour_desc_ConnectLine" xml:space="preserve">
+    <value>将您的 Corprio 公司与 Line channel 连接，以便 Corprio-SocialMediaMarketer 可以代替您创建广播消息并回复私人消息。</value>
+  </data>
+  <data name="tour_desc_DeliverySection" xml:space="preserve">
+    <value>您在此設定的送貨方式將在您的客戶結帳時顯示給他們選擇。</value>
+  </data>
+  <data name="tour_desc_DisconnectFacebook" xml:space="preserve">
+    <value>終止您的 Corprio 公司和 Facebook 帳戶之間的連線。</value>
+  </data>
+  <data name="tour_desc_GetStarted" xml:space="preserve">
+    <value>在此完成一些簡單的配置即讓 Corprio-SocialMediaMarketer 投入服務。</value>
+  </data>
+  <data name="tour_desc_HowToAddMyLineChannel" xml:space="preserve">
+    <value>&lt;img class="border rounded" src='/images/line_qr_code.png' style='width: 100%;'/&gt;&lt;p&gt;不要忘記，您必須先將您的 Line channel 新增為好友，然後才能看到其廣播訊息。最簡單的方法是使用 Line 應用掃描 Line 開發者控制台 &gt; {您的提供者名稱} &gt; {您的頻道名稱} &gt; Messaging API setting 中的二維碼。&lt;/p&gt;</value>
+  </data>
+  <data name="tour_desc_PaymentSection" xml:space="preserve">
+    <value>您在此設定的付款方式將在您的客戶結帳時提供給他們選擇。</value>
+  </data>
+  <data name="tour_desc_ProductPublication" xml:space="preserve">
+    <value>將您的 Corprio 公司與 Facebook 帳戶和/或 Line channel 連結後，您可以將產品發佈到您的 Facebook 頁面、Instagram 帳戶和/或 Line 管道。</value>
+  </data>
+  <data name="tour_desc_ProductSetting" xml:space="preserve">
+    <value>在此設定如何將您的商品發佈到您的社群媒體。</value>
+  </data>
+  <data name="tour_desc_PublishButton" xml:space="preserve">
+    <value>產品發布後，其按鈕的圖示就會更新。您可以參考它來判斷該產品是否曾經發佈到社交媒體。</value>
+  </data>
+  <data name="tour_desc_PublishedInFacebook" xml:space="preserve">
+    <value>&lt;div class="d-flex justify-content-center"&gt;&lt;img class="border rounded" src='/images/post_in_FB.png' style='max-height:300px' /&gt;&lt;/div&gt;&lt;p&gt;如果您已在系統設定中將您的 Corprio 公司與 Facebook 連接，則您可以在 Facebook 頁面中查看該貼文。&lt;/p&gt;</value>
+  </data>
+  <data name="tour_desc_PublishedInInstagram" xml:space="preserve">
+    <value>&lt;div class="d-flex justify-content-center"&gt;&lt;img class="border rounded" src='/images/post_in_IG.png' style='max-height:300px'/&gt;&lt;/div&gt;&lt;p&gt;您也可以在您的 Instagram 帳戶中找到該貼文。注意：如果您發布的產品沒有任何圖片，則無法在 Instagram 上發布貼文。&lt;/p&gt;</value>
+  </data>
+  <data name="tour_desc_PublishedInLine" xml:space="preserve">
+    <value>&lt;div class="d-flex justify-content-center"&gt;&lt;img class="border rounded" src='/images/broadcast_in_Line.png' style='max-height:300px;'/&gt;&lt;/div&gt;&lt;p&gt;如果您已在系統設定中將 Corprio 公司與 Line channel 連接，則可以在 Line 中查看廣播訊息。&lt;/p&gt;</value>
+  </data>
+  <data name="tour_desc_PublishProductDemo" xml:space="preserve">
+    <value>&lt;video autoplay loop style='max-width:100%;max-height:50vh;'&gt;&lt;source src='/images/publish_product.webm' type='video/webm' /&gt;&lt;/video&gt;&lt;div&gt;點擊發布按鈕後，查看將發佈到您的社群媒體的訊息。然後，按一下「確認」。&lt;/div&gt;</value>
+  </data>
+  <data name="tour_desc_SaveButton" xml:space="preserve">
+    <value>完成設定後，請不要忘記按一下「儲存」。</value>
+  </data>
+  <data name="tour_desc_SelectProduct" xml:space="preserve">
+    <value>選擇您想要發佈到社群媒體的產品，然後按一下此欄中對應的圖示。</value>
+  </data>
+  <data name="tour_desc_SomSection" xml:space="preserve">
+    <value>將您的 Corprio 公司與 Line channel 連接，以便 Corprio-SocialMediaMarketer 可以代替您創建廣播訊息並回覆私人訊息。</value>
+  </data>
+  <data name="tour_desc_ThankyouSection" xml:space="preserve">
+    <value>在此設定您希望在客戶完成結帳後向其顯示的感謝訊息。</value>
+  </data>
+  <data name="tour_desc_Welcome" xml:space="preserve">
+    <value>歡迎來到 Corprio-SocialMediaMarketer。</value>
+  </data>
+  <data name="tour_title_BroadcastSetting" xml:space="preserve">
+    <value>編輯 Line 廣播訊息標頭</value>
+  </data>
+  <data name="tour_title_CheckoutSection" xml:space="preserve">
+    <value>結帳頁面資訊設定</value>
+  </data>
+  <data name="tour_title_ConnectFacebook" xml:space="preserve">
+    <value>與 Facebook 連接</value>
+  </data>
+  <data name="tour_title_ConnectLine" xml:space="preserve">
+    <value>與 Line channel 連接</value>
+  </data>
+  <data name="tour_title_DeliverySection" xml:space="preserve">
+    <value>送貨方式設定</value>
+  </data>
+  <data name="tour_title_DisconnectFacebook" xml:space="preserve">
+    <value>終止與 Facebook 連接</value>
+  </data>
+  <data name="tour_title_GetStarted" xml:space="preserve">
+    <value>系統設定</value>
+  </data>
+  <data name="tour_title_HowToAddMyLineChannel" xml:space="preserve">
+    <value>添加您的 Line 频道为好友</value>
+  </data>
+  <data name="tour_title_PaymentSection" xml:space="preserve">
+    <value>付款方式設定</value>
+  </data>
+  <data name="tour_title_ProductPublication" xml:space="preserve">
+    <value>產品發布</value>
+  </data>
+  <data name="tour_title_ProductSetting" xml:space="preserve">
+    <value>更新社群媒體貼文範本</value>
+  </data>
+  <data name="tour_title_PublishButton" xml:space="preserve">
+    <value>發布按鈕</value>
+  </data>
+  <data name="tour_title_PublishedInFacebook" xml:space="preserve">
+    <value>Facebook 上的帖子</value>
+  </data>
+  <data name="tour_title_PublishedInInstagram" xml:space="preserve">
+    <value>Instagram 上的帖子</value>
+  </data>
+  <data name="tour_title_PublishedInLine" xml:space="preserve">
+    <value>Line上的广播消息</value>
+  </data>
+  <data name="tour_title_PublishProductDemo" xml:space="preserve">
+    <value>示範</value>
+  </data>
+  <data name="tour_title_SaveButton" xml:space="preserve">
+    <value>儲存</value>
+  </data>
+  <data name="tour_title_SelectProduct" xml:space="preserve">
+    <value>選擇產品</value>
+  </data>
+  <data name="tour_title_SomSection" xml:space="preserve">
+    <value>销售订单创建方式</value>
+  </data>
+  <data name="tour_title_ThankyouSection" xml:space="preserve">
+    <value>感謝資訊設定</value>
+  </data>
+  <data name="tour_title_Welcome" xml:space="preserve">
+    <value>歡迎</value>
   </data>
 </root>

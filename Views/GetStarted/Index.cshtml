@@ -346,12 +346,12 @@
                         <p>@localizer["SocialMediaTemplate_Desc"]</p>
                     </div>                
                     
-                    <div class="form-group mb-5">
+                    <div id="broadcast-setting" class="form-group mb-5">
                         <h5><help-label asp-for="LineBroadcastHeader"></help-label></h5>
                         @Html.DevExtreme().TextBoxFor(m => m.LineBroadcastHeader).Width("100%")
                     </div>
 
-                    <div class="row mb-2">
+                    <div id="product-setting" class="row mb-2">
                         <div class="col-sm">
                             <h5 class="mb-2">@localizer["Panel_Blocks"] - @localizer["PanelTitle_Product"]</h5>
                             <div id="block-panel-product" class="rounded border border-success bg-white py-1 mb-3 setting-panel">&nbsp;</div>

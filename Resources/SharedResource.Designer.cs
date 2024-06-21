@@ -223,7 +223,7 @@ namespace Corprio.SocialWorker.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to This message will always appear as the first line of your Lne channels&apos; broadcast messages..
+        ///   Looks up a localized string similar to This message will always appear as the first line of your Line channels&apos; broadcast messages..
         /// </summary>
         public static string BroadcastHeader_Description {
             get {
@@ -412,7 +412,7 @@ namespace Corprio.SocialWorker.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Connet Line.
+        ///   Looks up a localized string similar to Connect Line.
         /// </summary>
         public static string Connect_Line {
             get {
@@ -466,7 +466,7 @@ namespace Corprio.SocialWorker.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to CustomText.
+        ///   Looks up a localized string similar to Custom Text.
         /// </summary>
         public static string CustomText {
             get {
@@ -1879,7 +1879,7 @@ namespace Corprio.SocialWorker.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Are you sure to unapprove this record?.
+        ///   Looks up a localized string similar to Are you sure you want to unapprove this record?.
         /// </summary>
         public static string PromptUnapprove {
             get {
@@ -1983,15 +1983,6 @@ namespace Corprio.SocialWorker.Resources {
         public static string Qty {
             get {
                 return ResourceManager.GetString("Qty", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Receipient.
-        /// </summary>
-        public static string Receipient {
-            get {
-                return ResourceManager.GetString("Receipient", resourceCulture);
             }
         }
         
@@ -2833,146 +2824,380 @@ namespace Corprio.SocialWorker.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Edit the header that will appear in your Line channels&apos; broadcast messages..
+        /// </summary>
+        public static string tour_desc_BroadcastSetting {
+            get {
+                return ResourceManager.GetString("tour_desc_BroadcastSetting", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to When your customer elects to check out, they will be re-directed to a checkout page to review their shopping cart and provide personal information. You can define any message you want to show to your customer at the checkout page..
         /// </summary>
-        public static string Tour_CheckoutSection_Desc {
+        public static string tour_desc_CheckoutSection {
             get {
-                return ResourceManager.GetString("Tour_CheckoutSection_Desc", resourceCulture);
+                return ResourceManager.GetString("tour_desc_CheckoutSection", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Connect your Corprio company with Facebook so that Corprio-SocialMediaMarketer can create posts/stories and respond to private messages on your behalf..
+        /// </summary>
+        public static string tour_desc_ConnectFacebook {
+            get {
+                return ResourceManager.GetString("tour_desc_ConnectFacebook", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Connect your Corprio company with your Line channels so that Corprio-SocialMediaMarketer can create broadcast messages and respond to private messages on your behalf..
+        /// </summary>
+        public static string tour_desc_ConnectLine {
+            get {
+                return ResourceManager.GetString("tour_desc_ConnectLine", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to The delivery methods you set up here will be displayed to your customers when they check out..
         /// </summary>
-        public static string Tour_DelliverySection_Desc {
+        public static string tour_desc_DeliverySection {
             get {
-                return ResourceManager.GetString("Tour_DelliverySection_Desc", resourceCulture);
+                return ResourceManager.GetString("tour_desc_DeliverySection", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Terminate the connection between your company and Facebook account..
+        ///   Looks up a localized string similar to Terminate the connection between your Corprio company and Facebook account..
         /// </summary>
-        public static string Tour_DisconnectFacebook_Desc {
+        public static string tour_desc_DisconnectFacebook {
             get {
-                return ResourceManager.GetString("Tour_DisconnectFacebook_Desc", resourceCulture);
+                return ResourceManager.GetString("tour_desc_DisconnectFacebook", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Connect your company with Facebook so that {0} can create posts/stories and respond to private messages / comments on your behalf..
+        ///   Looks up a localized string similar to Complete some simple configurations here to start using Corprio-SocialMediaMarketer..
         /// </summary>
-        public static string Tour_FbSection_Desc {
+        public static string tour_desc_GetStarted {
             get {
-                return ResourceManager.GetString("Tour_FbSection_Desc", resourceCulture);
+                return ResourceManager.GetString("tour_desc_GetStarted", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Complete some simple configurations here to start using {0}..
+        ///   Looks up a localized string similar to &lt;img class=&quot;border rounded&quot; src=&apos;/images/line_qr_code.png&apos; style=&apos;width: 100%;&apos;/&gt;&lt;p&gt;Don&apos;t forget that you must have added your Line channel as a friend before you can see its broadcast messages. The simplest way is to use Line App to scan the QR code in your Line Developers Console &gt; {Your Provider&apos;s Name} &gt; {Your Channel&apos;s Name} &gt; Messaging API settings.&lt;/p&gt;.
         /// </summary>
-        public static string Tour_GetStarted_Desc {
+        public static string tour_desc_HowToAddMyLineChannel {
             get {
-                return ResourceManager.GetString("Tour_GetStarted_Desc", resourceCulture);
+                return ResourceManager.GetString("tour_desc_HowToAddMyLineChannel", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to The payment methods you set up here will be made available to your customers when they check out..
         /// </summary>
-        public static string Tour_PaymentSection_Desc {
+        public static string tour_desc_PaymentSection {
             get {
-                return ResourceManager.GetString("Tour_PaymentSection_Desc", resourceCulture);
+                return ResourceManager.GetString("tour_desc_PaymentSection", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Once you have connected your company with your Facebook account, you can publish products to your Facebook pages and Instagram accounts..
+        ///   Looks up a localized string similar to Once you have connected your Corprio company with your Facebook account and/or Line channels, you can publish products to your Facebook pages, Instagram accounts and/or Line channels..
         /// </summary>
-        public static string Tour_ProductPublication_Desc {
+        public static string tour_desc_ProductPublication {
             get {
-                return ResourceManager.GetString("Tour_ProductPublication_Desc", resourceCulture);
+                return ResourceManager.GetString("tour_desc_ProductPublication", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Define how your products will be posted to your social media..
+        /// </summary>
+        public static string tour_desc_ProductSetting {
+            get {
+                return ResourceManager.GetString("tour_desc_ProductSetting", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Once a product is published, the button&apos;s icon would change. You can use it as a reference to tell if you have published this product already..
         /// </summary>
-        public static string Tour_PublishButton_Desc {
+        public static string tour_desc_PublishButton {
             get {
-                return ResourceManager.GetString("Tour_PublishButton_Desc", resourceCulture);
+                return ResourceManager.GetString("tour_desc_PublishButton", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;div class=&quot;d-flex justify-content-center&quot;&gt;&lt;img class=&quot;border rounded&quot; src=&apos;/images/post_in_FB.png&apos; style=&apos;max-height:300px&apos; /&gt;&lt;/div&gt;&lt;p&gt;Provided you have connected your Corprio company with Facebook in GetStarted, you can then check the post in your Facebook page.&lt;/p&gt;.
+        /// </summary>
+        public static string tour_desc_PublishedInFacebook {
+            get {
+                return ResourceManager.GetString("tour_desc_PublishedInFacebook", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;div class=&quot;d-flex justify-content-center&quot;&gt;&lt;img class=&quot;border rounded&quot; src=&apos;/images/post_in_IG.png&apos; style=&apos;max-height:300px&apos;/&gt;&lt;/div&gt;&lt;p&gt;You can then also find the post in your Instagram account. Note: if the product you publish does not have any image, no post can be made to Instagram.&lt;/p&gt;.
+        /// </summary>
+        public static string tour_desc_PublishedInInstagram {
+            get {
+                return ResourceManager.GetString("tour_desc_PublishedInInstagram", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;div class=&quot;d-flex justify-content-center&quot;&gt;&lt;img class=&quot;border rounded&quot; src=&apos;/images/broadcast_in_Line.png&apos; style=&apos;max-height:300px;&apos;/&gt;&lt;/div&gt;&lt;p&gt;Provided you have connected your Corprio company with a Line channel in GetStarted, you can check the broadcast message in your Line channel.&lt;/p&gt;.
+        /// </summary>
+        public static string tour_desc_PublishedInLine {
+            get {
+                return ResourceManager.GetString("tour_desc_PublishedInLine", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;video autoplay loop style=&apos;max-width:100%;max-height:50vh;&apos;&gt;&lt;source src=&apos;/images/publish_product.webm&apos; type=&apos;video/webm&apos; /&gt;&lt;/video&gt;&lt;div&gt;After clicking the publication button, review the message that will be posted to your social media. Then, click &apos;Confirm.&apos;.&lt;/div&gt;.
+        /// </summary>
+        public static string tour_desc_PublishProductDemo {
+            get {
+                return ResourceManager.GetString("tour_desc_PublishProductDemo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Don&apos;t forget to click save when you done with configuring Corprio-SocialMediaMarketer..
+        /// </summary>
+        public static string tour_desc_SaveButton {
+            get {
+                return ResourceManager.GetString("tour_desc_SaveButton", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Select the product you would like to publish and click the corresponding icon in this column..
         /// </summary>
-        public static string Tour_PublishCol_Desc {
+        public static string tour_desc_SelectProduct {
             get {
-                return ResourceManager.GetString("Tour_PublishCol_Desc", resourceCulture);
+                return ResourceManager.GetString("tour_desc_SelectProduct", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to If you wish to have re-run site tour, simply click this button..
+        ///   Looks up a localized string similar to Once you have connected your Corprio company with your Facebook account and/or Line channels, a chatbot can handle messages your customers send to your Facebook pages, Instagram accounts and/or Line channels. That chatbot will create sales orders according to your settings here..
         /// </summary>
-        public static string Tour_Rerun {
+        public static string tour_desc_SomSection {
             get {
-                return ResourceManager.GetString("Tour_Rerun", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Don&apos;t forget to click save when you done with configuring {0}..
-        /// </summary>
-        public static string Tour_SaveButton_Desc {
-            get {
-                return ResourceManager.GetString("Tour_SaveButton_Desc", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Once you have connected your company with your Facebook account, a chatbot can handle messages your customers send to your Facebook pages and Instagram accounts. That chatbot will create sales orders according to your settings here..
-        /// </summary>
-        public static string Tour_SomSection_Desc {
-            get {
-                return ResourceManager.GetString("Tour_SomSection_Desc", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Define how your products/catalogues will be posted to your social media..
-        /// </summary>
-        public static string Tour_TemplateSection_Desc {
-            get {
-                return ResourceManager.GetString("Tour_TemplateSection_Desc", resourceCulture);
+                return ResourceManager.GetString("tour_desc_SomSection", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Define the thank-you message that you want to display to your customer after they complete checkout..
         /// </summary>
-        public static string Tour_ThankyouSection_Desc {
+        public static string tour_desc_ThankyouSection {
             get {
-                return ResourceManager.GetString("Tour_ThankyouSection_Desc", resourceCulture);
+                return ResourceManager.GetString("tour_desc_ThankyouSection", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Welcome to {0}..
+        ///   Looks up a localized string similar to Welcome to Corprio-SocialMediaMarketer..
         /// </summary>
-        public static string Tour_Welcome_Desc {
+        public static string tour_desc_Welcome {
             get {
-                return ResourceManager.GetString("Tour_Welcome_Desc", resourceCulture);
+                return ResourceManager.GetString("tour_desc_Welcome", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Edit broadcast message&apos;s header.
+        /// </summary>
+        public static string tour_title_BroadcastSetting {
+            get {
+                return ResourceManager.GetString("tour_title_BroadcastSetting", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Configure checkout page.
+        /// </summary>
+        public static string tour_title_CheckoutSection {
+            get {
+                return ResourceManager.GetString("tour_title_CheckoutSection", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Connect with Facebook.
+        /// </summary>
+        public static string tour_title_ConnectFacebook {
+            get {
+                return ResourceManager.GetString("tour_title_ConnectFacebook", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Connect with Line.
+        /// </summary>
+        public static string tour_title_ConnectLine {
+            get {
+                return ResourceManager.GetString("tour_title_ConnectLine", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Set up delivery method.
+        /// </summary>
+        public static string tour_title_DeliverySection {
+            get {
+                return ResourceManager.GetString("tour_title_DeliverySection", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Disconnect from Facebook.
+        /// </summary>
+        public static string tour_title_DisconnectFacebook {
+            get {
+                return ResourceManager.GetString("tour_title_DisconnectFacebook", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Configuration.
+        /// </summary>
+        public static string tour_title_GetStarted {
+            get {
+                return ResourceManager.GetString("tour_title_GetStarted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Add your Line channel as friend.
+        /// </summary>
+        public static string tour_title_HowToAddMyLineChannel {
+            get {
+                return ResourceManager.GetString("tour_title_HowToAddMyLineChannel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Set up payment method.
+        /// </summary>
+        public static string tour_title_PaymentSection {
+            get {
+                return ResourceManager.GetString("tour_title_PaymentSection", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Publish your products.
+        /// </summary>
+        public static string tour_title_ProductPublication {
+            get {
+                return ResourceManager.GetString("tour_title_ProductPublication", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Edit message template.
+        /// </summary>
+        public static string tour_title_ProductSetting {
+            get {
+                return ResourceManager.GetString("tour_title_ProductSetting", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Publication button.
+        /// </summary>
+        public static string tour_title_PublishButton {
+            get {
+                return ResourceManager.GetString("tour_title_PublishButton", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Post in Facebook.
+        /// </summary>
+        public static string tour_title_PublishedInFacebook {
+            get {
+                return ResourceManager.GetString("tour_title_PublishedInFacebook", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Post in Instagram.
+        /// </summary>
+        public static string tour_title_PublishedInInstagram {
+            get {
+                return ResourceManager.GetString("tour_title_PublishedInInstagram", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Broadcast in Line.
+        /// </summary>
+        public static string tour_title_PublishedInLine {
+            get {
+                return ResourceManager.GetString("tour_title_PublishedInLine", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Demo.
+        /// </summary>
+        public static string tour_title_PublishProductDemo {
+            get {
+                return ResourceManager.GetString("tour_title_PublishProductDemo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Save.
+        /// </summary>
+        public static string tour_title_SaveButton {
+            get {
+                return ResourceManager.GetString("tour_title_SaveButton", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Select product.
+        /// </summary>
+        public static string tour_title_SelectProduct {
+            get {
+                return ResourceManager.GetString("tour_title_SelectProduct", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Manage how sales orders are created.
+        /// </summary>
+        public static string tour_title_SomSection {
+            get {
+                return ResourceManager.GetString("tour_title_SomSection", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Define thank-you message.
+        /// </summary>
+        public static string tour_title_ThankyouSection {
+            get {
+                return ResourceManager.GetString("tour_title_ThankyouSection", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Welcome.
         /// </summary>
-        public static string Tour_Welcome_Title {
+        public static string tour_title_Welcome {
             get {
-                return ResourceManager.GetString("Tour_Welcome_Title", resourceCulture);
+                return ResourceManager.GetString("tour_title_Welcome", resourceCulture);
             }
         }
         

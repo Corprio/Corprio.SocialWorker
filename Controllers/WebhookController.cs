@@ -548,11 +548,11 @@ namespace Corprio.SocialWorker.Controllers
                     if (page?.FacebookUser?.OrganizationID == null)
                     {
                         // apparently Facebook may send multiple notifications for the same message,
-                        // each of which uses a different sender ID and receipient ID to represent the same sender and receipient
+                        // each of which uses a different sender ID and recipient ID to represent the same sender and recipient
                         Log.Error($"Failed to find page, and its associated objects, based on recipient ID {messaging.Recipient.MetaID}.");
                         continue;
                     }
-                    Log.Information($"Found relevant page with receipientID: {messaging.Recipient.MetaID}; senderID: {messaging.Sender.MetaID}, message: {messaging.Message.Text}");
+                    Log.Information($"Found relevant page with recipientID: {messaging.Recipient.MetaID}; senderID: {messaging.Sender.MetaID}, message: {messaging.Message.Text}");
 
                     setting = await applicationSettingService.GetSetting<ApplicationSetting>(page.FacebookUser.OrganizationID);
 
