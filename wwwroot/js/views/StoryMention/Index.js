@@ -260,8 +260,8 @@ function getPages() {
 window.fbAsyncInit = function () {
     FB.init({
         appId: vdata.settings.metaApiID,
-        cookie: true,
-        xfbml: true,
+        cookie: true, // Enable cookies to allow the server to access the session.
+        xfbml: true, // Parse social plugins on this webpage.
         version: vdata.settings.metaApiVersion
     });
     FB.getLoginStatus(function (response) {

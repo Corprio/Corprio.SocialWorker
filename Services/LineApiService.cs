@@ -113,13 +113,11 @@ namespace Corprio.SocialWorker.Services
         /// <returns></returns>
         public async Task SetWebhookEndpoint()
         {            
-            string baseUrl = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Production" 
-                ? _configuration["AppBaseUrl"] 
-                : _configuration["WebhookCallbackUrl"];  // this URL is not local host
+            string callbackUrl = _configuration["WebhookCallbackUrl"];
 
             await LineApiRequest(method: HttpMethod.Put, 
                 endPoint: "v2/bot/channel/webhook/endpoint", 
-                json: new { endpoint = $"{baseUrl}/{_channel.OrganizationID}/{_channel.ID}/line" });
+                json: new { endpoint = $"{callbackUrl}/{_channel.OrganizationID}/{_channel.ID}/line" });
         }
 
         /// <summary>
